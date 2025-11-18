@@ -1,0 +1,317 @@
+# Control Horario - Sistema de Control Horario
+# Escuela de Música
+
+## 📋 Contexto del Proyecto
+
+Sistema de control horario para escuela de música con ~500 empleados (docentes y no docentes).
+Stack: Flutter Web + Firebase + Riverpod
+
+**FASE ACTUAL: FASE 1 - UI/UX Design Only**
+No implementar lógica de negocio ni Firebase aún. Solo interfaces visuales con datos mock.
+
+---
+
+## 🏗️ Arquitectura del Proyecto
+
+### Estructura de carpetas OBLIGATORIA:
+
+```
+lib/
+  ├── main.dart
+  ├── app.dart                    # MaterialApp principal
+  │
+  ├── core/                       # Configuración y utilidades
+  │   ├── theme/
+  │   │   ├── app_colors.dart     # Paleta de colores
+  │   │   ├── app_text_styles.dart # Tipografías
+  │   │   ├── app_theme.dart      # ThemeData completo
+  │   │   └── app_spacing.dart    # Espaciados consistentes
+  │   ├── constants/
+  │   │   ├── app_constants.dart  # Constantes generales
+  │   │   └── breakpoints.dart    # Responsive breakpoints
+  │   └── router/
+  │       └── app_router.dart     # Navegación (go_router)
+  │
+  ├── features/                   # Organizado por features
+  │   ├── auth/
+  │   │   ├── presentation/       # UI (screens + widgets)
+  │   │   ├── providers/          # Riverpod providers (Fase 2)
+  │   │   └── models/             # Models (Fase 2)
+  │   ├── dashboard/
+  │   │   ├── presentation/
+  │   │   ├── providers/
+  │   │   └── models/
+  │   └── admin/
+  │       ├── presentation/
+  │       ├── providers/
+  │       └── models/
+  │
+  ├── shared/                     # Widgets y utilidades compartidas
+  │   ├── widgets/                # Componentes reutilizables
+  │   │   ├── buttons/
+  │   │   ├── cards/
+  │   │   ├── inputs/
+  │   │   └── layouts/
+  │   └── utils/                  # Helpers, extensions
+  │
+  └── services/                   # Servicios externos (Fase 2)
+      ├── firebase/
+      └── api/
+```
+
+---
+
+## 🎨 FASE 1: Solo Diseño UI/UX (ACTUAL)
+
+### Principios ESTRICTOS:
+
+1. **SEPARACIÓN UI/LÓGICA:**
+   - Widgets en `/presentation` NO contienen lógica de negocio
+   - Solo reciben datos via props
+   - Emiten eventos via callbacks: `onPressed`, `onChanged`
+   - Usar datos MOCK hardcoded dentro de los widgets
+
+2. **NO implementar aún:**
+   - ❌ Riverpod providers funcionales
+   - ❌ Conexiones a Firebase
+   - ❌ Autenticación real
+   - ❌ Navegación compleja
+   - ❌ Validaciones de formularios
+
+3. **SÍ implementar:**
+   - ✅ Theme system completo
+   - ✅ Widgets base reutilizables
+   - ✅ Layouts responsivos
+   - ✅ Pantallas con datos mock
+   - ✅ Animaciones y transiciones
+   - ✅ Estados visuales (loading, error, empty)
+
+4. **Marcar pendientes:**
+   ```dart
+   // TODO [FASE-2]: Conectar con AuthProvider
+   // TODO [FASE-2]: Validar con Firebase
+   // MOCK DATA: Reemplazar con datos reales en Fase 2
+   ```
+
+---
+
+## 📐 Sistema de Diseño
+
+### Paleta de Colores (Proyecto Libertad):
+
+```dart
+// core/theme/app_colors.dart
+class AppColors {
+  // Brand Colors
+  static const primary = Color(0xFF1E3A8A);      // Azul profundo
+  static const secondary = Color(0xFF7C3AED);    // Violeta
+  static const accent = Color(0xFFFB923C);       // Coral
+  
+  // Functional Colors
+  static const success = Color(0xFF10B981);      // Verde
+  static const warning = Color(0xFFF59E0B);      // Ámbar
+  static const error = Color(0xFFEF4444);        // Rojo
+  static const info = Color(0xFF3B82F6);         // Azul cielo
+  
+  // Surfaces
+  static const background = Color(0xFFF8FAFC);   // Gris muy claro
+  static const surface = Color(0xFFFFFFFF);      // Blanco
+  static const surfaceVariant = Color(0xFFF1F5F9);
+  
+  // Text
+  static const textPrimary = Color(0xFF0F172A);  // Casi negro
+  static const textSecondary = Color(0xFF64748B); // Gris
+  static const textTertiary = Color(0xFF94A3B8);
+  
+  // Borders
+  static const border = Color(0xFFE2E8F0);
+  static const borderLight = Color(0xFFF1F5F9);
+}
+```
+
+### Tipografía:
+- **Fuente**: Inter (Google Fonts)
+- **Pesos**: 400 (Regular), 500 (Medium), 600 (SemiBold), 700 (Bold)
+
+### Espaciado:
+- **Base unit**: 4px
+- **Scale**: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64
+
+---
+
+## 🔧 Reglas de Código
+
+### Nomenclatura:
+- **Archivos**: `snake_case.dart`
+- **Clases**: `PascalCase`
+- **Variables**: `camelCase`
+- **Constantes**: `SCREAMING_SNAKE_CASE` (solo para valores primitivos)
+- **Privados**: `_underscorePrefijo`
+
+### Estructura de Widgets:
+```dart
+class DashboardScreen extends ConsumerWidget {
+  const DashboardScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 1. Variables y constantes
+    // 2. Métodos helper (_buildSection)
+    // 3. Return Scaffold/Container
+  }
+  
+  // Métodos privados al final
+  Widget _buildSection() { ... }
+}
+```
+
+### Widgets Reutilizables:
+- Crear en `/shared/widgets/`
+- Documentar props con comentarios
+- Incluir ejemplo de uso en comentario
+- Mínimo 3 variantes (small, medium, large o primary, secondary, tertiary)
+
+```dart
+/// Botón personalizado del proyecto Libertad
+/// 
+/// Ejemplo:
+/// ```dart
+/// CustomButton(
+///   text: 'Entrar',
+///   variant: ButtonVariant.primary,
+///   onPressed: () {},
+/// )
+/// ```
+class CustomButton extends StatelessWidget {
+  // ...
+}
+```
+
+### Responsive Design:
+```dart
+class Breakpoints {
+  static const mobile = 640;
+  static const tablet = 768;
+  static const desktop = 1024;
+  static const wide = 1280;
+}
+
+// Uso:
+final isMobile = MediaQuery.of(context).size.width < Breakpoints.tablet;
+```
+
+---
+
+## 🎯 Prioridades de Desarrollo FASE 1
+
+### Sprint 1: Fundamentos (2-3 días)
+1. Setup del proyecto Flutter
+2. Sistema de Theme completo
+3. Widgets base: CustomButton, CustomTextField, CustomCard
+4. Layout base: AppBar, NavigationRail/Drawer
+
+### Sprint 2: Pantallas Auth (2 días)
+5. Login Screen (solo UI)
+6. Splash Screen
+7. Navegación básica
+
+### Sprint 3: Dashboard Empleado (3-4 días)
+8. Dashboard principal (diseño mostrado)
+9. Componentes de fichaje
+10. Resumen del día
+11. Tabla de registros recientes
+12. Calendario mensual
+
+### Sprint 4: Otras Pantallas (2-3 días)
+13. Perfil del empleado
+14. Configuración
+15. Panel admin básico (lista empleados)
+
+### Sprint 5: Polish (1-2 días)
+16. Animaciones y transiciones
+17. Estados de loading/error
+18. Responsive final
+19. Documentación de componentes
+
+---
+
+## 🚫 Restricciones y Buenas Prácticas
+
+### NO hacer:
+- ❌ Usar colores hardcoded (`Colors.blue`), usar siempre `AppColors.primary`
+- ❌ Usar valores de espaciado mágicos (`SizedBox(height: 23)`), usar `AppSpacing.md`
+- ❌ Widgets gigantes (+300 líneas), extraer a componentes
+- ❌ Lógica de negocio en widgets
+- ❌ `setState` excesivo, preparar para Riverpod
+- ❌ Imports absolutos, usar relativos dentro de features
+
+### SÍ hacer:
+- ✅ `const` constructors siempre que sea posible
+- ✅ Extraer magic numbers a constantes
+- ✅ Comentar TODOs para Fase 2
+- ✅ Widgets pequeños y enfocados
+- ✅ Separar UI de lógica desde el inicio
+- ✅ Pensar en modo responsive (mobile-first)
+
+---
+
+## 🤖 Instrucciones para Claude/Cursor
+
+Cuando el desarrollador pida crear código:
+
+1. **Verificar fase actual**: Estamos en FASE 1, solo UI
+2. **Seguir estructura de carpetas** exactamente como se define arriba
+3. **Usar el sistema de diseño** (colores, tipografías, espaciados)
+4. **Crear componentes reutilizables** cuando sea apropiado
+5. **Incluir comentarios** explicando la estructura
+6. **Marcar TODOs** para conexiones futuras con lógica
+7. **Mostrar ejemplo de uso** de widgets creados
+8. **Código limpio**: Preferir legibilidad sobre cleverness
+
+### Formato de respuesta:
+```
+[Breve explicación de lo que se va a crear]
+
+[Código con comentarios explicativos]
+
+[Ejemplo de uso si es componente reutilizable]
+
+[Notas sobre qué falta para Fase 2]
+```
+
+---
+
+## 📦 Dependencias Fase 1
+
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # State Management
+  flutter_riverpod: ^2.4.0
+  
+  # UI
+  google_fonts: ^6.1.0
+  
+  # Routing
+  go_router: ^12.0.0
+  
+  # Utils
+  intl: ^0.19.0  # Para formateo de fechas/horas
+
+dev_dependencies:
+  flutter_lints: ^3.0.0
+```
+
+---
+
+## 📝 Notas Finales
+
+- Este archivo guía TODO el desarrollo del proyecto
+- Actualizar cuando cambien requisitos
+- En Fase 2 se agregarán reglas de Firebase y Riverpod funcional
+- Mantener disciplina de separación UI/Lógica
+
+**Versión**: 1.0 - Fase 1 (UI Only)
+**Última actualización**: Noviembre 2025
