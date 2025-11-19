@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../core/constants/app_constants.dart';
 
 /// Variantes de elevación de card
 enum CardElevation {
@@ -111,41 +110,42 @@ class CustomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final card = Card(
-      elevation: _getElevationValue(),
-      color: backgroundColor ?? AppColors.surface,
-      shadowColor: AppColors.shadow,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(
-          borderRadius ?? AppSpacing.radiusMd,
-        ),
-        side: borderColor != null
-            ? BorderSide(
+    final radius = borderRadius ?? AppSpacing.radiusMd;
+    
+    // Usar Container con BoxShadow personalizado para mejor control
+    final card = Container(
+      width: width,
+      height: height,
+      margin: margin ?? EdgeInsets.zero,
+      decoration: BoxDecoration(
+        color: backgroundColor ?? AppColors.surface,
+        borderRadius: BorderRadius.circular(radius),
+        border: borderColor != null
+            ? Border.all(
                 color: borderColor!,
                 width: borderWidth,
               )
-            : BorderSide.none,
+            : null,
+        boxShadow: _getBoxShadow(),
       ),
-      margin: margin ?? EdgeInsets.zero,
-      clipBehavior: clipBehavior,
-      child: Container(
-        width: width,
-        height: height,
-        padding: padding ?? AppSpacing.card,
-        child: child,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(radius),
+        clipBehavior: clipBehavior,
+        child: Container(
+          padding: padding ?? AppSpacing.card,
+          child: child,
+        ),
       ),
     );
 
-    // Si es clickeable, envolver en InkWell
+    // Si es clickeable, envolver en Material + InkWell
     if (onTap != null || onLongPress != null) {
       return Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
           onLongPress: onLongPress,
-          borderRadius: BorderRadius.circular(
-            borderRadius ?? AppSpacing.radiusMd,
-          ),
+          borderRadius: BorderRadius.circular(radius),
           child: card,
         ),
       );
@@ -154,16 +154,44 @@ class CustomCard extends StatelessWidget {
     return card;
   }
 
-  double _getElevationValue() {
+  /// Obtiene la sombra según el nivel de elevación
+  /// 
+  /// Fase 1.5.1: Medium usa BoxShadow personalizado (opacity 0.10, blur 12)
+  List<BoxShadow> _getBoxShadow() {
     switch (elevation) {
       case CardElevation.none:
-        return AppConstants.elevationNone;
+        return [];
+      
       case CardElevation.low:
-        return AppConstants.elevationSm;
+        return [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 4.0,
+            offset: const Offset(0, 1),
+            spreadRadius: 0,
+          ),
+        ];
+      
       case CardElevation.medium:
-        return AppConstants.elevationMd;
+        // Fase 1.5.1: Elevación media personalizada para mejor contraste
+        return [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.10),
+            blurRadius: 12.0,
+            offset: const Offset(0, 4),
+            spreadRadius: 0,
+          ),
+        ];
+      
       case CardElevation.high:
-        return AppConstants.elevationLg;
+        return [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 20.0,
+            offset: const Offset(0, 8),
+            spreadRadius: 0,
+          ),
+        ];
     }
   }
 }

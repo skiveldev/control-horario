@@ -32,7 +32,7 @@ class _TimeClockCardState extends State<TimeClockCard> {
   @override
   Widget build(BuildContext context) {
     return CustomCard(
-      elevation: CardElevation.low,
+      elevation: CardElevation.medium,
       padding: AppSpacing.cardLarge,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

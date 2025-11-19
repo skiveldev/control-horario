@@ -23,7 +23,7 @@ class WeeklySummaryCard extends StatelessWidget {
     final days = summary['days'] as List<Map<String, dynamic>>;
 
     return CustomCard(
-      elevation: CardElevation.low,
+      elevation: CardElevation.medium,
       padding: AppSpacing.cardLarge,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

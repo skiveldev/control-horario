@@ -19,7 +19,7 @@ class QuickActionsCard extends StatelessWidget {
     final actions = MockData.quickActions;
 
     return CustomCard(
-      elevation: CardElevation.low,
+      elevation: CardElevation.medium,
       padding: AppSpacing.cardLarge,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -61,7 +61,7 @@ class _MonthlyCalendarCardState extends State<MonthlyCalendarCard> {
         _currentDate.month == DateTime.now().month;
 
     return CustomCard(
-      elevation: CardElevation.low,
+      elevation: CardElevation.medium,
       padding: AppSpacing.cardLarge,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

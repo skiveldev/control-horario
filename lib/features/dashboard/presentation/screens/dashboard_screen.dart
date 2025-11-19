@@ -16,13 +16,13 @@ import '../widgets/quick_actions_card.dart';
 /// 
 /// Muestra:
 /// - Header con información del empleado
-/// - Grid responsivo de cards (fichaje, resumen, registros, calendario)
+/// - Layout responsivo optimizado (Fase 1.5)
 /// - Acciones rápidas
 /// 
-/// Layout adaptativo:
-/// - Mobile: 1 columna
-/// - Tablet: 2 columnas
-/// - Desktop: 3 columnas
+/// Layout adaptativo mejorado:
+/// - Desktop: Multi-columna con sidebar sticky (60% + 25% + 15%)
+/// - Tablet: 2 columnas balanceadas (60/40)
+/// - Mobile: 1 columna vertical
 /// 
 /// MOCK DATA: Usa datos de MockData para simular la información
 /// TODO [FASE-2]: Conectar con providers reales de Riverpod
@@ -72,56 +72,195 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildDashboardGrid(BuildContext context) {
-    // Número de columnas según breakpoint
-    final columns = context.columns;
-    final gap = context.gridGap;
+    // Seleccionar layout según breakpoint (Fase 1.5)
+    if (context.isDesktop) {
+      return _buildDesktopLayout(context);
+    } else if (context.isMobile) {
+      return _buildMobileLayout(context);
+    } else {
+      return _buildTabletLayout(context);
+    }
+  }
 
+  // ==========================================================================
+  // DESKTOP LAYOUT (>1024px) - Fase 1.5
+  // ==========================================================================
+
+  Widget _buildDesktopLayout(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Calcular ancho de cada card
-        final totalGaps = (columns - 1) * gap;
-        final availableWidth = constraints.maxWidth - totalGaps;
-        final cardWidth = availableWidth / columns;
+        final width = constraints.maxWidth;
+        final gap = LayoutProportions.desktopGap;
 
-        return Wrap(
-          spacing: gap,
-          runSpacing: gap,
+        return Column(
           children: [
-            // Card de Fichaje (Completado)
-            SizedBox(
-              width: cardWidth,
-              child: const TimeClockCard(),
-            ),
+            // Row 1: TimeClock 60% + Summary 40%
+            _buildDesktopTopRow(context, width, gap),
+            
+            SizedBox(height: gap),
+            
+            // Row 2: Recent Records 100%
+            _buildDesktopRecordsRow(context, width, gap),
+            
+            SizedBox(height: gap),
+            
+            // Row 3: Calendar 30% + Weekly 35% + Actions 35% (Fase 1.5.1)
+            _buildDesktopBottomRow(context, width, gap),
+          ],
+        );
+      },
+    );
+  }
 
-            // Card de Resumen del Día (Completado)
-            SizedBox(
-              width: cardWidth,
-              child: const DaySummaryCard(),
-            ),
+  Widget _buildDesktopTopRow(BuildContext context, double width, double gap) {
+    final clockWidth = width * LayoutProportions.desktopTimeClockWidth - gap / 2;
+    final summaryWidth = width * (1 - LayoutProportions.desktopTimeClockWidth) - gap / 2;
 
-            // Card de Registros Recientes (Completado)
-            SizedBox(
-              width: cardWidth,
-              child: const RecentRecordsCard(),
-            ),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Time Clock Card (60%)
+        SizedBox(
+          width: clockWidth,
+          child: const TimeClockCard(),
+        ),
+        
+        SizedBox(width: gap),
+        
+        // Day Summary Card (40%)
+        SizedBox(
+          width: summaryWidth,
+          child: const DaySummaryCard(),
+        ),
+      ],
+    );
+  }
 
-            // Card de Calendario Mensual (Completado)
-            SizedBox(
-              width: cardWidth,
-              child: const MonthlyCalendarCard(),
-            ),
+  Widget _buildDesktopRecordsRow(BuildContext context, double width, double gap) {
+    // Recent Records al 100%
+    return const RecentRecordsCard();
+  }
 
-            // Card de Resumen Semanal (Completado)
-            SizedBox(
-              width: cardWidth,
-              child: const WeeklySummaryCard(),
-            ),
+  Widget _buildDesktopBottomRow(BuildContext context, double width, double gap) {
+    // Calcular anchos para 3 cards: 30% + 35% + 35% (Fase 1.5.1)
+    final calendarWidth = width * LayoutProportions.desktopCalendarWidth - gap * 2 / 3;
+    final weeklyWidth = width * LayoutProportions.desktopWeeklyWidth - gap * 2 / 3;
+    final actionsWidth = width * LayoutProportions.desktopActionsWidth - gap * 2 / 3;
 
-            // Card de Acciones Rápidas (Completado)
-            SizedBox(
-              width: cardWidth,
-              child: const QuickActionsCard(),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Monthly Calendar (30%)
+        SizedBox(
+          width: calendarWidth,
+          child: const MonthlyCalendarCard(),
+        ),
+        
+        SizedBox(width: gap),
+        
+        // Weekly Summary (35%)
+        SizedBox(
+          width: weeklyWidth,
+          child: const WeeklySummaryCard(),
+        ),
+        
+        SizedBox(width: gap),
+        
+        // Quick Actions (35%)
+        SizedBox(
+          width: actionsWidth,
+          child: const QuickActionsCard(),
+        ),
+      ],
+    );
+  }
+
+  // ==========================================================================
+  // MOBILE LAYOUT (<768px) - Fase 1.5
+  // ==========================================================================
+
+  Widget _buildMobileLayout(BuildContext context) {
+    final gap = LayoutProportions.mobileGap;
+
+    return Column(
+      children: [
+        const TimeClockCard(),
+        SizedBox(height: gap),
+        
+        const DaySummaryCard(),
+        SizedBox(height: gap),
+        
+        const RecentRecordsCard(),
+        SizedBox(height: gap),
+        
+        const MonthlyCalendarCard(),
+        SizedBox(height: gap),
+        
+        const WeeklySummaryCard(),
+        SizedBox(height: gap),
+        
+        const QuickActionsCard(),
+      ],
+    );
+  }
+
+  // ==========================================================================
+  // TABLET LAYOUT (768-1024px) - Fase 1.5
+  // ==========================================================================
+
+  Widget _buildTabletLayout(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final gap = LayoutProportions.tabletGap;
+        final primaryWidth = width * LayoutProportions.tabletPrimaryWidth - gap / 2;
+        final secondaryWidth = width * LayoutProportions.tabletSecondaryWidth - gap / 2;
+
+        return Column(
+          children: [
+            // Row 1: TimeClock 60% + Summary 40%
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: primaryWidth,
+                  child: const TimeClockCard(),
+                ),
+                SizedBox(width: gap),
+                SizedBox(
+                  width: secondaryWidth,
+                  child: const DaySummaryCard(),
+                ),
+              ],
             ),
+            
+            SizedBox(height: gap),
+            
+            // Row 2: Recent Records 100%
+            const RecentRecordsCard(),
+            
+            SizedBox(height: gap),
+            
+            // Row 3: Calendar 50% + Weekly 50%
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: width * 0.5 - gap / 2,
+                  child: const MonthlyCalendarCard(),
+                ),
+                SizedBox(width: gap),
+                SizedBox(
+                  width: width * 0.5 - gap / 2,
+                  child: const WeeklySummaryCard(),
+                ),
+              ],
+            ),
+            
+            SizedBox(height: gap),
+            
+            // Row 4: Quick Actions 100%
+            const QuickActionsCard(),
           ],
         );
       },

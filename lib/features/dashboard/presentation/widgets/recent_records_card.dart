@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/constants/breakpoints.dart';
 import '../../../../core/constants/mock_data.dart';
 import '../../../../shared/widgets/cards/custom_card.dart';
 import 'records_table.dart';
@@ -17,11 +18,13 @@ class RecentRecordsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Datos mock
-    final records = MockData.recentRecords;
+    // Datos mock - Limitar según breakpoint (Fase 1.5)
+    final allRecords = MockData.recentRecords;
+    final maxRecords = context.isMobile ? 3 : 5; // 3 en mobile, 5 en tablet/desktop
+    final records = allRecords.take(maxRecords).toList();
 
     return CustomCard(
-      elevation: CardElevation.low,
+      elevation: CardElevation.medium,
       padding: AppSpacing.cardLarge,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,7 +101,7 @@ class RecentRecordsCard extends StatelessWidget {
                 AppSpacing.horizontalSpaceSm,
                 Expanded(
                   child: Text(
-                    'Mostrando los últimos 5 registros. Ver historial completo para más.',
+                    'Mostrando los últimos ${records.length} registros. Ver historial completo para más.',
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.info,
                     ),

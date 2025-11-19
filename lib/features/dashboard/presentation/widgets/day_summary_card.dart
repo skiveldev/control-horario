@@ -31,7 +31,7 @@ class DaySummaryCard extends StatelessWidget {
     final estimatedExit = summary['estimatedExit'] as String;
 
     return CustomCard(
-      elevation: CardElevation.low,
+      elevation: CardElevation.medium,
       padding: AppSpacing.cardLarge,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
