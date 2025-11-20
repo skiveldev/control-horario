@@ -34,7 +34,7 @@ class RecordStatusBadge extends StatelessWidget {
       return Container(
         padding: AppSpacing.allXs,
         decoration: BoxDecoration(
-          color: data['color'].withOpacity(0.1),
+          color: data['color'].withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
         child: Icon(
@@ -51,10 +51,10 @@ class RecordStatusBadge extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: (data['color'] as Color).withOpacity(0.1),
+        color: (data['color'] as Color).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
         border: Border.all(
-          color: (data['color'] as Color).withOpacity(0.3),
+          color: (data['color'] as Color).withValues(alpha: 0.3),
           width: 1,
         ),
       ),

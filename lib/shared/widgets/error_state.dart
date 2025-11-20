@@ -154,7 +154,7 @@ class ErrorState extends StatelessWidget {
           Container(
             padding: AppSpacing.allXl,
             decoration: BoxDecoration(
-              color: (iconColor ?? AppColors.error).withOpacity(0.1),
+              color: (iconColor ?? AppColors.error).withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(

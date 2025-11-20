@@ -88,7 +88,7 @@ class StatCard extends StatelessWidget {
           Container(
             padding: AppSpacing.allSm,
             decoration: BoxDecoration(
-              color: mainColor.withOpacity(0.1),
+              color: mainColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
             ),
             child: Icon(
@@ -137,7 +137,7 @@ class StatCard extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: (trendPositive ? AppColors.success : AppColors.error)
-                        .withOpacity(0.1),
+                        .withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                   ),
                   child: Row(

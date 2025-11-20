@@ -298,9 +298,15 @@ class CustomButton extends StatelessWidget {
       children.add(AppSpacing.horizontalSpaceSm);
     }
 
-    // Texto
+    // Texto - envuelto en Flexible para evitar overflow
     children.add(
-      Text(text),
+      Flexible(
+        child: Text(
+          text,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+        ),
+      ),
     );
 
     // Ícono derecho

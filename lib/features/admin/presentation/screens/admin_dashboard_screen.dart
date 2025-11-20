@@ -182,7 +182,7 @@ class AdminDashboardScreen extends StatelessWidget {
           border: Border.all(color: AppColors.border),
           boxShadow: [
             BoxShadow(
-              color: AppColors.shadow.withOpacity(0.05),
+              color: AppColors.shadow.withValues(alpha: 0.05),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -193,7 +193,7 @@ class AdminDashboardScreen extends StatelessWidget {
             Container(
               padding: AppSpacing.allMd,
               decoration: BoxDecoration(
-                color: (item['color'] as Color).withOpacity(0.1),
+                color: (item['color'] as Color).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
               ),
               child: Icon(

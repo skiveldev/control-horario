@@ -244,6 +244,9 @@ final isMobile = MediaQuery.of(context).size.width < Breakpoints.tablet;
 - ❌ Lógica de negocio en widgets
 - ❌ `setState` excesivo, preparar para Riverpod
 - ❌ Imports absolutos, usar relativos dentro de features
+- ❌ **Text directo en Row sin Flexible/Expanded** → causa overflow
+- ❌ **APIs deprecadas** (`.withOpacity()`, `MaterialStateProperty`, etc.)
+- ❌ **Asumir anchos fijos** en layouts responsivos
 
 ### SÍ hacer:
 - ✅ `const` constructors siempre que sea posible
@@ -252,6 +255,114 @@ final isMobile = MediaQuery.of(context).size.width < Breakpoints.tablet;
 - ✅ Widgets pequeños y enfocados
 - ✅ Separar UI de lógica desde el inicio
 - ✅ Pensar en modo responsive (mobile-first)
+- ✅ **Siempre envolver Text en Flexible cuando esté en Row/Column**
+- ✅ **Usar `.withValues(alpha:)` en lugar de `.withOpacity()`**
+- ✅ **Usar `WidgetStateProperty` en lugar de `MaterialStateProperty`**
+- ✅ **Calcular anchos responsivos: (total - gaps) * proportion**
+
+### Workflow de Git (CRÍTICO):
+- ✅ **SIEMPRE probar código ANTES de hacer commit**
+- ✅ Ejecutar `flutter run` y verificar que no hay errores
+- ✅ Verificar que no hay overflow warnings
+- ✅ Revisar linter (`dart analyze` o `read_lints`)
+- ✅ Solo después de pruebas exitosas: `git commit`
+- ❌ **NUNCA hacer commit de código no probado**
+- ❌ **NUNCA asumir que el código funciona sin ejecutarlo**
+
+**Secuencia obligatoria:**
+1. Hacer cambios en código
+2. Ejecutar `flutter run -d chrome`
+3. Probar funcionalidad y responsive
+4. Verificar consola sin errores y warnings
+5. Ejecutar `dart analyze` para deprecated warnings
+6. Si todo OK → `git add` + `git commit`
+7. Si hay errores → corregir y volver a paso 2
+
+---
+
+## 🛡️ Prevención de Errores Comunes
+
+### Overflow Prevention (RenderFlex overflowed)
+
+**Problema**: Text dentro de Row/Column causa overflow al redimensionar.
+
+**Reglas obligatorias:**
+```dart
+// ❌ MAL - Causa overflow
+Row(
+  children: [
+    Icon(Icons.star),
+    Text('Texto largo que puede causar overflow'),
+  ],
+)
+
+// ✅ BIEN - Previene overflow
+Row(
+  children: [
+    Icon(Icons.star),
+    Flexible(
+      child: Text(
+        'Texto largo que puede causar overflow',
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+      ),
+    ),
+  ],
+)
+```
+
+**Checklist antes de commit:**
+- [ ] Todo Text en Row/Column está en Flexible o Expanded
+- [ ] Probado redimensionando ventana (mobile → desktop)
+- [ ] Sin warnings "RenderFlex overflowed" en consola
+
+### Deprecated APIs (Flutter 3.18+)
+
+**APIs deprecadas y sus reemplazos:**
+
+```dart
+// ❌ DEPRECATED
+color.withOpacity(0.5)
+MaterialStateProperty.all(value)
+MaterialState.selected
+colorScheme.background
+colorScheme.onBackground
+
+// ✅ CORRECTO (Flutter 3.18+)
+color.withValues(alpha: 0.5)
+WidgetStateProperty.all(value)
+WidgetState.selected
+colorScheme.surface
+colorScheme.onSurface
+```
+
+**Checklist antes de commit:**
+- [ ] Ejecutar `dart analyze --fatal-infos`
+- [ ] Verificar 0 warnings de deprecated_member_use
+- [ ] Buscar en código: `.withOpacity(` → reemplazar por `.withValues(alpha:`
+
+### Layout Responsivo
+
+**Problema**: Anchos fijos o cálculos incorrectos de proporciones.
+
+**Fórmula correcta para layouts con gaps:**
+```dart
+// Para N elementos con (N-1) gaps:
+final availableWidth = totalWidth - (gaps * (N - 1));
+final elementWidth = availableWidth * proportion;
+
+// ❌ MAL
+final width1 = totalWidth * 0.6 - gap / 2;  // Incorrecto
+
+// ✅ BIEN  
+final availableWidth = totalWidth - gap;
+final width1 = availableWidth * 0.6;
+```
+
+**Checklist:**
+- [ ] Usar LayoutBuilder para obtener constraints
+- [ ] Restar gaps ANTES de multiplicar por proporciones
+- [ ] Probar en múltiples resoluciones
 
 ---
 

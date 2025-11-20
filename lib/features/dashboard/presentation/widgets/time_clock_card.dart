@@ -46,9 +46,12 @@ class _TimeClockCardState extends State<TimeClockCard> {
                 color: AppColors.primary,
               ),
               AppSpacing.horizontalSpaceSm,
-              Text(
-                'Registro de Jornada',
-                style: AppTextStyles.h5,
+              Flexible(
+                child: Text(
+                  'Registro de Jornada',
+                  style: AppTextStyles.h5,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
@@ -67,7 +70,7 @@ class _TimeClockCardState extends State<TimeClockCard> {
               vertical: AppSpacing.md,
             ),
             decoration: BoxDecoration(
-              color: _getStatusColor().withOpacity(0.1),
+              color: _getStatusColor().withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
             ),
             child: Row(

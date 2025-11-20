@@ -111,7 +111,7 @@ class CalendarGrid extends StatelessWidget {
       textColor = AppColors.textOnPrimary;
     } else if (hasSpecialType) {
       final typeColor = _getColorForType(specialType);
-      backgroundColor = typeColor.withOpacity(0.2);
+      backgroundColor = typeColor.withValues(alpha: 0.2);
       borderColor = typeColor;
       textColor = typeColor;
     }

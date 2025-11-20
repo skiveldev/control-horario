@@ -108,7 +108,7 @@ class EmptyState extends StatelessWidget {
           Container(
             padding: AppSpacing.allXl,
             decoration: BoxDecoration(
-              color: (iconColor ?? AppColors.textTertiary).withOpacity(0.1),
+              color: (iconColor ?? AppColors.textTertiary).withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(

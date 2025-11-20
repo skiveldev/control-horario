@@ -110,7 +110,7 @@ class InfoCard extends StatelessWidget {
               Container(
                 padding: AppSpacing.allSm,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
                 child: Icon(

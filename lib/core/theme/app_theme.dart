@@ -62,9 +62,9 @@ class AppTheme {
         onSurface: AppColors.textPrimary,
         surfaceContainerHighest: AppColors.surfaceVariant,
         
-        // Background
-        background: AppColors.background,
-        onBackground: AppColors.textPrimary,
+        // Background - deprecated, usando surface en su lugar
+        // background: AppColors.background,  // DEPRECATED en Flutter 3.18+
+        // onBackground: AppColors.textPrimary, // DEPRECATED en Flutter 3.18+
         
         // Error
         error: AppColors.error,
@@ -288,13 +288,13 @@ class AppTheme {
       // CHECKBOX
       // ========================================================================
       checkboxTheme: CheckboxThemeData(
-        fillColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return AppColors.primary;
           }
           return AppColors.border;
         }),
-        checkColor: MaterialStateProperty.all(AppColors.textOnPrimary),
+        checkColor: WidgetStateProperty.all(AppColors.textOnPrimary),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
         ),
@@ -304,8 +304,8 @@ class AppTheme {
       // RADIO
       // ========================================================================
       radioTheme: RadioThemeData(
-        fillColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return AppColors.primary;
           }
           return AppColors.border;
@@ -316,14 +316,14 @@ class AppTheme {
       // SWITCH
       // ========================================================================
       switchTheme: SwitchThemeData(
-        thumbColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return AppColors.primary;
           }
           return AppColors.border;
         }),
-        trackColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return AppColors.primaryLight;
           }
           return AppColors.borderLight;

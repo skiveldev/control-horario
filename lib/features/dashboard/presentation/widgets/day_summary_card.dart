@@ -45,9 +45,12 @@ class DaySummaryCard extends StatelessWidget {
                 color: AppColors.info,
               ),
               AppSpacing.horizontalSpaceSm,
-              Text(
-                'Resumen del Día',
-                style: AppTextStyles.h5,
+              Flexible(
+                child: Text(
+                  'Resumen del Día',
+                  style: AppTextStyles.h5,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
@@ -131,10 +134,10 @@ class DaySummaryCard extends StatelessWidget {
         vertical: AppSpacing.md,
       ),
       decoration: BoxDecoration(
-        color: AppColors.warning.withOpacity(0.1),
+        color: AppColors.warning.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
         border: Border.all(
-          color: AppColors.warning.withOpacity(0.3),
+          color: AppColors.warning.withValues(alpha: 0.3),
           width: 1,
         ),
       ),

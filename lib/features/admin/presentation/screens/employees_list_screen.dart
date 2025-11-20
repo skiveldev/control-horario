@@ -200,7 +200,7 @@ class _EmployeesListScreenState extends State<EmployeesListScreen> {
         });
       },
       backgroundColor: AppColors.surfaceVariant,
-      selectedColor: AppColors.primary.withOpacity(0.1),
+      selectedColor: AppColors.primary.withValues(alpha: 0.1),
       checkmarkColor: AppColors.primary,
       labelStyle: AppTextStyles.labelMedium.copyWith(
         color: isSelected ? AppColors.primary : AppColors.textPrimary,

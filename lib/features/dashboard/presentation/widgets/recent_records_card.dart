@@ -33,19 +33,24 @@ class RecentRecordsCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.history,
-                    size: AppSpacing.iconMd,
-                    color: AppColors.secondary,
-                  ),
-                  AppSpacing.horizontalSpaceSm,
-                  Text(
-                    'Registros Recientes',
-                    style: AppTextStyles.h5,
-                  ),
-                ],
+              Flexible(
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.history,
+                      size: AppSpacing.iconMd,
+                      color: AppColors.secondary,
+                    ),
+                    AppSpacing.horizontalSpaceSm,
+                    Flexible(
+                      child: Text(
+                        'Registros Recientes',
+                        style: AppTextStyles.h5,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
 
               // Botón ver todo
@@ -88,7 +93,7 @@ class RecentRecordsCard extends StatelessWidget {
           Container(
             padding: AppSpacing.allMd,
             decoration: BoxDecoration(
-              color: AppColors.info.withOpacity(0.1),
+              color: AppColors.info.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
             ),
             child: Row(

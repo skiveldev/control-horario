@@ -164,7 +164,7 @@ class LoadingOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black.withOpacity(opacity),
+      color: Colors.black.withValues(alpha: opacity),
       child: Center(
         child: Container(
           padding: AppSpacing.allXxl,

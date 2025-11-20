@@ -57,7 +57,7 @@ class EmployeeHeader extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow.withOpacity(0.05),
+            color: AppColors.shadow.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -81,7 +81,7 @@ class EmployeeHeader extends StatelessWidget {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.2),
+                          color: AppColors.primary.withValues(alpha: 0.2),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -243,26 +243,26 @@ class EmployeeHeader extends StatelessWidget {
 
     switch (status) {
       case 'activo':
-        backgroundColor = AppColors.success.withOpacity(0.1);
+        backgroundColor = AppColors.success.withValues(alpha: 0.1);
         textColor = AppColors.success;
         label = 'Activo';
         icon = Icons.access_time;
         break;
       case 'en_pausa':
-        backgroundColor = AppColors.warning.withOpacity(0.1);
+        backgroundColor = AppColors.warning.withValues(alpha: 0.1);
         textColor = AppColors.warning;
         label = 'En pausa';
         icon = Icons.pause_circle_outline;
         break;
       case 'completo':
-        backgroundColor = AppColors.info.withOpacity(0.1);
+        backgroundColor = AppColors.info.withValues(alpha: 0.1);
         textColor = AppColors.info;
         label = 'Completo';
         icon = Icons.check_circle_outline;
         break;
       case 'sin_fichar':
       default:
-        backgroundColor = AppColors.textTertiary.withOpacity(0.1);
+        backgroundColor = AppColors.textTertiary.withValues(alpha: 0.1);
         textColor = AppColors.textTertiary;
         label = 'Fuera de horario';
         icon = Icons.access_time_outlined;

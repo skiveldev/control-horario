@@ -32,7 +32,7 @@ class LoginHeader extends StatelessWidget {
           Container(
             padding: AppSpacing.allLg,
             decoration: BoxDecoration(
-              color: AppColors.textOnPrimary.withOpacity(0.2),
+              color: AppColors.textOnPrimary.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -59,7 +59,7 @@ class LoginHeader extends StatelessWidget {
           Text(
             'Inicia sesión para gestionar tu tiempo',
             style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textOnPrimary.withOpacity(0.9),
+              color: AppColors.textOnPrimary.withValues(alpha: 0.9),
             ),
             textAlign: TextAlign.center,
           ),

@@ -37,9 +37,12 @@ class WeeklySummaryCard extends StatelessWidget {
                 color: AppColors.info,
               ),
               AppSpacing.horizontalSpaceSm,
-              Text(
-                'Esta Semana',
-                style: AppTextStyles.h5,
+              Flexible(
+                child: Text(
+                  'Esta Semana',
+                  style: AppTextStyles.h5,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
@@ -170,7 +173,7 @@ class WeeklySummaryCard extends StatelessWidget {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: barColor.withOpacity(0.3),
+                          color: barColor.withValues(alpha: 0.3),
                           blurRadius: 4,
                           offset: const Offset(0, 2),
                         ),

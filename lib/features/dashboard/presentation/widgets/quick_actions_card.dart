@@ -33,9 +33,12 @@ class QuickActionsCard extends StatelessWidget {
                 color: AppColors.accent,
               ),
               AppSpacing.horizontalSpaceSm,
-              Text(
-                'Acciones Rápidas',
-                style: AppTextStyles.h5,
+              Flexible(
+                child: Text(
+                  'Acciones Rápidas',
+                  style: AppTextStyles.h5,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
@@ -81,12 +84,12 @@ class QuickActionsCard extends StatelessWidget {
         padding: AppSpacing.allMd,
         decoration: BoxDecoration(
           color: isEnabled
-              ? color.withOpacity(0.05)
-              : AppColors.surfaceVariant.withOpacity(0.5),
+              ? color.withValues(alpha: 0.05)
+              : AppColors.surfaceVariant.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
           border: Border.all(
             color: isEnabled
-                ? color.withOpacity(0.2)
+                ? color.withValues(alpha: 0.2)
                 : AppColors.border,
             width: 1,
           ),
@@ -98,7 +101,7 @@ class QuickActionsCard extends StatelessWidget {
               padding: AppSpacing.allSm,
               decoration: BoxDecoration(
                 color: isEnabled
-                    ? color.withOpacity(0.1)
+                    ? color.withValues(alpha: 0.1)
                     : AppColors.borderLight,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
               ),
@@ -140,7 +143,7 @@ class QuickActionsCard extends StatelessWidget {
                   vertical: AppSpacing.xs,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.textTertiary.withOpacity(0.1),
+                  color: AppColors.textTertiary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                 ),
                 child: Text(

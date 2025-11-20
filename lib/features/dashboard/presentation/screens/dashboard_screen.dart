@@ -113,8 +113,10 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildDesktopTopRow(BuildContext context, double width, double gap) {
-    final clockWidth = width * LayoutProportions.desktopTimeClockWidth - gap / 2;
-    final summaryWidth = width * (1 - LayoutProportions.desktopTimeClockWidth) - gap / 2;
+    // Para 2 elementos con 1 gap: (width - 1*gap) * proportion
+    final availableWidth = width - gap;
+    final clockWidth = availableWidth * LayoutProportions.desktopTimeClockWidth;
+    final summaryWidth = availableWidth * (1 - LayoutProportions.desktopTimeClockWidth);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,10 +144,11 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildDesktopBottomRow(BuildContext context, double width, double gap) {
-    // Calcular anchos para 3 cards: 30% + 35% + 35% (Fase 1.5.1)
-    final calendarWidth = width * LayoutProportions.desktopCalendarWidth - gap * 2 / 3;
-    final weeklyWidth = width * LayoutProportions.desktopWeeklyWidth - gap * 2 / 3;
-    final actionsWidth = width * LayoutProportions.desktopActionsWidth - gap * 2 / 3;
+    // Para 3 elementos con 2 gaps: (width - 2*gap) * proportion
+    final availableWidth = width - (2 * gap);
+    final calendarWidth = availableWidth * LayoutProportions.desktopCalendarWidth;
+    final weeklyWidth = availableWidth * LayoutProportions.desktopWeeklyWidth;
+    final actionsWidth = availableWidth * LayoutProportions.desktopActionsWidth;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -213,8 +216,16 @@ class DashboardScreen extends StatelessWidget {
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         final gap = LayoutProportions.tabletGap;
-        final primaryWidth = width * LayoutProportions.tabletPrimaryWidth - gap / 2;
-        final secondaryWidth = width * LayoutProportions.tabletSecondaryWidth - gap / 2;
+        
+        // Para 2 elementos con 1 gap: (width - 1*gap) * proportion
+        final availableWidthRow1 = width - gap;
+        final primaryWidth = availableWidthRow1 * LayoutProportions.tabletPrimaryWidth;
+        final secondaryWidth = availableWidthRow1 * LayoutProportions.tabletSecondaryWidth;
+        
+        // Row 3: 50/50
+        final availableWidthRow3 = width - gap;
+        final calendarWidthTablet = availableWidthRow3 * 0.5;
+        final weeklyWidthTablet = availableWidthRow3 * 0.5;
 
         return Column(
           children: [
@@ -246,12 +257,12 @@ class DashboardScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  width: width * 0.5 - gap / 2,
+                  width: calendarWidthTablet,
                   child: const MonthlyCalendarCard(),
                 ),
                 SizedBox(width: gap),
                 SizedBox(
-                  width: width * 0.5 - gap / 2,
+                  width: weeklyWidthTablet,
                   child: const WeeklySummaryCard(),
                 ),
               ],

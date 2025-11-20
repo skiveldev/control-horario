@@ -86,7 +86,7 @@ class WorkHoursProgress extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                   boxShadow: [
                     BoxShadow(
-                      color: color.withOpacity(0.3),
+                      color: color.withValues(alpha: 0.3),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
