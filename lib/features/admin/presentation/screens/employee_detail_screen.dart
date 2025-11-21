@@ -8,6 +8,7 @@ import '../../../../shared/widgets/layouts/custom_app_bar.dart';
 import '../../../../shared/widgets/cards/custom_card.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
 import '../../../dashboard/presentation/widgets/records_table.dart';
+import '../widgets/week_schedule_viewer.dart';
 
 /// Pantalla de detalle de empleado (Admin)
 /// 
@@ -153,6 +154,39 @@ class EmployeeDetailScreen extends StatelessWidget {
                       _buildInfoRow(
                         'Fichado hoy',
                         (employee['isClockedIn'] as bool) ? 'Sí' : 'No',
+                      ),
+                    ],
+                  ),
+                ),
+
+                AppSpacing.verticalSpaceLg,
+
+                // Horario Laboral
+                CustomCard(
+                  elevation: CardElevation.low,
+                  padding: AppSpacing.cardLarge,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.schedule,
+                            size: 20,
+                            color: AppColors.primary,
+                          ),
+                          AppSpacing.horizontalSpaceSm,
+                          Expanded(
+                            child: Text(
+                              'Horario Laboral',
+                              style: AppTextStyles.h5,
+                            ),
+                          ),
+                        ],
+                      ),
+                      AppSpacing.verticalSpaceLg,
+                      WeekScheduleViewer(
+                        employeeId: employeeId,
                       ),
                     ],
                   ),

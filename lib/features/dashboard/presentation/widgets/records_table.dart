@@ -3,7 +3,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
-import 'record_status_badge.dart';
+import '../../../../shared/widgets/cards/clocking_status_badge.dart';
 
 /// Tabla responsiva de registros de fichaje
 /// 
@@ -45,6 +45,28 @@ class RecordsTable extends StatelessWidget {
     }
 
     return _buildTableView();
+  }
+
+  /// Convierte el estado string (datos mock) al enum ClockingStatus
+  ClockingStatus _mapStatusToEnum(String status) {
+    switch (status.toLowerCase()) {
+      case 'completo':
+        return ClockingStatus.complete;
+      case 'incompleto':
+        return ClockingStatus.incomplete;
+      case 'sin_fichar':
+        return ClockingStatus.incomplete;
+      case 'auto_cerrado':
+      case 'auto-cerrado':
+        return ClockingStatus.autoClosed;
+      case 'editado':
+        return ClockingStatus.edited;
+      case 'activo':
+      case 'en_curso':
+        return ClockingStatus.ongoing;
+      default:
+        return ClockingStatus.complete;
+    }
   }
 
   // ==========================================================================
@@ -91,7 +113,9 @@ class RecordsTable extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                RecordStatusBadge(status: record['status'] as String),
+                ClockingStatusBadge(
+                  status: _mapStatusToEnum(record['status'] as String),
+                ),
               ],
             ),
 
@@ -241,7 +265,9 @@ class RecordsTable extends StatelessWidget {
             horizontal: AppSpacing.md,
             vertical: AppSpacing.md,
           ),
-          child: RecordStatusBadge(status: record['status'] as String),
+          child: ClockingStatusBadge(
+            status: _mapStatusToEnum(record['status'] as String),
+          ),
         ),
       ],
     );

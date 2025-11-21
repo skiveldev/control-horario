@@ -98,6 +98,12 @@ class CustomButton extends StatelessWidget {
   /// Radio de borde personalizado
   final double? borderRadius;
 
+  /// Color de fondo personalizado (sobrescribe el de la variante)
+  final Color? backgroundColor;
+
+  /// Si el botón outline debe usarse (para secondary)
+  final bool outline;
+
   const CustomButton({
     super.key,
     required this.text,
@@ -109,6 +115,8 @@ class CustomButton extends StatelessWidget {
     this.isLoading = false,
     this.fullWidth = false,
     this.borderRadius,
+    this.backgroundColor,
+    this.outline = false,
   });
 
   @override
@@ -144,13 +152,14 @@ class CustomButton extends StatelessWidget {
   // ==========================================================================
 
   Widget _buildPrimaryButton(bool isDisabled) {
+    final bgColor = backgroundColor ?? AppColors.primary;
     return ElevatedButton(
       onPressed: isDisabled ? null : onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
+        backgroundColor: bgColor,
         foregroundColor: AppColors.textOnPrimary,
-        disabledBackgroundColor: AppColors.borderLight,
-        disabledForegroundColor: AppColors.textTertiary,
+        disabledBackgroundColor: bgColor.withValues(alpha: 0.4),
+        disabledForegroundColor: AppColors.textOnPrimary.withValues(alpha: 0.5),
         elevation: isDisabled ? 0 : 2,
         shadowColor: AppColors.shadow,
         padding: _getPadding(),
@@ -166,13 +175,38 @@ class CustomButton extends StatelessWidget {
   }
 
   Widget _buildSecondaryButton(bool isDisabled) {
+    // Si outline es true, usar OutlinedButton en lugar de ElevatedButton
+    if (outline) {
+      return OutlinedButton(
+        onPressed: isDisabled ? null : onPressed,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.textPrimary,
+          disabledForegroundColor: AppColors.textTertiary.withValues(alpha: 0.5),
+          side: BorderSide(
+            color: isDisabled 
+                ? AppColors.border.withValues(alpha: 0.4) 
+                : AppColors.border,
+            width: 2,
+          ),
+          padding: _getPadding(),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              borderRadius ?? AppSpacing.radiusMd,
+            ),
+          ),
+          textStyle: _getTextStyle(),
+        ),
+        child: _buildContent(),
+      );
+    }
+    
     return ElevatedButton(
       onPressed: isDisabled ? null : onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.surfaceVariant,
         foregroundColor: AppColors.textPrimary,
-        disabledBackgroundColor: AppColors.borderLight,
-        disabledForegroundColor: AppColors.textTertiary,
+        disabledBackgroundColor: AppColors.surfaceVariant.withValues(alpha: 0.4),
+        disabledForegroundColor: AppColors.textPrimary.withValues(alpha: 0.5),
         elevation: 0,
         padding: _getPadding(),
         shape: RoundedRectangleBorder(
@@ -209,9 +243,11 @@ class CustomButton extends StatelessWidget {
       onPressed: isDisabled ? null : onPressed,
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.primary,
-        disabledForegroundColor: AppColors.textTertiary,
+        disabledForegroundColor: AppColors.primary.withValues(alpha: 0.4),
         side: BorderSide(
-          color: isDisabled ? AppColors.borderLight : AppColors.primary,
+          color: isDisabled 
+              ? AppColors.primary.withValues(alpha: 0.3) 
+              : AppColors.primary,
           width: 2,
         ),
         padding: _getPadding(),
@@ -232,8 +268,8 @@ class CustomButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.success,
         foregroundColor: AppColors.textOnDark,
-        disabledBackgroundColor: AppColors.borderLight,
-        disabledForegroundColor: AppColors.textTertiary,
+        disabledBackgroundColor: AppColors.success.withValues(alpha: 0.4),
+        disabledForegroundColor: AppColors.textOnDark.withValues(alpha: 0.5),
         elevation: isDisabled ? 0 : 2,
         shadowColor: AppColors.shadow,
         padding: _getPadding(),
@@ -254,8 +290,8 @@ class CustomButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.error,
         foregroundColor: AppColors.textOnDark,
-        disabledBackgroundColor: AppColors.borderLight,
-        disabledForegroundColor: AppColors.textTertiary,
+        disabledBackgroundColor: AppColors.error.withValues(alpha: 0.4),
+        disabledForegroundColor: AppColors.textOnDark.withValues(alpha: 0.5),
         elevation: isDisabled ? 0 : 2,
         shadowColor: AppColors.shadow,
         padding: _getPadding(),

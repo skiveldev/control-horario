@@ -7,6 +7,8 @@ import '../../../../core/constants/mock_data.dart';
 import '../../../../shared/widgets/cards/custom_card.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
 import '../../../../shared/widgets/layouts/custom_app_bar.dart';
+import '../widgets/profile_edit_dialog.dart';
+import '../../../admin/presentation/widgets/week_schedule_viewer.dart';
 
 /// Pantalla de perfil del empleado
 /// 
@@ -96,11 +98,70 @@ class ProfileScreen extends StatelessWidget {
                       icon: Icons.schedule,
                     ),
                     _InfoItem(
-                      label: 'Horas diarias',
-                      value: '${user['workHoursPerDay']}h',
+                      label: 'Horas semanales',
+                      value: '${user['workHoursPerDay'] * 5}h/semana',
                       icon: Icons.access_time,
                     ),
                   ],
+                ),
+
+                AppSpacing.verticalSpaceLg,
+
+                // Mi Horario Laboral
+                _buildInfoSection(
+                  title: 'Mi Horario Laboral',
+                  icon: Icons.schedule,
+                  items: [
+                    _InfoItem(
+                      label: 'Horario contratado',
+                      value: '${user['workHoursPerDay'] * 5}h/semana',
+                      icon: Icons.access_time,
+                    ),
+                  ],
+                ),
+
+                AppSpacing.verticalSpaceSm,
+
+                CustomCard(
+                  elevation: CardElevation.low,
+                  padding: AppSpacing.card,
+                  child: Column(
+                    children: [
+                      WeekScheduleViewer(
+                        employeeId: user['id'] as String,
+                        isReadOnly: true,
+                      ),
+                      AppSpacing.verticalSpaceMd,
+                      Container(
+                        padding: AppSpacing.allMd,
+                        decoration: BoxDecoration(
+                          color: AppColors.info.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                          border: Border.all(
+                            color: AppColors.info.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              size: 16,
+                              color: AppColors.info,
+                            ),
+                            AppSpacing.horizontalSpaceSm,
+                            Expanded(
+                              child: Text(
+                                'Para cambios en tu horario, contacta a Recursos Humanos',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.info,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
                 AppSpacing.verticalSpaceXxl,
@@ -112,10 +173,14 @@ class ProfileScreen extends StatelessWidget {
                   variant: ButtonVariant.primary,
                   fullWidth: context.isMobile,
                   onPressed: () {
-                    // TODO [FASE-2]: Navegar a pantalla de edición
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Edición de perfil en desarrollo'),
+                    showDialog(
+                      context: context,
+                      builder: (context) => ProfileEditDialog(
+                        user: user,
+                        onSave: (updatedData) {
+                          // TODO [FASE-2]: Actualizar datos con Riverpod
+                          // Por ahora solo muestra SnackBar desde el dialog
+                        },
                       ),
                     );
                   },

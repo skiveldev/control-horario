@@ -136,6 +136,13 @@ class AdminDashboardScreen extends StatelessWidget {
         'route': AppRouter.adminEmployees,
       },
       {
+        'icon': Icons.schedule,
+        'title': 'Gestión de Horarios',
+        'subtitle': 'Plantillas y horarios personalizados',
+        'color': AppColors.info,
+        'route': AppRouter.adminSchedules,
+      },
+      {
         'icon': Icons.assignment,
         'title': 'Reportes',
         'subtitle': 'Informes y estadísticas',

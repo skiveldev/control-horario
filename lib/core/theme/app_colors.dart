@@ -156,6 +156,28 @@ class AppColors {
   );
 
   // ============================================================================
+  // CLOCKING STATUS COLORS (Estados de fichaje - Semántica)
+  // ============================================================================
+  
+  /// Color para fichaje completado correctamente
+  static Color get clockingComplete => success;
+  
+  /// Color para fichaje en pausa
+  static Color get clockingOnBreak => info;
+  
+  /// Color para fichaje incompleto (sin salida registrada)
+  static Color get clockingIncomplete => warning;
+  
+  /// Color para salida anticipada (antes de completar jornada)
+  static Color get clockingEarlyExit => error;
+  
+  /// Color para fichajes editados manualmente
+  static Color get clockingEdited => secondary;
+  
+  /// Color para fichajes cerrados automáticamente por el sistema
+  static Color get clockingAutoClosed => textSecondary;
+
+  // ============================================================================
   // HELPERS
   // ============================================================================
   

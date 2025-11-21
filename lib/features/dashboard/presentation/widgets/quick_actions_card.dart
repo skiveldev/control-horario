@@ -4,6 +4,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/mock_data.dart';
 import '../../../../shared/widgets/cards/custom_card.dart';
+import 'edit_entrance_dialog.dart';
 
 /// Card de acciones rápidas
 /// 
@@ -71,12 +72,18 @@ class QuickActionsCard extends StatelessWidget {
     return InkWell(
       onTap: isEnabled
           ? () {
-              // TODO [FASE-2]: Implementar acciones reales
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${action['title']} - En desarrollo'),
-                ),
-              );
+              // Detectar si es la acción "Editar Registro"
+              final title = action['title'] as String;
+              if (title.contains('Editar') || title.toLowerCase().contains('registro')) {
+                _handleEditEntrance(context);
+              } else {
+                // TODO [FASE-2]: Implementar otras acciones
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${action['title']} - En desarrollo'),
+                  ),
+                );
+              }
             }
           : null,
       borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
@@ -183,6 +190,30 @@ class QuickActionsCard extends StatelessWidget {
       default:
         return Icons.help;
     }
+  }
+
+  /// Maneja la acción de editar hora de entrada (DEMO)
+  void _handleEditEntrance(BuildContext context) {
+    // MOCK DATA: Datos de ejemplo para demostración visual
+    final currentEntrance = const TimeOfDay(hour: 9, minute: 0);
+    final exitTime = const TimeOfDay(hour: 18, minute: 0);
+
+    showEditEntranceDialog(
+      context: context,
+      currentEntrance: currentEntrance,
+      exitTime: exitTime,
+      onSave: (newTime) {
+        // TODO [FASE-2]: Guardar en Firebase/Riverpod
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Hora de entrada actualizada a ${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}',
+            ),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      },
+    );
   }
 }
 

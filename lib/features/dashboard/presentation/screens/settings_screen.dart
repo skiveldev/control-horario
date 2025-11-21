@@ -7,6 +7,7 @@ import '../../../../core/constants/breakpoints.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../shared/widgets/cards/custom_card.dart';
 import '../../../../shared/widgets/layouts/custom_app_bar.dart';
+import '../../../auth/presentation/widgets/change_password_dialog.dart';
 
 /// Pantalla de configuración
 /// 
@@ -139,15 +140,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       },
                     ),
                     _buildNavigationItem(
-                      title: 'Cambiar contraseña',
-                      subtitle: 'Actualiza tu contraseña de acceso',
-                      icon: Icons.lock,
+                      title: 'Contraseña y Seguridad',
+                      subtitle: 'Último cambio hace 3 meses',
+                      icon: Icons.lock_outline,
                       onTap: () {
-                        // TODO [FASE-2]: Navegar a cambio de contraseña
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Cambio de contraseña en desarrollo'),
-                          ),
+                        showDialog(
+                          context: context,
+                          builder: (context) => const ChangePasswordDialog(),
                         );
                       },
                     ),

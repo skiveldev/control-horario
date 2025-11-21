@@ -14,6 +14,7 @@ import '../../features/dashboard/presentation/screens/settings_screen.dart';
 import '../../features/admin/presentation/screens/admin_dashboard_screen.dart';
 import '../../features/admin/presentation/screens/employees_list_screen.dart';
 import '../../features/admin/presentation/screens/employee_detail_screen.dart';
+import '../../features/admin/presentation/screens/schedule_management_screen.dart';
 
 /// Sistema de navegación de la aplicación
 /// 
@@ -35,6 +36,7 @@ class AppRouter {
   static const String admin = '/admin';
   static const String adminEmployees = '/admin/employees';
   static const String adminEmployeeDetail = '/admin/employees/:id';
+  static const String adminSchedules = '/admin/schedules';
 
   // ============================================================================
   // ROUTER CONFIGURATION
@@ -160,6 +162,16 @@ class AppRouter {
                 },
               ),
             ],
+          ),
+          // Gestión de horarios
+          GoRoute(
+            path: 'schedules',
+            name: 'admin-schedules',
+            pageBuilder: (context, state) => _buildPageWithTransition(
+              context: context,
+              state: state,
+              child: const ScheduleManagementScreen(),
+            ),
           ),
         ],
       ),
