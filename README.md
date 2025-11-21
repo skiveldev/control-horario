@@ -5,10 +5,10 @@ Sistema de control horario para escuela de música con ~500 empleados.
 ## 📋 Información General
 
 - **Cliente**: Escuela de Música
-- **Usuarios**: ~500 empleados (docentes y no docentes)
+- **Usuarios**: 458 empleados (docentes y no docentes)
 - **Plataforma**: Web (Flutter) + Móvil (futuro)
-- **Backend**: Firebase (Auth + Firestore + Hosting)
-- **Estado**: FASE 1 - UI/UX Design
+- **Backend**: Firebase (Auth + Firestore + Functions + Storage)
+- **Estado**: ✅ FASE 1 Completada | 🚧 FASE 2 Planificada
 
 ## 🎯 Objetivos del MVP
 
@@ -29,19 +29,30 @@ Sistema de control horario para escuela de música con ~500 empleados.
 ```
 Frontend:
 ├── Flutter 3.x (Web + Mobile)
-├── Riverpod (State Management)
-└── go_router (Navegación)
+├── Riverpod (State Management) ⭐ ÚNICO Y OFICIAL
+│   └── Code generation (riverpod_generator + freezed)
+├── go_router (Navegación)
+└── Material Design 3 (UI)
 
 Backend:
 ├── Firebase Auth (Autenticación)
-├── Cloud Firestore (Base de datos)
+├── Cloud Firestore (Base de datos NoSQL)
+├── Cloud Functions (Automatización)
+├── Cloud Storage (Archivado)
 └── Firebase Hosting (Deploy web)
 
 Desarrollo:
 ├── Cursor IDE
 ├── Claude AI (Asistente de desarrollo)
+├── Firebase Emulator Suite (Testing local)
 └── Git + GitHub
 ```
+
+**⚠️ IMPORTANTE**: 
+- **Riverpod** es el ÚNICO state management permitido
+- NO usar `setState` para estado de aplicación, `Provider`, `BLoC`, `GetX`, o similares
+- `setState` SOLO permitido para UI local que no afecta otros widgets (TextField, hover, etc.)
+- Todo el estado de aplicación se gestiona con Riverpod providers
 
 ## 📁 Estructura del Proyecto
 ```
@@ -120,64 +131,75 @@ flutter run -d chrome
 
 ## 📅 Roadmap de Desarrollo
 
-### ✅ Fase 0: Planificación (COMPLETADO)
-- Definición de requisitos
-- Diseño de arquitectura
-- Configuración de Cursor
+### ✅ Fase 1: UI/UX (COMPLETADO)
+- [x] Sistema de Theme completo
+- [x] 15+ Widgets reutilizables
+- [x] 8 Pantallas implementadas
+- [x] Navegación con go_router
+- [x] Diseño responsive (mobile/tablet/desktop)
+- [x] Estados loading/error/empty
+- [x] ~50 archivos creados (~8,000 líneas)
 
-### 🔄 Fase 1: UI/UX (EN PROGRESO)
-**Sprint 1: Fundamentos** (2-3 días)
-- [ ] Sistema de Theme completo
-- [ ] Widgets base (botones, inputs, cards)
-- [ ] Layout principal
+**Ver**: `FASE1_COMPLETADO.md` para detalles completos
 
-**Sprint 2: Autenticación** (2 días)
-- [ ] Pantalla de Login
-- [ ] Splash Screen
-- [ ] Navegación básica
+---
 
-**Sprint 3: Dashboard Empleado** (3-4 días)
-- [ ] Dashboard principal
-- [ ] Componentes de fichaje
-- [ ] Resumen del día
-- [ ] Registros recientes
-- [ ] Calendario
+### 🚧 Fase 2: Backend + Lógica (PLANIFICADO - 6 semanas)
+**Objetivo**: Reemplazar datos mock con Firebase funcional
 
-**Sprint 4: Otras Pantallas** (2-3 días)
-- [ ] Perfil empleado
-- [ ] Configuración
-- [ ] Panel admin básico
+**Sprint 1: MVP - Core Básico** (Semana 1)
+- [ ] Configurar Firebase (Auth + Firestore)
+- [ ] Login funcional con Firebase Auth
+- [ ] Sistema de fichaje básico (Entrada/Salida)
+- [ ] Dashboard con datos reales
 
-**Sprint 5: Polish** (1-2 días)
-- [ ] Animaciones
-- [ ] Responsive
-- [ ] Testing visual
+**Sprint 2: Pausas + Validaciones** (Semana 2)
+- [ ] Sistema de 1 pausa por día
+- [ ] Máquina de estados (deshabilitar botones)
+- [ ] Cálculo de horas trabajadas
+- [ ] Validación de salida anticipada
 
-### 📦 Fase 2: Lógica & Backend (FUTURO)
-- Integración con Firebase
-- Riverpod providers funcionales
-- Autenticación real
-- CRUD de fichajes
-- Validaciones
+**Sprint 3: Panel Admin** (Semana 3)
+- [ ] Lista de 458 empleados
+- [ ] Admin puede corregir fichajes
+- [ ] Historial de ediciones
+- [ ] Panel de anomalías
+
+**Sprint 4: Automatización** (Semana 4)
+- [ ] Cierre automático de fichajes (Cloud Function)
+- [ ] Detección de horas extras (Cloud Function)
+- [ ] Sistema de aprobación (RRHH/Admin)
+
+**Sprint 5: Reportes** (Semana 5)
+- [ ] Generación de reportes mensuales
+- [ ] Exportación a PDF
+- [ ] Archivado automático (>3 meses → Cloud Storage)
+
+**Ver**: `docs/FASE2_PLANIFICACION.md` para especificaciones completas  
+**Resumen**: `docs/FASE2_RESUMEN.md` para checklist rápido
+
+---
 
 ### 🚀 Fase 3: Deploy & Testing (FUTURO)
-- Testing completo
+- Testing completo (>70% cobertura)
 - Deploy a Firebase Hosting
+- Monitoreo y alertas
 - Capacitación usuarios
-- Soporte post-lanzamiento
 
-### 📱 Fase 4: App Móvil (FUTURO)
-- Adaptación UI para móvil
-- Build Android/iOS
-- Publicación en stores
+### 📱 Fase 4: Features Avanzadas (FUTURO)
+- Geolocalización GPS
+- App móvil nativa (Android/iOS)
+- Gestión de vacaciones/permisos
+- Reconocimiento facial
+- Multi-idioma
 
 ## 👥 Roles y Permisos
 
-| Rol | Descripción | Permisos |
-|-----|-------------|----------|
-| **Empleado** | Usuario final | Ver propio registro, fichar |
-| **Admin** | Administrador IT | Crear usuarios, corregir fichajes, reportes |
-| **RRHH** | Recursos Humanos | Gestión horarios, permisos (Fase 2+) |
+| Rol | Cantidad | Permisos |
+|-----|----------|----------|
+| **Empleado** | 456 | - Ver sus propios registros<br>- Fichar entrada/pausa/retorno/salida<br>- Editar solo entrada (mismo día) |
+| **RRHH** | 1 | - Ver todos los empleados<br>- Generar reportes y exportar PDF<br>- Gestionar horarios<br>- Aprobar horas extras |
+| **Admin** | 1 | - Todo lo de RRHH +<br>- Crear/eliminar usuarios<br>- Corregir cualquier fichaje<br>- Configuración del sistema |
 
 ## 📝 Convenciones de Código
 
@@ -234,5 +256,21 @@ Privado - Todos los derechos reservados
 ---
 
 **Versión**: 1.0.0
+---
+
+## 📚 Documentación del Proyecto
+
+### Estado Actual
+- **[FASE1_COMPLETADO.md](FASE1_COMPLETADO.md)** - Resumen completo de Fase 1 (UI/UX)
+- **[.cursor/plans/fase-2-backend-logica.plan.md](.cursor/plans/fase-2-backend-logica.plan.md)** - 📋 Planificación completa de Fase 2 (50+ páginas)
+- **[docs/FASE2_RESUMEN.md](docs/FASE2_RESUMEN.md)** - 🎯 Resumen ejecutivo de Fase 2
+- **[docs/CONTEXTO_FASE2.md](docs/CONTEXTO_FASE2.md)** - Contexto para nueva sesión
+
+### Guías de Desarrollo
+- **[.cursorrules](.cursorrules)** - Reglas del proyecto y metodología de trabajo
+- **[lib/shared/widgets/README.md](lib/shared/widgets/README.md)** - Documentación de componentes
+
+---
+
 **Última actualización**: Noviembre 2025
 **Estado**: En desarrollo - Fase 1

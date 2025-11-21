@@ -6,8 +6,15 @@
 Sistema de control horario para escuela de música con ~500 empleados (docentes y no docentes).
 Stack: Flutter Web + Firebase + Riverpod
 
-**FASE ACTUAL: FASE 1 - UI/UX Design Only**
-No implementar lógica de negocio ni Firebase aún. Solo interfaces visuales con datos mock.
+**FASE ACTUAL: TRANSICIÓN FASE 1 → FASE 2**
+- ✅ FASE 1 completada: UI/UX con datos mock
+- 🚧 FASE 2 en planificación: Backend + Lógica + Firebase
+
+**STATE MANAGEMENT: RIVERPOD (ÚNICO Y OBLIGATORIO)**
+- TODO el estado de aplicación se gestiona con Riverpod
+- NO usar setState para estado de app, Provider, BLoC, GetX, o similares
+- setState SOLO permitido para UI local (TextField, hover, animaciones locales)
+- Widgets consumen datos SOLO vía Riverpod providers
 
 ---
 
@@ -61,9 +68,9 @@ lib/
 
 ---
 
-## 🎨 FASE 1: Solo Diseño UI/UX (ACTUAL)
+## 🎨 FASE 1: Solo Diseño UI/UX (COMPLETADA)
 
-### Principios ESTRICTOS:
+### Principios que se siguieron:
 
 1. **SEPARACIÓN UI/LÓGICA:**
    - Widgets en `/presentation` NO contienen lógica de negocio
@@ -71,14 +78,14 @@ lib/
    - Emiten eventos via callbacks: `onPressed`, `onChanged`
    - Usar datos MOCK hardcoded dentro de los widgets
 
-2. **NO implementar aún:**
+2. **Lo que NO se implementó:**
    - ❌ Riverpod providers funcionales
    - ❌ Conexiones a Firebase
    - ❌ Autenticación real
    - ❌ Navegación compleja
    - ❌ Validaciones de formularios
 
-3. **SÍ implementar:**
+3. **Lo que SÍ se implementó:**
    - ✅ Theme system completo
    - ✅ Widgets base reutilizables
    - ✅ Layouts responsivos
@@ -86,12 +93,160 @@ lib/
    - ✅ Animaciones y transiciones
    - ✅ Estados visuales (loading, error, empty)
 
-4. **Marcar pendientes:**
-   ```dart
-   // TODO [FASE-2]: Conectar con AuthProvider
-   // TODO [FASE-2]: Validar con Firebase
-   // MOCK DATA: Reemplazar con datos reales en Fase 2
-   ```
+---
+
+## 🚀 FASE 2: Backend + Lógica (ACTUAL)
+
+### State Management: RIVERPOD (Obligatorio)
+
+**REGLA CRÍTICA**: Todo el estado se gestiona EXCLUSIVAMENTE con Riverpod.
+
+#### ❌ PROHIBIDO (para estado de aplicación):
+```dart
+// NO usar setState para estado que afecta otros widgets
+class MyWidget extends StatefulWidget { ... }
+
+// NO usar Provider antiguo
+Provider<User>(...)
+
+// NO usar BLoC
+BlocProvider<AuthBloc>(...)
+
+// NO usar GetX
+Get.put(Controller())
+
+// NO usar variables globales mutables
+User currentUser; // ❌ NO
+```
+
+#### ⚠️ EXCEPCIÓN: setState para UI local
+```dart
+// ✅ PERMITIDO: setState SOLO para UI local que NO afecta otros widgets
+class LocalFormWidget extends StatefulWidget {
+  @override
+  State<LocalFormWidget> createState() => _LocalFormWidgetState();
+}
+
+class _LocalFormWidgetState extends State<LocalFormWidget> {
+  String _textInput = '';
+  bool _isExpanded = false;
+  
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TextField(
+          onChanged: (value) => setState(() => _textInput = value), // ✅ OK: local
+        ),
+        ExpansionTile(
+          onExpansionChanged: (expanded) => 
+            setState(() => _isExpanded = expanded), // ✅ OK: local
+        ),
+      ],
+    );
+  }
+}
+
+// Regla: Si el estado NO sale del widget → setState OK
+//        Si el estado afecta otros widgets → Riverpod obligatorio
+```
+
+#### ✅ OBLIGATORIO:
+```dart
+// SÍ usar Riverpod providers
+@riverpod
+Stream<User> currentUser(CurrentUserRef ref) {
+  return authService.userChanges();
+}
+
+// SÍ usar ConsumerWidget
+class MyWidget extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(currentUserProvider);
+    return Text(user.name);
+  }
+}
+
+// SÍ usar ref.watch() en build
+final data = ref.watch(myProvider);
+
+// SÍ usar ref.read() en callbacks
+onPressed: () => ref.read(myProvider.notifier).doSomething()
+```
+
+#### Tipos de Providers:
+1. **StreamProvider**: Datos en tiempo real (Firestore snapshots)
+2. **FutureProvider**: Operaciones asíncronas de una vez
+3. **StateProvider**: Estado simple y local
+4. **NotifierProvider**: Estado complejo con métodos
+
+#### Code Generation:
+```dart
+// Usar @riverpod annotation
+@riverpod
+class AuthNotifier extends _$AuthNotifier {
+  @override
+  User? build() => null;
+  
+  Future<void> signIn(String email, String password) async {
+    // Lógica
+  }
+}
+
+// Generar código con:
+// flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+### Arquitectura en Capas
+
+```
+UI (ConsumerWidget)
+  ↓ ref.watch()
+Providers (Riverpod)
+  ↓ llama
+Services (Firebase)
+```
+
+**Flujo de datos**:
+1. Widget usa `ref.watch(provider)` para obtener datos
+2. Provider consulta Service (Firebase)
+3. Service retorna Stream/Future
+4. Provider transforma datos si es necesario
+5. Widget se reconstruye automáticamente cuando datos cambian
+
+### Principios ESTRICTOS:
+
+1. **SEPARACIÓN DE RESPONSABILIDADES:**
+   - **Widgets**: Solo presentación (NO lógica)
+   - **Providers**: Lógica de negocio y estado
+   - **Services**: Comunicación con Firebase
+   - **Models**: Estructuras de datos inmutables (freezed)
+
+2. **NUNCA en widgets:**
+   - ❌ Llamadas directas a Firebase
+   - ❌ Cálculos de negocio complejos
+   - ❌ Transformaciones de datos
+   - ❌ setState() para estado de aplicación
+   - ⚠️ setState() permitido SOLO para UI local (TextField, hover, animaciones locales)
+
+3. **SIEMPRE en providers:**
+   - ✅ Toda la lógica de negocio
+   - ✅ Llamadas a services
+   - ✅ Transformaciones de datos
+   - ✅ Validaciones
+
+4. **Testing:**
+   - ✅ Providers se testean con ProviderContainer
+   - ✅ Widgets se testean con ProviderScope + overrides
+   - ✅ Mockear providers fácilmente
+
+### Marcar código pendiente:
+```dart
+// TODO [FASE-2-SPRINT-1]: Conectar con AuthProvider
+// TODO [FASE-2-SPRINT-2]: Implementar máquina de estados
+// MOCK DATA: Reemplazar con Riverpod provider en Sprint 1
+```
 
 ---
 
@@ -368,9 +523,76 @@ final width1 = availableWidth * 0.6;
 
 ## 🤖 Instrucciones para Claude/Cursor
 
-Cuando el desarrollador pida crear código:
+### 🗣️ METODOLOGÍA DE TRABAJO (CRÍTICO)
 
-1. **Verificar fase actual**: Estamos en FASE 1, solo UI
+**REGLA DE ORO**: PLANIFICAR → DISCUTIR → CONSTRUIR
+
+#### Fase de Planificación (conversación):
+Cuando el desarrollador:
+- Pide **"recomendaciones"** o **"sugerencias"**
+- Está iniciando una **nueva fase** del proyecto
+- Pregunta **"¿qué recomiendas?"** o **"¿cómo debería...?"**
+- Menciona palabras como: **planificar, diseñar, estructurar, definir**
+
+**ENTONCES debes:**
+1. ❌ **NO construir código inmediatamente**
+2. ✅ **CONVERSAR y hacer preguntas** para entender necesidades
+3. ✅ **Discutir opciones y alternativas** (pros/contras)
+4. ✅ **Esperar confirmación** antes de implementar
+5. ✅ **Mostrar ejemplos conceptuales** (no código completo)
+
+**Flujo correcto de planificación:**
+```
+Usuario: "¿Qué recomiendas para X?"
+  ↓
+Claude: Hace preguntas específicas sobre:
+  - Requisitos funcionales
+  - Restricciones técnicas
+  - Casos de uso reales
+  - Prioridades del negocio
+  ↓
+Usuario: Responde preguntas
+  ↓
+Claude: Presenta 2-3 opciones con pros/contras
+  ↓
+Usuario: Elige opción o pide ajustes
+  ↓
+Claude: Refina detalles con más preguntas
+  ↓
+Usuario: Confirma especificación final
+  ↓
+Claude: AHORA SÍ construye código
+```
+
+**Ejemplo de interacción CORRECTA:**
+```
+Usuario: "¿Qué recomiendas para la base de datos?"
+
+Claude (MAL ❌):
+[Código completo de estructura Firebase]
+
+Claude (BIEN ✅):
+"Antes de diseñar, necesito entender:
+1. ¿Cuántos empleados reales hay?
+2. ¿Tipo de fichaje? (solo entrada/salida o también pausas)
+3. ¿Necesitas histórico ilimitado?
+..."
+```
+
+#### Fase de Construcción (implementación):
+Cuando el desarrollador:
+- Da **instrucciones claras** de implementar algo ya discutido
+- Dice: **"Crea"**, **"Implementa"**, **"Construye"**
+- Confirma una especificación: **"Sí, hazlo así"**
+
+**ENTONCES debes:**
+1. ✅ **Construir código inmediatamente**
+2. ✅ **Seguir las especificaciones acordadas**
+3. ✅ **Aplicar todas las reglas del proyecto**
+
+### Cuando crear código:
+
+1. **Verificar fase actual**: Estamos en FASE 1, solo UI (actualizar según corresponda)
 2. **Seguir estructura de carpetas** exactamente como se define arriba
 3. **Usar el sistema de diseño** (colores, tipografías, espaciados)
 4. **Crear componentes reutilizables** cuando sea apropiado
@@ -421,8 +643,9 @@ dev_dependencies:
 
 - Este archivo guía TODO el desarrollo del proyecto
 - Actualizar cuando cambien requisitos
-- En Fase 2 se agregarán reglas de Firebase y Riverpod funcional
 - Mantener disciplina de separación UI/Lógica
+- **Fase 2 en curso**: Se están planificando reglas de Firebase y Riverpod funcional
 
-**Versión**: 1.0 - Fase 1 (UI Only)
+**Versión**: 1.1 - Transición Fase 1 → Fase 2
 **Última actualización**: Noviembre 2025
+**Estado**: ✅ Fase 1 completada | 🚧 Fase 2 en planificación
