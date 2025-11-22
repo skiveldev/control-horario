@@ -1,18 +1,44 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'app.dart';
 
 /// Punto de entrada de la aplicación Control Horario
 /// 
 /// Configura:
 /// - WidgetsFlutterBinding
+/// - Firebase
+/// - Firebase Emulator (solo en debug mode)
 /// - Orientación de pantalla
 /// - Status bar / System UI
 /// - Providers globales (Riverpod)
 void main() async {
   // Asegurar inicialización de Flutter
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ============================================================================
+  // INICIALIZAR FIREBASE
+  // ============================================================================
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // ============================================================================
+  // CONFIGURAR EMULATOR EN DEBUG MODE
+  // ============================================================================
+  if (kDebugMode) {
+    // Descomentar las siguientes líneas para usar el emulator local
+    // NOTA: Ejecutar primero `firebase emulators:start`
+    
+    // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+    // FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+    
+    debugPrint('🔧 Modo DEBUG: Emuladores deshabilitados');
+    debugPrint('   Para habilitar, descomentar líneas en main.dart');
+  }
 
   // ============================================================================
   // CONFIGURACIÓN DE ORIENTACIÓN

@@ -10,10 +10,11 @@ import '../../../../shared/widgets/buttons/custom_button.dart';
 /// Contiene los campos de email, contraseña, checkbox de "Recordarme"
 /// y botón de iniciar sesión.
 /// 
-/// MOCK DATA: Por ahora no valida, solo simula el login.
+/// Callback pasa email y password para que el padre maneje la autenticación.
 class LoginForm extends StatefulWidget {
   /// Callback cuando se presiona el botón de login
-  final VoidCallback onLogin;
+  /// Recibe email y password como parámetros
+  final Future<void> Function(String email, String password) onLogin;
 
   const LoginForm({
     super.key,
@@ -39,35 +40,39 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   Future<void> _handleLogin() async {
-    // Validar formulario
-    if (_formKey.currentState != null) {
-      // Por ahora no validamos, solo simulamos el proceso
-      // _formKey.currentState!.validate();
+    // Validar formulario básico
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor ingresa email y contraseña'),
+        ),
+      );
+      return;
     }
 
     setState(() => _isLoading = true);
 
-    // TODO [FASE-2]: Implementar lógica real de autenticación
-    // try {
-    //   await ref.read(authProvider).login(
-    //     email: _emailController.text,
-    //     password: _passwordController.text,
-    //   );
-    //   widget.onLogin();
-    // } catch (e) {
-    //   // Mostrar error
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(content: Text('Error: ${e.toString()}')),
-    //   );
-    // }
-
-    // MOCK: Simular delay de red
-    await Future.delayed(const Duration(seconds: 1));
-
-    setState(() => _isLoading = false);
-
-    // Llamar callback
-    widget.onLogin();
+    try {
+      // Llamar al callback con email y password
+      await widget.onLogin(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+    } catch (e) {
+      // Mostrar error si falla la autenticación
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al iniciar sesión: ${e.toString()}'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/constants/breakpoints.dart';
+import '../../../auth/providers/auth_provider.dart';
 import '../widgets/employee_header.dart';
 import '../widgets/time_clock_card.dart';
 import '../widgets/day_summary_card.dart';
@@ -16,41 +18,86 @@ import '../widgets/quick_actions_card.dart';
 /// 
 /// Muestra:
 /// - Header con información del empleado
-/// - Layout responsivo optimizado (Fase 1.5)
-/// - Acciones rápidas
+/// - Layout responsivo optimizado
+/// - Datos en tiempo real desde Firebase + Riverpod
 /// 
 /// Layout adaptativo mejorado:
-/// - Desktop: Multi-columna con sidebar sticky (60% + 25% + 15%)
+/// - Desktop: Multi-columna (60% + 40%)
 /// - Tablet: 2 columnas balanceadas (60/40)
 /// - Mobile: 1 columna vertical
-/// 
-/// MOCK DATA: Usa datos de MockData para simular la información
-/// TODO [FASE-2]: Conectar con providers reales de Riverpod
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Observar usuario actual
+    final userAsync = ref.watch(currentUserProvider);
+    
+    return userAsync.when(
+      data: (user) {
+        if (user == null) {
+          // No debería pasar si las rutas están protegidas
+          return const Scaffold(
+            body: Center(
+              child: Text('Usuario no autenticado'),
+            ),
+          );
+        }
+        
+        return _buildDashboard(context, ref, user);
+      },
+      loading: () => const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (error, stack) => Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: AppColors.error,
+              ),
+              AppSpacing.verticalSpaceMd,
+              Text(
+                'Error al cargar dashboard',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              AppSpacing.verticalSpaceSm,
+              Text(
+                error.toString(),
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildDashboard(BuildContext context, WidgetRef ref, user) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Column(
         children: [
           // Header con información del empleado
           EmployeeHeader(
-            onAvatarTap: () {
-              context.push(AppRouter.profile);
-            },
+            employeeName: user.displayName,
+            employeeId: user.employeeId,
+            onAvatarTap: () => context.push(AppRouter.profile),
             onNotificationsTap: () {
-              // TODO [FASE-2]: Mostrar panel de notificaciones
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Notificaciones en desarrollo'),
                 ),
               );
             },
-            onSettingsTap: () {
-              context.push(AppRouter.settings);
-            },
+            onSettingsTap: () => context.push(AppRouter.settings),
           ),
 
           // Contenido principal con scroll
@@ -63,7 +110,7 @@ class DashboardScreen extends StatelessWidget {
                   desktop: AppSpacing.xxxl,
                 ),
               ),
-              child: _buildDashboardGrid(context),
+              child: _buildDashboardGrid(context, ref),
             ),
           ),
         ],
@@ -71,22 +118,23 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDashboardGrid(BuildContext context) {
-    // Seleccionar layout según breakpoint (Fase 1.5)
+  Widget _buildDashboardGrid(BuildContext context, WidgetRef ref) {
+    // Seleccionar layout según breakpoint
+    // TODO [FASE-2-SPRINT-1]: Pasar datos reales a los widgets de dashboard
     if (context.isDesktop) {
-      return _buildDesktopLayout(context);
+      return _buildDesktopLayout(context, ref);
     } else if (context.isMobile) {
-      return _buildMobileLayout(context);
+      return _buildMobileLayout(context, ref);
     } else {
-      return _buildTabletLayout(context);
+      return _buildTabletLayout(context, ref);
     }
   }
 
   // ==========================================================================
-  // DESKTOP LAYOUT (>1024px) - Fase 1.5
+  // DESKTOP LAYOUT (>1024px)
   // ==========================================================================
 
-  Widget _buildDesktopLayout(BuildContext context) {
+  Widget _buildDesktopLayout(BuildContext context, WidgetRef ref) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
@@ -95,12 +143,12 @@ class DashboardScreen extends StatelessWidget {
         return Column(
           children: [
             // Row 1: TimeClock 60% + Summary 40%
-            _buildDesktopTopRow(context, width, gap),
+            _buildDesktopTopRow(context, ref, width, gap),
             
             SizedBox(height: gap),
             
             // Row 2: Recent Records 100%
-            _buildDesktopRecordsRow(context, width, gap),
+            _buildDesktopRecordsRow(context, ref, width, gap),
             
             SizedBox(height: gap),
             
@@ -112,7 +160,7 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDesktopTopRow(BuildContext context, double width, double gap) {
+  Widget _buildDesktopTopRow(BuildContext context, WidgetRef ref, double width, double gap) {
     // Para 2 elementos con 1 gap: (width - 1*gap) * proportion
     final availableWidth = width - gap;
     final clockWidth = availableWidth * LayoutProportions.desktopTimeClockWidth;
@@ -138,7 +186,7 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDesktopRecordsRow(BuildContext context, double width, double gap) {
+  Widget _buildDesktopRecordsRow(BuildContext context, WidgetRef ref, double width, double gap) {
     // Recent Records al 100%
     return const RecentRecordsCard();
   }
@@ -179,10 +227,10 @@ class DashboardScreen extends StatelessWidget {
   }
 
   // ==========================================================================
-  // MOBILE LAYOUT (<768px) - Fase 1.5
+  // MOBILE LAYOUT (<768px)
   // ==========================================================================
 
-  Widget _buildMobileLayout(BuildContext context) {
+  Widget _buildMobileLayout(BuildContext context, WidgetRef ref) {
     final gap = LayoutProportions.mobileGap;
 
     return Column(
@@ -208,10 +256,10 @@ class DashboardScreen extends StatelessWidget {
   }
 
   // ==========================================================================
-  // TABLET LAYOUT (768-1024px) - Fase 1.5
+  // TABLET LAYOUT (768-1024px)
   // ==========================================================================
 
-  Widget _buildTabletLayout(BuildContext context) {
+  Widget _buildTabletLayout(BuildContext context, WidgetRef ref) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;

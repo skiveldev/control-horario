@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -8,19 +9,19 @@ import '../../../../core/router/app_router.dart';
 import '../../../../shared/widgets/cards/custom_card.dart';
 import '../../../../shared/widgets/layouts/custom_app_bar.dart';
 import '../../../auth/presentation/widgets/change_password_dialog.dart';
+import '../../../auth/providers/auth_provider.dart';
 
 /// Pantalla de configuración
 /// 
 /// Permite al usuario ajustar preferencias de la aplicación.
-/// Solo UI en Fase 1, funcionalidad real en Fase 2.
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   // Estados mock de configuraciones
   bool _emailNotifications = true;
   bool _pushNotifications = true;
@@ -30,6 +31,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Observar estado de logout
+    final authNotifierState = ref.watch(authNotifierProvider);
+    final isLoggingOut = authNotifierState.isLoading;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: const CustomAppBar(
@@ -179,30 +183,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   padding: AppSpacing.cardLarge,
                   borderColor: AppColors.error,
                   child: InkWell(
-                    onTap: () {
+                    onTap: isLoggingOut ? null : () {
                       _showLogoutDialog(context);
                     },
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.logout,
-                          color: AppColors.error,
-                        ),
+                        if (isLoggingOut)
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.error,
+                            ),
+                          )
+                        else
+                          Icon(
+                            Icons.logout,
+                            color: AppColors.error,
+                          ),
                         AppSpacing.horizontalSpaceMd,
                         Expanded(
                           child: Text(
-                            'Cerrar sesión',
+                            isLoggingOut ? 'Cerrando sesión...' : 'Cerrar sesión',
                             style: AppTextStyles.bodyMedium.copyWith(
                               color: AppColors.error,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          size: 16,
-                          color: AppColors.error,
-                        ),
+                        if (!isLoggingOut)
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            size: 16,
+                            color: AppColors.error,
+                          ),
                       ],
                     ),
                   ),
@@ -376,19 +391,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Cerrar sesión'),
         content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              // TODO [FASE-2]: Lógica real de logout
-              context.go(AppRouter.login);
+            onPressed: () async {
+              Navigator.of(dialogContext).pop();
+              
+              // Ejecutar logout real con Firebase
+              await ref.read(authNotifierProvider.notifier).signOut();
+              
+              // Navegar a login (el authStateChanges se encargará de esto también)
+              if (context.mounted) {
+                context.go(AppRouter.login);
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error,

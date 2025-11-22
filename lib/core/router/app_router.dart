@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'auth_notifier.dart';
 
 // Pantallas de autenticación
 import '../../features/auth/presentation/screens/splash_screen.dart';
@@ -19,10 +21,13 @@ import '../../features/admin/presentation/screens/schedule_management_screen.dar
 /// Sistema de navegación de la aplicación
 /// 
 /// Usa go_router para manejar las rutas de forma declarativa.
-/// En Fase 2 se añadirán guards de autenticación y rutas protegidas.
+/// Incluye protección de rutas basada en autenticación.
 class AppRouter {
   // Prevenir instanciación
   AppRouter._();
+  
+  // Instancia del AuthNotifier para go_router
+  static final _authNotifier = AuthNotifier(FirebaseAuth.instance);
 
   // ============================================================================
   // ROUTE NAMES (Nombres de rutas)
@@ -45,20 +50,26 @@ class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: splash,
     debugLogDiagnostics: true,
+    refreshListenable: _authNotifier,
     
-    // TODO [FASE-2]: Implementar redirect para auth
-    // redirect: (context, state) {
-    //   final isAuthenticated = ref.read(authProvider).isAuthenticated;
-    //   final isGoingToLogin = state.location == login;
-    //   
-    //   if (!isAuthenticated && !isGoingToLogin) {
-    //     return login;
-    //   }
-    //   if (isAuthenticated && isGoingToLogin) {
-    //     return dashboard;
-    //   }
-    //   return null;
-    // },
+    // Redirect para proteger rutas
+    redirect: (context, state) {
+      final isAuthenticated = _authNotifier.isAuthenticated;
+      final isGoingToLogin = state.matchedLocation == login;
+      final isGoingToSplash = state.matchedLocation == splash;
+      
+      // Si no está autenticado y no va a login o splash, redirigir a login
+      if (!isAuthenticated && !isGoingToLogin && !isGoingToSplash) {
+        return login;
+      }
+      
+      // Si está autenticado y va a login, redirigir a dashboard
+      if (isAuthenticated && isGoingToLogin) {
+        return dashboard;
+      }
+      
+      return null; // No redirigir
+    },
     
     routes: [
       // ========================================================================

@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ========================================
+    // MODO TEST - Solo para desarrollo
+    // ========================================
+    // TODO [SPRINT-3]: Cambiar a reglas de producción
+    // 
+    // Por ahora, cualquier usuario autenticado puede leer y escribir
+    // cualquier documento. Esto facilita el desarrollo rápido.
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+

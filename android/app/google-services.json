@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "113891078966",
+    "project_id": "control-horario-rega",
+    "storage_bucket": "control-horario-rega.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:113891078966:android:5e7379e3021e71f1823997",
+        "android_client_info": {
+          "package_name": "app.controlhorario.control_horario"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtG8gEmH8kd4890HBFBUk2XgQr-7lFySo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
