@@ -468,3 +468,4 @@ Pantalla: Perfil (/profile)
 
 **Próxima revisión**: Después de cierre de contrato (antes de Fase 2)
 
+

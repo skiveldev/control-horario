@@ -83,3 +83,4 @@ Se han completado exitosamente todas las tareas del BLOQUE 2, enfocadas en la ge
 2. `lib/features/auth/presentation/widgets/change_password_dialog.dart`
 
 
+
