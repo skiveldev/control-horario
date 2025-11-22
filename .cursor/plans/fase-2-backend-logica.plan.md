@@ -1,56 +1,56 @@
-# 📋 FASE 2 - PLANIFICACIÓN COMPLETA
+﻿# ðŸ“‹ FASE 2 - PLANIFICACIÃ“N COMPLETA
 
-## Backend + Lógica + Firebase
+## Backend + LÃ³gica + Firebase
 
-**Proyecto**: Sistema de Control Horario - Escuela de Música
+**Proyecto**: Sistema de Control Horario - Escuela de MÃºsica
 
-**Estado**: 🚧 En Planificación
+**Estado**: ðŸš§ En PlanificaciÃ³n
 
-**Versión**: 2.0.0-planning
+**VersiÃ³n**: 2.0.0-planning
 
 **Fecha**: Noviembre 2025
 
 ---
 
-## 📊 Contexto del Proyecto
+## ðŸ“Š Contexto del Proyecto
 
-### ✅ Fase 1 Completada
+### âœ… Fase 1 Completada
 
 - UI/UX completo con datos mock
 - 8 pantallas implementadas
-- Sistema de diseño completo
-- Navegación con go_router
-- **50 archivos** creados (~8,000 líneas)
+- Sistema de diseÃ±o completo
+- NavegaciÃ³n con go_router
+- **50 archivos** creados (~8,000 lÃ­neas)
 
-### 🎯 Objetivo Fase 2
+### ðŸŽ¯ Objetivo Fase 2
 
-Implementar **backend funcional** con Firebase y lógica de negocio real, reemplazando todos los datos mock.
+Implementar **backend funcional** con Firebase y lÃ³gica de negocio real, reemplazando todos los datos mock.
 
 ---
 
-## 🏢 Requisitos del Cliente
+## ðŸ¢ Requisitos del Cliente
 
 ### Datos de la Escuela
 
 - **Empleados**: 458 (docentes + no docentes)
 - **Todos fichan**: Sin excepciones
 - **Contratos**: Todos fijos (horarios variables por empleado)
-- **Histórico**: Conservar 4 años de registros
+- **HistÃ³rico**: Conservar 4 aÃ±os de registros
 
 ### Sistema de Fichaje
 
 ```
-Flujo del día:
+Flujo del dÃ­a:
 1. ENTRADA (obligatoria)
 2. PAUSA (opcional, solo 1 vez)
 3. RETORNO (si hubo pausa)
 4. SALIDA (obligatoria)
 
 Reglas:
-- Solo 1 pausa permitida por día
+- Solo 1 pausa permitida por dÃ­a
 - Pausa cuenta como tiempo trabajado
 - Fichaje remoto permitido (docentes + trabajo remoto)
-- Geolocalización: nice-to-have (auditorías futuras)
+- GeolocalizaciÃ³n: nice-to-have (auditorÃ­as futuras)
 ```
 
 ### Roles de Usuario
@@ -59,108 +59,108 @@ Reglas:
 
 |-----|----------|----------|
 
-| **Empleado** | - Ver sus propios registros<br>- Fichar entrada/pausa/retorno/salida<br>- Editar solo ENTRADA (mismo día) | 456 |
+| **Empleado** | - Ver sus propios registros<br>- Fichar entrada/pausa/retorno/salida<br>- Editar solo ENTRADA (mismo dÃ­a) | 456 |
 
 | **RRHH** | - Ver todos los empleados<br>- Generar reportes<br>- Exportar PDF<br>- Gestionar horarios<br>- Aprobar horas extras | 1 |
 
-| **Admin** | - Todo lo de RRHH +<br>- Crear/eliminar usuarios<br>- Corregir cualquier fichaje<br>- Configuración del sistema | 1 |
+| **Admin** | - Todo lo de RRHH +<br>- Crear/eliminar usuarios<br>- Corregir cualquier fichaje<br>- ConfiguraciÃ³n del sistema | 1 |
 
 ### Reglas de Negocio
 
-1. **Validación de secuencia**: No permitir fichajes fuera de orden
-2. **Edición de empleado**: Solo entrada, solo mismo día, sin aprobación
-3. **Edición de admin**: Cualquier fichaje, cualquier fecha, con historial
-4. **Cierre automático**: Si olvida fichar salida → cierre a fin de horario contratado
-5. **Horas extras**: Requieren aprobación de RRHH o Admin
-6. **Salida anticipada**: Diálogo de confirmación si faltan >1 hora
+1. **ValidaciÃ³n de secuencia**: No permitir fichajes fuera de orden
+2. **EdiciÃ³n de empleado**: Solo entrada, solo mismo dÃ­a, sin aprobaciÃ³n
+3. **EdiciÃ³n de admin**: Cualquier fichaje, cualquier fecha, con historial
+4. **Cierre automÃ¡tico**: Si olvida fichar salida â†’ cierre a fin de horario contratado
+5. **Horas extras**: Requieren aprobaciÃ³n de RRHH o Admin
+6. **Salida anticipada**: DiÃ¡logo de confirmaciÃ³n si faltan >1 hora
 
 ### Reportes Requeridos
 
 - Horas mensuales por empleado
 - Horas extras (pendientes/aprobadas/rechazadas)
-- Anomalías (fichajes incompletos, auto-cerrados)
-- Exportación a PDF
+- AnomalÃ­as (fichajes incompletos, auto-cerrados)
+- ExportaciÃ³n a PDF
 
-### Restricciones Técnicas
+### Restricciones TÃ©cnicas
 
 - **Budget**: Plan gratuito Firebase inicialmente
-- **Performance**: Tiempo real no crítico (delay de minutos aceptable)
+- **Performance**: Tiempo real no crÃ­tico (delay de minutos aceptable)
 - **Archivado**: Mantener 3 meses accesibles, resto archivado
 - **Escalabilidad**: Preparado para crecimiento futuro
 
-### Stack Técnico (Fase 2)
+### Stack TÃ©cnico (Fase 2)
 
-- **State Management**: **Riverpod** (único y oficial del proyecto)
-                                - NO usar `setState`, `InheritedWidget`, `Provider`, o `BLoC`
-                                - TODO el estado se maneja con Riverpod
-                                - Widgets consumen datos SOLO vía Riverpod providers
-                                - Code generation con `riverpod_generator` + `freezed`
+- **State Management**: **Riverpod** (Ãºnico y oficial del proyecto)
+    - NO usar `setState`, `InheritedWidget`, `Provider`, o `BLoC`
+    - TODO el estado se maneja con Riverpod
+    - Widgets consumen datos SOLO vÃ­a Riverpod providers
+    - Code generation con `riverpod_generator` + `freezed`
 - **Backend**: Firebase (Auth, Firestore, Functions, Storage)
-- **Navegación**: go_router (ya implementado en Fase 1)
+- **NavegaciÃ³n**: go_router (ya implementado en Fase 1)
 - **UI**: Material Design 3 + Custom Theme (ya implementado en Fase 1)
 
 ---
 
-## 🗄️ DISEÑO DE BASE DE DATOS FIREBASE
+## ðŸ—„ï¸ DISEÃ‘O DE BASE DE DATOS FIREBASE
 
 ### Estructura de Colecciones
 
 ```
 firestore/
-├── users/                                    # Colección principal
-│   └── {userId}/                             # Documento por usuario
-│       ├── (campos del perfil)
-│       ├── daily_records/                    # Subcolección de fichajes
-│       │   └── {YYYY-MM-DD}/                 # 1 documento por día
-│       │       ├── clocks (objeto)
-│       │       └── metadata
-│       └── monthly_summary/                  # Subcolección de resúmenes
-│           └── {YYYY-MM}/                    # 1 documento por mes
-│               └── (totales pre-calculados)
-│
-├── schedules/                                # Colección de horarios
-│   └── {scheduleId}/
-│       └── (configuración de horario)
-│
-├── overtime_requests/                        # Colección de horas extras
-│   └── {requestId}/
-│       └── (solicitud de aprobación)
-│
-└── system_config/                            # Colección de configuración
-    └── settings/                             # Documento único
-        └── (reglas globales del sistema)
+â”œâ”€â”€ users/    # ColecciÃ³n principal
+â”‚   â””â”€â”€ {userId}/    # Documento por usuario
+â”‚       â”œâ”€â”€ (campos del perfil)
+â”‚       â”œâ”€â”€ daily_records/    # SubcolecciÃ³n de fichajes
+â”‚       â”‚   â””â”€â”€ {YYYY-MM-DD}/                 # 1 documento por dÃ­a
+â”‚       â”‚       â”œâ”€â”€ clocks (objeto)
+â”‚       â”‚       â””â”€â”€ metadata
+â”‚       â””â”€â”€ monthly_summary/                  # SubcolecciÃ³n de resÃºmenes
+â”‚           â””â”€â”€ {YYYY-MM}/    # 1 documento por mes
+â”‚               â””â”€â”€ (totales pre-calculados)
+â”‚
+â”œâ”€â”€ schedules/    # ColecciÃ³n de horarios
+â”‚   â””â”€â”€ {scheduleId}/
+â”‚       â””â”€â”€ (configuraciÃ³n de horario)
+â”‚
+â”œâ”€â”€ overtime_requests/    # ColecciÃ³n de horas extras
+â”‚   â””â”€â”€ {requestId}/
+â”‚       â””â”€â”€ (solicitud de aprobaciÃ³n)
+â”‚
+â””â”€â”€ system_config/    # ColecciÃ³n de configuraciÃ³n
+    â””â”€â”€ settings/    # Documento Ãºnico
+        â””â”€â”€ (reglas globales del sistema)
 ```
 
 ---
 
-## 🏗️ ARQUITECTURA DE STATE MANAGEMENT
+## ðŸ—ï¸ ARQUITECTURA DE STATE MANAGEMENT
 
 ### Principio: Riverpod para TODO
 
-**REGLA FUNDAMENTAL**: Todo el estado de la aplicación se gestiona exclusivamente con **Riverpod**.
+**REGLA FUNDAMENTAL**: Todo el estado de la aplicaciÃ³n se gestiona exclusivamente con **Riverpod**.
 
-#### ❌ NO Usar para Estado de Aplicación:
+#### âŒ NO Usar para Estado de AplicaciÃ³n:
 
-- `setState()` para estado que afecta otros widgets o lógica de negocio
+- `setState()` para estado que afecta otros widgets o lÃ³gica de negocio
 - `InheritedWidget` o `InheritedNotifier`
 - `Provider` package (antiguo)
 - `BLoC` pattern
 - `GetX` o cualquier otro state management
 - Variables globales o singletons con estado mutable
 
-#### ⚠️ Excepción Permitida:
+#### âš ï¸ ExcepciÃ³n Permitida:
 
-✅ `setState()` SOLO para UI local que NO afecta otros widgets:
+âœ… `setState()` SOLO para UI local que NO afecta otros widgets:
 
 - Estado de TextField antes de enviar
 - Estado de Checkbox/Switch local
 - Animaciones puramente visuales
 - Hover states, focus states
-- Expansión/colapso de widgets locales
+- ExpansiÃ³n/colapso de widgets locales
 
-**Regla**: Si el estado NO sale del widget → `setState` OK. Si sale → Riverpod obligatorio.
+**Regla**: Si el estado NO sale del widget â†’ `setState` OK. Si sale â†’ Riverpod obligatorio.
 
-#### ✅ SÍ Usar:
+#### âœ… SÃ Usar:
 
 - **Riverpod Providers** para todo el estado
 - **ConsumerWidget** o **ConsumerStatefulWidget** para widgets que consumen estado
@@ -168,68 +168,68 @@ firestore/
 - **ref.read()** solo en callbacks (nunca en build)
 - **Code generation** con `riverpod_generator` y `freezed`
 
-### Patrón de Arquitectura
+### PatrÃ³n de Arquitectura
 
 ```
-┌─────────────────────────────────────────┐
-│           UI Layer (Widgets)            │
-│   - ConsumerWidget / ConsumerStateful   │
-│   - NO lógica de negocio                │
-│   - Solo presentación                   │
-└──────────────┬──────────────────────────┘
-               │ ref.watch() / ref.listen()
-               ↓
-┌─────────────────────────────────────────┐
-│      Providers Layer (Riverpod)         │
-│   - Stream/Future/State Providers       │
-│   - Lógica de negocio                   │
-│   - Transformaciones de datos           │
-└──────────────┬──────────────────────────┘
-               │ llama
-               ↓
-┌─────────────────────────────────────────┐
-│       Services Layer (Firebase)         │
-│   - FirebaseAuth                        │
-│   - Firestore queries                   │
-│   - Cloud Functions calls               │
-│   - Storage operations                  │
-└─────────────────────────────────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚           UI Layer (Widgets)            â”‚
+â”‚   - ConsumerWidget / ConsumerStateful   â”‚
+â”‚   - NO lÃ³gica de negocio                â”‚
+â”‚   - Solo presentaciÃ³n                   â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+               â”‚ ref.watch() / ref.listen()
+               â†“
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚      Providers Layer (Riverpod)         â”‚
+â”‚   - Stream/Future/State Providers       â”‚
+â”‚   - LÃ³gica de negocio                   â”‚
+â”‚   - Transformaciones de datos           â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+               â”‚ llama
+               â†“
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚       Services Layer (Firebase)         â”‚
+â”‚   - FirebaseAuth    â”‚
+â”‚   - Firestore queries                   â”‚
+â”‚   - Cloud Functions calls               â”‚
+â”‚   - Storage operations                  â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ### Ejemplo Completo
 
 ```dart
-// ❌ INCORRECTO - No usar setState para estado de aplicación
+// âŒ INCORRECTO - No usar setState para estado de aplicaciÃ³n
 class DashboardScreenOld extends StatefulWidget {
   @override
   State<DashboardScreenOld> createState() => _DashboardScreenOldState();
 }
 
 class _DashboardScreenOldState extends State<DashboardScreenOld> {
-  List<DailyRecord> records = []; // ❌ Estado que afecta toda la pantalla
+  List<DailyRecord> records = []; // âŒ Estado que afecta toda la pantalla
   
   @override
   void initState() {
     super.initState();
-    loadRecords(); // ❌ NO
+    loadRecords(); // âŒ NO
   }
   
   void loadRecords() async {
     final data = await FirebaseFirestore.instance
         .collection('users/$uid/daily_records')
         .get();
-    setState(() { // ❌ NO USAR setState para estado de aplicación
+    setState(() { // âŒ NO USAR setState para estado de aplicaciÃ³n
       records = data.docs.map((doc) => DailyRecord.fromJson(doc.data())).toList();
     });
   }
   
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(...); // ❌ MAL
+    return ListView.builder(...); // âŒ MAL
   }
 }
 
-// ⚠️ EXCEPCIÓN VÁLIDA - setState para UI local
+// âš ï¸ EXCEPCIÃ“N VÃLIDA - setState para UI local
 class SearchBarWidget extends StatefulWidget {
   final Function(String) onSearch;
   
@@ -240,22 +240,22 @@ class SearchBarWidget extends StatefulWidget {
 }
 
 class _SearchBarWidgetState extends State<SearchBarWidget> {
-  String _searchText = ''; // ✅ Estado local del widget
+  String _searchText = ''; // âœ… Estado local del widget
   
   @override
   Widget build(BuildContext context) {
     return TextField(
       onChanged: (value) {
-        setState(() => _searchText = value); // ✅ OK: UI local
+        setState(() => _searchText = value); // âœ… OK: UI local
       },
       onSubmitted: (value) {
-        widget.onSearch(value); // Solo aquí sale del widget
+        widget.onSearch(value); // Solo aquÃ­ sale del widget
       },
     );
   }
 }
 
-// ✅ CORRECTO - Usar Riverpod
+// âœ… CORRECTO - Usar Riverpod
 @riverpod
 Stream<List<DailyRecord>> monthlyRecords(MonthlyRecordsRef ref, String userId) {
   return FirebaseFirestore.instance
@@ -275,7 +275,7 @@ class DashboardScreen extends ConsumerWidget {
     final recordsAsync = ref.watch(monthlyRecordsProvider(getCurrentUserId()));
     
     return recordsAsync.when(
-      data: (records) => ListView.builder(...), // ✅ BIEN
+      data: (records) => ListView.builder(...), // âœ… BIEN
       loading: () => LoadingSpinner(),
       error: (error, stack) => ErrorState(error: error),
     );
@@ -294,7 +294,7 @@ Stream<User> currentUser(CurrentUserRef ref) {
 }
 ```
 
-2. **FutureProvider**: Para operaciones asíncronas de una vez
+2. **FutureProvider**: Para operaciones asÃ­ncronas de una vez
 ```dart
 @riverpod
 Future<List<Schedule>> schedules(SchedulesRef ref) async {
@@ -309,7 +309,7 @@ Future<List<Schedule>> schedules(SchedulesRef ref) async {
 final selectedDateProvider = StateProvider<DateTime>((ref) => DateTime.now());
 ```
 
-4. **NotifierProvider**: Para estado complejo con métodos
+4. **NotifierProvider**: Para estado complejo con mÃ©todos
 ```dart
 @riverpod
 class ClockingNotifier extends _$ClockingNotifier {
@@ -317,12 +317,12 @@ class ClockingNotifier extends _$ClockingNotifier {
   ClockingState build() => ClockingState.notStarted();
   
   Future<void> clockIn() async {
-    // Lógica de fichaje
+    // LÃ³gica de fichaje
     state = ClockingState.working();
   }
   
   Future<void> clockOut() async {
-    // Lógica de fichaje
+    // LÃ³gica de fichaje
     state = ClockingState.finished();
   }
 }
@@ -333,24 +333,24 @@ class ClockingNotifier extends _$ClockingNotifier {
 
 1. **En widgets (build method)**:
 
-                                                - ✅ Usar `ref.watch()` para escuchar cambios
-                                                - ❌ NUNCA usar `ref.read()` en build
+    - âœ… Usar `ref.watch()` para escuchar cambios
+    - âŒ NUNCA usar `ref.read()` en build
 
 2. **En callbacks (onPressed, onChanged)**:
 
-                                                - ✅ Usar `ref.read()` para ejecutar acciones
-                                                - ✅ Usar `ref.invalidate()` para refrescar datos
+    - âœ… Usar `ref.read()` para ejecutar acciones
+    - âœ… Usar `ref.invalidate()` para refrescar datos
 
 3. **En providers**:
 
-                                                - ✅ Usar `ref.watch()` para depender de otros providers
-                                                - ✅ Usar `ref.read()` para llamar métodos
+    - âœ… Usar `ref.watch()` para depender de otros providers
+    - âœ… Usar `ref.read()` para llamar mÃ©todos
 
 4. **Dependencias**:
 
-                                                - ✅ Providers pueden depender de otros providers
-                                                - ✅ Auto-refetch cuando dependencias cambian
-                                                - ✅ Auto-dispose cuando no se usan
+    - âœ… Providers pueden depender de otros providers
+    - âœ… Auto-refetch cuando dependencias cambian
+    - âœ… Auto-dispose cuando no se usan
 
 ### Testing con Riverpod
 
@@ -387,21 +387,21 @@ testWidgets('DashboardScreen shows records', (tester) async {
 
 ### Beneficios de Riverpod en este Proyecto
 
-1. **Reactive**: UI se actualiza automáticamente cuando datos cambian
-2. **Testeable**: Fácil mockear providers en tests
+1. **Reactive**: UI se actualiza automÃ¡ticamente cuando datos cambian
+2. **Testeable**: FÃ¡cil mockear providers en tests
 3. **Type-safe**: Errores en compile-time, no runtime
-4. **Performance**: Auto-dispose y caché inteligente
+4. **Performance**: Auto-dispose y cachÃ© inteligente
 5. **Developer Experience**: Code generation reduce boilerplate
 6. **Debuggeable**: Riverpod DevTools para inspeccionar estado
-7. **Escalable**: Fácil agregar nuevos providers sin refactorizar
+7. **Escalable**: FÃ¡cil agregar nuevos providers sin refactorizar
 
 ---
 
-## 📐 ESPECIFICACIONES POR SPRINT
+## ðŸ“ ESPECIFICACIONES POR SPRINT
 
-### 🎯 Sprint 1: MVP - Core Básico (Semana 1)
+### ðŸŽ¯ Sprint 1: MVP - Core BÃ¡sico (Semana 1)
 
-**Objetivo**: Login funcional + Fichaje básico Entrada/Salida
+**Objetivo**: Login funcional + Fichaje bÃ¡sico Entrada/Salida
 
 #### Colecciones a Implementar
 
@@ -410,13 +410,13 @@ testWidgets('DashboardScreen shows records', (tester) async {
 ```typescript
 // Documento: /users/{userId}
 interface User {
-  // Identificación
+  // IdentificaciÃ³n
   userId: string;              // Firebase Auth UID
   employeeId: string;          // ID interno ("EMP-001")
   email: string;
   displayName: string;
   
-  // Información Laboral
+  // InformaciÃ³n Laboral
   role: 'employee' | 'rrhh' | 'admin';
   position: string;            // "Profesor de Piano"
   contractType: 'full_time' | 'part_time';
@@ -455,14 +455,14 @@ interface User {
 ```typescript
 // Documento: /users/{userId}/daily_records/{YYYY-MM-DD}
 interface DailyRecord {
-  // Identificación
+  // IdentificaciÃ³n
   date: string;                // "2025-11-20" (YYYY-MM-DD)
   userId: string;
   
   // Fichajes (Sprint 1: solo in/out)
   clocks: {
     clockIn: string | null;     // "08:30:00" (HH:mm:ss)
-    clockOut: string | null;    // "17:00:00" o null si no fichó
+    clockOut: string | null;    // "17:00:00" o null si no fichÃ³
     // breakStart: null,        // Sprint 2
     // breakEnd: null,          // Sprint 2
   };
@@ -488,7 +488,7 @@ interface DailyRecord {
   userId: "uid123",
   clocks: {
     clockIn: "08:30:00",
-    clockOut: null              // Aún no fichó salida
+    clockOut: null              // AÃºn no fichÃ³ salida
   },
   clockInTimestamp: Timestamp,
   clockOutTimestamp: null,
@@ -508,7 +508,7 @@ interface SystemConfig {
   clockingRules: {
     maxDailyHours: number;      // 12
     allowEarlyClockIn: number;  // 15 minutos antes
-    allowLateClockOut: number;  // 15 minutos después
+    allowLateClockOut: number;  // 15 minutos despuÃ©s
   };
   
   updatedAt: Timestamp;
@@ -518,24 +518,24 @@ interface SystemConfig {
 
 #### Funcionalidades Sprint 1
 
-**Autenticación**:
+**AutenticaciÃ³n**:
 
 - [x] Login con Firebase Auth (email/password)
 - [x] Logout
-- [x] Protección de rutas (redirect si no autenticado)
+- [x] ProtecciÃ³n de rutas (redirect si no autenticado)
 - [x] Provider: `AuthProvider` (Riverpod)
 
 **Fichaje**:
 
-- [x] Botón "Fichar Entrada" → Crea documento en `daily_records/{today}`
-- [x] Botón "Fichar Salida" → Actualiza documento con `clockOut`
+- [x] BotÃ³n "Fichar Entrada" â†’ Crea documento en `daily_records/{today}`
+- [x] BotÃ³n "Fichar Salida" â†’ Actualiza documento con `clockOut`
 - [x] Mostrar estado actual (sin fichar / en trabajo)
 - [x] Provider: `ClockingProvider` (Riverpod)
 
 **Dashboard**:
 
 - [x] Mostrar fichajes del mes actual
-- [x] Calcular total horas del día
+- [x] Calcular total horas del dÃ­a
 - [x] Calcular total horas del mes
 - [x] Provider: `DashboardProvider` (Riverpod)
 
@@ -573,7 +573,7 @@ service cloud.firestore {
       // Escribir: Solo admin
       allow write: if isAdmin();
       
-      // Subcolección de fichajes
+      // SubcolecciÃ³n de fichajes
       match /daily_records/{recordId} {
         // Leer: El propio usuario o admin/rrhh
         allow read: if isOwner(userId) || isAdmin() || isRRHH();
@@ -581,7 +581,7 @@ service cloud.firestore {
         // Crear: El propio usuario (fichaje)
         allow create: if isOwner(userId);
         
-        // Actualizar: El propio usuario (solo mismo día) o admin
+        // Actualizar: El propio usuario (solo mismo dÃ­a) o admin
         allow update: if isOwner(userId) && recordId == getToday() || isAdmin();
         
         // Eliminar: Solo admin
@@ -598,9 +598,9 @@ service cloud.firestore {
 }
 ```
 
-**Nota**: `getToday()` es función helper a implementar en el cliente, no en reglas.
+**Nota**: `getToday()` es funciÃ³n helper a implementar en el cliente, no en reglas.
 
-#### Índices Compuestos Sprint 1
+#### Ãndices Compuestos Sprint 1
 
 ```javascript
 // Firestore Indexes (crear en Firebase Console)
@@ -630,7 +630,7 @@ Collection: users/{userId}/daily_records
 
 // lib/features/dashboard/providers/dashboard_provider.dart
 - MonthlyRecordsProvider (Stream de registros del mes)
-- DailySummaryProvider (Computed del día actual)
+- DailySummaryProvider (Computed del dÃ­a actual)
 - MonthlySummaryProvider (Computed del mes actual)
 ```
 
@@ -640,21 +640,21 @@ Collection: users/{userId}/daily_records
 // Unit Tests
 - AuthProvider tests
 - ClockingProvider tests
-- Cálculo de horas trabajadas
+- CÃ¡lculo de horas trabajadas
 
 // Widget Tests
 - LoginScreen con providers mock
 - DashboardScreen con datos de prueba
 
 // Integration Tests
-- Flujo completo: Login → Fichar → Ver dashboard → Logout
+- Flujo completo: Login â†’ Fichar â†’ Ver dashboard â†’ Logout
 ```
 
 ---
 
-### 🎯 Sprint 2: Pausas + Validaciones (Semana 2)
+### ðŸŽ¯ Sprint 2: Pausas + Validaciones (Semana 2)
 
-**Objetivo**: Añadir sistema de pausas + máquina de estados
+**Objetivo**: AÃ±adir sistema de pausas + mÃ¡quina de estados
 
 #### Cambios en Estructura
 
@@ -665,22 +665,22 @@ interface DailyRecord {
   date: string;
   userId: string;
   
-  // ✨ NUEVO: Agregar pausas
+  // âœ¨ NUEVO: Agregar pausas
   clocks: {
     clockIn: string | null;
-    breakStart: string | null;    // ✨ Sprint 2
-    breakEnd: string | null;      // ✨ Sprint 2
+    breakStart: string | null;    // âœ¨ Sprint 2
+    breakEnd: string | null;      // âœ¨ Sprint 2
     clockOut: string | null;
   };
   
   clockInTimestamp: Timestamp | null;
-  breakStartTimestamp: Timestamp | null;    // ✨ Sprint 2
-  breakEndTimestamp: Timestamp | null;      // ✨ Sprint 2
+  breakStartTimestamp: Timestamp | null;    // âœ¨ Sprint 2
+  breakEndTimestamp: Timestamp | null;      // âœ¨ Sprint 2
   clockOutTimestamp: Timestamp | null;
   
-  // ✨ NUEVO: Cálculos
-  totalWorkedMinutes: number | null;        // ✨ Sprint 2
-  breakDurationMinutes: number | null;      // ✨ Sprint 2
+  // âœ¨ NUEVO: CÃ¡lculos
+  totalWorkedMinutes: number | null;        // âœ¨ Sprint 2
+  breakDurationMinutes: number | null;      // âœ¨ Sprint 2
   
   status: 'incomplete' | 'complete';
   
@@ -691,29 +691,29 @@ interface DailyRecord {
 
 #### Funcionalidades Sprint 2
 
-**Máquina de Estados**:
+**MÃ¡quina de Estados**:
 
 ```typescript
 enum ClockingState {
-  NOT_STARTED,    // Inicio del día → Solo ENTRADA disponible
-  WORKING,        // Fichó entrada → PAUSA o SALIDA disponibles
-  ON_BREAK,       // Fichó pausa → Solo RETORNO disponible
-  RETURNED,       // Fichó retorno → PAUSA o SALIDA disponibles (= WORKING)
-  FINISHED        // Fichó salida → Nada disponible
+  NOT_STARTED,    // Inicio del dÃ­a â†’ Solo ENTRADA disponible
+  WORKING,        // FichÃ³ entrada â†’ PAUSA o SALIDA disponibles
+  ON_BREAK,       // FichÃ³ pausa â†’ Solo RETORNO disponible
+  RETURNED,       // FichÃ³ retorno â†’ PAUSA o SALIDA disponibles (= WORKING)
+  FINISHED        // FichÃ³ salida â†’ Nada disponible
 }
 ```
 
 **Validaciones**:
 
-- [x] Deshabilitar botones según estado actual
+- [x] Deshabilitar botones segÃºn estado actual
 - [x] Prevenir fichajes fuera de secuencia
-- [x] Diálogo de confirmación en salida anticipada (falta >1h)
+- [x] DiÃ¡logo de confirmaciÃ³n en salida anticipada (falta >1h)
 - [x] Provider: `ClockingStateProvider` (Riverpod)
 
-**Cálculos**:
+**CÃ¡lculos**:
 
 - [x] Calcular minutos trabajados (incluye pausas)
-- [x] Calcular duración de pausa
+- [x] Calcular duraciÃ³n de pausa
 - [x] Actualizar `totalWorkedMinutes` al fichar salida
 - [x] Provider: `TimeCalculationProvider` (Riverpod)
 
@@ -721,22 +721,22 @@ enum ClockingState {
 
 ```dart
 // Unit Tests
-- Máquina de estados (todas las transiciones)
-- Validación de secuencia de fichajes
-- Cálculo de minutos trabajados
+- MÃ¡quina de estados (todas las transiciones)
+- ValidaciÃ³n de secuencia de fichajes
+- CÃ¡lculo de minutos trabajados
 
 // Widget Tests
-- Botones deshabilitados según estado
-- Diálogo de confirmación en salida anticipada
+- Botones deshabilitados segÃºn estado
+- DiÃ¡logo de confirmaciÃ³n en salida anticipada
 
 // Integration Tests
-- Flujo completo con pausa: Entrada → Pausa → Retorno → Salida
+- Flujo completo con pausa: Entrada â†’ Pausa â†’ Retorno â†’ Salida
 - Intentar fichar fuera de orden (debe fallar)
 ```
 
 ---
 
-### 🎯 Sprint 3: Panel Admin + Correcciones (Semana 3)
+### ðŸŽ¯ Sprint 3: Panel Admin + Correcciones (Semana 3)
 
 **Objetivo**: Admin puede ver todos los empleados y corregir fichajes
 
@@ -748,7 +748,7 @@ enum ClockingState {
 interface DailyRecord {
   // ... campos anteriores
   
-  // ✨ NUEVO: Historial de ediciones
+  // âœ¨ NUEVO: Historial de ediciones
   editHistory: Array<{
     field: string;              // "clockIn" | "clockOut" | etc.
     oldValue: string | null;
@@ -756,12 +756,12 @@ interface DailyRecord {
     editedBy: string;           // uid del editor
     editedByRole: string;       // "employee" | "admin"
     editedAt: Timestamp;
-    reason?: string;            // Opcional: motivo de corrección
-  }> | null;                    // ✨ Sprint 3
+    reason?: string;            // Opcional: motivo de correcciÃ³n
+  }> | null;    // âœ¨ Sprint 3
   
-  // ✨ NUEVO: Flag de corrección
-  wasEdited: boolean;           // ✨ Sprint 3
-  lastEditedAt: Timestamp | null; // ✨ Sprint 3
+  // âœ¨ NUEVO: Flag de correcciÃ³n
+  wasEdited: boolean;           // âœ¨ Sprint 3
+  lastEditedAt: Timestamp | null; // âœ¨ Sprint 3
 }
 ```
 
@@ -775,19 +775,19 @@ interface DailyRecord {
 - [x] Ver detalle de empleado
 - [x] Provider: `AdminEmployeesProvider` (Riverpod)
 
-**Corrección de Fichajes**:
+**CorrecciÃ³n de Fichajes**:
 
 - [x] Admin puede editar cualquier campo de cualquier fecha
-- [x] Modal de confirmación con campo "motivo"
+- [x] Modal de confirmaciÃ³n con campo "motivo"
 - [x] Guardar en `editHistory` cada cambio
 - [x] Marcar registro como editado (`wasEdited: true`)
 - [x] Provider: `AdminClockingProvider` (Riverpod)
 
-**Lista de Anomalías**:
+**Lista de AnomalÃ­as**:
 
 - [x] Query de registros con `status: "incomplete"`
 - [x] Mostrar en panel admin
-- [x] Botón para corregir desde lista
+- [x] BotÃ³n para corregir desde lista
 - [x] Provider: `AnomaliesProvider` (Riverpod)
 
 #### Reglas de Seguridad Sprint 3
@@ -811,23 +811,23 @@ match /daily_records/{recordId} {
 
 ```dart
 // Unit Tests
-- AdminEmployeesProvider (filtros, búsqueda)
+- AdminEmployeesProvider (filtros, bÃºsqueda)
 - Historial de ediciones (agregar, formatear)
 
 // Widget Tests
 - Lista de empleados con filtros
-- Modal de corrección de fichaje
+- Modal de correcciÃ³n de fichaje
 
 // Integration Tests
-- Admin corrige fichaje → Se guarda en editHistory
-- Empleado intenta editar campo prohibido → Falla
+- Admin corrige fichaje â†’ Se guarda en editHistory
+- Empleado intenta editar campo prohibido â†’ Falla
 ```
 
 ---
 
-### 🎯 Sprint 4: Cierre Automático + Horas Extras (Semana 4)
+### ðŸŽ¯ Sprint 4: Cierre AutomÃ¡tico + Horas Extras (Semana 4)
 
-**Objetivo**: Automatizar cierres + sistema de aprobación de horas extras
+**Objetivo**: Automatizar cierres + sistema de aprobaciÃ³n de horas extras
 
 #### Nuevas Colecciones
 
@@ -837,7 +837,7 @@ match /daily_records/{recordId} {
 // Documento: /schedules/{scheduleId}
 interface Schedule {
   scheduleId: string;           // "schedule_standard"
-  name: string;                 // "Jornada Estándar"
+  name: string;                 // "Jornada EstÃ¡ndar"
   description: string;
   
   // Horario semanal
@@ -886,8 +886,8 @@ interface OvertimeRequest {
   // Estado
   status: 'pending' | 'approved' | 'rejected';
   
-  // Aprobación
-  reviewedBy: string | null;    // uid de quien aprobó
+  // AprobaciÃ³n
+  reviewedBy: string | null;    // uid de quien aprobÃ³
   reviewedByName: string | null;
   reviewedAt: Timestamp | null;
   reviewNotes: string | null;
@@ -906,7 +906,7 @@ interface OvertimeRequest {
 interface User {
   // ... campos anteriores
   
-  scheduleId: string;           // ✨ Ahora se usa (Sprint 4)
+  scheduleId: string;           // âœ¨ Ahora se usa (Sprint 4)
 }
 ```
 
@@ -916,33 +916,33 @@ interface User {
 interface DailyRecord {
   // ... campos anteriores
   
-  // ✨ NUEVO: Cierre automático
-  autoClosedAt: string | null;      // ✨ Sprint 4
-  wasAutoClosed: boolean;           // ✨ Sprint 4
-  requiresReview: boolean;          // ✨ Sprint 4 (anomalía)
+  // âœ¨ NUEVO: Cierre automÃ¡tico
+  autoClosedAt: string | null;      // âœ¨ Sprint 4
+  wasAutoClosed: boolean;           // âœ¨ Sprint 4
+  requiresReview: boolean;          // âœ¨ Sprint 4 (anomalÃ­a)
 }
 ```
 
 #### Funcionalidades Sprint 4
 
-**Cierre Automático**:
+**Cierre AutomÃ¡tico**:
 
 - [x] Cloud Function diaria (ejecuta a medianoche)
-- [x] Query registros `status: "incomplete"` del día anterior
+- [x] Query registros `status: "incomplete"` del dÃ­a anterior
 - [x] Obtener horario del empleado (`schedules`)
 - [x] Cerrar con `clockOut: endTime` del horario
 - [x] Marcar `wasAutoClosed: true`, `requiresReview: true`
 - [x] **Archivo**: `functions/src/autoCloseRecords.ts`
 
-**Detección de Horas Extras**:
+**DetecciÃ³n de Horas Extras**:
 
 - [x] Cloud Function semanal (ejecuta domingo 23:59)
 - [x] Calcular total minutos trabajados de la semana
 - [x] Comparar con `weeklyHours` contratadas
-- [x] Si hay diferencia > 0 → Crear `overtime_request` con `status: "pending"`
+- [x] Si hay diferencia > 0 â†’ Crear `overtime_request` con `status: "pending"`
 - [x] **Archivo**: `functions/src/detectOvertime.ts`
 
-**Aprobación de Horas Extras**:
+**AprobaciÃ³n de Horas Extras**:
 
 - [x] Panel RRHH/Admin muestra solicitudes pendientes
 - [x] Botones: Aprobar / Rechazar
@@ -957,20 +957,20 @@ interface DailyRecord {
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
-// Cloud Function: Cierre automático diario
+// Cloud Function: Cierre automÃ¡tico diario
 export const autoCloseRecords = functions.pubsub
-  .schedule('0 0 * * *')  // Cada día a medianoche
+  .schedule('0 0 * * *')  // Cada dÃ­a a medianoche
   .timeZone('Europe/Madrid')
   .onRun(async (context) => {
-    // Lógica de cierre automático
+    // LÃ³gica de cierre automÃ¡tico
   });
 
-// Cloud Function: Detección de horas extras semanal
+// Cloud Function: DetecciÃ³n de horas extras semanal
 export const detectOvertime = functions.pubsub
   .schedule('59 23 * * 0')  // Domingos a las 23:59
   .timeZone('Europe/Madrid')
   .onRun(async (context) => {
-    // Lógica de detección de horas extras
+    // LÃ³gica de detecciÃ³n de horas extras
   });
 ```
 
@@ -986,20 +986,20 @@ export const detectOvertime = functions.pubsub
 
 // Widget Tests
 - Panel de solicitudes de horas extras
-- Modal de aprobación/rechazo
+- Modal de aprobaciÃ³n/rechazo
 
 // Integration Tests
-- Simular día sin fichar salida → Verificar cierre automático
-- Simular semana con horas extras → Verificar creación de solicitud
+- Simular dÃ­a sin fichar salida â†’ Verificar cierre automÃ¡tico
+- Simular semana con horas extras â†’ Verificar creaciÃ³n de solicitud
 ```
 
 ---
 
-### 🎯 Sprint 5: Reportes + Archivado (Semana 5)
+### ðŸŽ¯ Sprint 5: Reportes + Archivado (Semana 5)
 
-**Objetivo**: Generación de reportes + archivado de registros antiguos
+**Objetivo**: GeneraciÃ³n de reportes + archivado de registros antiguos
 
-#### Nueva Colección
+#### Nueva ColecciÃ³n
 
 ##### SubCollection: `users/{userId}/monthly_summary`
 
@@ -1014,7 +1014,7 @@ interface MonthlySummary {
   totalMinutesWorked: number;   // 9600 (160h)
   avgDailyMinutes: number;      // 480 (8h)
   
-  // Extras y anomalías
+  // Extras y anomalÃ­as
   overtimeMinutes: number;      // 120 (2h)
   incompleteDays: number;       // 2
   autoClosedDays: number;       // 1
@@ -1034,9 +1034,9 @@ interface MonthlySummary {
 
 #### Funcionalidades Sprint 5
 
-**Generación de Resúmenes Mensuales**:
+**GeneraciÃ³n de ResÃºmenes Mensuales**:
 
-- [x] Cloud Function mensual (ejecuta día 1 de cada mes)
+- [x] Cloud Function mensual (ejecuta dÃ­a 1 de cada mes)
 - [x] Para cada usuario: calcular totales del mes anterior
 - [x] Guardar en `monthly_summary/{YYYY-MM}`
 - [x] **Archivo**: `functions/src/generateMonthlySummaries.ts`
@@ -1046,25 +1046,25 @@ interface MonthlySummary {
 - [x] Pantalla de reportes (RRHH/Admin)
 - [x] Filtros: Empleado, Mes, Departamento
 - [x] Mostrar datos de `monthly_summary`
-- [x] Gráficos: horas trabajadas por semana
+- [x] GrÃ¡ficos: horas trabajadas por semana
 - [x] Provider: `ReportsProvider` (Riverpod)
 
-**Exportación a PDF**:
+**ExportaciÃ³n a PDF**:
 
-- [x] Botón "Exportar PDF" en pantalla de reportes
-- [x] Usar librería `pdf` de Flutter
+- [x] BotÃ³n "Exportar PDF" en pantalla de reportes
+- [x] Usar librerÃ­a `pdf` de Flutter
 - [x] Generar PDF con:
-                                - Encabezado con logo escuela
-                                - Tabla de fichajes del mes
-                                - Totales y promedios
-                                - Anomalías destacadas
+    - Encabezado con logo escuela
+    - Tabla de fichajes del mes
+    - Totales y promedios
+    - AnomalÃ­as destacadas
 - [x] Descargar archivo
 - [x] Provider: `PDFExportProvider` (Riverpod)
 
 **Archivado de Registros**:
 
-- [x] Cloud Function mensual (ejecuta día 1 de cada mes)
-- [x] Query registros con `date < (hoy - 90 días)`
+- [x] Cloud Function mensual (ejecuta dÃ­a 1 de cada mes)
+- [x] Query registros con `date < (hoy - 90 dÃ­as)`
 - [x] Exportar a JSON comprimido
 - [x] Subir a Cloud Storage: `gs://bucket/archive/{YYYY-MM}.json.gz`
 - [x] Eliminar de Firestore
@@ -1072,8 +1072,8 @@ interface MonthlySummary {
 
 **Consulta de Archivados**:
 
-- [x] Función helper para leer archivos de Storage
-- [x] Botón "Ver histórico completo" (para admin/rrhh)
+- [x] FunciÃ³n helper para leer archivos de Storage
+- [x] BotÃ³n "Ver histÃ³rico completo" (para admin/rrhh)
 - [x] Descargar JSON de Storage y parsear
 - [x] Mostrar en tabla (lectura lenta, warning de performance)
 - [x] Provider: `ArchivedRecordsProvider` (Riverpod)
@@ -1083,20 +1083,20 @@ interface MonthlySummary {
 ```typescript
 // functions/src/index.ts
 
-// Cloud Function: Generar resúmenes mensuales
+// Cloud Function: Generar resÃºmenes mensuales
 export const generateMonthlySummaries = functions.pubsub
-  .schedule('0 2 1 * *')  // Día 1 de cada mes a las 2am
+  .schedule('0 2 1 * *')  // DÃ­a 1 de cada mes a las 2am
   .timeZone('Europe/Madrid')
   .onRun(async (context) => {
-    // Lógica de generación de resúmenes
+    // LÃ³gica de generaciÃ³n de resÃºmenes
   });
 
 // Cloud Function: Archivar registros antiguos
 export const archiveOldRecords = functions.pubsub
-  .schedule('0 3 1 * *')  // Día 1 de cada mes a las 3am
+  .schedule('0 3 1 * *')  // DÃ­a 1 de cada mes a las 3am
   .timeZone('Europe/Madrid')
   .onRun(async (context) => {
-    // Lógica de archivado
+    // LÃ³gica de archivado
   });
 ```
 
@@ -1109,20 +1109,20 @@ export const archiveOldRecords = functions.pubsub
 
 // Unit Tests (Flutter)
 - ReportsProvider (filtros, queries)
-- PDFExportProvider (generación de PDF)
+- PDFExportProvider (generaciÃ³n de PDF)
 
 // Widget Tests
 - Pantalla de reportes con filtros
-- Visualización de resúmenes mensuales
+- VisualizaciÃ³n de resÃºmenes mensuales
 
 // Integration Tests
-- Generar reporte → Exportar PDF → Verificar descarga
-- Consultar registros archivados → Verificar lectura de Storage
+- Generar reporte â†’ Exportar PDF â†’ Verificar descarga
+- Consultar registros archivados â†’ Verificar lectura de Storage
 ```
 
 ---
 
-## 🔐 REGLAS DE SEGURIDAD COMPLETAS
+## ðŸ” REGLAS DE SEGURIDAD COMPLETAS
 
 ```javascript
 rules_version = '2';
@@ -1159,7 +1159,7 @@ service cloud.firestore {
     
     function getTodayDate() {
       // Implementar en cliente, no disponible en reglas
-      // Esta función es solo ilustrativa
+      // Esta funciÃ³n es solo ilustrativa
       return "2025-11-20";
     }
     
@@ -1190,7 +1190,7 @@ service cloud.firestore {
         
         // Crear registro: El propio usuario (fichaje)
         allow create: if isOwner(userId) && 
-                      request.resource.data.userId == request.auth.uid;
+    request.resource.data.userId == request.auth.uid;
         
         // Actualizar registro
         allow update: if (
@@ -1212,7 +1212,7 @@ service cloud.firestore {
           let newClocks = request.resource.data.clocks;
           
           return (
-            // Solo clockIn cambió
+            // Solo clockIn cambiÃ³
             newClocks.clockIn != oldClocks.clockIn &&
             newClocks.clockOut == oldClocks.clockOut &&
             newClocks.breakStart == oldClocks.breakStart &&
@@ -1251,7 +1251,7 @@ service cloud.firestore {
     // ========================================
     
     match /overtime_requests/{requestId} {
-      // Leer: El empleado dueño de la solicitud o admin/rrhh
+      // Leer: El empleado dueÃ±o de la solicitud o admin/rrhh
       allow read: if request.auth.uid == resource.data.userId || isAdminOrRRHH();
       
       // Crear: Solo Cloud Functions (auto-generadas)
@@ -1281,10 +1281,10 @@ service cloud.firestore {
 
 ---
 
-## 📊 ÍNDICES COMPUESTOS NECESARIOS
+## ðŸ“Š ÃNDICES COMPUESTOS NECESARIOS
 
 ```javascript
-// Crear en Firebase Console → Firestore → Indexes
+// Crear en Firebase Console â†’ Firestore â†’ Indexes
 
 // 1. Para queries de registros por fecha (dashboard empleado)
 Collection: users/{userId}/daily_records
@@ -1295,7 +1295,7 @@ Collection Group: daily_records
 - status (Ascending)
 - date (Descending)
 
-// 3. Para queries de registros que requieren revisión
+// 3. Para queries de registros que requieren revisiÃ³n
 Collection Group: daily_records
 - requiresReview (Ascending)
 - date (Descending)
@@ -1311,20 +1311,20 @@ Collection: overtime_requests
 - status (Ascending)
 - weekNumber (Descending)
 
-// 6. Para queries de resúmenes mensuales
+// 6. Para queries de resÃºmenes mensuales
 Collection: users/{userId}/monthly_summary
 - month (Descending)
 ```
 
-**Nota**: Firebase sugerirá crear índices automáticamente cuando ejecutes queries que los requieran.
+**Nota**: Firebase sugerirÃ¡ crear Ã­ndices automÃ¡ticamente cuando ejecutes queries que los requieran.
 
 ---
 
-## 💰 OPTIMIZACIÓN DE COSTOS
+## ðŸ’° OPTIMIZACIÃ“N DE COSTOS
 
-### Límites del Plan Gratuito
+### LÃ­mites del Plan Gratuito
 
-| Recurso | Límite Diario | Límite Mensual |
+| Recurso | LÃ­mite Diario | LÃ­mite Mensual |
 
 |---------|---------------|----------------|
 
@@ -1338,113 +1338,113 @@ Collection: users/{userId}/monthly_summary
 
 | Network | - | 10 GB |
 
-### Estimación de Uso
+### EstimaciÃ³n de Uso
 
 #### Writes
 
 ```
 Fichajes diarios:
-- 458 empleados × 1 documento/día = 458 writes/día
-- Update de documento: 3 actualizaciones promedio/día = 1,374 writes/día
-- Total: ~2,000 writes/día ✅ (10% del límite)
+- 458 empleados Ã— 1 documento/dÃ­a = 458 writes/dÃ­a
+- Update de documento: 3 actualizaciones promedio/dÃ­a = 1,374 writes/dÃ­a
+- Total: ~2,000 writes/dÃ­a âœ… (10% del lÃ­mite)
 
-Mensual: ~44,000 writes/mes ✅
+Mensual: ~44,000 writes/mes âœ…
 ```
 
 #### Reads
 
 ```
 Pico matutino (9-10am):
-- 229 empleados × 30 reads (cargar dashboard) = 6,870 reads/hora
+- 229 empleados Ã— 30 reads (cargar dashboard) = 6,870 reads/hora
 
-Uso distribuido durante el día:
-- 229 docentes × 20 reads (promedio) = 4,580 reads
+Uso distribuido durante el dÃ­a:
+- 229 docentes Ã— 20 reads (promedio) = 4,580 reads
 
 Consultas admin/RRHH:
-- 2 usuarios × 200 reads/día = 400 reads
+- 2 usuarios Ã— 200 reads/dÃ­a = 400 reads
 
-Total: ~12,000 reads/día ✅ (24% del límite)
-Mensual: ~360,000 reads/mes ✅
+Total: ~12,000 reads/dÃ­a âœ… (24% del lÃ­mite)
+Mensual: ~360,000 reads/mes âœ…
 ```
 
 #### Storage
 
 ```
-Registro por día: ~2 KB
-458 empleados × 22 días × 12 meses × 3 años = 362,208 registros
-362,208 × 2 KB = 724 MB ✅ (72% del límite de 1 GB)
+Registro por dÃ­a: ~2 KB
+458 empleados Ã— 22 dÃ­as Ã— 12 meses Ã— 3 aÃ±os = 362,208 registros
+362,208 Ã— 2 KB = 724 MB âœ… (72% del lÃ­mite de 1 GB)
 
 Con archivado (solo 3 meses en Firestore):
-458 × 22 × 3 = 30,228 registros
-30,228 × 2 KB = 60 MB ✅ (6% del límite)
+458 Ã— 22 Ã— 3 = 30,228 registros
+30,228 Ã— 2 KB = 60 MB âœ… (6% del lÃ­mite)
 ```
 
-### Estrategias de Optimización
+### Estrategias de OptimizaciÃ³n
 
-#### 1. **Caché Local Agresivo**
+#### 1. **CachÃ© Local Agresivo**
 
 ```dart
 // Usar cached data cuando sea posible
 FirebaseFirestore.instance
   .collection('users/$uid/daily_records')
   .doc(today)
-  .get(GetOptions(source: Source.cache))  // Lee de caché primero
+  .get(GetOptions(source: Source.cache))  // Lee de cachÃ© primero
 ```
 
 **Ahorro**: 60-80% de reads
 
-#### 2. **Paginación Inteligente**
+#### 2. **PaginaciÃ³n Inteligente**
 
 ```dart
-// Dashboard: Mostrar solo últimos 7 días por defecto
+// Dashboard: Mostrar solo Ãºltimos 7 dÃ­as por defecto
 query.limit(7);
 
-// Botón "Ver más" carga 30 días
+// BotÃ³n "Ver mÃ¡s" carga 30 dÃ­as
 query.limit(30).startAfterDocument(lastDocument);
 ```
 
 **Ahorro**: 70% de reads en carga inicial
 
-#### 3. **Resúmenes Pre-calculados**
+#### 3. **ResÃºmenes Pre-calculados**
 
 ```dart
 // En vez de calcular totales del mes leyendo 22 documentos:
 // Leer 1 documento de monthly_summary
 
-// Ahorro: 22 reads → 1 read (95% menos)
+// Ahorro: 22 reads â†’ 1 read (95% menos)
 ```
 
 #### 4. **Listeners Selectivos**
 
 ```dart
-// NO escuchar toda la colección
-// SÍ escuchar solo el documento de hoy
+// NO escuchar toda la colecciÃ³n
+// SÃ escuchar solo el documento de hoy
 
-// ❌ MAL
+// âŒ MAL
 db.collection('users/$uid/daily_records').snapshots()
 
-// ✅ BIEN
+// âœ… BIEN
 db.collection('users/$uid/daily_records').doc(today).snapshots()
 ```
 
 **Ahorro**: 90% de reads recurrentes
 
-#### 5. **Archivado Automático**
+#### 5. **Archivado AutomÃ¡tico**
 
-- Registros > 3 meses → Cloud Storage
+- Registros > 3 meses â†’ Cloud Storage
 - Reduce storage en Firestore
 - Reduce tiempo de queries
 
-**Ahorro en Storage**: 90% (de 724 MB → 60 MB)
+**Ahorro en Storage**: 90% (de 724 MB â†’ 60 MB)
 
 ### Costos Proyectados
 
 #### Escenario: Uso Optimizado (Con estrategias aplicadas)
 
 ```
-Reads: ~12,000/día × 30 días = 360,000/mes ✅ GRATIS
-Writes: ~2,000/día × 30 días = 60,000/mes ✅ GRATIS
-Storage: 60 MB (Firestore) + 700 MB (Storage) ✅ GRATIS
+Reads: ~12,000/dÃ­a Ã— 30 dÃ­as = 360,000/mes âœ… GRATIS
+Writes: ~2,000/dÃ­a Ã— 30 dÃ­as = 60,000/mes âœ… GRATIS
+Storage: 60 MB (Firestore) + 700 MB (Storage) âœ… GRATIS
 ```
 
 **Costo mensual: $0** (dentro del plan gratuito)
@@ -1452,17 +1452,17 @@ Storage: 60 MB (Firestore) + 700 MB (Storage) ✅ GRATIS
 #### Escenario: Uso Sin Optimizar (Sin estrategias)
 
 ```
-Reads: ~35,000/día × 30 días = 1,050,000/mes
+Reads: ~35,000/dÃ­a Ã— 30 dÃ­as = 1,050,000/mes
 - Gratis: 1,500,000
-- Exceso: 0 ✅ GRATIS (pero cerca del límite)
+- Exceso: 0 âœ… GRATIS (pero cerca del lÃ­mite)
 
-Writes: ~4,000/día × 30 días = 120,000/mes
-- Gratis: 600,000 ✅ GRATIS
+Writes: ~4,000/dÃ­a Ã— 30 dÃ­as = 120,000/mes
+- Gratis: 600,000 âœ… GRATIS
 
-Storage: 724 MB ✅ GRATIS
+Storage: 724 MB âœ… GRATIS
 ```
 
-**Costo mensual: $0** (pero riesgo de superar límite en picos)
+**Costo mensual: $0** (pero riesgo de superar lÃ­mite en picos)
 
 #### Escenario: Crecimiento (600 empleados, sin optimizar)
 
@@ -1470,25 +1470,25 @@ Storage: 724 MB ✅ GRATIS
 Reads: 2,000,000/mes
 - Gratis: 1,500,000
 - Exceso: 500,000
-- Costo: $0.18 (500K / 100K × $0.036)
+- Costo: $0.18 (500K / 100K Ã— $0.036)
 
-Writes: 150,000/mes ✅ GRATIS
-Storage: 900 MB ✅ GRATIS
+Writes: 150,000/mes âœ… GRATIS
+Storage: 900 MB âœ… GRATIS
 ```
 
 **Costo mensual: ~$0.20** (muy bajo)
 
-### Recomendación
+### RecomendaciÃ³n
 
-✅ **Implementar estrategias de optimización desde Sprint 1**
+âœ… **Implementar estrategias de optimizaciÃ³n desde Sprint 1**
 
-✅ **Monitorear uso en Firebase Console**
+âœ… **Monitorear uso en Firebase Console**
 
-✅ **Alertas si se supera 80% de límite diario**
+âœ… **Alertas si se supera 80% de lÃ­mite diario**
 
 ---
 
-## 🧪 ESTRATEGIA DE TESTING
+## ðŸ§ª ESTRATEGIA DE TESTING
 
 ### Niveles de Testing
 
@@ -1503,7 +1503,7 @@ Storage: 900 MB ✅ GRATIS
 
 // Helpers
 - TimeCalculation (calcular minutos trabajados)
-- DateHelpers (formatear fechas, semana del año)
+- DateHelpers (formatear fechas, semana del aÃ±o)
 - ClockingStateMachine (transiciones de estado)
 
 // Models
@@ -1512,35 +1512,35 @@ Storage: 900 MB ✅ GRATIS
 - OvertimeRequest.fromJson() / toJson()
 ```
 
-**Objetivo**: 80% de cobertura en lógica de negocio
+**Objetivo**: 80% de cobertura en lÃ³gica de negocio
 
 #### 2. **Widget Tests**
 
 ```dart
 // Screens
-- LoginScreen (formulario, validación)
+- LoginScreen (formulario, validaciÃ³n)
 - DashboardScreen (mostrar datos, botones deshabilitados)
 - AdminDashboardScreen (lista de empleados)
 
 // Widgets
-- ClockingButtons (estado de botones según ClockingState)
-- RecordsTable (mostrar registros, paginación)
+- ClockingButtons (estado de botones segÃºn ClockingState)
+- RecordsTable (mostrar registros, paginaciÃ³n)
 - OvertimeRequestCard (aprobar/rechazar)
 ```
 
-**Objetivo**: 60% de cobertura en widgets críticos
+**Objetivo**: 60% de cobertura en widgets crÃ­ticos
 
 #### 3. **Integration Tests**
 
 ```dart
 // Flujos completos
-- Login → Dashboard → Fichar → Logout
-- Fichar día completo: Entrada → Pausa → Retorno → Salida
-- Admin corrige fichaje → Verificar editHistory
-- RRHH aprueba horas extras → Verificar estado cambiado
+- Login â†’ Dashboard â†’ Fichar â†’ Logout
+- Fichar dÃ­a completo: Entrada â†’ Pausa â†’ Retorno â†’ Salida
+- Admin corrige fichaje â†’ Verificar editHistory
+- RRHH aprueba horas extras â†’ Verificar estado cambiado
 ```
 
-**Objetivo**: 5-10 flujos críticos cubiertos
+**Objetivo**: 5-10 flujos crÃ­ticos cubiertos
 
 #### 4. **Cloud Functions Tests**
 
@@ -1574,9 +1574,9 @@ firebase emulators:start
 
 **Beneficios**:
 
-- ✅ Testing local sin costo
-- ✅ Datos aislados de producción
-- ✅ Rápido (sin latencia de red)
+- âœ… Testing local sin costo
+- âœ… Datos aislados de producciÃ³n
+- âœ… RÃ¡pido (sin latencia de red)
 
 #### Test Data
 
@@ -1621,7 +1621,7 @@ jobs:
 
 ---
 
-## 📦 DEPENDENCIAS ADICIONALES
+## ðŸ“¦ DEPENDENCIAS ADICIONALES
 
 ### Flutter (pubspec.yaml)
 
@@ -1636,7 +1636,7 @@ dependencies:
   go_router: ^12.0.0
   intl: ^0.19.0
   
-  # ✨ NUEVAS para Fase 2
+  # âœ¨ NUEVAS para Fase 2
   
   # Firebase
   firebase_core: ^2.24.0
@@ -1649,7 +1649,7 @@ dependencies:
   
   # Utils
   freezed_annotation: ^2.4.1     # Para models immutables
-  json_annotation: ^4.8.1        # Para serialización
+  json_annotation: ^4.8.1        # Para serializaciÃ³n
   
   # PDF Generation
   pdf: ^3.10.0
@@ -1664,7 +1664,7 @@ dependencies:
 dev_dependencies:
   flutter_lints: ^3.0.0
   
-  # ✨ NUEVAS
+  # âœ¨ NUEVAS
   build_runner: ^2.4.6           # Para code generation
   riverpod_generator: ^2.3.0
   freezed: ^2.4.5
@@ -1701,23 +1701,23 @@ dev_dependencies:
 
 ---
 
-## 🚀 PLAN DE IMPLEMENTACIÓN
+## ðŸš€ PLAN DE IMPLEMENTACIÃ“N
 
-### Preparación (Antes de Sprint 1)
+### PreparaciÃ³n (Antes de Sprint 1)
 
 #### 1. Configurar Proyecto Firebase
 
 - [ ] Crear proyecto en [Firebase Console](https://console.firebase.google.com)
 - [ ] Habilitar Firebase Authentication
-                                - [ ] Activar método Email/Password
-                                - [ ] (Opcional) Activar Google Sign-In
+    - [ ] Activar mÃ©todo Email/Password
+    - [ ] (Opcional) Activar Google Sign-In
 - [ ] Crear Firestore Database
-                                - [ ] Iniciar en **modo test** (cambiar a producción en Sprint 3)
-                                - [ ] Seleccionar región: `europe-west1`
+    - [ ] Iniciar en **modo test** (cambiar a producciÃ³n en Sprint 3)
+    - [ ] Seleccionar regiÃ³n: `europe-west1`
 - [ ] Habilitar Cloud Storage
-                                - [ ] Crear bucket para archivado
+    - [ ] Crear bucket para archivado
 - [ ] Habilitar Cloud Functions
-                                - [ ] Actualizar plan a Blaze (pay-as-you-go, pero seguirá gratis con nuestro uso)
+    - [ ] Actualizar plan a Blaze (pay-as-you-go, pero seguirÃ¡ gratis con nuestro uso)
 
 #### 2. Configurar Flutter con Firebase
 
@@ -1731,7 +1731,7 @@ flutterfire configure
 # Seguir wizard:
 # - Seleccionar proyecto Firebase
 # - Seleccionar plataformas (web, android, ios)
-# - Generar archivos de configuración
+# - Generar archivos de configuraciÃ³n
 ```
 
 #### 3. Poblar Datos Iniciales
@@ -1744,7 +1744,7 @@ flutterfire configure
 # - 1 Admin
 # - 1 RRHH
 # - 10 Empleados de prueba
-# - 2 Schedules (Jornada Estándar, Jornada Tarde)
+# - 2 Schedules (Jornada EstÃ¡ndar, Jornada Tarde)
 ```
 
 #### 4. Configurar Emuladores
@@ -1761,94 +1761,94 @@ firebase init emulators
 
 ### Cronograma
 
-| Sprint | Duración | Fechas | Entregable |
+| Sprint | DuraciÃ³n | Fechas | Entregable |
 
 |--------|----------|--------|------------|
 
-| **Preparación** | 2 días | Nov 25-26 | Proyecto Firebase configurado |
+| **PreparaciÃ³n** | 2 dÃ­as | Nov 25-26 | Proyecto Firebase configurado |
 
-| **Sprint 1** | 5 días | Nov 27 - Dic 1 | Login + Fichaje básico |
+| **Sprint 1** | 5 dÃ­as | Nov 27 - Dic 1 | Login + Fichaje bÃ¡sico |
 
-| **Sprint 2** | 5 días | Dic 2 - Dic 6 | Pausas + Validaciones |
+| **Sprint 2** | 5 dÃ­as | Dic 2 - Dic 6 | Pausas + Validaciones |
 
-| **Sprint 3** | 5 días | Dic 9 - Dic 13 | Panel Admin + Correcciones |
+| **Sprint 3** | 5 dÃ­as | Dic 9 - Dic 13 | Panel Admin + Correcciones |
 
-| **Sprint 4** | 5 días | Dic 16 - Dic 20 | Cierre automático + Horas extras |
+| **Sprint 4** | 5 dÃ­as | Dic 16 - Dic 20 | Cierre automÃ¡tico + Horas extras |
 
-| **Sprint 5** | 5 días | Ene 7 - Ene 10 | Reportes + Archivado |
+| **Sprint 5** | 5 dÃ­as | Ene 7 - Ene 10 | Reportes + Archivado |
 
-| **Testing** | 3 días | Ene 13 - Ene 15 | Tests + Bug fixes |
+| **Testing** | 3 dÃ­as | Ene 13 - Ene 15 | Tests + Bug fixes |
 
-| **Deploy** | 2 días | Ene 16 - Ene 17 | Producción |
+| **Deploy** | 2 dÃ­as | Ene 16 - Ene 17 | ProducciÃ³n |
 
-**Total**: ~30 días laborables (~6 semanas)
+**Total**: ~30 dÃ­as laborables (~6 semanas)
 
 ---
 
-## 📚 ESTRUCTURA DE ARCHIVOS FASE 2
+## ðŸ“š ESTRUCTURA DE ARCHIVOS FASE 2
 
 ### Archivos a Crear
 
 ```
 lib/
-├── core/
-│   ├── services/
-│   │   ├── firebase_service.dart              # ✨ Nuevo
-│   │   └── auth_service.dart                  # ✨ Nuevo
-│   └── utils/
-│       ├── date_helpers.dart                  # ✨ Nuevo
-│       ├── time_calculation.dart              # ✨ Nuevo
-│       └── validators.dart                    # ✨ Nuevo
-│
-├── features/
-│   ├── auth/
-│   │   ├── models/
-│   │   │   └── user_model.dart                # ✨ Nuevo
-│   │   └── providers/
-│   │       ├── auth_provider.dart             # ✨ Nuevo
-│   │       └── auth_state_provider.dart       # ✨ Nuevo
-│   │
-│   ├── dashboard/
-│   │   ├── models/
-│   │   │   ├── daily_record_model.dart        # ✨ Nuevo
-│   │   │   ├── monthly_summary_model.dart     # ✨ Nuevo
-│   │   │   └── clocking_state.dart            # ✨ Nuevo
-│   │   └── providers/
-│   │       ├── clocking_provider.dart         # ✨ Nuevo
-│   │       ├── clocking_state_provider.dart   # ✨ Nuevo
-│   │       ├── dashboard_provider.dart        # ✨ Nuevo
-│   │       └── time_calculation_provider.dart # ✨ Nuevo
-│   │
-│   └── admin/
-│       ├── models/
-│       │   ├── overtime_request_model.dart    # ✨ Nuevo
-│       │   └── schedule_model.dart            # ✨ Nuevo
-│       └── providers/
-│           ├── admin_employees_provider.dart  # ✨ Nuevo
-│           ├── admin_clocking_provider.dart   # ✨ Nuevo
-│           ├── anomalies_provider.dart        # ✨ Nuevo
-│           ├── overtime_provider.dart         # ✨ Nuevo
-│           └── reports_provider.dart          # ✨ Nuevo
-│
-├── main.dart                                  # 🔄 Actualizar (Firebase init)
-└── app.dart                                   # 🔄 Actualizar (Providers)
+â”œâ”€â”€ core/
+â”‚   â”œâ”€â”€ services/
+â”‚   â”‚   â”œâ”€â”€ firebase_service.dart              # âœ¨ Nuevo
+â”‚   â”‚   â””â”€â”€ auth_service.dart                  # âœ¨ Nuevo
+â”‚   â””â”€â”€ utils/
+â”‚       â”œâ”€â”€ date_helpers.dart                  # âœ¨ Nuevo
+â”‚       â”œâ”€â”€ time_calculation.dart              # âœ¨ Nuevo
+â”‚       â””â”€â”€ validators.dart    # âœ¨ Nuevo
+â”‚
+â”œâ”€â”€ features/
+â”‚   â”œâ”€â”€ auth/
+â”‚   â”‚   â”œâ”€â”€ models/
+â”‚   â”‚   â”‚   â””â”€â”€ user_model.dart                # âœ¨ Nuevo
+â”‚   â”‚   â””â”€â”€ providers/
+â”‚   â”‚       â”œâ”€â”€ auth_provider.dart             # âœ¨ Nuevo
+â”‚   â”‚       â””â”€â”€ auth_state_provider.dart       # âœ¨ Nuevo
+â”‚   â”‚
+â”‚   â”œâ”€â”€ dashboard/
+â”‚   â”‚   â”œâ”€â”€ models/
+â”‚   â”‚   â”‚   â”œâ”€â”€ daily_record_model.dart        # âœ¨ Nuevo
+â”‚   â”‚   â”‚   â”œâ”€â”€ monthly_summary_model.dart     # âœ¨ Nuevo
+â”‚   â”‚   â”‚   â””â”€â”€ clocking_state.dart            # âœ¨ Nuevo
+â”‚   â”‚   â””â”€â”€ providers/
+â”‚   â”‚       â”œâ”€â”€ clocking_provider.dart         # âœ¨ Nuevo
+â”‚   â”‚       â”œâ”€â”€ clocking_state_provider.dart   # âœ¨ Nuevo
+â”‚   â”‚       â”œâ”€â”€ dashboard_provider.dart        # âœ¨ Nuevo
+â”‚   â”‚       â””â”€â”€ time_calculation_provider.dart # âœ¨ Nuevo
+â”‚   â”‚
+â”‚   â””â”€â”€ admin/
+â”‚       â”œâ”€â”€ models/
+â”‚       â”‚   â”œâ”€â”€ overtime_request_model.dart    # âœ¨ Nuevo
+â”‚       â”‚   â””â”€â”€ schedule_model.dart            # âœ¨ Nuevo
+â”‚       â””â”€â”€ providers/
+â”‚           â”œâ”€â”€ admin_employees_provider.dart  # âœ¨ Nuevo
+â”‚           â”œâ”€â”€ admin_clocking_provider.dart   # âœ¨ Nuevo
+â”‚           â”œâ”€â”€ anomalies_provider.dart        # âœ¨ Nuevo
+â”‚           â”œâ”€â”€ overtime_provider.dart         # âœ¨ Nuevo
+â”‚           â””â”€â”€ reports_provider.dart          # âœ¨ Nuevo
+â”‚
+â”œâ”€â”€ main.dart    # ðŸ”„ Actualizar (Firebase init)
+â””â”€â”€ app.dart    # ðŸ”„ Actualizar (Providers)
 
 functions/
-├── src/
-│   ├── index.ts                               # ✨ Nuevo
-│   ├── autoCloseRecords.ts                    # ✨ Nuevo
-│   ├── detectOvertime.ts                      # ✨ Nuevo
-│   ├── generateMonthlySummaries.ts            # ✨ Nuevo
-│   └── archiveOldRecords.ts                   # ✨ Nuevo
-├── test/
-│   └── (tests para functions)                 # ✨ Nuevo
-├── package.json                               # ✨ Nuevo
-└── tsconfig.json                              # ✨ Nuevo
+â”œâ”€â”€ src/
+â”‚   â”œâ”€â”€ index.ts    # âœ¨ Nuevo
+â”‚   â”œâ”€â”€ autoCloseRecords.ts    # âœ¨ Nuevo
+â”‚   â”œâ”€â”€ detectOvertime.ts    # âœ¨ Nuevo
+â”‚   â”œâ”€â”€ generateMonthlySummaries.ts            # âœ¨ Nuevo
+â”‚   â””â”€â”€ archiveOldRecords.ts                   # âœ¨ Nuevo
+â”œâ”€â”€ test/
+â”‚   â””â”€â”€ (tests para functions)                 # âœ¨ Nuevo
+â”œâ”€â”€ package.json    # âœ¨ Nuevo
+â””â”€â”€ tsconfig.json    # âœ¨ Nuevo
 
-firestore.rules                                # ✨ Nuevo
-firestore.indexes.json                         # ✨ Nuevo
-storage.rules                                  # ✨ Nuevo
-firebase.json                                  # ✨ Nuevo (config)
+firestore.rules    # âœ¨ Nuevo
+firestore.indexes.json    # âœ¨ Nuevo
+storage.rules    # âœ¨ Nuevo
+firebase.json    # âœ¨ Nuevo (config)
 ```
 
 **Total de archivos nuevos**: ~35
@@ -1857,9 +1857,9 @@ firebase.json                                  # ✨ Nuevo (config)
 
 ---
 
-## ✅ CHECKLIST DE IMPLEMENTACIÓN
+## âœ… CHECKLIST DE IMPLEMENTACIÃ“N
 
-### Preparación
+### PreparaciÃ³n
 
 - [ ] Crear proyecto Firebase
 - [ ] Configurar Authentication (Email/Password)
@@ -1882,39 +1882,39 @@ firebase.json                                  # ✨ Nuevo (config)
 - [ ] Conectar botones de fichaje con Firestore
 - [ ] Implementar `DashboardProvider`
 - [ ] Mostrar registros del mes en dashboard
-- [ ] Crear reglas de seguridad básicas
+- [ ] Crear reglas de seguridad bÃ¡sicas
 - [ ] Tests unitarios (Auth, Clocking)
-- [ ] Test de integración (Login → Fichar → Logout)
+- [ ] Test de integraciÃ³n (Login â†’ Fichar â†’ Logout)
 
 ### Sprint 2: Pausas
 
 - [ ] Actualizar `DailyRecordModel` (agregar pausas)
 - [ ] Implementar `ClockingState` (enum)
 - [ ] Implementar `ClockingStateProvider`
-- [ ] Actualizar botones (deshabilitar según estado)
+- [ ] Actualizar botones (deshabilitar segÃºn estado)
 - [ ] Implementar `TimeCalculationProvider`
 - [ ] Calcular minutos trabajados (incluye pausas)
-- [ ] Implementar diálogo de confirmación (salida anticipada)
-- [ ] Tests unitarios (State machine, Cálculos)
-- [ ] Test de integración (Flujo completo con pausa)
+- [ ] Implementar diÃ¡logo de confirmaciÃ³n (salida anticipada)
+- [ ] Tests unitarios (State machine, CÃ¡lculos)
+- [ ] Test de integraciÃ³n (Flujo completo con pausa)
 
 ### Sprint 3: Admin
 
 - [ ] Implementar `AdminEmployeesProvider`
-- [ ] Implementar lista de empleados (filtros, búsqueda)
+- [ ] Implementar lista de empleados (filtros, bÃºsqueda)
 - [ ] Implementar `AdminClockingProvider`
-- [ ] Modal de corrección de fichaje
+- [ ] Modal de correcciÃ³n de fichaje
 - [ ] Guardar `editHistory` en registros
 - [ ] Implementar `AnomaliesProvider`
-- [ ] Panel de anomalías
+- [ ] Panel de anomalÃ­as
 - [ ] Actualizar reglas de seguridad (admin puede todo)
 - [ ] Tests unitarios (Admin providers)
-- [ ] Test de integración (Admin corrige fichaje)
+- [ ] Test de integraciÃ³n (Admin corrige fichaje)
 
-### Sprint 4: Automatización
+### Sprint 4: AutomatizaciÃ³n
 
 - [ ] Implementar `ScheduleModel`
-- [ ] Crear colección `schedules` con datos de prueba
+- [ ] Crear colecciÃ³n `schedules` con datos de prueba
 - [ ] Actualizar `UserModel` (agregar `scheduleId`)
 - [ ] Implementar `OvertimeRequestModel`
 - [ ] Implementar `OvertimeProvider`
@@ -1932,9 +1932,9 @@ firebase.json                                  # ✨ Nuevo (config)
 - [ ] Crear Cloud Function: `generateMonthlySummaries`
 - [ ] Implementar `ReportsProvider`
 - [ ] Pantalla de reportes (filtros)
-- [ ] Gráficos de horas trabajadas
+- [ ] GrÃ¡ficos de horas trabajadas
 - [ ] Implementar `PDFExportProvider`
-- [ ] Generación de PDF
+- [ ] GeneraciÃ³n de PDF
 - [ ] Crear Cloud Function: `archiveOldRecords`
 - [ ] Implementar `ArchivedRecordsProvider`
 - [ ] Consulta de registros archivados
@@ -1950,129 +1950,129 @@ firebase.json                                  # ✨ Nuevo (config)
 
 ### Deploy
 
-- [ ] Actualizar reglas de seguridad (modo producción)
-- [ ] Crear índices compuestos en Firestore
+- [ ] Actualizar reglas de seguridad (modo producciÃ³n)
+- [ ] Crear Ã­ndices compuestos en Firestore
 - [ ] Configurar alertas de cuota en Firebase Console
-- [ ] Deploy de Cloud Functions a producción
+- [ ] Deploy de Cloud Functions a producciÃ³n
 - [ ] Build de Flutter Web (`flutter build web --release`)
 - [ ] Deploy a Firebase Hosting
-- [ ] Pruebas en producción
+- [ ] Pruebas en producciÃ³n
 - [ ] Monitorear logs y errores
 
 ---
 
-## 🎯 OBJETIVOS DE FASE 2
+## ðŸŽ¯ OBJETIVOS DE FASE 2
 
 ### Funcionales
 
-- ✅ Login y autenticación real con Firebase
-- ✅ Sistema de fichaje completo (Entrada/Pausa/Retorno/Salida)
-- ✅ Validaciones de secuencia y máquina de estados
-- ✅ Panel admin funcional (ver todos, corregir fichajes)
-- ✅ Cierre automático de fichajes olvidados
-- ✅ Sistema de aprobación de horas extras
-- ✅ Reportes mensuales por empleado
-- ✅ Exportación a PDF
-- ✅ Archivado automático de registros antiguos
+- âœ… Login y autenticaciÃ³n real con Firebase
+- âœ… Sistema de fichaje completo (Entrada/Pausa/Retorno/Salida)
+- âœ… Validaciones de secuencia y mÃ¡quina de estados
+- âœ… Panel admin funcional (ver todos, corregir fichajes)
+- âœ… Cierre automÃ¡tico de fichajes olvidados
+- âœ… Sistema de aprobaciÃ³n de horas extras
+- âœ… Reportes mensuales por empleado
+- âœ… ExportaciÃ³n a PDF
+- âœ… Archivado automÃ¡tico de registros antiguos
 
-### Técnicos
+### TÃ©cnicos
 
-- ✅ Firebase Authentication implementado
-- ✅ Firestore con estructura escalable
-- ✅ Riverpod providers funcionales
-- ✅ Cloud Functions automatizadas
-- ✅ Reglas de seguridad robustas
-- ✅ Optimización de costos (plan gratuito)
-- ✅ Tests con >70% de cobertura
-- ✅ Código limpio y mantenible
+- âœ… Firebase Authentication implementado
+- âœ… Firestore con estructura escalable
+- âœ… Riverpod providers funcionales
+- âœ… Cloud Functions automatizadas
+- âœ… Reglas de seguridad robustas
+- âœ… OptimizaciÃ³n de costos (plan gratuito)
+- âœ… Tests con >70% de cobertura
+- âœ… CÃ³digo limpio y mantenible
 
 ### Negocio
 
-- ✅ Sistema usable por los 458 empleados
-- ✅ Admin y RRHH pueden gestionar empleados
-- ✅ Cumple con requisitos de auditoría (histórico 4 años)
-- ✅ Escalable para crecimiento futuro
-- ✅ Costo mínimo (plan gratuito)
+- âœ… Sistema usable por los 458 empleados
+- âœ… Admin y RRHH pueden gestionar empleados
+- âœ… Cumple con requisitos de auditorÃ­a (histÃ³rico 4 aÃ±os)
+- âœ… Escalable para crecimiento futuro
+- âœ… Costo mÃ­nimo (plan gratuito)
 
 ---
 
-## 🔮 FASE 3: FUTURAS MEJORAS (No incluidas en Fase 2)
+## ðŸ”® FASE 3: FUTURAS MEJORAS (No incluidas en Fase 2)
 
 ### Features Adicionales
 
-- 📍 **Geolocalización**: Registrar ubicación GPS en fichajes
-- 📱 **App Móvil Nativa**: Versión Android/iOS
-- 👤 **Reconocimiento Facial**: Verificación biométrica
-- 📅 **Gestión de Vacaciones**: Solicitudes y aprobaciones
-- 📝 **Permisos y Bajas**: Gestión de ausencias
-- 📊 **Dashboard Analítico**: Gráficos avanzados con charts
-- 🔔 **Notificaciones Push**: Recordatorios de fichaje
-- 📧 **Notificaciones Email**: Resúmenes semanales
-- 🏢 **Multi-empresa**: Soporte para múltiples instituciones
-- 🌐 **Multi-idioma**: i18n (inglés, catalán)
-- 🎨 **Temas**: Dark mode
-- 📤 **Exportar Excel**: Además de PDF
-- 🔍 **Búsqueda Avanzada**: Filtros complejos en reportes
-- 📈 **Predicciones**: ML para detectar patrones
+- ðŸ“ **GeolocalizaciÃ³n**: Registrar ubicaciÃ³n GPS en fichajes
+- ðŸ“± **App MÃ³vil Nativa**: VersiÃ³n Android/iOS
+- ðŸ‘¤ **Reconocimiento Facial**: VerificaciÃ³n biomÃ©trica
+- ðŸ“… **GestiÃ³n de Vacaciones**: Solicitudes y aprobaciones
+- ðŸ“ **Permisos y Bajas**: GestiÃ³n de ausencias
+- ðŸ“Š **Dashboard AnalÃ­tico**: GrÃ¡ficos avanzados con charts
+- ðŸ”” **Notificaciones Push**: Recordatorios de fichaje
+- ðŸ“§ **Notificaciones Email**: ResÃºmenes semanales
+- ðŸ¢ **Multi-empresa**: Soporte para mÃºltiples instituciones
+- ðŸŒ **Multi-idioma**: i18n (inglÃ©s, catalÃ¡n)
+- ðŸŽ¨ **Temas**: Dark mode
+- ðŸ“¤ **Exportar Excel**: AdemÃ¡s de PDF
+- ðŸ” **BÃºsqueda Avanzada**: Filtros complejos en reportes
+- ðŸ“ˆ **Predicciones**: ML para detectar patrones
 
-### Optimizaciones Técnicas
+### Optimizaciones TÃ©cnicas
 
-- ⚡ **Offline Support**: App funcional sin internet
-- 🔄 **Sync Incremental**: Solo sincronizar cambios
-- 📦 **PWA**: Progressive Web App con install prompt
-- 🚀 **Performance**: Lazy loading, code splitting
-- 🔐 **2FA**: Autenticación de dos factores
-- 📱 **Responsive Mejorado**: Tablet mode optimizado
+- âš¡ **Offline Support**: App funcional sin internet
+- ðŸ”„ **Sync Incremental**: Solo sincronizar cambios
+- ðŸ“¦ **PWA**: Progressive Web App con install prompt
+- ðŸš€ **Performance**: Lazy loading, code splitting
+- ðŸ” **2FA**: AutenticaciÃ³n de dos factores
+- ðŸ“± **Responsive Mejorado**: Tablet mode optimizado
 
 ---
 
-## 📝 NOTAS FINALES
+## ðŸ“ NOTAS FINALES
 
 ### Decisiones Tomadas
 
-1. ✅ **1 pausa por día** (simplifica lógica y reduce writes)
-2. ✅ **1 documento por día** (vs 1 por fichaje) - optimiza queries
-3. ✅ **Horas extras necesitan aprobación** (RRHH o Admin)
-4. ✅ **Cierre automático marcado como anomalía** (requiere revisión)
-5. ✅ **Cloud Storage para archivado** (más barato que Firestore)
-6. ✅ **Salida anticipada: warning si faltan >1 hora**
-7. ✅ **Empleado solo edita entrada, mismo día, sin aprobación**
-8. ✅ **Admin edita todo, con historial de cambios**
+1. âœ… **1 pausa por dÃ­a** (simplifica lÃ³gica y reduce writes)
+2. âœ… **1 documento por dÃ­a** (vs 1 por fichaje) - optimiza queries
+3. âœ… **Horas extras necesitan aprobaciÃ³n** (RRHH o Admin)
+4. âœ… **Cierre automÃ¡tico marcado como anomalÃ­a** (requiere revisiÃ³n)
+5. âœ… **Cloud Storage para archivado** (mÃ¡s barato que Firestore)
+6. âœ… **Salida anticipada: warning si faltan >1 hora**
+7. âœ… **Empleado solo edita entrada, mismo dÃ­a, sin aprobaciÃ³n**
+8. âœ… **Admin edita todo, con historial de cambios**
 
 ### Flexibilidad de Firebase
 
-- ✅ **Estructura evolutiva**: Empezamos simple, agregamos campos según avancemos
-- ✅ **No necesita schema rígido**: Fácil agregar/quitar campos
-- ⚠️ **Planear colecciones bien**: Difícil cambiar estructura base después
-- ✅ **Desarrollo iterativo**: Sprint por sprint, testeando en real
+- âœ… **Estructura evolutiva**: Empezamos simple, agregamos campos segÃºn avancemos
+- âœ… **No necesita schema rÃ­gido**: FÃ¡cil agregar/quitar campos
+- âš ï¸ **Planear colecciones bien**: DifÃ­cil cambiar estructura base despuÃ©s
+- âœ… **Desarrollo iterativo**: Sprint por sprint, testeando en real
 
-### Próximos Pasos
+### PrÃ³ximos Pasos
 
-1. **Confirmar** que la planificación cubre todos los requisitos
-2. **Hacer preguntas** si algo no está claro
-3. **Iniciar Sprint 1**: Configurar Firebase → Implementar MVP
-4. **Iterar**: Feedback después de cada Sprint
+1. **Confirmar** que la planificaciÃ³n cubre todos los requisitos
+2. **Hacer preguntas** si algo no estÃ¡ claro
+3. **Iniciar Sprint 1**: Configurar Firebase â†’ Implementar MVP
+4. **Iterar**: Feedback despuÃ©s de cada Sprint
 
 ---
 
-**Equipo**: Control Horario - Escuela de Música
+**Equipo**: Control Horario - Escuela de MÃºsica
 
-**Documento**: Planificación Fase 2
+**Documento**: PlanificaciÃ³n Fase 2
 
-**Versión**: 2.0.0-planning
+**VersiÃ³n**: 2.0.0-planning
 
-**Estado**: 🚧 Pendiente de Aprobación
+**Estado**: ðŸš§ Pendiente de AprobaciÃ³n
 
 **Fecha**: Noviembre 2025
 
 ---
 
-## ❓ ¿Listo para Empezar?
+## â“ Â¿Listo para Empezar?
 
-Una vez apruebes esta planificación, procederemos con:
+Una vez apruebes esta planificaciÃ³n, procederemos con:
 
-1. **Configuración de Firebase** (Preparación)
-2. **Implementación de Sprint 1** (MVP)
+1. **ConfiguraciÃ³n de Firebase** (PreparaciÃ³n)
+2. **ImplementaciÃ³n de Sprint 1** (MVP)
 3. **Iteraciones** hasta completar Fase 2
 
-**¿Alguna duda o ajuste a la planificación?** 🚀
+**Â¿Alguna duda o ajuste a la planificaciÃ³n?** ðŸš€
