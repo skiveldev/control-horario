@@ -27,7 +27,10 @@ enum ClockingState {
 /// 1. Sin fichar → Solo Entrada habilitado
 /// 2. Trabajando → Salida y Pausa habilitados
 /// 3. En pausa → Solo Retorno habilitado
-/// 4. Completo → Todos deshabilitados
+/// 4. Completo → Entrada habilitado (permite múltiples ciclos en el día)
+/// 
+/// MOCK DATA: Permite múltiples fichajes en el mismo día (Fase 1 - solo UI).
+/// TODO [FASE-2]: Validar con backend si permite múltiples entradas/salidas.
 /// 
 /// Ejemplo de uso:
 /// ```dart
@@ -110,7 +113,10 @@ class ClockingButtons extends StatelessWidget {
   // ==========================================================================
 
   Widget _buildEntranceButton() {
-    final isEnabled = currentState == ClockingState.notStarted && !isLoading;
+    // Habilitar en estado inicial O después de fichar salida (permitir múltiples ciclos)
+    final isEnabled = (currentState == ClockingState.notStarted || 
+                       currentState == ClockingState.finished) && 
+                      !isLoading;
 
     return CustomButton(
       text: 'Entrada',
@@ -121,7 +127,8 @@ class ClockingButtons extends StatelessWidget {
       onPressed: isEnabled
           ? () => onAction(ClockingAction.entrance)
           : null,
-      isLoading: isLoading && currentState == ClockingState.notStarted,
+      isLoading: isLoading && (currentState == ClockingState.notStarted || 
+                               currentState == ClockingState.finished),
     );
   }
 

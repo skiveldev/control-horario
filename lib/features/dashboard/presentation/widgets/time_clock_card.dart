@@ -139,7 +139,7 @@ class _TimeClockCardState extends State<TimeClockCard> {
 
         case ClockingAction.exit:
           _currentState = ClockingState.finished;
-          _statusMessage = '¡Jornada completada! Hasta mañana';
+          _statusMessage = 'Salida registrada. Puedes volver a fichar entrada';
           _showSuccessSnackBar('Salida registrada correctamente');
           break;
 
