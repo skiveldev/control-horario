@@ -2,15 +2,45 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // ========================================
-    // MODO TEST - Solo para desarrollo
+    // REGLAS DE PRODUCCIÓN - MVP Sprint 1
     // ========================================
-    // TODO [SPRINT-3]: Cambiar a reglas de producción
-    // 
-    // Por ahora, cualquier usuario autenticado puede leer y escribir
-    // cualquier documento. Esto facilita el desarrollo rápido.
+    
+    // Colección de usuarios
+    match /users/{userId} {
+      // Los usuarios solo pueden leer su propio documento
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Solo admins pueden escribir datos de usuario (implementar en Sprint 2)
+      // Por ahora, nadie puede modificar directamente los documentos de usuario
+      allow write: if false;
+      
+      // Subcolección de registros diarios
+      match /daily_records/{recordId} {
+        // Los usuarios solo pueden leer sus propios registros
+        allow read: if request.auth != null && request.auth.uid == userId;
+        
+        // Los usuarios pueden crear nuevos registros
+        allow create: if request.auth != null 
+                      && request.auth.uid == userId
+                      && request.resource.data.userId == userId;
+        
+        // Los usuarios pueden actualizar sus propios registros
+        // (solo para agregar hora de salida)
+        allow update: if request.auth != null 
+                      && request.auth.uid == userId
+                      && resource.data.userId == userId;
+        
+        // No permitir eliminar registros
+        allow delete: if false;
+      }
+    }
+    
+    // Denegar acceso a cualquier otra colección no especificada
     match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if false;
     }
   }
 }
+
+
 

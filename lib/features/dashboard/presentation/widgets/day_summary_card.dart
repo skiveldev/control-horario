@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
-import '../../../../core/constants/mock_data.dart';
 import '../../../../shared/widgets/cards/custom_card.dart';
+import '../../../auth/providers/auth_provider.dart';
+import '../../providers/clocking_provider.dart';
+import '../../providers/dashboard_provider.dart';
 import 'work_hours_progress.dart';
 import 'time_info_badge.dart';
 
@@ -16,19 +19,64 @@ import 'time_info_badge.dart';
 /// - Salida estimada
 /// - Tiempo de pausa acumulado
 /// 
-/// MOCK DATA: Usa MockData.todaySummary
-class DaySummaryCard extends StatelessWidget {
+/// Conectado con Riverpod para mostrar datos reales desde Firebase.
+class DaySummaryCard extends ConsumerWidget {
   const DaySummaryCard({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Datos mock
-    final summary = MockData.todaySummary;
-    final totalHours = summary['totalHours'] as double;
-    final expectedHours = summary['expectedHours'] as double;
-    final breakTime = summary['breakTime'] as int;
-    final entranceTime = summary['entranceTime'] as String;
-    final estimatedExit = summary['estimatedExit'] as String;
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Observar providers
+    final todayRecordAsync = ref.watch(todayRecordProvider);
+    final todayMinutes = ref.watch(todayTotalMinutesProvider);
+    final userAsync = ref.watch(currentUserProvider);
+
+    return todayRecordAsync.when(
+      data: (todayRecord) => userAsync.when(
+        data: (user) {
+          if (user == null) {
+            return _buildEmptyState('Usuario no encontrado');
+          }
+
+          // Si no hay registro de hoy
+          if (todayRecord == null || todayRecord.clockInTimestamp == null) {
+            return _buildEmptyState('Sin registro de entrada hoy');
+          }
+
+          // Calcular datos
+          final entranceTime = _formatTime(todayRecord.clockInTimestamp!);
+          final totalHours = todayMinutes / 60.0;
+          final expectedHours = user.weeklyHours / 5.0; // Horas diarias esperadas
+          final estimatedExit = _calculateEstimatedExit(
+            todayRecord.clockInTimestamp!,
+            expectedHours,
+          );
+          final breakTime = 0; // TODO [FASE-2-SPRINT-2]: Calcular pausas reales
+
+          return _buildContent(
+            context: context,
+            totalHours: totalHours,
+            expectedHours: expectedHours,
+            entranceTime: entranceTime,
+            estimatedExit: estimatedExit,
+            breakTime: breakTime,
+          );
+        },
+        loading: () => _buildLoadingState(),
+        error: (error, stack) => _buildEmptyState('Error al cargar usuario'),
+      ),
+      loading: () => _buildLoadingState(),
+      error: (error, stack) => _buildEmptyState('Error al cargar registro'),
+    );
+  }
+
+  Widget _buildContent({
+    required BuildContext context,
+    required double totalHours,
+    required double expectedHours,
+    required String entranceTime,
+    required String estimatedExit,
+    required int breakTime,
+  }) {
 
     return CustomCard(
       elevation: CardElevation.medium,
@@ -127,6 +175,67 @@ class DaySummaryCard extends StatelessWidget {
     );
   }
 
+  Widget _buildLoadingState() {
+    return CustomCard(
+      elevation: CardElevation.medium,
+      padding: AppSpacing.cardLarge,
+      child: const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(String message) {
+    return CustomCard(
+      elevation: CardElevation.medium,
+      padding: AppSpacing.cardLarge,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Título del card
+          Row(
+            children: [
+              Icon(
+                Icons.today,
+                size: AppSpacing.iconMd,
+                color: AppColors.info,
+              ),
+              AppSpacing.horizontalSpaceSm,
+              Flexible(
+                child: Text(
+                  'Resumen del Día',
+                  style: AppTextStyles.h5,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          AppSpacing.verticalSpaceLg,
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.calendar_today,
+                  size: 48,
+                  color: AppColors.textTertiary,
+                ),
+                AppSpacing.verticalSpaceMd,
+                Text(
+                  message,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildBreakTimeBadge(int breakMinutes) {
     return Container(
       padding: AppSpacing.symmetric(
@@ -173,6 +282,25 @@ class DaySummaryCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // ==========================================================================
+  // HELPERS
+  // ==========================================================================
+
+  /// Formatear DateTime a string HH:mm
+  String _formatTime(DateTime dateTime) {
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+
+  /// Calcular hora estimada de salida
+  String _calculateEstimatedExit(DateTime clockInTime, double expectedHours) {
+    final estimatedExit = clockInTime.add(
+      Duration(minutes: (expectedHours * 60).round()),
+    );
+    return _formatTime(estimatedExit);
   }
 }
 

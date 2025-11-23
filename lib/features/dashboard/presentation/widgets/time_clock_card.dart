@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/cards/custom_card.dart';
+import '../../providers/clocking_provider.dart';
 import 'clock_display.dart';
 import 'clocking_buttons.dart';
 
@@ -14,97 +16,137 @@ import 'clocking_buttons.dart';
 /// - Mensaje de estado actual
 /// 
 /// Maneja el flujo de fichaje diario con estados visuales.
-/// 
-/// MOCK DATA: Simula el fichaje localmente.
-/// TODO [FASE-2]: Conectar con backend real
-class TimeClockCard extends StatefulWidget {
+/// Conectado con Riverpod para fichaje real en Firebase.
+class TimeClockCard extends ConsumerStatefulWidget {
   const TimeClockCard({super.key});
 
   @override
-  State<TimeClockCard> createState() => _TimeClockCardState();
+  ConsumerState<TimeClockCard> createState() => _TimeClockCardState();
 }
 
-class _TimeClockCardState extends State<TimeClockCard> {
-  ClockingState _currentState = ClockingState.notStarted;
-  bool _isLoading = false;
-  String _statusMessage = 'Sin registro activo';
+class _TimeClockCardState extends ConsumerState<TimeClockCard> {
 
   @override
   Widget build(BuildContext context) {
-    return CustomCard(
-      elevation: CardElevation.medium,
-      padding: AppSpacing.cardLarge,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Título del card
-          Row(
+    // Observar el registro de hoy
+    final todayRecordAsync = ref.watch(todayRecordProvider);
+    
+    // Observar el estado de las acciones de fichaje
+    final clockingState = ref.watch(clockingNotifierProvider);
+
+    return todayRecordAsync.when(
+      data: (todayRecord) {
+        // Determinar estado actual basado en datos de Firestore
+        final currentState = _determineClockingState(todayRecord);
+        final statusMessage = _getStatusMessage(currentState);
+        final isLoading = clockingState.isLoading;
+
+        return CustomCard(
+          elevation: CardElevation.medium,
+          padding: AppSpacing.cardLarge,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Título del card
+              Row(
+                children: [
+                  Icon(
+                    Icons.access_time,
+                    size: AppSpacing.iconMd,
+                    color: AppColors.primary,
+                  ),
+                  AppSpacing.horizontalSpaceSm,
+                  Flexible(
+                    child: Text(
+                      'Registro de Jornada',
+                      style: AppTextStyles.h5,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+
+              AppSpacing.verticalSpaceXxl,
+
+              // Reloj digital
+              const ClockDisplay(),
+
+              AppSpacing.verticalSpaceXxl,
+
+              // Mensaje de estado
+              Container(
+                padding: AppSpacing.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.md,
+                ),
+                decoration: BoxDecoration(
+                  color: _getStatusColor(currentState).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      _getStatusIcon(currentState),
+                      size: AppSpacing.iconSm,
+                      color: _getStatusColor(currentState),
+                    ),
+                    AppSpacing.horizontalSpaceSm,
+                    Flexible(
+                      child: Text(
+                        statusMessage,
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: _getStatusColor(currentState),
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              AppSpacing.verticalSpaceXxl,
+
+              // Botones de acción
+              ClockingButtons(
+                currentState: currentState,
+                isLoading: isLoading,
+                onAction: _handleClockingAction,
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => CustomCard(
+        elevation: CardElevation.medium,
+        padding: AppSpacing.cardLarge,
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (error, stack) => CustomCard(
+        elevation: CardElevation.medium,
+        padding: AppSpacing.cardLarge,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                Icons.access_time,
-                size: AppSpacing.iconMd,
-                color: AppColors.primary,
+                Icons.error_outline,
+                size: 48,
+                color: AppColors.error,
               ),
-              AppSpacing.horizontalSpaceSm,
-              Flexible(
-                child: Text(
-                  'Registro de Jornada',
-                  style: AppTextStyles.h5,
-                  overflow: TextOverflow.ellipsis,
+              AppSpacing.verticalSpaceMd,
+              Text(
+                'Error al cargar el registro',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.error,
                 ),
               ),
             ],
           ),
-
-          AppSpacing.verticalSpaceXxl,
-
-          // Reloj digital
-          const ClockDisplay(),
-
-          AppSpacing.verticalSpaceXxl,
-
-          // Mensaje de estado
-          Container(
-            padding: AppSpacing.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.md,
-            ),
-            decoration: BoxDecoration(
-              color: _getStatusColor().withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  _getStatusIcon(),
-                  size: AppSpacing.iconSm,
-                  color: _getStatusColor(),
-                ),
-                AppSpacing.horizontalSpaceSm,
-                Flexible(
-                  child: Text(
-                    _statusMessage,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: _getStatusColor(),
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          AppSpacing.verticalSpaceXxl,
-
-          // Botones de acción
-          ClockingButtons(
-            currentState: _currentState,
-            isLoading: _isLoading,
-            onAction: _handleClockingAction,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -114,58 +156,81 @@ class _TimeClockCardState extends State<TimeClockCard> {
   // ==========================================================================
 
   Future<void> _handleClockingAction(ClockingAction action) async {
-    setState(() => _isLoading = true);
-
-    // TODO [FASE-2]: Realizar petición al backend
-    // try {
-    //   await ref.read(clockingProvider).registerAction(action);
-    // } catch (e) {
-    //   _showErrorSnackBar(e.toString());
-    // }
-
-    // MOCK: Simular delay de red
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (!mounted) return;
-
-    // Actualizar estado según la acción
-    setState(() {
+    try {
       switch (action) {
         case ClockingAction.entrance:
-          _currentState = ClockingState.working;
-          _statusMessage = '¡Entrada registrada! Trabajando...';
-          _showSuccessSnackBar('Entrada registrada correctamente');
+          await ref.read(clockingNotifierProvider.notifier).clockIn();
+          if (mounted) {
+            _showSuccessSnackBar('Entrada registrada correctamente');
+          }
           break;
 
         case ClockingAction.exit:
-          _currentState = ClockingState.finished;
-          _statusMessage = 'Salida registrada. Puedes volver a fichar entrada';
-          _showSuccessSnackBar('Salida registrada correctamente');
+          await ref.read(clockingNotifierProvider.notifier).clockOut();
+          if (mounted) {
+            _showSuccessSnackBar('Salida registrada correctamente');
+          }
           break;
 
         case ClockingAction.pause:
-          _currentState = ClockingState.onPause;
-          _statusMessage = 'En pausa. Recuerda registrar tu retorno';
-          _showSuccessSnackBar('Pausa registrada correctamente');
+          // TODO [FASE-2-SPRINT-2]: Implementar pausas
+          if (mounted) {
+            _showInfoSnackBar('Pausas disponibles en próxima versión');
+          }
           break;
 
         case ClockingAction.returnFromPause:
-          _currentState = ClockingState.working;
-          _statusMessage = '¡Retorno registrado! Trabajando...';
-          _showSuccessSnackBar('Retorno registrado correctamente');
+          // TODO [FASE-2-SPRINT-2]: Implementar retornos
+          if (mounted) {
+            _showInfoSnackBar('Retornos disponibles en próxima versión');
+          }
           break;
       }
-
-      _isLoading = false;
-    });
+    } catch (e) {
+      if (mounted) {
+        _showErrorSnackBar('Error al registrar: ${e.toString()}');
+      }
+    }
   }
 
   // ==========================================================================
   // HELPERS
   // ==========================================================================
 
-  Color _getStatusColor() {
-    switch (_currentState) {
+  /// Determinar estado de fichaje basado en datos de Firestore
+  ClockingState _determineClockingState(dynamic todayRecord) {
+    if (todayRecord == null) {
+      return ClockingState.notStarted;
+    }
+
+    final hasClockIn = todayRecord.clockInTimestamp != null;
+    final hasClockOut = todayRecord.clockOutTimestamp != null;
+
+    if (hasClockIn && hasClockOut) {
+      return ClockingState.finished;
+    } else if (hasClockIn && !hasClockOut) {
+      return ClockingState.working;
+    } else {
+      return ClockingState.notStarted;
+    }
+  }
+
+  /// Obtener mensaje de estado basado en ClockingState
+  String _getStatusMessage(ClockingState state) {
+    switch (state) {
+      case ClockingState.notStarted:
+        return 'Sin registro activo';
+      case ClockingState.working:
+        return '¡Trabajando! No olvides fichar tu salida';
+      case ClockingState.onPause:
+        return 'En pausa. Recuerda registrar tu retorno';
+      case ClockingState.finished:
+        return 'Jornada completada. Buen trabajo!';
+    }
+  }
+
+  Color _getStatusColor(ClockingState state) {
+    switch (state) {
       case ClockingState.notStarted:
         return AppColors.textSecondary;
       case ClockingState.working:
@@ -177,8 +242,8 @@ class _TimeClockCardState extends State<TimeClockCard> {
     }
   }
 
-  IconData _getStatusIcon() {
-    switch (_currentState) {
+  IconData _getStatusIcon(ClockingState state) {
+    switch (state) {
       case ClockingState.notStarted:
         return Icons.schedule;
       case ClockingState.working:
@@ -211,26 +276,46 @@ class _TimeClockCardState extends State<TimeClockCard> {
     );
   }
 
-  // TODO [FASE-2]: Usar cuando se implemente manejo de errores
-  // void _showErrorSnackBar(String message) {
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(
-  //       content: Row(
-  //         children: [
-  //           const Icon(
-  //             Icons.error,
-  //             color: AppColors.textOnDark,
-  //           ),
-  //           AppSpacing.horizontalSpaceMd,
-  //           Expanded(
-  //             child: Text(message),
-  //           ),
-  //         ],
-  //       ),
-  //       backgroundColor: AppColors.error,
-  //       duration: const Duration(seconds: 3),
-  //     ),
-  //   );
-  // }
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(
+              Icons.error,
+              color: AppColors.textOnDark,
+            ),
+            AppSpacing.horizontalSpaceMd,
+            Expanded(
+              child: Text(message),
+            ),
+          ],
+        ),
+        backgroundColor: AppColors.error,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _showInfoSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(
+              Icons.info,
+              color: AppColors.textOnDark,
+            ),
+            AppSpacing.horizontalSpaceMd,
+            Expanded(
+              child: Text(message),
+            ),
+          ],
+        ),
+        backgroundColor: AppColors.info,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
 }
 

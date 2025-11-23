@@ -26,3 +26,6 @@ class AuthNotifier extends ChangeNotifier {
   bool get isAuthenticated => _currentUser != null;
 }
 
+
+
+

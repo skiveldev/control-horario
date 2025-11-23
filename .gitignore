@@ -58,6 +58,9 @@ app.*.map.json
 .cursor/
 .cursorrules.backup
 
+# Firebase deployment cache
+.firebase/
+
 # Coverage
 coverage/
 *.lcov
