@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/mock_data.dart';
@@ -16,6 +16,7 @@ class WeeklySummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColorsHelper.of(context);
     // Datos mock
     final summary = MockData.weeklySummary;
     final totalHours = summary['totalHours'] as double;
@@ -34,13 +35,15 @@ class WeeklySummaryCard extends StatelessWidget {
               Icon(
                 Icons.bar_chart,
                 size: AppSpacing.iconMd,
-                color: AppColors.info,
+                color: colors.info,
               ),
               AppSpacing.horizontalSpaceSm,
               Flexible(
                 child: Text(
                   'Esta Semana',
-                  style: AppTextStyles.h5,
+                  style: AppTextStyles.h5.copyWith(
+                    color: colors.textPrimary,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -56,7 +59,7 @@ class WeeklySummaryCard extends StatelessWidget {
               Text(
                 'Total semanal',
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
+                  color: colors.textSecondary,
                 ),
               ),
               RichText(
@@ -65,13 +68,13 @@ class WeeklySummaryCard extends StatelessWidget {
                     TextSpan(
                       text: '${totalHours.toStringAsFixed(1)}h',
                       style: AppTextStyles.h4.copyWith(
-                        color: AppColors.primary,
+                        color: colors.primary,
                       ),
                     ),
                     TextSpan(
                       text: ' / ${expectedHours.toStringAsFixed(0)}h',
                       style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textSecondary,
+                        color: colors.textSecondary,
                       ),
                     ),
                   ],
@@ -90,6 +93,7 @@ class WeeklySummaryCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: days.map((day) {
                 return _buildDayBar(
+                  context: context,
                   day: day['day'] as String,
                   hours: day['hours'] as double,
                   maxHours: 10.0, // Escala máxima para el gráfico
@@ -107,9 +111,9 @@ class WeeklySummaryCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: totalHours / expectedHours,
               minHeight: 6,
-              backgroundColor: AppColors.borderLight,
+              backgroundColor: colors.borderLight,
               valueColor: AlwaysStoppedAnimation<Color>(
-                _getProgressColor(totalHours / expectedHours),
+                _getProgressColor(context, totalHours / expectedHours),
               ),
             ),
           ),
@@ -122,7 +126,7 @@ class WeeklySummaryCard extends StatelessWidget {
             child: Text(
               '${((totalHours / expectedHours) * 100).toInt()}% de la semana',
               style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.textTertiary,
+                color: colors.textTertiary,
               ),
             ),
           ),
@@ -132,13 +136,15 @@ class WeeklySummaryCard extends StatelessWidget {
   }
 
   Widget _buildDayBar({
+    required BuildContext context,
     required String day,
     required double hours,
     required double maxHours,
     required String status,
   }) {
+    final colors = AppColorsHelper.of(context);
     final heightRatio = (hours / maxHours).clamp(0.0, 1.0);
-    final barColor = _getColorForStatus(status);
+    final barColor = _getColorForStatus(context, status);
 
     return Expanded(
       child: Padding(
@@ -150,7 +156,7 @@ class WeeklySummaryCard extends StatelessWidget {
             Text(
               '${hours.toStringAsFixed(1)}h',
               style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.textSecondary,
+                color: colors.textSecondary,
                 fontSize: 10,
               ),
             ),
@@ -190,7 +196,7 @@ class WeeklySummaryCard extends StatelessWidget {
             Text(
               day,
               style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.textPrimary,
+                color: colors.textPrimary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -200,26 +206,28 @@ class WeeklySummaryCard extends StatelessWidget {
     );
   }
 
-  Color _getColorForStatus(String status) {
+  Color _getColorForStatus(BuildContext context, String status) {
+    final colors = AppColorsHelper.of(context);
     switch (status) {
       case 'completo':
-        return AppColors.success;
+        return colors.success;
       case 'incompleto':
-        return AppColors.warning;
+        return colors.warning;
       case 'activo':
-        return AppColors.info;
+        return colors.info;
       default:
-        return AppColors.textSecondary;
+        return colors.textSecondary;
     }
   }
 
-  Color _getProgressColor(double progress) {
+  Color _getProgressColor(BuildContext context, double progress) {
+    final colors = AppColorsHelper.of(context);
     if (progress >= 0.9) {
-      return AppColors.success;
+      return colors.success;
     } else if (progress >= 0.7) {
-      return AppColors.info;
+      return colors.info;
     } else {
-      return AppColors.warning;
+      return colors.warning;
     }
   }
 }

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 
@@ -55,6 +55,8 @@ class _ClockDisplayState extends State<ClockDisplay> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColorsHelper.of(context);
+    
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -62,20 +64,20 @@ class _ClockDisplayState extends State<ClockDisplay> {
         Container(
           padding: AppSpacing.allMd,
           decoration: BoxDecoration(
-            gradient: AppColors.primaryGradient,
+            color: colors.secondary, // Cyan para el reloj
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.3),
+                color: colors.primary.withValues(alpha: 0.3),
                 blurRadius: 16,
                 offset: const Offset(0, 4),
               ),
             ],
           ),
-          child: const Icon(
+          child: Icon(
             Icons.access_time,
             size: 32,
-            color: AppColors.textOnPrimary,
+            color: colors.textOnPrimary,
           ),
         ),
 
@@ -94,7 +96,7 @@ class _ClockDisplayState extends State<ClockDisplay> {
             _currentTime,
             key: ValueKey<String>(_currentTime),
             style: AppTextStyles.displayLarge.copyWith(
-              color: AppColors.primary,
+              color: colors.primary,
               fontWeight: FontWeight.w700,
               letterSpacing: 2,
             ),
@@ -107,7 +109,7 @@ class _ClockDisplayState extends State<ClockDisplay> {
         Text(
           'Hora actual',
           style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textSecondary,
+            color: colors.textSecondary,
           ),
         ),
       ],

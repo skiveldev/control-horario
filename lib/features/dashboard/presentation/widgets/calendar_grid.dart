@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 
@@ -82,14 +82,19 @@ class CalendarGrid extends StatelessWidget {
     return Row(
       children: weekdays.map((day) {
         return Expanded(
-          child: Center(
-            child: Text(
-              day,
-              style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.textTertiary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+          child: Builder(
+            builder: (context) {
+              final colors = AppColorsHelper.of(context);
+              return Center(
+                child: Text(
+                  day,
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: colors.textTertiary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              );
+            }
           ),
         );
       }).toList(),
@@ -97,24 +102,27 @@ class CalendarGrid extends StatelessWidget {
   }
 
   Widget _buildDayCell(int day) {
-    final isCurrentDay = day == currentDay;
-    final specialType = specialDays[day];
-    final hasSpecialType = specialType != null;
+    return Builder(
+      builder: (context) {
+        final colors = AppColorsHelper.of(context);
+        final isCurrentDay = day == currentDay;
+        final specialType = specialDays[day];
+        final hasSpecialType = specialType != null;
 
-    Color? backgroundColor;
-    Color? borderColor;
-    Color textColor = AppColors.textPrimary;
+        Color? backgroundColor;
+        Color? borderColor;
+        Color textColor = colors.textPrimary;
 
-    // Determinar colores según tipo
-    if (isCurrentDay) {
-      backgroundColor = AppColors.primary;
-      textColor = AppColors.textOnPrimary;
-    } else if (hasSpecialType) {
-      final typeColor = _getColorForType(specialType);
-      backgroundColor = typeColor.withValues(alpha: 0.2);
-      borderColor = typeColor;
-      textColor = typeColor;
-    }
+        // Determinar colores según tipo
+        if (isCurrentDay) {
+          backgroundColor = colors.primary;
+          textColor = colors.textOnPrimary;
+        } else if (hasSpecialType) {
+          final typeColor = _getColorForType(context, specialType);
+          backgroundColor = typeColor.withValues(alpha: 0.2);
+          borderColor = typeColor;
+          textColor = typeColor;
+        }
 
     return InkWell(
       onTap: onDayTap != null ? () => onDayTap!(day) : null,
@@ -138,22 +146,25 @@ class CalendarGrid extends StatelessWidget {
         ),
       ),
     );
+      }
+    );
   }
 
-  Color _getColorForType(String type) {
+  Color _getColorForType(BuildContext context, String type) {
+    final colors = AppColorsHelper.of(context);
     switch (type) {
       case 'festivo':
-        return AppColors.error;
+        return colors.error;
       case 'vacaciones':
         return const Color(0xFFEC4899); // Rosa
       case 'evento':
-        return AppColors.secondary;
+        return colors.secondary;
       case 'ausencia':
-        return AppColors.warning;
+        return colors.warning;
       case 'activo':
-        return AppColors.success;
+        return colors.success;
       default:
-        return AppColors.textSecondary;
+        return colors.textSecondary;
     }
   }
 }

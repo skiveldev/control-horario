@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 
@@ -28,7 +28,7 @@ class RecordStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final data = _getStatusData(status);
+    final data = _getStatusData(context, status);
 
     if (compact) {
       return Container(
@@ -82,29 +82,30 @@ class RecordStatusBadge extends StatelessWidget {
     );
   }
 
-  Map<String, dynamic> _getStatusData(String status) {
+  Map<String, dynamic> _getStatusData(BuildContext context, String status) {
+    final colors = AppColorsHelper.of(context);
     switch (status.toLowerCase()) {
       case 'completo':
         return {
-          'color': AppColors.success,
+          'color': colors.success,
           'icon': Icons.check_circle,
           'text': 'Completo',
         };
       case 'incompleto':
         return {
-          'color': AppColors.warning,
+          'color': colors.warning,
           'icon': Icons.warning,
           'text': 'Incompleto',
         };
       case 'sin_fichar':
         return {
-          'color': AppColors.error,
+          'color': colors.error,
           'icon': Icons.cancel,
           'text': 'Sin fichar',
         };
       default:
         return {
-          'color': AppColors.textSecondary,
+          'color': colors.textSecondary,
           'icon': Icons.help,
           'text': 'Desconocido',
         };

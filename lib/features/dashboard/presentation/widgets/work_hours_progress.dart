@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_colors_helper.dart';
+import '../../../../core/theme/app_gradients.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 
@@ -34,9 +35,10 @@ class WorkHoursProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColorsHelper.of(context);
     final progress = workedHours / expectedHours;
     final percentage = (progress * 100).clamp(0, 100).toInt();
-    final color = progressColor ?? _getProgressColor(progress);
+    final color = progressColor ?? _getProgressColor(context, progress);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,7 +51,7 @@ class WorkHoursProgress extends StatelessWidget {
             Text(
               'Total horas trabajadas',
               style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: colors.textSecondary,
               ),
             ),
             Text(
@@ -71,26 +73,40 @@ class WorkHoursProgress extends StatelessWidget {
             Container(
               height: 8,
               decoration: BoxDecoration(
-                color: AppColors.borderLight,
+                color: colors.borderLight,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
               ),
             ),
 
-            // Progress
+            // Progress - Gradiente en dark mode, color sólido en light mode
             FractionallySizedBox(
               widthFactor: progress.clamp(0.0, 1.0),
               child: Container(
                 height: 8,
                 decoration: BoxDecoration(
-                  color: color,
+                  // Gradiente SOLO en dark mode
+                  gradient: Theme.of(context).brightness == Brightness.dark 
+                      ? AppGradients.progressBar 
+                      : LinearGradient(
+                          colors: [
+                            Theme.of(context).colorScheme.primary,
+                            Theme.of(context).colorScheme.secondary,
+                          ],
+                        ),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
-                  boxShadow: [
+                  // Glow SOLO en dark mode
+                  boxShadow: Theme.of(context).brightness == Brightness.dark ? [
                     BoxShadow(
-                      color: color.withValues(alpha: 0.3),
-                      blurRadius: 4,
+                      color: const Color(0xFF06B6D4).withValues(alpha: 0.3),
+                      blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
-                  ],
+                    BoxShadow(
+                      color: const Color(0xFFD946EF).withValues(alpha: 0.2),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ] : null,
                 ),
               ),
             ),
@@ -105,7 +121,7 @@ class WorkHoursProgress extends StatelessWidget {
           child: Text(
             '$percentage%',
             style: AppTextStyles.labelSmall.copyWith(
-              color: AppColors.textTertiary,
+              color: colors.textTertiary,
             ),
           ),
         ),
@@ -113,13 +129,14 @@ class WorkHoursProgress extends StatelessWidget {
     );
   }
 
-  Color _getProgressColor(double progress) {
+  Color _getProgressColor(BuildContext context, double progress) {
+    final colors = AppColorsHelper.of(context);
     if (progress >= 0.9) {
-      return AppColors.success; // 90%+ completado
+      return colors.success; // 90%+ completado
     } else if (progress >= 0.5) {
-      return AppColors.info; // 50-90% en progreso
+      return colors.info; // 50-90% en progreso
     } else {
-      return AppColors.warning; // < 50% inicio
+      return colors.warning; // < 50% inicio
     }
   }
 }

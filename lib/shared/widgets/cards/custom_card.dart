@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 
 /// Variantes de elevación de card
@@ -118,7 +117,7 @@ class CustomCard extends StatelessWidget {
       height: height,
       margin: margin ?? EdgeInsets.zero,
       decoration: BoxDecoration(
-        color: backgroundColor ?? AppColors.surface,
+        color: backgroundColor ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(radius),
         border: borderColor != null
             ? Border.all(

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/constants/breakpoints.dart';
+import '../../../../shared/widgets/navigation/mobile_drawer.dart';
+import '../../../../shared/widgets/navigation/responsive_navigation.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../widgets/employee_header.dart';
 import '../widgets/time_clock_card.dart';
@@ -46,14 +47,14 @@ class DashboardScreen extends ConsumerWidget {
         
         return _buildDashboard(context, ref, user);
       },
-      loading: () => const Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(
+      loading: () => Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: const Center(
           child: CircularProgressIndicator(),
         ),
       ),
       error: (error, stack) => Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -61,7 +62,7 @@ class DashboardScreen extends ConsumerWidget {
               Icon(
                 Icons.error_outline,
                 size: 64,
-                color: AppColors.error,
+                color: Theme.of(context).colorScheme.error,
               ),
               AppSpacing.verticalSpaceMd,
               Text(
@@ -81,39 +82,91 @@ class DashboardScreen extends ConsumerWidget {
   }
   
   Widget _buildDashboard(BuildContext context, WidgetRef ref, user) {
+    final isMobile = context.isMobile || context.isTablet;
+    
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          // Header con información del empleado
-          EmployeeHeader(
-            employeeName: user.displayName,
-            employeeId: user.employeeId,
-            onAvatarTap: () => context.push(AppRouter.profile),
-            onNotificationsTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Notificaciones en desarrollo'),
-                ),
-              );
-            },
-            onSettingsTap: () => context.push(AppRouter.settings),
-          ),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      // Drawer solo en mobile/tablet
+      drawer: isMobile ? const MobileDrawer() : null,
+      body: ResponsiveNavigation(
+        child: Column(
+          children: [
+            // Header con información del empleado + botón hamburguesa
+            _buildHeaderWithHamburger(context, ref, user, isMobile),
 
-          // Contenido principal con scroll
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(
-                context.responsiveValue(
-                  mobile: AppSpacing.lg,
-                  tablet: AppSpacing.xxl,
-                  desktop: AppSpacing.xxxl,
+            // Contenido principal con scroll
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(
+                  context.responsiveValue(
+                    mobile: AppSpacing.lg,
+                    tablet: AppSpacing.xxl,
+                    desktop: AppSpacing.xxxl,
+                  ),
+                ),
+                child: _buildDashboardGrid(context, ref),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  /// Construye el header con el botón hamburguesa integrado
+  Widget _buildHeaderWithHamburger(BuildContext context, WidgetRef ref, user, bool isMobile) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        border: Border(
+          bottom: BorderSide(
+            color: Theme.of(context).dividerColor,
+            width: 1,
+          ),
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.responsiveValue(
+              mobile: AppSpacing.md,
+              tablet: AppSpacing.lg,
+              desktop: AppSpacing.xxl,
+            ),
+            vertical: AppSpacing.md,
+          ),
+          child: Row(
+            children: [
+              // Botón hamburguesa SOLO en mobile (en desktop el sidebar tiene su propio botón)
+              if (isMobile) ...[
+                IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                  tooltip: 'Abrir menú',
+                ),
+                AppSpacing.horizontalSpaceMd,
+              ],
+              
+              // Contenido del EmployeeHeader (expandido)
+              Expanded(
+                child: EmployeeHeader(
+                  employeeName: user.displayName,
+                  employeeId: user.employeeId,
+                  onAvatarTap: () => context.push(AppRouter.profile),
+                  onNotificationsTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Notificaciones en desarrollo'),
+                      ),
+                    );
+                  },
+                  onSettingsTap: () => context.push(AppRouter.settings),
                 ),
               ),
-              child: _buildDashboardGrid(context, ref),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
@@ -87,89 +87,99 @@ class RecordsTable extends StatelessWidget {
   }
 
   Widget _buildMobileRecordCard(Map<String, dynamic> record) {
-    return InkWell(
-      onTap: onRecordTap != null ? () => onRecordTap!(record) : null,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-      child: Container(
-        padding: AppSpacing.allMd,
-        decoration: BoxDecoration(
-          color: AppColors.surfaceVariant,
+    return Builder(
+      builder: (context) {
+        final colors = AppColorsHelper.of(context);
+        return InkWell(
+          onTap: onRecordTap != null ? () => onRecordTap!(record) : null,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-          border: Border.all(
-            color: AppColors.border,
-            width: 1,
+          child: Container(
+            padding: AppSpacing.allMd,
+            decoration: BoxDecoration(
+              color: colors.surfaceVariant,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+              border: Border.all(
+                color: colors.border,
+                width: 1,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Fecha + Estado
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      record['date'] as String,
+                      style: AppTextStyles.labelLarge.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colors.textPrimary,
+                      ),
+                    ),
+                    ClockingStatusBadge(
+                      status: _mapStatusToEnum(record['status'] as String),
+                    ),
+                  ],
+                ),
+
+                AppSpacing.verticalSpaceSm,
+
+                // Entrada - Salida
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildInfoItem(
+                        context,
+                        'Entrada',
+                        record['entrance'] as String,
+                        Icons.login,
+                      ),
+                    ),
+                    AppSpacing.horizontalSpaceMd,
+                    Expanded(
+                      child: _buildInfoItem(
+                        context,
+                        'Salida',
+                        record['exit'] as String,
+                        Icons.logout,
+                      ),
+                    ),
+                  ],
+                ),
+
+                AppSpacing.verticalSpaceSm,
+
+                // Total
+                _buildInfoItem(
+                  context,
+                  'Total',
+                  record['total'] as String,
+                  Icons.schedule,
+                ),
+              ],
+            ),
           ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Fecha + Estado
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  record['date'] as String,
-                  style: AppTextStyles.labelLarge.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                ClockingStatusBadge(
-                  status: _mapStatusToEnum(record['status'] as String),
-                ),
-              ],
-            ),
-
-            AppSpacing.verticalSpaceSm,
-
-            // Entrada - Salida
-            Row(
-              children: [
-                Expanded(
-                  child: _buildInfoItem(
-                    'Entrada',
-                    record['entrance'] as String,
-                    Icons.login,
-                  ),
-                ),
-                AppSpacing.horizontalSpaceMd,
-                Expanded(
-                  child: _buildInfoItem(
-                    'Salida',
-                    record['exit'] as String,
-                    Icons.logout,
-                  ),
-                ),
-              ],
-            ),
-
-            AppSpacing.verticalSpaceSm,
-
-            // Total
-            _buildInfoItem(
-              'Total',
-              record['total'] as String,
-              Icons.schedule,
-            ),
-          ],
-        ),
-      ),
+        );
+      }
     );
   }
 
-  Widget _buildInfoItem(String label, String value, IconData icon) {
+  Widget _buildInfoItem(BuildContext context, String label, String value, IconData icon) {
+    final colors = AppColorsHelper.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
           icon,
           size: 14,
-          color: AppColors.textSecondary,
+          color: colors.textSecondary,
         ),
         const SizedBox(width: 4),
         Text(
           '$label: ',
           style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textSecondary,
+            color: colors.textSecondary,
           ),
         ),
         Flexible(
@@ -177,6 +187,7 @@ class RecordsTable extends StatelessWidget {
             value,
             style: AppTextStyles.bodySmall.copyWith(
               fontWeight: FontWeight.w600,
+              color: colors.textPrimary,
             ),
             overflow: TextOverflow.ellipsis,
           ),
@@ -190,50 +201,57 @@ class RecordsTable extends StatelessWidget {
   // ==========================================================================
 
   Widget _buildTableView() {
-    return Table(
-      columnWidths: const {
-        0: FlexColumnWidth(2), // Fecha
-        1: FlexColumnWidth(1.5), // Entrada
-        2: FlexColumnWidth(1.5), // Salida
-        3: FlexColumnWidth(1.5), // Total
-        4: FlexColumnWidth(2), // Estado
-      },
-      border: TableBorder(
-        horizontalInside: BorderSide(
-          color: AppColors.border,
-          width: 1,
-        ),
-      ),
-      children: [
-        // Header
-        _buildTableHeader(),
+    return Builder(
+      builder: (context) {
+        final colors = AppColorsHelper.of(context);
+        return Table(
+          columnWidths: const {
+            0: FlexColumnWidth(2), // Fecha
+            1: FlexColumnWidth(1.5), // Entrada
+            2: FlexColumnWidth(1.5), // Salida
+            3: FlexColumnWidth(1.5), // Total
+            4: FlexColumnWidth(2), // Estado
+          },
+          border: TableBorder(
+            horizontalInside: BorderSide(
+              color: colors.border,
+              width: 1,
+            ),
+          ),
+          children: [
+            // Header
+            _buildTableHeader(context),
 
-        // Rows
-        ...records.map((record) => _buildTableRow(record)),
-      ],
+            // Rows
+            ...records.map((record) => _buildTableRow(context, record)),
+          ],
+        );
+      }
     );
   }
 
-  TableRow _buildTableHeader() {
+  TableRow _buildTableHeader(BuildContext context) {
+    final colors = AppColorsHelper.of(context);
     return TableRow(
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
+        color: colors.surfaceVariant,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(AppSpacing.radiusSm),
           topRight: Radius.circular(AppSpacing.radiusSm),
         ),
       ),
       children: [
-        _buildHeaderCell('FECHA'),
-        _buildHeaderCell('ENTRADA'),
-        _buildHeaderCell('SALIDA'),
-        _buildHeaderCell('TOTAL'),
-        _buildHeaderCell('ESTADO'),
+        _buildHeaderCell(context, 'FECHA'),
+        _buildHeaderCell(context, 'ENTRADA'),
+        _buildHeaderCell(context, 'SALIDA'),
+        _buildHeaderCell(context, 'TOTAL'),
+        _buildHeaderCell(context, 'ESTADO'),
       ],
     );
   }
 
-  Widget _buildHeaderCell(String text) {
+  Widget _buildHeaderCell(BuildContext context, String text) {
+    final colors = AppColorsHelper.of(context);
     return Padding(
       padding: AppSpacing.symmetric(
         horizontal: AppSpacing.md,
@@ -242,7 +260,7 @@ class RecordsTable extends StatelessWidget {
       child: Text(
         text,
         style: AppTextStyles.labelSmall.copyWith(
-          color: AppColors.textSecondary,
+          color: colors.textSecondary,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.5,
         ),
@@ -250,16 +268,17 @@ class RecordsTable extends StatelessWidget {
     );
   }
 
-  TableRow _buildTableRow(Map<String, dynamic> record) {
+  TableRow _buildTableRow(BuildContext context, Map<String, dynamic> record) {
+    final colors = AppColorsHelper.of(context);
     return TableRow(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colors.surface,
       ),
       children: [
-        _buildTableCell(record['date'] as String),
-        _buildTableCell(record['entrance'] as String),
-        _buildTableCell(record['exit'] as String),
-        _buildTableCell(record['total'] as String, bold: true),
+        _buildTableCell(context, record['date'] as String),
+        _buildTableCell(context, record['entrance'] as String),
+        _buildTableCell(context, record['exit'] as String),
+        _buildTableCell(context, record['total'] as String, bold: true),
         Padding(
           padding: AppSpacing.symmetric(
             horizontal: AppSpacing.md,
@@ -273,7 +292,8 @@ class RecordsTable extends StatelessWidget {
     );
   }
 
-  Widget _buildTableCell(String text, {bool bold = false}) {
+  Widget _buildTableCell(BuildContext context, String text, {bool bold = false}) {
+    final colors = AppColorsHelper.of(context);
     return Padding(
       padding: AppSpacing.symmetric(
         horizontal: AppSpacing.md,
@@ -283,6 +303,7 @@ class RecordsTable extends StatelessWidget {
         text,
         style: AppTextStyles.bodyMedium.copyWith(
           fontWeight: bold ? FontWeight.w600 : FontWeight.normal,
+          color: colors.textPrimary,
         ),
       ),
     );

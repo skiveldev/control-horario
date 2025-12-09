@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
+import 'core/providers/theme_provider.dart';
 
 /// Aplicación principal del Control Horario
 /// 
@@ -12,6 +13,9 @@ class ControlHorarioApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Observar el modo de tema actual
+    final themeMode = ref.watch(themeNotifierProvider);
+    
     return MaterialApp.router(
       // ========================================================================
       // APP CONFIG
@@ -20,12 +24,11 @@ class ControlHorarioApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       
       // ========================================================================
-      // THEME
+      // THEME - Dual Theme System
       // ========================================================================
       theme: AppTheme.lightTheme,
-      // TODO [FASE-2]: Implementar darkTheme cuando esté listo
-      // darkTheme: AppTheme.darkTheme,
-      // themeMode: ThemeMode.system, // o usar provider para persistir preferencia
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
       
       // ========================================================================
       // ROUTER

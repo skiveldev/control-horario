@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
@@ -49,16 +48,16 @@ class EmployeeHeader extends StatelessWidget {
               vertical: AppSpacing.lg,
             ),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: const Border(
+        color: Theme.of(context).colorScheme.surface,
+        border: Border(
           bottom: BorderSide(
-            color: AppColors.border,
+            color: Theme.of(context).dividerColor,
             width: 1,
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow.withValues(alpha: 0.05),
+            color: Theme.of(context).shadowColor.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -77,12 +76,12 @@ class EmployeeHeader extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: AppColors.primary,
+                        color: Theme.of(context).colorScheme.primary,
                         width: 2,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.2),
+                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -90,13 +89,13 @@ class EmployeeHeader extends StatelessWidget {
                     ),
                     child: CircleAvatar(
                       radius: context.isMobile ? 24 : 28,
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       child: Icon(
                               Icons.person,
                               size: context.isMobile
                                   ? AppSpacing.iconLg
                                   : AppSpacing.iconXl,
-                              color: AppColors.textOnPrimary,
+                              color: Theme.of(context).colorScheme.onPrimary,
                             ),
                     ),
                   ),
@@ -126,7 +125,7 @@ class EmployeeHeader extends StatelessWidget {
                       Text(
                         employeeId,
                         style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textTertiary,
+                          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -158,18 +157,18 @@ class EmployeeHeader extends StatelessWidget {
                     top: 6,
                     child: Container(
                       padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: AppColors.error,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.error,
                         shape: BoxShape.circle,
                       ),
                       constraints: const BoxConstraints(
                         minWidth: 8,
                         minHeight: 8,
                       ),
-                      child: const Text(
+                      child: Text(
                         '3',
                         style: TextStyle(
-                          color: AppColors.textOnDark,
+                          color: Theme.of(context).colorScheme.onError,
                           fontSize: 8,
                           fontWeight: FontWeight.bold,
                         ),

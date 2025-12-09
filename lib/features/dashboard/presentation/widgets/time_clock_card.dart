@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/cards/custom_card.dart';
@@ -37,6 +37,7 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
     return todayRecordAsync.when(
       data: (todayRecord) {
         // Determinar estado actual basado en datos de Firestore
+        final colors = AppColorsHelper.of(context);
         final currentState = _determineClockingState(todayRecord);
         final statusMessage = _getStatusMessage(currentState);
         final isLoading = clockingState.isLoading;
@@ -53,13 +54,15 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
                   Icon(
                     Icons.access_time,
                     size: AppSpacing.iconMd,
-                    color: AppColors.primary,
+                    color: colors.primary,
                   ),
                   AppSpacing.horizontalSpaceSm,
                   Flexible(
                     child: Text(
                       'Registro de Jornada',
-                      style: AppTextStyles.h5,
+                      style: AppTextStyles.h5.copyWith(
+                        color: colors.textPrimary,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -80,7 +83,7 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
                   vertical: AppSpacing.md,
                 ),
                 decoration: BoxDecoration(
-                  color: _getStatusColor(currentState).withValues(alpha: 0.1),
+                  color: _getStatusColor(context, currentState).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
                 child: Row(
@@ -89,14 +92,14 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
                     Icon(
                       _getStatusIcon(currentState),
                       size: AppSpacing.iconSm,
-                      color: _getStatusColor(currentState),
+                      color: _getStatusColor(context, currentState),
                     ),
                     AppSpacing.horizontalSpaceSm,
                     Flexible(
                       child: Text(
                         statusMessage,
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: _getStatusColor(currentState),
+                          color: _getStatusColor(context, currentState),
                           fontWeight: FontWeight.w500,
                         ),
                         textAlign: TextAlign.center,
@@ -125,29 +128,32 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
           child: CircularProgressIndicator(),
         ),
       ),
-      error: (error, stack) => CustomCard(
-        elevation: CardElevation.medium,
-        padding: AppSpacing.cardLarge,
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 48,
-                color: AppColors.error,
-              ),
-              AppSpacing.verticalSpaceMd,
-              Text(
-                'Error al cargar el registro',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.error,
+      error: (error, stack) {
+        final colors = AppColorsHelper.of(context);
+        return CustomCard(
+          elevation: CardElevation.medium,
+          padding: AppSpacing.cardLarge,
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: colors.error,
                 ),
-              ),
-            ],
+                AppSpacing.verticalSpaceMd,
+                Text(
+                  'Error al cargar el registro',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: colors.error,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -229,16 +235,17 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
     }
   }
 
-  Color _getStatusColor(ClockingState state) {
+  Color _getStatusColor(BuildContext context, ClockingState state) {
+    final colors = AppColorsHelper.of(context);
     switch (state) {
       case ClockingState.notStarted:
-        return AppColors.textSecondary;
+        return colors.textSecondary;
       case ClockingState.working:
-        return AppColors.success;
+        return colors.success;
       case ClockingState.onPause:
-        return AppColors.warning;
+        return colors.warning;
       case ClockingState.finished:
-        return AppColors.info;
+        return colors.info;
     }
   }
 
@@ -256,13 +263,14 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
   }
 
   void _showSuccessSnackBar(String message) {
+    final colors = AppColorsHelper.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.check_circle,
-              color: AppColors.textOnDark,
+              color: colors.textOnDark,
             ),
             AppSpacing.horizontalSpaceMd,
             Expanded(
@@ -270,20 +278,21 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
             ),
           ],
         ),
-        backgroundColor: AppColors.success,
+        backgroundColor: colors.success,
         duration: const Duration(seconds: 2),
       ),
     );
   }
 
   void _showErrorSnackBar(String message) {
+    final colors = AppColorsHelper.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.error,
-              color: AppColors.textOnDark,
+              color: colors.textOnDark,
             ),
             AppSpacing.horizontalSpaceMd,
             Expanded(
@@ -291,20 +300,21 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
             ),
           ],
         ),
-        backgroundColor: AppColors.error,
+        backgroundColor: colors.error,
         duration: const Duration(seconds: 3),
       ),
     );
   }
 
   void _showInfoSnackBar(String message) {
+    final colors = AppColorsHelper.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.info,
-              color: AppColors.textOnDark,
+              color: colors.textOnDark,
             ),
             AppSpacing.horizontalSpaceMd,
             Expanded(
@@ -312,7 +322,7 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
             ),
           ],
         ),
-        backgroundColor: AppColors.info,
+        backgroundColor: colors.info,
         duration: const Duration(seconds: 2),
       ),
     );

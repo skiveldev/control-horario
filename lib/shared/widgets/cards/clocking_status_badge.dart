@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_colors_dark.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
 
@@ -48,7 +49,8 @@ class ClockingStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final data = _getStatusData(status);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final data = _getStatusData(status, isDark);
     
     final badge = Container(
       padding: small
@@ -61,10 +63,10 @@ class ClockingStatusBadge extends StatelessWidget {
               vertical: AppSpacing.xs,
             ),
       decoration: BoxDecoration(
-        color: (data['color'] as Color).withValues(alpha: 0.1),
+        color: data['backgroundColor'] as Color,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: (data['color'] as Color).withValues(alpha: 0.2),
+          color: data['borderColor'] as Color,
           width: 1,
         ),
       ),
@@ -74,7 +76,7 @@ class ClockingStatusBadge extends StatelessWidget {
           Icon(
             data['icon'] as IconData,
             size: small ? 12 : 14,
-            color: data['color'] as Color,
+            color: data['textColor'] as Color,
           ),
           SizedBox(width: small ? 3 : 4),
           Flexible(
@@ -84,7 +86,7 @@ class ClockingStatusBadge extends StatelessWidget {
                   ? AppTextStyles.labelSmall.copyWith(fontSize: 10)
                   : AppTextStyles.labelSmall
               ).copyWith(
-                color: data['color'] as Color,
+                color: data['textColor'] as Color,
                 fontWeight: FontWeight.w600,
               ),
               overflow: TextOverflow.ellipsis,
@@ -106,12 +108,22 @@ class ClockingStatusBadge extends StatelessWidget {
     return badge;
   }
 
-  /// Obtiene los datos de visualización según el estado
-  Map<String, dynamic> _getStatusData(ClockingStatus status) {
+  /// Obtiene los datos de visualización según el estado CON COLORES ESPECÍFICOS
+  /// Usa colores exactos del archivo colores.txt para dark mode
+  Map<String, dynamic> _getStatusData(ClockingStatus status, bool isDark) {
     switch (status) {
       case ClockingStatus.complete:
+        // Badge "Completo" - Verde teal con colores específicos
         return {
-          'color': AppColors.clockingComplete,
+          'backgroundColor': isDark 
+              ? AppColorsDark.clockingCompleteBackground  // #134E4A
+              : AppColors.clockingComplete.withValues(alpha: 0.1),
+          'textColor': isDark 
+              ? AppColorsDark.clockingCompleteText  // #5EEAD4
+              : AppColors.clockingComplete,
+          'borderColor': isDark 
+              ? AppColorsDark.clockingCompleteBorder  // #0F766E
+              : AppColors.clockingComplete.withValues(alpha: 0.2),
           'icon': Icons.check_circle,
           'text': 'Completo',
           'tooltip': null,
@@ -119,7 +131,15 @@ class ClockingStatusBadge extends StatelessWidget {
 
       case ClockingStatus.incomplete:
         return {
-          'color': AppColors.clockingIncomplete,
+          'backgroundColor': isDark 
+              ? AppColors.clockingIncomplete.withValues(alpha: 0.1)
+              : AppColors.clockingIncomplete.withValues(alpha: 0.1),
+          'textColor': isDark 
+              ? AppColors.clockingIncomplete
+              : AppColors.clockingIncomplete,
+          'borderColor': isDark 
+              ? AppColors.clockingIncomplete.withValues(alpha: 0.2)
+              : AppColors.clockingIncomplete.withValues(alpha: 0.2),
           'icon': Icons.warning_rounded,
           'text': 'Incompleto',
           'tooltip': 'Fichaje sin cierre registrado',
@@ -127,7 +147,15 @@ class ClockingStatusBadge extends StatelessWidget {
 
       case ClockingStatus.autoClosed:
         return {
-          'color': AppColors.clockingAutoClosed,
+          'backgroundColor': isDark 
+              ? AppColors.clockingAutoClosed.withValues(alpha: 0.1)
+              : AppColors.clockingAutoClosed.withValues(alpha: 0.1),
+          'textColor': isDark 
+              ? AppColors.clockingAutoClosed
+              : AppColors.clockingAutoClosed,
+          'borderColor': isDark 
+              ? AppColors.clockingAutoClosed.withValues(alpha: 0.2)
+              : AppColors.clockingAutoClosed.withValues(alpha: 0.2),
           'icon': Icons.settings_rounded,
           'text': 'Auto-cerrado',
           'tooltip': 'Cierre automático por sistema',
@@ -135,7 +163,15 @@ class ClockingStatusBadge extends StatelessWidget {
 
       case ClockingStatus.edited:
         return {
-          'color': AppColors.clockingEdited,
+          'backgroundColor': isDark 
+              ? AppColors.clockingEdited.withValues(alpha: 0.1)
+              : AppColors.clockingEdited.withValues(alpha: 0.1),
+          'textColor': isDark 
+              ? AppColors.clockingEdited
+              : AppColors.clockingEdited,
+          'borderColor': isDark 
+              ? AppColors.clockingEdited.withValues(alpha: 0.2)
+              : AppColors.clockingEdited.withValues(alpha: 0.2),
           'icon': Icons.edit_rounded,
           'text': 'Editado',
           'tooltip': 'Registro modificado manualmente',
@@ -143,7 +179,15 @@ class ClockingStatusBadge extends StatelessWidget {
 
       case ClockingStatus.ongoing:
         return {
-          'color': AppColors.clockingOnBreak,
+          'backgroundColor': isDark 
+              ? AppColors.clockingOnBreak.withValues(alpha: 0.1)
+              : AppColors.clockingOnBreak.withValues(alpha: 0.1),
+          'textColor': isDark 
+              ? AppColors.clockingOnBreak
+              : AppColors.clockingOnBreak,
+          'borderColor': isDark 
+              ? AppColors.clockingOnBreak.withValues(alpha: 0.2)
+              : AppColors.clockingOnBreak.withValues(alpha: 0.2),
           'icon': Icons.access_time_rounded,
           'text': 'En curso',
           'tooltip': null,

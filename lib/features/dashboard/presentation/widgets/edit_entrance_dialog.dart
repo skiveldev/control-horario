@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
@@ -74,6 +74,9 @@ class _EditEntranceDialog extends StatefulWidget {
 class _EditEntranceDialogState extends State<_EditEntranceDialog> {
   late TimeOfDay selectedTime;
   String? errorMessage;
+  
+  // Helper para acceder a colors en todos los métodos
+  AppColorsHelper get colors => AppColorsHelper.of(context);
 
   @override
   void initState() {
@@ -83,8 +86,10 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColorsHelper.of(context);
+    
     return Dialog(
-      backgroundColor: AppColors.surface,
+      backgroundColor: colors.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       ),
@@ -99,7 +104,7 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
               children: [
                 Icon(
                   Icons.edit_calendar_rounded,
-                  color: AppColors.primary,
+                  color: colors.primary,
                   size: AppSpacing.iconLg,
                 ),
                 AppSpacing.horizontalSpaceSm,
@@ -109,12 +114,14 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
                     children: [
                       Text(
                         'Editar Hora de Entrada',
-                        style: AppTextStyles.h4,
+                        style: AppTextStyles.h4.copyWith(
+                          color: colors.textPrimary,
+                        ),
                       ),
                       Text(
                         'Solo registros del día actual',
                         style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
+                          color: colors.textSecondary,
                         ),
                       ),
                     ],
@@ -129,7 +136,7 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
             Container(
               padding: AppSpacing.allMd,
               decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
+                color: colors.surfaceVariant,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
               ),
               child: Row(
@@ -137,13 +144,14 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
                   Icon(
                     Icons.calendar_today,
                     size: AppSpacing.iconSm,
-                    color: AppColors.textSecondary,
+                    color: colors.textSecondary,
                   ),
                   AppSpacing.horizontalSpaceSm,
                   Text(
                     'HOY - ${_formatDate(DateTime.now())}',
                     style: AppTextStyles.labelMedium.copyWith(
                       fontWeight: FontWeight.w600,
+                      color: colors.textPrimary,
                     ),
                   ),
                 ],
@@ -166,10 +174,10 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
               Container(
                 padding: AppSpacing.allSm,
                 decoration: BoxDecoration(
-                  color: AppColors.error.withValues(alpha: 0.1),
+                  color: colors.error.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                   border: Border.all(
-                    color: AppColors.error.withValues(alpha: 0.3),
+                    color: colors.error.withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
@@ -178,14 +186,14 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
                     Icon(
                       Icons.error_outline,
                       size: 16,
-                      color: AppColors.error,
+                      color: colors.error,
                     ),
                     AppSpacing.horizontalSpaceXs,
                     Expanded(
                       child: Text(
                         errorMessage!,
                         style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.error,
+                          color: colors.error,
                         ),
                       ),
                     ),
@@ -226,6 +234,7 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
   }
 
   Widget _buildTimePicker() {
+    final colors = AppColorsHelper.of(context);
     return InkWell(
       onTap: _showTimePicker,
       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -233,7 +242,7 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
         padding: AppSpacing.allLg,
         decoration: BoxDecoration(
           border: Border.all(
-            color: errorMessage != null ? AppColors.error : AppColors.border,
+            color: errorMessage != null ? colors.error : colors.border,
             width: 2,
           ),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -244,13 +253,13 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
             Icon(
               Icons.access_time_rounded,
               size: AppSpacing.iconXl,
-              color: AppColors.primary,
+              color: colors.primary,
             ),
             AppSpacing.horizontalSpaceMd,
             Text(
               _formatTimeOfDay(selectedTime),
               style: AppTextStyles.displaySmall.copyWith(
-                color: AppColors.primary,
+                color: colors.primary,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -258,7 +267,7 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
             Icon(
               Icons.edit,
               size: AppSpacing.iconMd,
-              color: AppColors.textSecondary,
+              color: colors.textSecondary,
             ),
           ],
         ),
@@ -267,13 +276,14 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
   }
 
   Widget _buildCurrentInfo() {
+    final colors = AppColorsHelper.of(context);
     return Container(
       padding: AppSpacing.allMd,
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.05),
+        color: colors.info.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
         border: Border.all(
-          color: AppColors.info.withValues(alpha: 0.2),
+          color: colors.info.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -283,7 +293,7 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
             icon: Icons.login,
             label: 'Entrada actual',
             value: _formatTimeOfDay(widget.currentEntrance),
-            color: AppColors.textSecondary,
+            color: colors.textSecondary,
           ),
           if (widget.exitTime != null) ...[
             AppSpacing.verticalSpaceXs,
@@ -291,7 +301,7 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
               icon: Icons.logout,
               label: 'Salida registrada',
               value: _formatTimeOfDay(widget.exitTime!),
-              color: AppColors.success,
+              color: colors.success,
             ),
           ],
         ],
@@ -305,6 +315,8 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
     required String value,
     required Color color,
   }) {
+    final colors = AppColorsHelper.of(context);
+    
     return Row(
       children: [
         Icon(
@@ -316,7 +328,7 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
         Text(
           '$label: ',
           style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textSecondary,
+            color: colors.textSecondary,
           ),
         ),
         Text(
@@ -338,10 +350,10 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: AppColors.primary,
-              onPrimary: AppColors.textOnPrimary,
-              surface: AppColors.surface,
-              onSurface: AppColors.textPrimary,
+              primary: colors.primary,
+              onPrimary: colors.textOnPrimary,
+              surface: colors.surface,
+              onSurface: colors.textPrimary,
             ),
           ),
           child: child!,
@@ -460,6 +472,9 @@ class _EditEntranceBottomSheet extends StatefulWidget {
 class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
   late TimeOfDay selectedTime;
   String? errorMessage;
+  
+  // Helper para acceder a colors en todos los métodos
+  AppColorsHelper get colors => AppColorsHelper.of(context);
 
   @override
   void initState() {
@@ -469,9 +484,11 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColorsHelper.of(context);
+    
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colors.surface,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(AppSpacing.radiusXl),
           topRight: Radius.circular(AppSpacing.radiusXl),
@@ -491,7 +508,7 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.border,
+              color: colors.border,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -510,7 +527,7 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
           Text(
             'Solo registros del día actual',
             style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textSecondary,
+              color: colors.textSecondary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -521,7 +538,7 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
           Container(
             padding: AppSpacing.allSm,
             decoration: BoxDecoration(
-              color: AppColors.surfaceVariant,
+              color: colors.surfaceVariant,
               borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
             ),
             child: Row(
@@ -530,7 +547,7 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
                 Icon(
                   Icons.calendar_today,
                   size: 14,
-                  color: AppColors.textSecondary,
+                  color: colors.textSecondary,
                 ),
                 AppSpacing.horizontalSpaceXs,
                 Text(
@@ -559,10 +576,10 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
             Container(
               padding: AppSpacing.allSm,
               decoration: BoxDecoration(
-                color: AppColors.error.withValues(alpha: 0.1),
+                color: colors.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 border: Border.all(
-                  color: AppColors.error.withValues(alpha: 0.3),
+                  color: colors.error.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),
@@ -571,14 +588,14 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
                   Icon(
                     Icons.error_outline,
                     size: 16,
-                    color: AppColors.error,
+                    color: colors.error,
                   ),
                   AppSpacing.horizontalSpaceXs,
                   Expanded(
                     child: Text(
                       errorMessage!,
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.error,
+                        color: colors.error,
                       ),
                     ),
                   ),
@@ -616,6 +633,7 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
   }
 
   Widget _buildTimePicker() {
+    final colors = AppColorsHelper.of(context);
     return InkWell(
       onTap: _showTimePicker,
       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -623,7 +641,7 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
         padding: AppSpacing.allLg,
         decoration: BoxDecoration(
           border: Border.all(
-            color: errorMessage != null ? AppColors.error : AppColors.border,
+            color: errorMessage != null ? colors.error : colors.border,
             width: 2,
           ),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -634,13 +652,13 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
             Icon(
               Icons.access_time_rounded,
               size: AppSpacing.iconXl,
-              color: AppColors.primary,
+              color: colors.primary,
             ),
             AppSpacing.horizontalSpaceMd,
             Text(
               _formatTimeOfDay(selectedTime),
               style: AppTextStyles.displaySmall.copyWith(
-                color: AppColors.primary,
+                color: colors.primary,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -648,7 +666,7 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
             Icon(
               Icons.edit,
               size: AppSpacing.iconMd,
-              color: AppColors.textSecondary,
+              color: colors.textSecondary,
             ),
           ],
         ),
@@ -657,13 +675,14 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
   }
 
   Widget _buildCurrentInfo() {
+    final colors = AppColorsHelper.of(context);
     return Container(
       padding: AppSpacing.allMd,
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.05),
+        color: colors.info.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
         border: Border.all(
-          color: AppColors.info.withValues(alpha: 0.2),
+          color: colors.info.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -673,7 +692,7 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
             icon: Icons.login,
             label: 'Actual',
             value: _formatTimeOfDay(widget.currentEntrance),
-            color: AppColors.textSecondary,
+            color: colors.textSecondary,
           ),
           if (widget.exitTime != null) ...[
             AppSpacing.verticalSpaceXs,
@@ -681,7 +700,7 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
               icon: Icons.logout,
               label: 'Salida',
               value: _formatTimeOfDay(widget.exitTime!),
-              color: AppColors.success,
+              color: colors.success,
             ),
           ],
         ],
@@ -707,7 +726,7 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
         Text(
           '$label: ',
           style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textSecondary,
+            color: colors.textSecondary,
           ),
         ),
         Text(
@@ -729,10 +748,10 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: AppColors.primary,
-              onPrimary: AppColors.textOnPrimary,
-              surface: AppColors.surface,
-              onSurface: AppColors.textPrimary,
+              primary: colors.primary,
+              onPrimary: colors.textOnPrimary,
+              surface: colors.surface,
+              onSurface: colors.textPrimary,
             ),
           ),
           child: child!,

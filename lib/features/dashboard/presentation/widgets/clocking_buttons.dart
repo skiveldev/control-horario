@@ -121,7 +121,7 @@ class ClockingButtons extends StatelessWidget {
     return CustomButton(
       text: 'Entrada',
       icon: Icons.login,
-      variant: isEnabled ? ButtonVariant.success : ButtonVariant.secondary,
+      variant: isEnabled ? ButtonVariant.primary : ButtonVariant.secondary, // ← GRADIENTE VERDE
       size: ButtonSize.large,
       fullWidth: true,
       onPressed: isEnabled
@@ -142,7 +142,7 @@ class ClockingButtons extends StatelessWidget {
     return CustomButton(
       text: 'Salida',
       icon: Icons.logout,
-      variant: ButtonVariant.primary,
+      variant: isEnabled ? ButtonVariant.danger : ButtonVariant.secondary, // ← ROJO para salir
       size: ButtonSize.large,
       fullWidth: true,
       onPressed: isEnabled
@@ -162,7 +162,7 @@ class ClockingButtons extends StatelessWidget {
     return CustomButton(
       text: 'Pausa',
       icon: Icons.pause,
-      variant: ButtonVariant.outline,
+      variant: isEnabled ? ButtonVariant.warning : ButtonVariant.secondary, // ← GRADIENTE NARANJA
       size: ButtonSize.large,
       fullWidth: true,
       onPressed: isEnabled

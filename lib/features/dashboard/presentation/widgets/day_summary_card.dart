@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_colors_dark.dart';
+import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
@@ -77,6 +78,7 @@ class DaySummaryCard extends ConsumerWidget {
     required String estimatedExit,
     required int breakTime,
   }) {
+    final colors = AppColorsHelper.of(context);
 
     return CustomCard(
       elevation: CardElevation.medium,
@@ -90,13 +92,15 @@ class DaySummaryCard extends ConsumerWidget {
               Icon(
                 Icons.today,
                 size: AppSpacing.iconMd,
-                color: AppColors.info,
+                color: colors.info,
               ),
               AppSpacing.horizontalSpaceSm,
               Flexible(
                 child: Text(
                   'Resumen del Día',
-                  style: AppTextStyles.h5,
+                  style: AppTextStyles.h5.copyWith(
+                    color: colors.textPrimary,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -124,14 +128,14 @@ class DaySummaryCard extends ConsumerWidget {
                     TimeInfoBadge(
                       label: 'Hora de entrada',
                       time: entranceTime,
-                      color: AppColors.success,
+                      color: colors.success,
                       icon: Icons.login,
                     ),
                     AppSpacing.verticalSpaceMd,
                     TimeInfoBadge(
                       label: 'Salida estimada',
                       time: estimatedExit,
-                      color: AppColors.warning,
+                      color: AppColorsDark.purple, // Purple NO orange
                       icon: Icons.logout,
                     ),
                     AppSpacing.verticalSpaceMd,
@@ -149,7 +153,7 @@ class DaySummaryCard extends ConsumerWidget {
                         child: TimeInfoBadge(
                           label: 'Hora de entrada',
                           time: entranceTime,
-                          color: AppColors.success,
+                          color: colors.success,
                           icon: Icons.login,
                         ),
                       ),
@@ -158,7 +162,7 @@ class DaySummaryCard extends ConsumerWidget {
                         child: TimeInfoBadge(
                           label: 'Salida estimada',
                           time: estimatedExit,
-                          color: AppColors.warning,
+                          color: AppColorsDark.purple, // Purple NO orange
                           icon: Icons.logout,
                         ),
                       ),
@@ -186,101 +190,113 @@ class DaySummaryCard extends ConsumerWidget {
   }
 
   Widget _buildEmptyState(String message) {
-    return CustomCard(
-      elevation: CardElevation.medium,
-      padding: AppSpacing.cardLarge,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Título del card
-          Row(
+    return Builder(
+      builder: (context) {
+        final colors = AppColorsHelper.of(context);
+        return CustomCard(
+          elevation: CardElevation.medium,
+          padding: AppSpacing.cardLarge,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                Icons.today,
-                size: AppSpacing.iconMd,
-                color: AppColors.info,
+              // Título del card
+              Row(
+                children: [
+                  Icon(
+                    Icons.today,
+                    size: AppSpacing.iconMd,
+                    color: colors.info,
+                  ),
+                  AppSpacing.horizontalSpaceSm,
+                  Flexible(
+                    child: Text(
+                      'Resumen del Día',
+                      style: AppTextStyles.h5.copyWith(
+                        color: colors.textPrimary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
-              AppSpacing.horizontalSpaceSm,
-              Flexible(
-                child: Text(
-                  'Resumen del Día',
-                  style: AppTextStyles.h5,
-                  overflow: TextOverflow.ellipsis,
+              AppSpacing.verticalSpaceLg,
+              Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.calendar_today,
+                      size: 48,
+                      color: colors.textTertiary,
+                    ),
+                    AppSpacing.verticalSpaceMd,
+                    Text(
+                      message,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: colors.textSecondary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          AppSpacing.verticalSpaceLg,
-          Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.calendar_today,
-                  size: 48,
-                  color: AppColors.textTertiary,
-                ),
-                AppSpacing.verticalSpaceMd,
-                Text(
-                  message,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        );
+      }
     );
   }
 
   Widget _buildBreakTimeBadge(int breakMinutes) {
-    return Container(
-      padding: AppSpacing.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.md,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.warning.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-        border: Border.all(
-          color: AppColors.warning.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.coffee,
-            size: AppSpacing.iconMd,
-            color: AppColors.warning,
+    return Builder(
+      builder: (context) {
+        final colors = AppColorsHelper.of(context);
+        return Container(
+          padding: AppSpacing.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.md,
           ),
-          AppSpacing.horizontalSpaceMd,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Tiempo de pausa',
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.warning,
-                  ),
-                ),
-                AppSpacing.verticalSpaceXs,
-                Text(
-                  '${(breakMinutes ~/ 60)}h ${breakMinutes % 60}min acumulados hoy',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
+          decoration: BoxDecoration(
+            color: colors.warning.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            border: Border.all(
+              color: colors.warning.withValues(alpha: 0.3),
+              width: 1,
             ),
           ),
-        ],
-      ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.coffee,
+                size: AppSpacing.iconMd,
+                color: colors.warning,
+              ),
+              AppSpacing.horizontalSpaceMd,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Tiempo de pausa',
+                      style: AppTextStyles.labelSmall.copyWith(
+                        color: colors.warning,
+                      ),
+                    ),
+                    AppSpacing.verticalSpaceXs,
+                    Text(
+                      '${(breakMinutes ~/ 60)}h ${breakMinutes % 60}min acumulados hoy',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: colors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      }
     );
   }
 

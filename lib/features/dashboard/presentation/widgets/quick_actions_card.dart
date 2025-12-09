@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/mock_data.dart';
@@ -16,6 +16,7 @@ class QuickActionsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColorsHelper.of(context);
     // Datos mock
     final actions = MockData.quickActions;
 
@@ -31,13 +32,15 @@ class QuickActionsCard extends StatelessWidget {
               Icon(
                 Icons.bolt,
                 size: AppSpacing.iconMd,
-                color: AppColors.accent,
+                color: colors.accent,
               ),
               AppSpacing.horizontalSpaceSm,
               Flexible(
                 child: Text(
                   'Acciones Rápidas',
-                  style: AppTextStyles.h5,
+                  style: AppTextStyles.h5.copyWith(
+                    color: colors.textPrimary,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -65,8 +68,9 @@ class QuickActionsCard extends StatelessWidget {
     required BuildContext context,
     required Map<String, dynamic> action,
   }) {
+    final colors = AppColorsHelper.of(context);
     final isEnabled = action['enabled'] as bool;
-    final color = _getColorForType(action['color'] as String);
+    final color = _getColorForType(context, action['color'] as String);
     final icon = _getIconForName(action['icon'] as String);
 
     return InkWell(
@@ -92,12 +96,12 @@ class QuickActionsCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: isEnabled
               ? color.withValues(alpha: 0.05)
-              : AppColors.surfaceVariant.withValues(alpha: 0.5),
+              : colors.surfaceVariant.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
           border: Border.all(
             color: isEnabled
                 ? color.withValues(alpha: 0.2)
-                : AppColors.border,
+                : colors.border,
             width: 1,
           ),
         ),
@@ -109,13 +113,13 @@ class QuickActionsCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isEnabled
                     ? color.withValues(alpha: 0.1)
-                    : AppColors.borderLight,
+                    : colors.borderLight,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
               ),
               child: Icon(
                 icon,
                 size: AppSpacing.iconMd,
-                color: isEnabled ? color : AppColors.textTertiary,
+                color: isEnabled ? color : colors.textTertiary,
               ),
             ),
 
@@ -127,8 +131,8 @@ class QuickActionsCard extends StatelessWidget {
                 action['title'] as String,
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: isEnabled
-                      ? AppColors.textPrimary
-                      : AppColors.textTertiary,
+                      ? colors.textPrimary
+                      : colors.textTertiary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -150,13 +154,13 @@ class QuickActionsCard extends StatelessWidget {
                   vertical: AppSpacing.xs,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.textTertiary.withValues(alpha: 0.1),
+                  color: colors.textTertiary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                 ),
                 child: Text(
                   'Próximo',
                   style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.textTertiary,
+                    color: colors.textTertiary,
                   ),
                 ),
               ),
@@ -166,16 +170,17 @@ class QuickActionsCard extends StatelessWidget {
     );
   }
 
-  Color _getColorForType(String type) {
+  Color _getColorForType(BuildContext context, String type) {
+    final colors = AppColorsHelper.of(context);
     switch (type) {
       case 'info':
-        return AppColors.info;
+        return colors.info;
       case 'secondary':
-        return AppColors.secondary;
+        return colors.secondary;
       case 'accent':
-        return AppColors.accent;
+        return colors.accent;
       default:
-        return AppColors.primary;
+        return colors.primary;
     }
   }
 
@@ -203,13 +208,14 @@ class QuickActionsCard extends StatelessWidget {
       currentEntrance: currentEntrance,
       exitTime: exitTime,
       onSave: (newTime) {
+        final colors = AppColorsHelper.of(context);
         // TODO [FASE-2]: Guardar en Firebase/Riverpod
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               'Hora de entrada actualizada a ${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}',
             ),
-            backgroundColor: AppColors.success,
+            backgroundColor: colors.success,
           ),
         );
       },

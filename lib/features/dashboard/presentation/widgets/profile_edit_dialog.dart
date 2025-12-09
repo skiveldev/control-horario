@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
@@ -63,10 +63,11 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
     Navigator.of(context).pop();
 
     // Mock UI feedback
+    final colors = AppColorsHelper.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Perfil actualizado correctamente'),
-        backgroundColor: AppColors.success,
+      SnackBar(
+        content: const Text('Perfil actualizado correctamente'),
+        backgroundColor: colors.success,
       ),
     );
   }
@@ -158,6 +159,8 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
   }
 
   Widget _buildAvatarSection() {
+    final colors = AppColorsHelper.of(context);
+    
     return Center(
       child: Stack(
         children: [
@@ -166,21 +169,21 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: AppColors.primary,
+                color: colors.primary,
                 width: 3,
               ),
             ),
             child: CircleAvatar(
               radius: 60,
-              backgroundColor: AppColors.primary,
+              backgroundColor: colors.primary,
               backgroundImage: widget.user['avatarUrl'] != null
                   ? NetworkImage(widget.user['avatarUrl'] as String)
                   : null,
               child: widget.user['avatarUrl'] == null
-                  ? const Icon(
+                  ? Icon(
                       Icons.person,
                       size: 60,
-                      color: AppColors.textOnPrimary,
+                      color: colors.textOnPrimary,
                     )
                   : null,
             ),
@@ -192,24 +195,24 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
             bottom: 0,
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: colors.primary,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: AppColors.surface,
+                  color: colors.surface,
                   width: 3,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.shadow.withValues(alpha: 0.2),
+                    color: colors.shadow.withValues(alpha: 0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
                 ],
               ),
               child: IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.camera_alt,
-                  color: AppColors.textOnPrimary,
+                  color: colors.textOnPrimary,
                   size: 20,
                 ),
                 onPressed: () {
@@ -230,12 +233,14 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
   }
 
   Widget _buildNotificationSwitch() {
+    final colors = AppColorsHelper.of(context);
+    
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
+        color: colors.surfaceVariant,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         border: Border.all(
-          color: AppColors.border,
+          color: colors.border,
           width: 1,
         ),
       ),
@@ -247,7 +252,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
         subtitle: Text(
           'Recibe alertas y resúmenes en tu correo',
           style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textSecondary,
+            color: colors.textSecondary,
           ),
         ),
         value: _emailNotifications,
@@ -256,10 +261,10 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
             _emailNotifications = value;
           });
         },
-        activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
+        activeTrackColor: colors.primary.withValues(alpha: 0.5),
         thumbColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.primary;
+            return colors.primary;
           }
           return null;
         }),
@@ -268,13 +273,15 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
   }
 
   Widget _buildReadOnlySection() {
+    final colors = AppColorsHelper.of(context);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Información de solo lectura',
           style: AppTextStyles.labelLarge.copyWith(
-            color: AppColors.textSecondary,
+            color: colors.textSecondary,
           ),
         ),
 
@@ -310,13 +317,15 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
     required String value,
     required IconData icon,
   }) {
+    final colors = AppColorsHelper.of(context);
+    
     return Container(
       padding: AppSpacing.allMd,
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
+        color: colors.surfaceVariant,
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
         border: Border.all(
-          color: AppColors.borderLight,
+          color: colors.borderLight,
           width: 1,
         ),
       ),
@@ -325,7 +334,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
           Icon(
             icon,
             size: AppSpacing.iconSm,
-            color: AppColors.textSecondary,
+            color: colors.textSecondary,
           ),
           AppSpacing.horizontalSpaceMd,
           Expanded(
@@ -335,7 +344,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                 Text(
                   label,
                   style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: colors.textSecondary,
                   ),
                 ),
                 AppSpacing.verticalSpaceXs,

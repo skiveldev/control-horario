@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 
@@ -11,27 +11,33 @@ class CalendarLegend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColorsHelper.of(context);
+    
     return Wrap(
       spacing: AppSpacing.md,
       runSpacing: AppSpacing.sm,
       children: [
         _buildLegendItem(
-          color: AppColors.error,
+          context: context,
+          color: colors.error,
           label: 'Festivos',
           icon: Icons.event_busy,
         ),
         _buildLegendItem(
+          context: context,
           color: const Color(0xFFEC4899), // Rosa
           label: 'Vacaciones',
           icon: Icons.beach_access,
         ),
         _buildLegendItem(
-          color: AppColors.secondary,
+          context: context,
+          color: colors.secondary,
           label: 'Eventos',
           icon: Icons.event,
         ),
         _buildLegendItem(
-          color: AppColors.warning,
+          context: context,
+          color: colors.warning,
           label: 'Ausencias',
           icon: Icons.warning,
         ),
@@ -40,10 +46,13 @@ class CalendarLegend extends StatelessWidget {
   }
 
   Widget _buildLegendItem({
+    required BuildContext context,
     required Color color,
     required String label,
     required IconData icon,
   }) {
+    final colors = AppColorsHelper.of(context);
+    
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -70,7 +79,7 @@ class CalendarLegend extends StatelessWidget {
           child: Text(
             label,
             style: AppTextStyles.labelSmall.copyWith(
-              color: AppColors.textSecondary,
+              color: colors.textSecondary,
             ),
             overflow: TextOverflow.ellipsis,
           ),

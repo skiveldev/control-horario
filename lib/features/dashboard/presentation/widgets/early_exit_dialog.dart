@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
@@ -71,8 +71,10 @@ class _EarlyExitDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColorsHelper.of(context);
+    
     return Dialog(
-      backgroundColor: AppColors.surface,
+      backgroundColor: colors.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       ),
@@ -85,6 +87,8 @@ class _EarlyExitDialog extends StatelessWidget {
   }
 
   Widget _buildContent(BuildContext context) {
+    final colors = AppColorsHelper.of(context);
+    
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -92,7 +96,7 @@ class _EarlyExitDialog extends StatelessWidget {
         Icon(
           Icons.warning_rounded,
           size: AppSpacing.iconXxxl,
-          color: AppColors.warning,
+          color: colors.warning,
         ),
         
         AppSpacing.verticalSpaceLg,
@@ -100,7 +104,9 @@ class _EarlyExitDialog extends StatelessWidget {
         // Título
         Text(
           'Salida Anticipada',
-          style: AppTextStyles.h3,
+          style: AppTextStyles.h3.copyWith(
+            color: colors.textPrimary,
+          ),
           textAlign: TextAlign.center,
         ),
         
@@ -111,7 +117,7 @@ class _EarlyExitDialog extends StatelessWidget {
           textAlign: TextAlign.center,
           text: TextSpan(
             style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textPrimary,
+              color: colors.textPrimary,
             ),
             children: [
               const TextSpan(text: 'Aún te faltan '),
@@ -132,7 +138,7 @@ class _EarlyExitDialog extends StatelessWidget {
         Text(
           '¿Estás seguro de que deseas fichar la salida? Esto generará una incidencia.',
           style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.textSecondary,
+            color: colors.textSecondary,
           ),
           textAlign: TextAlign.center,
         ),
@@ -160,7 +166,7 @@ class _EarlyExitDialog extends StatelessWidget {
                 text: 'Confirmar Salida',
                 variant: ButtonVariant.primary,
                 size: ButtonSize.large,
-                backgroundColor: AppColors.error,
+                backgroundColor: colors.error,
                 onPressed: () {
                   Navigator.of(context).pop(true);
                   onConfirm();
@@ -204,9 +210,11 @@ class _EarlyExitBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColorsHelper.of(context);
+    
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colors.surface,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(AppSpacing.radiusXl),
           topRight: Radius.circular(AppSpacing.radiusXl),
@@ -226,7 +234,7 @@ class _EarlyExitBottomSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.border,
+              color: colors.border,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -237,7 +245,7 @@ class _EarlyExitBottomSheet extends StatelessWidget {
           Icon(
             Icons.warning_rounded,
             size: AppSpacing.iconXxxl,
-            color: AppColors.warning,
+            color: colors.warning,
           ),
           
           AppSpacing.verticalSpaceLg,
@@ -245,7 +253,9 @@ class _EarlyExitBottomSheet extends StatelessWidget {
           // Título
           Text(
             'Salida Anticipada',
-            style: AppTextStyles.h3,
+            style: AppTextStyles.h3.copyWith(
+              color: colors.textPrimary,
+            ),
             textAlign: TextAlign.center,
           ),
           
@@ -256,7 +266,7 @@ class _EarlyExitBottomSheet extends StatelessWidget {
             textAlign: TextAlign.center,
             text: TextSpan(
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textPrimary,
+                color: colors.textPrimary,
               ),
               children: [
                 const TextSpan(text: 'Aún te faltan '),
@@ -277,7 +287,7 @@ class _EarlyExitBottomSheet extends StatelessWidget {
           Text(
             '¿Estás seguro de que deseas fichar la salida? Esto generará una incidencia.',
             style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
+              color: colors.textSecondary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -292,7 +302,7 @@ class _EarlyExitBottomSheet extends StatelessWidget {
                 variant: ButtonVariant.primary,
                 size: ButtonSize.large,
                 fullWidth: true,
-                backgroundColor: AppColors.error,
+                backgroundColor: colors.error,
                 onPressed: () {
                   Navigator.of(context).pop(true);
                   onConfirm();

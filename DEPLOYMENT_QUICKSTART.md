@@ -200,3 +200,11 @@ firebase deploy --only firestore:rules && firebase deploy --only hosting
 
 **Última actualización:** 23 Noviembre 2025
 
+
+
+
+
+
+
+
+

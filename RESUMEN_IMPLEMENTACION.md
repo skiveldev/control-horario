@@ -379,3 +379,11 @@ Crear documentos en `/users/{uid}`:
 **Fecha:** 23 Noviembre 2025  
 **Versión:** 1.0
 
+
+
+
+
+
+
+
+

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
@@ -53,6 +53,7 @@ class RecentRecordsCard extends ConsumerWidget {
   }
 
   Widget _buildContent(BuildContext context, List<Map<String, dynamic>> records) {
+    final colors = AppColorsHelper.of(context);
 
     return CustomCard(
       elevation: CardElevation.medium,
@@ -70,13 +71,15 @@ class RecentRecordsCard extends ConsumerWidget {
                     Icon(
                       Icons.history,
                       size: AppSpacing.iconMd,
-                      color: AppColors.secondary,
+                      color: colors.secondary,
                     ),
                     AppSpacing.horizontalSpaceSm,
                     Flexible(
                       child: Text(
                         'Registros Recientes',
-                        style: AppTextStyles.h5,
+                        style: AppTextStyles.h5.copyWith(
+                          color: colors.textPrimary,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -97,7 +100,7 @@ class RecentRecordsCard extends ConsumerWidget {
                 icon: const Icon(Icons.arrow_forward, size: 16),
                 label: const Text('Ver todo'),
                 style: TextButton.styleFrom(
-                  foregroundColor: AppColors.primary,
+                  foregroundColor: colors.primary,
                 ),
               ),
             ],
@@ -124,7 +127,7 @@ class RecentRecordsCard extends ConsumerWidget {
           Container(
             padding: AppSpacing.allMd,
             decoration: BoxDecoration(
-              color: AppColors.info.withValues(alpha: 0.1),
+              color: colors.info.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
             ),
             child: Row(
@@ -132,14 +135,14 @@ class RecentRecordsCard extends ConsumerWidget {
                 Icon(
                   Icons.info_outline,
                   size: AppSpacing.iconSm,
-                  color: AppColors.info,
+                  color: colors.info,
                 ),
                 AppSpacing.horizontalSpaceSm,
                 Expanded(
                   child: Text(
                     'Mostrando los últimos ${records.length} registros. Ver historial completo para más.',
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.info,
+                      color: colors.info,
                     ),
                   ),
                 ),
@@ -152,133 +155,154 @@ class RecentRecordsCard extends ConsumerWidget {
   }
 
   Widget _buildLoadingState() {
-    return CustomCard(
-      elevation: CardElevation.medium,
-      padding: AppSpacing.cardLarge,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Builder(
+      builder: (context) {
+        final colors = AppColorsHelper.of(context);
+        return CustomCard(
+          elevation: CardElevation.medium,
+          padding: AppSpacing.cardLarge,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                Icons.history,
-                size: AppSpacing.iconMd,
-                color: AppColors.secondary,
+              Row(
+                children: [
+                  Icon(
+                    Icons.history,
+                    size: AppSpacing.iconMd,
+                    color: colors.secondary,
+                  ),
+                  AppSpacing.horizontalSpaceSm,
+                  Flexible(
+                    child: Text(
+                      'Registros Recientes',
+                      style: AppTextStyles.h5.copyWith(
+                        color: colors.textPrimary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
-              AppSpacing.horizontalSpaceSm,
-              Flexible(
-                child: Text(
-                  'Registros Recientes',
-                  style: AppTextStyles.h5,
-                  overflow: TextOverflow.ellipsis,
-                ),
+              AppSpacing.verticalSpaceLg,
+              const Center(
+                child: CircularProgressIndicator(),
               ),
             ],
           ),
-          AppSpacing.verticalSpaceLg,
-          const Center(
-            child: CircularProgressIndicator(),
-          ),
-        ],
-      ),
+        );
+      }
     );
   }
 
   Widget _buildEmptyState() {
-    return CustomCard(
-      elevation: CardElevation.medium,
-      padding: AppSpacing.cardLarge,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Builder(
+      builder: (context) {
+        final colors = AppColorsHelper.of(context);
+        return CustomCard(
+          elevation: CardElevation.medium,
+          padding: AppSpacing.cardLarge,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                Icons.history,
-                size: AppSpacing.iconMd,
-                color: AppColors.secondary,
+              Row(
+                children: [
+                  Icon(
+                    Icons.history,
+                    size: AppSpacing.iconMd,
+                    color: colors.secondary,
+                  ),
+                  AppSpacing.horizontalSpaceSm,
+                  Flexible(
+                    child: Text(
+                      'Registros Recientes',
+                      style: AppTextStyles.h5.copyWith(
+                        color: colors.textPrimary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
-              AppSpacing.horizontalSpaceSm,
-              Flexible(
-                child: Text(
-                  'Registros Recientes',
-                  style: AppTextStyles.h5,
-                  overflow: TextOverflow.ellipsis,
+              AppSpacing.verticalSpaceLg,
+              Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.event_busy,
+                      size: 48,
+                      color: colors.textTertiary,
+                    ),
+                    AppSpacing.verticalSpaceMd,
+                    Text(
+                      'No hay registros este mes',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: colors.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          AppSpacing.verticalSpaceLg,
-          Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.event_busy,
-                  size: 48,
-                  color: AppColors.textTertiary,
-                ),
-                AppSpacing.verticalSpaceMd,
-                Text(
-                  'No hay registros este mes',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        );
+      }
     );
   }
 
   Widget _buildErrorState(String errorMessage) {
-    return CustomCard(
-      elevation: CardElevation.medium,
-      padding: AppSpacing.cardLarge,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Builder(
+      builder: (context) {
+        final colors = AppColorsHelper.of(context);
+        return CustomCard(
+          elevation: CardElevation.medium,
+          padding: AppSpacing.cardLarge,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                Icons.history,
-                size: AppSpacing.iconMd,
-                color: AppColors.secondary,
+              Row(
+                children: [
+                  Icon(
+                    Icons.history,
+                    size: AppSpacing.iconMd,
+                    color: colors.secondary,
+                  ),
+                  AppSpacing.horizontalSpaceSm,
+                  Flexible(
+                    child: Text(
+                      'Registros Recientes',
+                      style: AppTextStyles.h5.copyWith(
+                        color: colors.textPrimary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
-              AppSpacing.horizontalSpaceSm,
-              Flexible(
-                child: Text(
-                  'Registros Recientes',
-                  style: AppTextStyles.h5,
-                  overflow: TextOverflow.ellipsis,
+              AppSpacing.verticalSpaceLg,
+              Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: colors.error,
+                    ),
+                    AppSpacing.verticalSpaceMd,
+                    Text(
+                      'Error al cargar registros',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: colors.error,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          AppSpacing.verticalSpaceLg,
-          Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 48,
-                  color: AppColors.error,
-                ),
-                AppSpacing.verticalSpaceMd,
-                Text(
-                  'Error al cargar registros',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.error,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        );
+      }
     );
   }
 

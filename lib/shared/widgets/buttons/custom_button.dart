@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_colors_dark.dart';
+import '../../../core/theme/app_gradients.dart';
+import '../../../core/theme/app_shadows.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
 
 /// Variantes de botón disponibles
 enum ButtonVariant {
-  /// Botón primario - Acción principal (fondo sólido)
+  /// Botón primario - Acción principal (gradiente verde)
   primary,
 
   /// Botón secundario - Acción secundaria (fondo gris)
@@ -17,11 +20,14 @@ enum ButtonVariant {
   /// Botón con borde - Acción alternativa (solo borde)
   outline,
 
-  /// Botón de éxito - Acciones positivas (verde)
+  /// Botón de éxito - Acciones positivas (gradiente azul)
   success,
 
-  /// Botón de error - Acciones destructivas (rojo)
+  /// Botón de error - Acciones destructivas (gradiente rojo)
   danger,
+
+  /// Botón de advertencia - Acciones de pausa (gradiente naranja)
+  warning,
 }
 
 /// Tamaños de botón disponibles
@@ -144,6 +150,8 @@ class CustomButton extends StatelessWidget {
         return _buildSuccessButton(isDisabled);
       case ButtonVariant.danger:
         return _buildDangerButton(isDisabled);
+      case ButtonVariant.warning:
+        return _buildWarningButton(isDisabled);
     }
   }
 
@@ -152,7 +160,18 @@ class CustomButton extends StatelessWidget {
   // ==========================================================================
 
   Widget _buildPrimaryButton(bool isDisabled) {
-    final bgColor = backgroundColor ?? AppColors.primary;
+    // Si no hay backgroundColor personalizado, usar GRADIENTE VERDE
+    if (backgroundColor == null) {
+      return _buildGradientButton(
+        isDisabled,
+        gradient: AppGradients.buttonPrimary,
+        glowShadow: AppShadows.buttonPrimaryGlow,
+        textColor: AppColorsDark.textOnPrimary,
+      );
+    }
+    
+    // Si hay backgroundColor personalizado, usar botón sólido estándar
+    final bgColor = backgroundColor!;
     return ElevatedButton(
       onPressed: isDisabled ? null : onPressed,
       style: ElevatedButton.styleFrom(
@@ -171,6 +190,41 @@ class CustomButton extends StatelessWidget {
         textStyle: _getTextStyle(),
       ),
       child: _buildContent(),
+    );
+  }
+  
+  /// Botón con gradiente + glow genérico (TODOS los botones principales)
+  Widget _buildGradientButton(bool isDisabled, {
+    required LinearGradient gradient,
+    required List<BoxShadow> glowShadow,
+    Color textColor = Colors.white,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: isDisabled ? null : onPressed,
+        borderRadius: BorderRadius.circular(borderRadius ?? AppSpacing.radiusMd),
+        child: Opacity(
+          opacity: isDisabled ? 0.5 : 1.0,
+          child: Container(
+            padding: _getPadding(),
+            decoration: BoxDecoration(
+              gradient: gradient, // ← Gradiente personalizado
+              borderRadius: BorderRadius.circular(borderRadius ?? AppSpacing.radiusMd),
+              boxShadow: isDisabled ? null : glowShadow, // ← Glow personalizado
+            ),
+            child: Center(
+              child: DefaultTextStyle(
+                style: _getTextStyle().copyWith(
+                  color: textColor,
+                  fontWeight: FontWeight.w600,
+                ),
+                child: _buildContent(),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -263,46 +317,32 @@ class CustomButton extends StatelessWidget {
   }
 
   Widget _buildSuccessButton(bool isDisabled) {
-    return ElevatedButton(
-      onPressed: isDisabled ? null : onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.success,
-        foregroundColor: AppColors.textOnDark,
-        disabledBackgroundColor: AppColors.success.withValues(alpha: 0.4),
-        disabledForegroundColor: AppColors.textOnDark.withValues(alpha: 0.5),
-        elevation: isDisabled ? 0 : 2,
-        shadowColor: AppColors.shadow,
-        padding: _getPadding(),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            borderRadius ?? AppSpacing.radiusMd,
-          ),
-        ),
-        textStyle: _getTextStyle(),
-      ),
-      child: _buildContent(),
+    // Usar gradiente azul/cyan para success (botón Retorno)
+    return _buildGradientButton(
+      isDisabled,
+      gradient: AppGradients.buttonInfo,
+      glowShadow: AppShadows.buttonInfoGlow,
+      textColor: Colors.white,
     );
   }
 
   Widget _buildDangerButton(bool isDisabled) {
-    return ElevatedButton(
-      onPressed: isDisabled ? null : onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.error,
-        foregroundColor: AppColors.textOnDark,
-        disabledBackgroundColor: AppColors.error.withValues(alpha: 0.4),
-        disabledForegroundColor: AppColors.textOnDark.withValues(alpha: 0.5),
-        elevation: isDisabled ? 0 : 2,
-        shadowColor: AppColors.shadow,
-        padding: _getPadding(),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            borderRadius ?? AppSpacing.radiusMd,
-          ),
-        ),
-        textStyle: _getTextStyle(),
-      ),
-      child: _buildContent(),
+    // Usar GRADIENTE ROJO para danger (botón Salida)
+    return _buildGradientButton(
+      isDisabled,
+      gradient: AppGradients.buttonDanger,
+      glowShadow: AppShadows.buttonDangerGlow,
+      textColor: Colors.white,
+    );
+  }
+
+  Widget _buildWarningButton(bool isDisabled) {
+    // Usar GRADIENTE NARANJA para warning (botón Pausa)
+    return _buildGradientButton(
+      isDisabled,
+      gradient: AppGradients.buttonWarning,
+      glowShadow: AppShadows.buttonWarningGlow,
+      textColor: Colors.white,
     );
   }
 
@@ -432,7 +472,8 @@ class CustomButton extends StatelessWidget {
       case ButtonVariant.primary:
       case ButtonVariant.success:
       case ButtonVariant.danger:
-        return AppColors.textOnPrimary;
+      case ButtonVariant.warning:
+        return Colors.white;
       case ButtonVariant.secondary:
         return AppColors.textPrimary;
       case ButtonVariant.text:

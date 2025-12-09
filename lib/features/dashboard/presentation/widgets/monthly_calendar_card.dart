@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/mock_data.dart';
@@ -57,6 +57,7 @@ class _MonthlyCalendarCardState extends State<MonthlyCalendarCard> {
   @override
   Widget build(BuildContext context) {
     final monthName = _getMonthName(_currentDate);
+    final colors = AppColorsHelper.of(context);
     final isCurrentMonth = _currentDate.year == DateTime.now().year &&
         _currentDate.month == DateTime.now().month;
 
@@ -72,13 +73,15 @@ class _MonthlyCalendarCardState extends State<MonthlyCalendarCard> {
               Icon(
                 Icons.calendar_month,
                 size: AppSpacing.iconMd,
-                color: AppColors.accent,
+                color: colors.accent,
               ),
               AppSpacing.horizontalSpaceSm,
               Expanded(
                 child: Text(
                   monthName.capitalize(),
-                  style: AppTextStyles.h5,
+                  style: AppTextStyles.h5.copyWith(
+                    color: colors.textPrimary,
+                  ),
                 ),
               ),
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'app.dart';
 
@@ -10,6 +11,7 @@ import 'app.dart';
 /// 
 /// Configura:
 /// - WidgetsFlutterBinding
+/// - SharedPreferences (theme persistence)
 /// - Firebase
 /// - Firebase Emulator (solo en debug mode)
 /// - Orientación de pantalla
@@ -18,6 +20,11 @@ import 'app.dart';
 void main() async {
   // Asegurar inicialización de Flutter
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ============================================================================
+  // INICIALIZAR SHARED PREFERENCES (para persistencia de tema)
+  // ============================================================================
+  await SharedPreferences.getInstance(); // Pre-cache para mejor performance
 
   // ============================================================================
   // INICIALIZAR FIREBASE
