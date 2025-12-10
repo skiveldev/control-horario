@@ -203,9 +203,7 @@ class AdminDashboardScreen extends StatelessWidget {
                 color: item['color'] as Color,
               ),
             ),
-
             AppSpacing.horizontalSpaceLg,
-
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,7 +219,6 @@ class AdminDashboardScreen extends StatelessWidget {
                 ],
               ),
             ),
-
             Icon(
               Icons.arrow_forward_ios,
               size: 16,

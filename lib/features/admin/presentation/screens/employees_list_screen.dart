@@ -44,11 +44,10 @@ class _EmployeesListScreenState extends State<EmployeesListScreen> {
     setState(() {
       _filteredEmployees = MockData.employees.where((emp) {
         final matchesSearch = emp['name'].toString().toLowerCase().contains(
-          _searchController.text.toLowerCase(),
-        );
+              _searchController.text.toLowerCase(),
+            );
 
-        final matchesDepartment =
-            _selectedDepartment == 'todos' ||
+        final matchesDepartment = _selectedDepartment == 'todos' ||
             emp['department'] == _selectedDepartment;
 
         return matchesSearch && matchesDepartment;

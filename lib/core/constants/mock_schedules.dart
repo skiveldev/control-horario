@@ -380,10 +380,8 @@ class MockSchedules {
   static String formatShifts(List<dynamic> shifts) {
     if (shifts.isEmpty) return 'Libre';
 
-    return shifts
-        .map((shift) {
-          return '${shift['startTime']}-${shift['endTime']}';
-        })
-        .join(' / ');
+    return shifts.map((shift) {
+      return '${shift['startTime']}-${shift['endTime']}';
+    }).join(' / ');
   }
 }

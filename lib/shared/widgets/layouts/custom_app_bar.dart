@@ -110,8 +110,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: transparent ? 0 : (elevation ?? 1),
       automaticallyImplyLeading: automaticallyImplyLeading,
       leading: leading,
-      title:
-          titleWidget ??
+      title: titleWidget ??
           (title != null ? Text(title!, style: AppTextStyles.h4) : null),
       actions: _buildActions(),
       flexibleSpace: showSearch ? _buildSearchBar() : null,
@@ -136,9 +135,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             child: CircleAvatar(
               radius: 18,
               backgroundColor: AppColors.primary,
-              backgroundImage: avatarUrl != null
-                  ? NetworkImage(avatarUrl!)
-                  : null,
+              backgroundImage:
+                  avatarUrl != null ? NetworkImage(avatarUrl!) : null,
               child: avatarUrl == null
                   ? const Icon(
                       Icons.person,

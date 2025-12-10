@@ -53,9 +53,8 @@ class SeedService {
     final batch = _db.batch();
 
     for (var schedule in schedules) {
-      final docRef = _db
-          .collection('schedules')
-          .doc(schedule['scheduleId'] as String);
+      final docRef =
+          _db.collection('schedules').doc(schedule['scheduleId'] as String);
       batch.set(docRef, schedule);
     }
 

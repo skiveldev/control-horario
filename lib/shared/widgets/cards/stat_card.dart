@@ -142,9 +142,8 @@ class StatCard extends StatelessWidget {
                             ? Icons.arrow_upward
                             : Icons.arrow_downward,
                         size: 10,
-                        color: trendPositive
-                            ? AppColors.success
-                            : AppColors.error,
+                        color:
+                            trendPositive ? AppColors.success : AppColors.error,
                       ),
                       const SizedBox(width: 2),
                       Text(

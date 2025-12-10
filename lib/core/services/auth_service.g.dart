@@ -15,9 +15,8 @@ String _$authServiceHash() => r'c71115a790bbd0d03e2a729447f6942fedfe4266';
 final authServiceProvider = AutoDisposeProvider<AuthService>.internal(
   authService,
   name: r'authServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$authServiceHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$authServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

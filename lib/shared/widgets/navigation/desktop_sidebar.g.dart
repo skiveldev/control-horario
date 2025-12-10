@@ -19,14 +19,14 @@ String _$sidebarNotifierHash() => r'c039ac56d0770ed8b3f5ad72f50c9a3c03bbd2c8';
 @ProviderFor(SidebarNotifier)
 final sidebarNotifierProvider =
     AutoDisposeNotifierProvider<SidebarNotifier, bool>.internal(
-      SidebarNotifier.new,
-      name: r'sidebarNotifierProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$sidebarNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  SidebarNotifier.new,
+  name: r'sidebarNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$sidebarNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$SidebarNotifier = AutoDisposeNotifier<bool>;
 // ignore_for_file: type=lint

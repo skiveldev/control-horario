@@ -52,8 +52,7 @@ class _MonthlyCalendarCardState extends State<MonthlyCalendarCard> {
   Widget build(BuildContext context) {
     final monthName = _getMonthName(_currentDate);
     final colors = AppColorsHelper.of(context);
-    final isCurrentMonth =
-        _currentDate.year == DateTime.now().year &&
+    final isCurrentMonth = _currentDate.year == DateTime.now().year &&
         _currentDate.month == DateTime.now().month;
 
     return CustomCard(

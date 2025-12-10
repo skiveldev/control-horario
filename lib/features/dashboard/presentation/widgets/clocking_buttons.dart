@@ -98,8 +98,7 @@ class ClockingButtons extends StatelessWidget {
 
   Widget _buildEntranceButton() {
     // Habilitar en estado inicial O después de fichar salida (permitir múltiples ciclos)
-    final isEnabled =
-        (currentState == ClockingState.notStarted ||
+    final isEnabled = (currentState == ClockingState.notStarted ||
             currentState == ClockingState.finished) &&
         !isLoading;
 
@@ -112,8 +111,7 @@ class ClockingButtons extends StatelessWidget {
       size: ButtonSize.large,
       fullWidth: true,
       onPressed: isEnabled ? () => onAction(ClockingAction.entrance) : null,
-      isLoading:
-          isLoading &&
+      isLoading: isLoading &&
           (currentState == ClockingState.notStarted ||
               currentState == ClockingState.finished),
     );
@@ -171,9 +169,8 @@ class ClockingButtons extends StatelessWidget {
       variant: isEnabled ? ButtonVariant.success : ButtonVariant.secondary,
       size: ButtonSize.large,
       fullWidth: true,
-      onPressed: isEnabled
-          ? () => onAction(ClockingAction.returnFromPause)
-          : null,
+      onPressed:
+          isEnabled ? () => onAction(ClockingAction.returnFromPause) : null,
       isLoading: isLoading && currentState == ClockingState.onPause,
     );
   }

@@ -54,6 +54,38 @@ Desarrollo:
 - `setState` SOLO permitido para UI local que no afecta otros widgets (TextField, hover, etc.)
 - Todo el estado de aplicación se gestiona con Riverpod providers
 
+## 🛡️ Sistema de Calidad de Código
+
+Este proyecto cuenta con **3 capas de protección** para garantizar código de alta calidad:
+
+### 1. Linter Estricto (`analysis_options.yaml`)
+- ✅ Detecta errores mientras escribes en tu IDE
+- ✅ Previene bugs críticos (`print()`, APIs deprecadas, etc.)
+- ✅ Funciona en tiempo real
+
+### 2. Pre-commit Hook (`.githooks/`)
+- ✅ Se ejecuta automáticamente antes de cada commit
+- ✅ Auto-formatea el código
+- ✅ Bloquea commits con errores
+
+**Instalación (una sola vez):**
+```bash
+git config core.hooksPath .githooks
+```
+
+### 3. GitHub Actions (`.github/workflows/`)
+- ✅ Se ejecuta en la nube después de cada push
+- ✅ Verifica código + construye la app
+- ✅ Bloquea merges de Pull Requests con errores
+
+**Ver estado:** [github.com/TU_REPO/actions](https://github.com)
+
+📖 **Documentación completa:**
+- [📋 Guía Rápida](SETUP_COMPLETO.md) - Resumen ejecutivo
+- [📚 Documentación Detallada](docs/QUALITY_SETUP.md) - Sistema completo
+- [🪝 Pre-commit Hooks](/.githooks/README.md) - Configuración y uso
+- [🤖 GitHub Actions](/.github/workflows/README.md) - CI/CD explicado
+
 ## 📁 Estructura del Proyecto
 ```
 control_horario/

@@ -208,9 +208,8 @@ class MobileDrawer extends ConsumerWidget {
         color: isSelected
             ? Theme.of(context).colorScheme.primary
             : (isDark
-                  ? AppColorsDark
-                        .textPrimary // Blanco en dark
-                  : Theme.of(context).colorScheme.onSurface), // Negro en light
+                ? AppColorsDark.textPrimary // Blanco en dark
+                : Theme.of(context).colorScheme.onSurface), // Negro en light
       ),
       title: Text(
         item.label,
@@ -218,11 +217,10 @@ class MobileDrawer extends ConsumerWidget {
           color: isSelected
               ? Theme.of(context).colorScheme.primary
               : (isDark
-                    ? AppColorsDark
-                          .textPrimary // Blanco en dark
-                    : Theme.of(
-                        context,
-                      ).colorScheme.onSurface), // Negro en light
+                  ? AppColorsDark.textPrimary // Blanco en dark
+                  : Theme.of(
+                      context,
+                    ).colorScheme.onSurface), // Negro en light
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
         ),
       ),

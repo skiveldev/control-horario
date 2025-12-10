@@ -211,9 +211,8 @@ class IconButtonCustom extends StatelessWidget {
             foregroundColor: iconColor ?? AppColors.textPrimary,
             disabledForegroundColor: AppColors.textTertiary,
             side: BorderSide(
-              color: onPressed == null
-                  ? AppColors.borderLight
-                  : AppColors.border,
+              color:
+                  onPressed == null ? AppColors.borderLight : AppColors.border,
               width: 1,
             ),
             shape: circular

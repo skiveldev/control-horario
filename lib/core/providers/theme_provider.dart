@@ -55,9 +55,8 @@ class ThemeNotifier extends _$ThemeNotifier {
   Future<void> toggleTheme() async {
     try {
       // Determinar nuevo modo
-      final newMode = state == ThemeMode.light
-          ? ThemeMode.dark
-          : ThemeMode.light;
+      final newMode =
+          state == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
 
       // Actualizar estado inmediatamente
       state = newMode;

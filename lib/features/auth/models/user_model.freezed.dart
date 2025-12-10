@@ -83,40 +83,39 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
   }) {
     return _then(
       _value.copyWith(
-            userId: null == userId
-                ? _value.userId
-                : userId // ignore: cast_nullable_to_non_nullable
-                      as String,
-            employeeId: null == employeeId
-                ? _value.employeeId
-                : employeeId // ignore: cast_nullable_to_non_nullable
-                      as String,
-            email: null == email
-                ? _value.email
-                : email // ignore: cast_nullable_to_non_nullable
-                      as String,
-            displayName: null == displayName
-                ? _value.displayName
-                : displayName // ignore: cast_nullable_to_non_nullable
-                      as String,
-            role: null == role
-                ? _value.role
-                : role // ignore: cast_nullable_to_non_nullable
-                      as UserRole,
-            weeklyHours: null == weeklyHours
-                ? _value.weeklyHours
-                : weeklyHours // ignore: cast_nullable_to_non_nullable
-                      as double,
-            isActive: null == isActive
-                ? _value.isActive
-                : isActive // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            createdAt: null == createdAt
-                ? _value.createdAt
-                : createdAt // ignore: cast_nullable_to_non_nullable
-                      as DateTime,
-          )
-          as $Val,
+        userId: null == userId
+            ? _value.userId
+            : userId // ignore: cast_nullable_to_non_nullable
+                as String,
+        employeeId: null == employeeId
+            ? _value.employeeId
+            : employeeId // ignore: cast_nullable_to_non_nullable
+                as String,
+        email: null == email
+            ? _value.email
+            : email // ignore: cast_nullable_to_non_nullable
+                as String,
+        displayName: null == displayName
+            ? _value.displayName
+            : displayName // ignore: cast_nullable_to_non_nullable
+                as String,
+        role: null == role
+            ? _value.role
+            : role // ignore: cast_nullable_to_non_nullable
+                as UserRole,
+        weeklyHours: null == weeklyHours
+            ? _value.weeklyHours
+            : weeklyHours // ignore: cast_nullable_to_non_nullable
+                as double,
+        isActive: null == isActive
+            ? _value.isActive
+            : isActive // ignore: cast_nullable_to_non_nullable
+                as bool,
+        createdAt: null == createdAt
+            ? _value.createdAt
+            : createdAt // ignore: cast_nullable_to_non_nullable
+                as DateTime,
+      ) as $Val,
     );
   }
 }
@@ -170,35 +169,35 @@ class __$$UserModelImplCopyWithImpl<$Res>
         userId: null == userId
             ? _value.userId
             : userId // ignore: cast_nullable_to_non_nullable
-                  as String,
+                as String,
         employeeId: null == employeeId
             ? _value.employeeId
             : employeeId // ignore: cast_nullable_to_non_nullable
-                  as String,
+                as String,
         email: null == email
             ? _value.email
             : email // ignore: cast_nullable_to_non_nullable
-                  as String,
+                as String,
         displayName: null == displayName
             ? _value.displayName
             : displayName // ignore: cast_nullable_to_non_nullable
-                  as String,
+                as String,
         role: null == role
             ? _value.role
             : role // ignore: cast_nullable_to_non_nullable
-                  as UserRole,
+                as UserRole,
         weeklyHours: null == weeklyHours
             ? _value.weeklyHours
             : weeklyHours // ignore: cast_nullable_to_non_nullable
-                  as double,
+                as double,
         isActive: null == isActive
             ? _value.isActive
             : isActive // ignore: cast_nullable_to_non_nullable
-                  as bool,
+                as bool,
         createdAt: null == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
-                  as DateTime,
+                as DateTime,
       ),
     );
   }
@@ -267,16 +266,16 @@ class _$UserModelImpl implements _UserModel {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    userId,
-    employeeId,
-    email,
-    displayName,
-    role,
-    weeklyHours,
-    isActive,
-    createdAt,
-  );
+        runtimeType,
+        userId,
+        employeeId,
+        email,
+        displayName,
+        role,
+        weeklyHours,
+        isActive,
+        createdAt,
+      );
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.

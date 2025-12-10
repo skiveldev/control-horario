@@ -87,40 +87,39 @@ class _$DailyRecordModelCopyWithImpl<$Res, $Val extends DailyRecordModel>
   }) {
     return _then(
       _value.copyWith(
-            date: null == date
-                ? _value.date
-                : date // ignore: cast_nullable_to_non_nullable
-                      as String,
-            userId: null == userId
-                ? _value.userId
-                : userId // ignore: cast_nullable_to_non_nullable
-                      as String,
-            clocks: null == clocks
-                ? _value.clocks
-                : clocks // ignore: cast_nullable_to_non_nullable
-                      as ClockTimes,
-            clockInTimestamp: freezed == clockInTimestamp
-                ? _value.clockInTimestamp
-                : clockInTimestamp // ignore: cast_nullable_to_non_nullable
-                      as DateTime?,
-            clockOutTimestamp: freezed == clockOutTimestamp
-                ? _value.clockOutTimestamp
-                : clockOutTimestamp // ignore: cast_nullable_to_non_nullable
-                      as DateTime?,
-            status: null == status
-                ? _value.status
-                : status // ignore: cast_nullable_to_non_nullable
-                      as RecordStatus,
-            createdAt: null == createdAt
-                ? _value.createdAt
-                : createdAt // ignore: cast_nullable_to_non_nullable
-                      as DateTime,
-            updatedAt: null == updatedAt
-                ? _value.updatedAt
-                : updatedAt // ignore: cast_nullable_to_non_nullable
-                      as DateTime,
-          )
-          as $Val,
+        date: null == date
+            ? _value.date
+            : date // ignore: cast_nullable_to_non_nullable
+                as String,
+        userId: null == userId
+            ? _value.userId
+            : userId // ignore: cast_nullable_to_non_nullable
+                as String,
+        clocks: null == clocks
+            ? _value.clocks
+            : clocks // ignore: cast_nullable_to_non_nullable
+                as ClockTimes,
+        clockInTimestamp: freezed == clockInTimestamp
+            ? _value.clockInTimestamp
+            : clockInTimestamp // ignore: cast_nullable_to_non_nullable
+                as DateTime?,
+        clockOutTimestamp: freezed == clockOutTimestamp
+            ? _value.clockOutTimestamp
+            : clockOutTimestamp // ignore: cast_nullable_to_non_nullable
+                as DateTime?,
+        status: null == status
+            ? _value.status
+            : status // ignore: cast_nullable_to_non_nullable
+                as RecordStatus,
+        createdAt: null == createdAt
+            ? _value.createdAt
+            : createdAt // ignore: cast_nullable_to_non_nullable
+                as DateTime,
+        updatedAt: null == updatedAt
+            ? _value.updatedAt
+            : updatedAt // ignore: cast_nullable_to_non_nullable
+                as DateTime,
+      ) as $Val,
     );
   }
 
@@ -187,35 +186,35 @@ class __$$DailyRecordModelImplCopyWithImpl<$Res>
         date: null == date
             ? _value.date
             : date // ignore: cast_nullable_to_non_nullable
-                  as String,
+                as String,
         userId: null == userId
             ? _value.userId
             : userId // ignore: cast_nullable_to_non_nullable
-                  as String,
+                as String,
         clocks: null == clocks
             ? _value.clocks
             : clocks // ignore: cast_nullable_to_non_nullable
-                  as ClockTimes,
+                as ClockTimes,
         clockInTimestamp: freezed == clockInTimestamp
             ? _value.clockInTimestamp
             : clockInTimestamp // ignore: cast_nullable_to_non_nullable
-                  as DateTime?,
+                as DateTime?,
         clockOutTimestamp: freezed == clockOutTimestamp
             ? _value.clockOutTimestamp
             : clockOutTimestamp // ignore: cast_nullable_to_non_nullable
-                  as DateTime?,
+                as DateTime?,
         status: null == status
             ? _value.status
             : status // ignore: cast_nullable_to_non_nullable
-                  as RecordStatus,
+                as RecordStatus,
         createdAt: null == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
-                  as DateTime,
+                as DateTime,
         updatedAt: null == updatedAt
             ? _value.updatedAt
             : updatedAt // ignore: cast_nullable_to_non_nullable
-                  as DateTime,
+                as DateTime,
       ),
     );
   }
@@ -282,16 +281,16 @@ class _$DailyRecordModelImpl implements _DailyRecordModel {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    date,
-    userId,
-    clocks,
-    clockInTimestamp,
-    clockOutTimestamp,
-    status,
-    createdAt,
-    updatedAt,
-  );
+        runtimeType,
+        date,
+        userId,
+        clocks,
+        clockInTimestamp,
+        clockOutTimestamp,
+        status,
+        createdAt,
+        updatedAt,
+      );
 
   /// Create a copy of DailyRecordModel
   /// with the given fields replaced by the non-null parameter values.
@@ -396,16 +395,15 @@ class _$ClockTimesCopyWithImpl<$Res, $Val extends ClockTimes>
   $Res call({Object? clockIn = freezed, Object? clockOut = freezed}) {
     return _then(
       _value.copyWith(
-            clockIn: freezed == clockIn
-                ? _value.clockIn
-                : clockIn // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            clockOut: freezed == clockOut
-                ? _value.clockOut
-                : clockOut // ignore: cast_nullable_to_non_nullable
-                      as String?,
-          )
-          as $Val,
+        clockIn: freezed == clockIn
+            ? _value.clockIn
+            : clockIn // ignore: cast_nullable_to_non_nullable
+                as String?,
+        clockOut: freezed == clockOut
+            ? _value.clockOut
+            : clockOut // ignore: cast_nullable_to_non_nullable
+                as String?,
+      ) as $Val,
     );
   }
 }
@@ -441,11 +439,11 @@ class __$$ClockTimesImplCopyWithImpl<$Res>
         clockIn: freezed == clockIn
             ? _value.clockIn
             : clockIn // ignore: cast_nullable_to_non_nullable
-                  as String?,
+                as String?,
         clockOut: freezed == clockOut
             ? _value.clockOut
             : clockOut // ignore: cast_nullable_to_non_nullable
-                  as String?,
+                as String?,
       ),
     );
   }

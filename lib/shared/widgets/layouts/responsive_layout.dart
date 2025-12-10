@@ -94,8 +94,7 @@ class MaxWidthContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveMaxWidth = maxWidth ?? context.maxContentWidth;
-    final effectivePadding =
-        padding ??
+    final effectivePadding = padding ??
         EdgeInsets.symmetric(horizontal: context.pageHorizontalPadding);
 
     return Align(

@@ -25,8 +25,8 @@ class AuthService {
   AuthService({
     required FirebaseAuth auth,
     required FirebaseFirestore firestore,
-  }) : _auth = auth,
-       _firestore = firestore;
+  })  : _auth = auth,
+        _firestore = firestore;
 
   // ==========================================================================
   // STREAMS Y GETTERS

@@ -89,7 +89,6 @@ class LoadingSpinner extends StatelessWidget {
             ),
           ),
         ),
-
         if (message != null) ...[
           AppSpacing.verticalSpaceMd,
           Text(

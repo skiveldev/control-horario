@@ -19,14 +19,13 @@ String _$todayRecordHash() => r'b3d6197094efcbd169e9105407be56c1cfd9e917';
 @ProviderFor(todayRecord)
 final todayRecordProvider =
     AutoDisposeStreamProvider<DailyRecordModel?>.internal(
-      todayRecord,
-      name: r'todayRecordProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$todayRecordHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  todayRecord,
+  name: r'todayRecordProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$todayRecordHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
@@ -42,14 +41,14 @@ String _$clockingNotifierHash() => r'ad2369b570d5ad9a2104830017fe22e8304b0cac';
 @ProviderFor(ClockingNotifier)
 final clockingNotifierProvider =
     AutoDisposeNotifierProvider<ClockingNotifier, AsyncValue<void>>.internal(
-      ClockingNotifier.new,
-      name: r'clockingNotifierProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$clockingNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  ClockingNotifier.new,
+  name: r'clockingNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$clockingNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$ClockingNotifier = AutoDisposeNotifier<AsyncValue<void>>;
 // ignore_for_file: type=lint

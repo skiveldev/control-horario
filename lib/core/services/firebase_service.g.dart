@@ -18,9 +18,8 @@ String _$firestoreHash() => r'ef4a6b0737caace50a6d79dd3e4e2aa1bc3031d5';
 final firestoreProvider = AutoDisposeProvider<FirebaseFirestore>.internal(
   firestore,
   name: r'firestoreProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$firestoreHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$firestoreHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -40,9 +39,8 @@ String _$firebaseAuthHash() => r'7791bf70ce0f01bf991a53a76abc915478673c0b';
 final firebaseAuthProvider = AutoDisposeProvider<FirebaseAuth>.internal(
   firebaseAuth,
   name: r'firebaseAuthProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$firebaseAuthHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$firebaseAuthHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

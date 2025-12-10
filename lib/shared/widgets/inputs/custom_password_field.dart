@@ -168,8 +168,8 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
                   color: widget.errorText != null
                       ? AppColors.error
                       : _isFocused
-                      ? AppColors.primary
-                      : AppColors.textSecondary,
+                          ? AppColors.primary
+                          : AppColors.textSecondary,
                 ),
                 children: const [
                   TextSpan(
@@ -193,9 +193,8 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
           textInputAction: TextInputAction.done,
           style: AppTextStyles.bodyMedium,
           decoration: InputDecoration(
-            labelText: widget.label != null && !widget.required
-                ? widget.label
-                : null,
+            labelText:
+                widget.label != null && !widget.required ? widget.label : null,
             hintText: widget.hintText ?? '••••••••',
             helperText: widget.helperText,
             errorText: widget.errorText,
@@ -207,8 +206,8 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
               color: widget.errorText != null
                   ? AppColors.error
                   : _isFocused
-                  ? AppColors.primary
-                  : AppColors.textSecondary,
+                      ? AppColors.primary
+                      : AppColors.textSecondary,
             ),
 
             // Toggle de visibilidad
@@ -222,12 +221,11 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
               color: widget.errorText != null
                   ? AppColors.error
                   : _isFocused
-                  ? AppColors.primary
-                  : AppColors.textSecondary,
+                      ? AppColors.primary
+                      : AppColors.textSecondary,
               onPressed: _toggleVisibility,
-              tooltip: _obscureText
-                  ? 'Mostrar contraseña'
-                  : 'Ocultar contraseña',
+              tooltip:
+                  _obscureText ? 'Mostrar contraseña' : 'Ocultar contraseña',
             ),
 
             // Ocultar contador

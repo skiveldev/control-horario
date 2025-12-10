@@ -205,8 +205,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   color: widget.errorText != null
                       ? AppColors.error
                       : _isFocused
-                      ? AppColors.primary
-                      : AppColors.textSecondary,
+                          ? AppColors.primary
+                          : AppColors.textSecondary,
                 ),
                 children: const [
                   TextSpan(
@@ -235,9 +235,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
           inputFormatters: widget.inputFormatters,
           style: AppTextStyles.bodyMedium,
           decoration: InputDecoration(
-            labelText: widget.label != null && !widget.required
-                ? widget.label
-                : null,
+            labelText:
+                widget.label != null && !widget.required ? widget.label : null,
             hintText: widget.hintText,
             helperText: widget.helperText,
             errorText: widget.errorText,
@@ -250,8 +249,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     color: widget.errorText != null
                         ? AppColors.error
                         : _isFocused
-                        ? AppColors.primary
-                        : AppColors.textSecondary,
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
                   )
                 : null,
             prefix: widget.prefix,
@@ -265,8 +264,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     color: widget.errorText != null
                         ? AppColors.error
                         : _isFocused
-                        ? AppColors.primary
-                        : AppColors.textSecondary,
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
                   )
                 : null,
             suffix: widget.suffix,

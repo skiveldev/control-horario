@@ -78,15 +78,15 @@ class ClockingNotifier extends _$ClockingNotifier {
           .collection('daily_records')
           .doc(today)
           .set({
-            'date': today,
-            'userId': user.userId,
-            'clocks': {'clockIn': timeString, 'clockOut': null},
-            'clockInTimestamp': Timestamp.fromDate(now),
-            'clockOutTimestamp': null,
-            'status': 'incomplete',
-            'createdAt': FieldValue.serverTimestamp(),
-            'updatedAt': FieldValue.serverTimestamp(),
-          });
+        'date': today,
+        'userId': user.userId,
+        'clocks': {'clockIn': timeString, 'clockOut': null},
+        'clockInTimestamp': Timestamp.fromDate(now),
+        'clockOutTimestamp': null,
+        'status': 'incomplete',
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
     });
   }
 
@@ -116,11 +116,11 @@ class ClockingNotifier extends _$ClockingNotifier {
           .collection('daily_records')
           .doc(today)
           .update({
-            'clocks.clockOut': timeString,
-            'clockOutTimestamp': Timestamp.fromDate(now),
-            'status': 'complete',
-            'updatedAt': FieldValue.serverTimestamp(),
-          });
+        'clocks.clockOut': timeString,
+        'clockOutTimestamp': Timestamp.fromDate(now),
+        'status': 'complete',
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
     });
   }
 }

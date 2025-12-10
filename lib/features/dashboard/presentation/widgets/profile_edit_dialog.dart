@@ -260,25 +260,19 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
           'Información de solo lectura',
           style: AppTextStyles.labelLarge.copyWith(color: colors.textSecondary),
         ),
-
         AppSpacing.verticalSpaceMd,
-
         _buildReadOnlyField(
           label: 'Correo electrónico',
           value: widget.user['email'] as String,
           icon: Icons.email,
         ),
-
         AppSpacing.verticalSpaceSm,
-
         _buildReadOnlyField(
           label: 'ID Empleado',
           value: widget.user['id'] as String,
           icon: Icons.tag,
         ),
-
         AppSpacing.verticalSpaceSm,
-
         _buildReadOnlyField(
           label: 'Departamento',
           value: widget.user['department'] as String,

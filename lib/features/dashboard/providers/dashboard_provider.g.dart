@@ -19,19 +19,19 @@ String _$monthlyRecordsHash() => r'0af101e9386d36315fcb43d5ad0fd8d79ea2617f';
 @ProviderFor(monthlyRecords)
 final monthlyRecordsProvider =
     AutoDisposeStreamProvider<List<DailyRecordModel>>.internal(
-      monthlyRecords,
-      name: r'monthlyRecordsProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$monthlyRecordsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  monthlyRecords,
+  name: r'monthlyRecordsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$monthlyRecordsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef MonthlyRecordsRef =
-    AutoDisposeStreamProviderRef<List<DailyRecordModel>>;
+typedef MonthlyRecordsRef
+    = AutoDisposeStreamProviderRef<List<DailyRecordModel>>;
 String _$todayTotalMinutesHash() => r'd6f2a815fd5e5b850b1d52ebca16e04b1a9893b9';
 
 /// Provider computado: Total de minutos trabajados hoy

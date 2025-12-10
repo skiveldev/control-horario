@@ -289,19 +289,14 @@ class DashboardScreen extends ConsumerWidget {
       children: [
         const TimeClockCard(),
         SizedBox(height: gap),
-
         const DaySummaryCard(),
         SizedBox(height: gap),
-
         const RecentRecordsCard(),
         SizedBox(height: gap),
-
         const MonthlyCalendarCard(),
         SizedBox(height: gap),
-
         const WeeklySummaryCard(),
         SizedBox(height: gap),
-
         const QuickActionsCard(),
       ],
     );

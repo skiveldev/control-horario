@@ -101,8 +101,7 @@ class DesktopSidebar extends ConsumerWidget {
       width: isExpanded ? 240 : 64,
       decoration: BoxDecoration(
         color: isDark
-            ? AppColorsDark
-                  .sidebarBackground // Navy oscuro
+            ? AppColorsDark.sidebarBackground // Navy oscuro
             : Theme.of(context).colorScheme.surface,
         border: Border(
           right: BorderSide(color: Theme.of(context).dividerColor, width: 1),
@@ -240,16 +239,15 @@ class DesktopSidebar extends ConsumerWidget {
                 size: 24,
                 color: isSelected
                     ? (isDark
-                          ? const Color(
-                              0xFF22D3EE,
-                            ) // Cyan brillante en dark mode
-                          : Theme.of(context)
-                                .colorScheme
-                                .primary) // Primary color en light mode
+                        ? const Color(
+                            0xFF22D3EE,
+                          ) // Cyan brillante en dark mode
+                        : Theme.of(context)
+                            .colorScheme
+                            .primary) // Primary color en light mode
                     : (isDark
-                          ? Colors
-                                .white // Blanco puro en dark mode
-                          : Colors.black87), // Negro en light mode
+                        ? Colors.white // Blanco puro en dark mode
+                        : Colors.black87), // Negro en light mode
               ),
 
               // Texto (solo si está expandido)
@@ -262,19 +260,17 @@ class DesktopSidebar extends ConsumerWidget {
                       fontSize: 16,
                       color: isSelected
                           ? (isDark
-                                ? const Color(
-                                    0xFF22D3EE,
-                                  ) // Cyan brillante en dark mode
-                                : Theme.of(context)
-                                      .colorScheme
-                                      .primary) // Primary color en light mode
+                              ? const Color(
+                                  0xFF22D3EE,
+                                ) // Cyan brillante en dark mode
+                              : Theme.of(context)
+                                  .colorScheme
+                                  .primary) // Primary color en light mode
                           : (isDark
-                                ? Colors
-                                      .white // Blanco puro en dark mode
-                                : Colors.black87), // Negro en light mode
-                      fontWeight: isSelected
-                          ? FontWeight.w600
-                          : FontWeight.normal,
+                              ? Colors.white // Blanco puro en dark mode
+                              : Colors.black87), // Negro en light mode
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.normal,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
