@@ -6,11 +6,11 @@ import '../../../../core/constants/breakpoints.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
 
 /// Diálogo para editar la hora de entrada del día actual
-/// 
+///
 /// Permite al empleado corregir su hora de entrada si olvidó fichar.
 /// Solo funciona para el día actual, días anteriores no son editables.
 /// Adapta su presentación según el dispositivo (Dialog en desktop, BottomSheet en mobile).
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// showEditEntranceDialog(
@@ -74,7 +74,7 @@ class _EditEntranceDialog extends StatefulWidget {
 class _EditEntranceDialogState extends State<_EditEntranceDialog> {
   late TimeOfDay selectedTime;
   String? errorMessage;
-  
+
   // Helper para acceder a colors en todos los métodos
   AppColorsHelper get colors => AppColorsHelper.of(context);
 
@@ -87,7 +87,7 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
   @override
   Widget build(BuildContext context) {
     final colors = AppColorsHelper.of(context);
-    
+
     return Dialog(
       backgroundColor: colors.surface,
       shape: RoundedRectangleBorder(
@@ -183,11 +183,7 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 16,
-                      color: colors.error,
-                    ),
+                    Icon(Icons.error_outline, size: 16, color: colors.error),
                     AppSpacing.horizontalSpaceXs,
                     Expanded(
                       child: Text(
@@ -282,10 +278,7 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
       decoration: BoxDecoration(
         color: colors.info.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-        border: Border.all(
-          color: colors.info.withValues(alpha: 0.2),
-          width: 1,
-        ),
+        border: Border.all(color: colors.info.withValues(alpha: 0.2), width: 1),
       ),
       child: Column(
         children: [
@@ -316,20 +309,14 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
     required Color color,
   }) {
     final colors = AppColorsHelper.of(context);
-    
+
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 14,
-          color: color,
-        ),
+        Icon(icon, size: 14, color: color),
         AppSpacing.horizontalSpaceXs,
         Text(
           '$label: ',
-          style: AppTextStyles.bodySmall.copyWith(
-            color: colors.textSecondary,
-          ),
+          style: AppTextStyles.bodySmall.copyWith(color: colors.textSecondary),
         ),
         Text(
           value,
@@ -420,8 +407,20 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
   }
 
   String _getMonthName(int month) {
-    const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 
-                    'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const months = [
+      'Ene',
+      'Feb',
+      'Mar',
+      'Abr',
+      'May',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dic',
+    ];
     return months[month - 1];
   }
 
@@ -472,7 +471,7 @@ class _EditEntranceBottomSheet extends StatefulWidget {
 class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
   late TimeOfDay selectedTime;
   String? errorMessage;
-  
+
   // Helper para acceder a colors en todos los métodos
   AppColorsHelper get colors => AppColorsHelper.of(context);
 
@@ -485,7 +484,7 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final colors = AppColorsHelper.of(context);
-    
+
     return Container(
       decoration: BoxDecoration(
         color: colors.surface,
@@ -521,9 +520,9 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
             style: AppTextStyles.h4,
             textAlign: TextAlign.center,
           ),
-          
+
           AppSpacing.verticalSpaceXs,
-          
+
           Text(
             'Solo registros del día actual',
             style: AppTextStyles.bodySmall.copyWith(
@@ -585,11 +584,7 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 16,
-                    color: colors.error,
-                  ),
+                  Icon(Icons.error_outline, size: 16, color: colors.error),
                   AppSpacing.horizontalSpaceXs,
                   Expanded(
                     child: Text(
@@ -681,10 +676,7 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
       decoration: BoxDecoration(
         color: colors.info.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-        border: Border.all(
-          color: colors.info.withValues(alpha: 0.2),
-          width: 1,
-        ),
+        border: Border.all(color: colors.info.withValues(alpha: 0.2), width: 1),
       ),
       child: Column(
         children: [
@@ -717,17 +709,11 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          size: 14,
-          color: color,
-        ),
+        Icon(icon, size: 14, color: color),
         AppSpacing.horizontalSpaceXs,
         Text(
           '$label: ',
-          style: AppTextStyles.bodySmall.copyWith(
-            color: colors.textSecondary,
-          ),
+          style: AppTextStyles.bodySmall.copyWith(color: colors.textSecondary),
         ),
         Text(
           value,
@@ -813,8 +799,20 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
   }
 
   String _getMonthName(int month) {
-    const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 
-                    'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const months = [
+      'Ene',
+      'Feb',
+      'Mar',
+      'Abr',
+      'May',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dic',
+    ];
     return months[month - 1];
   }
 
@@ -841,4 +839,3 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
     return time1.minute > time2.minute;
   }
 }
-

@@ -12,10 +12,10 @@ import '../widgets/login_form.dart';
 import '../widgets/login_footer.dart';
 
 /// Pantalla de Login
-/// 
+///
 /// Permite a los usuarios iniciar sesión con email y contraseña.
 /// Diseño centrado y responsivo con max-width de 400px.
-/// 
+///
 /// Usa Firebase Authentication + Riverpod para el estado.
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
@@ -58,9 +58,7 @@ class LoginScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       body: Container(
         // Gradiente sutil de fondo
-        decoration: const BoxDecoration(
-          gradient: AppColors.backgroundGradient,
-        ),
+        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
         child: Center(
           child: SingleChildScrollView(
             padding: EdgeInsets.symmetric(
@@ -105,4 +103,3 @@ class LoginScreen extends ConsumerWidget {
     );
   }
 }
-

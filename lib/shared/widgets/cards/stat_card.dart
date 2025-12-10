@@ -5,10 +5,10 @@ import '../../../core/theme/app_spacing.dart';
 import 'custom_card.dart';
 
 /// Card de estadística compacto
-/// 
+///
 /// Widget simple para mostrar una estadística con ícono y valor.
 /// Más compacto que InfoCard, ideal para grids de métricas.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// StatCard(
@@ -17,7 +17,7 @@ import 'custom_card.dart';
 ///   value: '500',
 ///   color: AppColors.primary,
 /// )
-/// 
+///
 /// // Con tendencia
 /// StatCard(
 ///   icon: Icons.trending_up,
@@ -26,7 +26,7 @@ import 'custom_card.dart';
 ///   trend: '+5%',
 ///   trendPositive: true,
 /// )
-/// 
+///
 /// // Clickeable
 /// StatCard(
 ///   icon: Icons.warning,
@@ -91,11 +91,7 @@ class StatCard extends StatelessWidget {
               color: mainColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
             ),
-            child: Icon(
-              icon,
-              size: AppSpacing.iconLg,
-              color: mainColor,
-            ),
+            child: Icon(icon, size: AppSpacing.iconLg, color: mainColor),
           ),
 
           AppSpacing.verticalSpaceMd,
@@ -120,9 +116,7 @@ class StatCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   value,
-                  style: AppTextStyles.h2.copyWith(
-                    color: mainColor,
-                  ),
+                  style: AppTextStyles.h2.copyWith(color: mainColor),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -144,15 +138,21 @@ class StatCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        trendPositive ? Icons.arrow_upward : Icons.arrow_downward,
+                        trendPositive
+                            ? Icons.arrow_upward
+                            : Icons.arrow_downward,
                         size: 10,
-                        color: trendPositive ? AppColors.success : AppColors.error,
+                        color: trendPositive
+                            ? AppColors.success
+                            : AppColors.error,
                       ),
                       const SizedBox(width: 2),
                       Text(
                         trend!,
                         style: AppTextStyles.labelSmall.copyWith(
-                          color: trendPositive ? AppColors.success : AppColors.error,
+                          color: trendPositive
+                              ? AppColors.success
+                              : AppColors.error,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -166,4 +166,3 @@ class StatCard extends StatelessWidget {
     );
   }
 }
-

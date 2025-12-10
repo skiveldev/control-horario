@@ -6,20 +6,17 @@ import '../../../../shared/widgets/inputs/custom_password_field.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
 
 /// Formulario de login
-/// 
+///
 /// Contiene los campos de email, contraseña, checkbox de "Recordarme"
 /// y botón de iniciar sesión.
-/// 
+///
 /// Callback pasa email y password para que el padre maneje la autenticación.
 class LoginForm extends StatefulWidget {
   /// Callback cuando se presiona el botón de login
   /// Recibe email y password como parámetros
   final Future<void> Function(String email, String password) onLogin;
 
-  const LoginForm({
-    super.key,
-    required this.onLogin,
-  });
+  const LoginForm({super.key, required this.onLogin});
 
   @override
   State<LoginForm> createState() => _LoginFormState();
@@ -43,9 +40,7 @@ class _LoginFormState extends State<LoginForm> {
     // Validar formulario básico
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor ingresa email y contraseña'),
-        ),
+        const SnackBar(content: Text('Por favor ingresa email y contraseña')),
       );
       return;
     }
@@ -120,10 +115,7 @@ class _LoginFormState extends State<LoginForm> {
                           setState(() => _rememberMe = value ?? false);
                         },
                 ),
-                Text(
-                  'Recordarme',
-                  style: AppTextStyles.bodyMedium,
-                ),
+                Text('Recordarme', style: AppTextStyles.bodyMedium),
 
                 const Spacer(),
 
@@ -156,7 +148,8 @@ class _LoginFormState extends State<LoginForm> {
               onPressed: _isLoading ? null : _handleLogin,
               isLoading: _isLoading,
               fullWidth: true,
-              variant: ButtonVariant.primary,
+              variant: ButtonVariant
+                  .brand, // Gradiente azul-violeta coherente con header
             ),
           ],
         ),
@@ -164,4 +157,3 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 }
-

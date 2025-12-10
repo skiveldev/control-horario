@@ -6,11 +6,11 @@ import '../../../../core/constants/breakpoints.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
 
 /// Diálogo de confirmación para salida anticipada
-/// 
+///
 /// Modal de advertencia crítica que se muestra cuando el usuario intenta
 /// salir antes de completar su jornada laboral. Adapta su presentación
 /// según el dispositivo (Dialog en desktop, BottomSheet en mobile).
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// showEarlyExitDialog(
@@ -72,7 +72,7 @@ class _EarlyExitDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppColorsHelper.of(context);
-    
+
     return Dialog(
       backgroundColor: colors.surface,
       shape: RoundedRectangleBorder(
@@ -88,7 +88,7 @@ class _EarlyExitDialog extends StatelessWidget {
 
   Widget _buildContent(BuildContext context) {
     final colors = AppColorsHelper.of(context);
-    
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -98,53 +98,45 @@ class _EarlyExitDialog extends StatelessWidget {
           size: AppSpacing.iconXxxl,
           color: colors.warning,
         ),
-        
+
         AppSpacing.verticalSpaceLg,
-        
+
         // Título
         Text(
           'Salida Anticipada',
-          style: AppTextStyles.h3.copyWith(
-            color: colors.textPrimary,
-          ),
+          style: AppTextStyles.h3.copyWith(color: colors.textPrimary),
           textAlign: TextAlign.center,
         ),
-        
+
         AppSpacing.verticalSpaceMd,
-        
+
         // Mensaje principal
         RichText(
           textAlign: TextAlign.center,
           text: TextSpan(
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: colors.textPrimary,
-            ),
+            style: AppTextStyles.bodyMedium.copyWith(color: colors.textPrimary),
             children: [
               const TextSpan(text: 'Aún te faltan '),
               TextSpan(
                 text: _formatDuration(remainingTime),
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.w700),
               ),
               const TextSpan(text: ' para completar tu jornada laboral.'),
             ],
           ),
         ),
-        
+
         AppSpacing.verticalSpaceSm,
-        
+
         // Mensaje secundario
         Text(
           '¿Estás seguro de que deseas fichar la salida? Esto generará una incidencia.',
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: colors.textSecondary,
-          ),
+          style: AppTextStyles.bodyMedium.copyWith(color: colors.textSecondary),
           textAlign: TextAlign.center,
         ),
-        
+
         AppSpacing.verticalSpaceXxl,
-        
+
         // Botones
         Row(
           children: [
@@ -182,7 +174,7 @@ class _EarlyExitDialog extends StatelessWidget {
   String _formatDuration(Duration duration) {
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
-    
+
     if (hours > 0 && minutes > 0) {
       return '${hours}h ${minutes}min';
     } else if (hours > 0) {
@@ -211,7 +203,7 @@ class _EarlyExitBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppColorsHelper.of(context);
-    
+
     return Container(
       decoration: BoxDecoration(
         color: colors.surface,
@@ -238,29 +230,27 @@ class _EarlyExitBottomSheet extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           AppSpacing.verticalSpaceLg,
-          
+
           // Icono de advertencia
           Icon(
             Icons.warning_rounded,
             size: AppSpacing.iconXxxl,
             color: colors.warning,
           ),
-          
+
           AppSpacing.verticalSpaceLg,
-          
+
           // Título
           Text(
             'Salida Anticipada',
-            style: AppTextStyles.h3.copyWith(
-              color: colors.textPrimary,
-            ),
+            style: AppTextStyles.h3.copyWith(color: colors.textPrimary),
             textAlign: TextAlign.center,
           ),
-          
+
           AppSpacing.verticalSpaceMd,
-          
+
           // Mensaje principal
           RichText(
             textAlign: TextAlign.center,
@@ -272,17 +262,15 @@ class _EarlyExitBottomSheet extends StatelessWidget {
                 const TextSpan(text: 'Aún te faltan '),
                 TextSpan(
                   text: _formatDuration(remainingTime),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
                 const TextSpan(text: ' para completar tu jornada laboral.'),
               ],
             ),
           ),
-          
+
           AppSpacing.verticalSpaceSm,
-          
+
           // Mensaje secundario
           Text(
             '¿Estás seguro de que deseas fichar la salida? Esto generará una incidencia.',
@@ -291,9 +279,9 @@ class _EarlyExitBottomSheet extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
-          
+
           AppSpacing.verticalSpaceXxl,
-          
+
           // Botones (apilados en mobile)
           Column(
             children: [
@@ -330,7 +318,7 @@ class _EarlyExitBottomSheet extends StatelessWidget {
   String _formatDuration(Duration duration) {
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
-    
+
     if (hours > 0 && minutes > 0) {
       return '${hours}h ${minutes}min';
     } else if (hours > 0) {
@@ -340,4 +328,3 @@ class _EarlyExitBottomSheet extends StatelessWidget {
     }
   }
 }
-

@@ -6,10 +6,10 @@ import '../../../../core/constants/mock_data.dart';
 import '../../../../shared/widgets/cards/custom_card.dart';
 
 /// Card de resumen semanal
-/// 
+///
 /// Muestra un resumen de las horas trabajadas en la semana actual.
 /// Incluye gráfico de barras simple y total de horas.
-/// 
+///
 /// MOCK DATA: Usa MockData.weeklySummary
 class WeeklySummaryCard extends StatelessWidget {
   const WeeklySummaryCard({super.key});
@@ -41,9 +41,7 @@ class WeeklySummaryCard extends StatelessWidget {
               Flexible(
                 child: Text(
                   'Esta Semana',
-                  style: AppTextStyles.h5.copyWith(
-                    color: colors.textPrimary,
-                  ),
+                  style: AppTextStyles.h5.copyWith(color: colors.textPrimary),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -67,9 +65,7 @@ class WeeklySummaryCard extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: '${totalHours.toStringAsFixed(1)}h',
-                      style: AppTextStyles.h4.copyWith(
-                        color: colors.primary,
-                      ),
+                      style: AppTextStyles.h4.copyWith(color: colors.primary),
                     ),
                     TextSpan(
                       text: ' / ${expectedHours.toStringAsFixed(0)}h',
@@ -231,4 +227,3 @@ class WeeklySummaryCard extends StatelessWidget {
     }
   }
 }
-

@@ -10,7 +10,7 @@ part 'auth_provider.g.dart';
 // ==============================================================================
 
 /// Provider del estado de autenticación de Firebase
-/// 
+///
 /// Emite User? de Firebase Auth cuando hay cambios en la autenticación.
 /// - null si no hay usuario autenticado
 /// - User si hay sesión activa
@@ -21,7 +21,7 @@ Stream<User?> authState(AuthStateRef ref) {
 }
 
 /// Provider del usuario actual con datos completos
-/// 
+///
 /// Combina Firebase Auth con Firestore para obtener UserModel completo.
 /// Emite:
 /// - null si no hay usuario autenticado
@@ -30,7 +30,7 @@ Stream<User?> authState(AuthStateRef ref) {
 Stream<UserModel?> currentUser(CurrentUserRef ref) async* {
   // Esperar al estado de autenticación
   final authState = await ref.watch(authStateProvider.future);
-  
+
   if (authState == null) {
     yield null;
     return;
@@ -46,7 +46,7 @@ Stream<UserModel?> currentUser(CurrentUserRef ref) async* {
 // ==============================================================================
 
 /// Notifier para acciones de autenticación
-/// 
+///
 /// Maneja operaciones como login y logout.
 /// Expone AsyncValue<void> como estado para manejar loading/error.
 @riverpod
@@ -57,10 +57,10 @@ class AuthNotifier extends _$AuthNotifier {
   }
 
   /// Iniciar sesión con email y contraseña
-  /// 
+  ///
   /// Actualiza el estado a loading mientras procesa.
   /// Lanza errores si las credenciales son inválidas.
-  /// 
+  ///
   /// Uso:
   /// ```dart
   /// await ref.read(authNotifierProvider.notifier).signIn(email, password);
@@ -77,10 +77,10 @@ class AuthNotifier extends _$AuthNotifier {
   }
 
   /// Cerrar sesión
-  /// 
+  ///
   /// Cierra la sesión del usuario actual.
   /// Actualiza el estado a loading mientras procesa.
-  /// 
+  ///
   /// Uso:
   /// ```dart
   /// await ref.read(authNotifierProvider.notifier).signOut();
@@ -93,15 +93,3 @@ class AuthNotifier extends _$AuthNotifier {
     });
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-

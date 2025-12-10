@@ -5,7 +5,7 @@ part 'user_model.freezed.dart';
 part 'user_model.g.dart';
 
 /// Modelo de Usuario del sistema
-/// 
+///
 /// Representa a un empleado con su información laboral y de autenticación.
 /// Usa Freezed para inmutabilidad y JSON serialization.
 @freezed
@@ -27,7 +27,7 @@ class UserModel with _$UserModel {
   /// Crear UserModel desde documento de Firestore
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    
+
     // Manejar createdAt que puede ser null o Timestamp
     DateTime createdAtDate;
     if (data['createdAt'] != null) {
@@ -36,7 +36,7 @@ class UserModel with _$UserModel {
       // Si no existe, usar la fecha actual
       createdAtDate = DateTime.now();
     }
-    
+
     return UserModel(
       userId: doc.id,
       employeeId: data['employeeId'] ?? '',
@@ -54,11 +54,10 @@ class UserModel with _$UserModel {
 enum UserRole {
   /// Empleado estándar - puede ver sus propios registros y fichar
   employee,
-  
+
   /// RRHH - puede ver todos los empleados y gestionar horarios
   rrhh,
-  
+
   /// Admin - control total del sistema
   admin,
 }
-

@@ -8,7 +8,7 @@ import 'firebase_options.dart';
 import 'app.dart';
 
 /// Punto de entrada de la aplicación Control Horario
-/// 
+///
 /// Configura:
 /// - WidgetsFlutterBinding
 /// - SharedPreferences (theme persistence)
@@ -29,9 +29,7 @@ void main() async {
   // ============================================================================
   // INICIALIZAR FIREBASE
   // ============================================================================
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // ============================================================================
   // CONFIGURAR EMULATOR EN DEBUG MODE
@@ -39,10 +37,10 @@ void main() async {
   if (kDebugMode) {
     // Descomentar las siguientes líneas para usar el emulator local
     // NOTA: Ejecutar primero `firebase emulators:start`
-    
+
     // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
     // FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
-    
+
     debugPrint('🔧 Modo DEBUG: Emuladores deshabilitados');
     debugPrint('   Para habilitar, descomentar líneas en main.dart');
   }
@@ -76,8 +74,6 @@ void main() async {
   // ============================================================================
   runApp(
     // ProviderScope de Riverpod para state management global
-    const ProviderScope(
-      child: ControlHorarioApp(),
-    ),
+    const ProviderScope(child: ControlHorarioApp()),
   );
 }

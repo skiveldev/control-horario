@@ -20,10 +20,10 @@ enum InfoCardType {
 }
 
 /// Card de información con ícono, título, valor y descripción
-/// 
+///
 /// Widget especializado para mostrar métricas o información resumida.
 /// Ideal para dashboards y resúmenes.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// InfoCard(
@@ -33,7 +33,7 @@ enum InfoCardType {
 ///   icon: Icons.schedule,
 ///   type: InfoCardType.info,
 /// )
-/// 
+///
 /// // Con porcentaje de progreso
 /// InfoCard(
 ///   title: 'Fichajes Completos',
@@ -43,7 +43,7 @@ enum InfoCardType {
 ///   type: InfoCardType.success,
 ///   progress: 0.9,
 /// )
-/// 
+///
 /// // Clickeable
 /// InfoCard(
 ///   title: 'Ausencias',
@@ -113,11 +113,7 @@ class InfoCard extends StatelessWidget {
                   color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
-                child: Icon(
-                  icon,
-                  size: AppSpacing.iconMd,
-                  color: color,
-                ),
+                child: Icon(icon, size: AppSpacing.iconMd, color: color),
               ),
 
               AppSpacing.horizontalSpaceMd,
@@ -153,9 +149,7 @@ class InfoCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   value,
-                  style: AppTextStyles.displaySmall.copyWith(
-                    color: color,
-                  ),
+                  style: AppTextStyles.displaySmall.copyWith(color: color),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -207,4 +201,3 @@ class InfoCard extends StatelessWidget {
     }
   }
 }
-

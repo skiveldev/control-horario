@@ -7,9 +7,9 @@ import '../../../../shared/widgets/cards/custom_card.dart';
 import 'edit_entrance_dialog.dart';
 
 /// Card de acciones rápidas
-/// 
+///
 /// Muestra atajos a funcionalidades comunes.
-/// 
+///
 /// MOCK DATA: Usa MockData.quickActions
 class QuickActionsCard extends StatelessWidget {
   const QuickActionsCard({super.key});
@@ -29,18 +29,12 @@ class QuickActionsCard extends StatelessWidget {
           // Header
           Row(
             children: [
-              Icon(
-                Icons.bolt,
-                size: AppSpacing.iconMd,
-                color: colors.accent,
-              ),
+              Icon(Icons.bolt, size: AppSpacing.iconMd, color: colors.accent),
               AppSpacing.horizontalSpaceSm,
               Flexible(
                 child: Text(
                   'Acciones Rápidas',
-                  style: AppTextStyles.h5.copyWith(
-                    color: colors.textPrimary,
-                  ),
+                  style: AppTextStyles.h5.copyWith(color: colors.textPrimary),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -53,10 +47,7 @@ class QuickActionsCard extends StatelessWidget {
           ...actions.map((action) {
             return Padding(
               padding: AppSpacing.verticalSm,
-              child: _buildActionItem(
-                context: context,
-                action: action,
-              ),
+              child: _buildActionItem(context: context, action: action),
             );
           }),
         ],
@@ -78,14 +69,13 @@ class QuickActionsCard extends StatelessWidget {
           ? () {
               // Detectar si es la acción "Editar Registro"
               final title = action['title'] as String;
-              if (title.contains('Editar') || title.toLowerCase().contains('registro')) {
+              if (title.contains('Editar') ||
+                  title.toLowerCase().contains('registro')) {
                 _handleEditEntrance(context);
               } else {
                 // TODO [FASE-2]: Implementar otras acciones
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('${action['title']} - En desarrollo'),
-                  ),
+                  SnackBar(content: Text('${action['title']} - En desarrollo')),
                 );
               }
             }
@@ -99,9 +89,7 @@ class QuickActionsCard extends StatelessWidget {
               : colors.surfaceVariant.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
           border: Border.all(
-            color: isEnabled
-                ? color.withValues(alpha: 0.2)
-                : colors.border,
+            color: isEnabled ? color.withValues(alpha: 0.2) : colors.border,
             width: 1,
           ),
         ),
@@ -130,9 +118,7 @@ class QuickActionsCard extends StatelessWidget {
               child: Text(
                 action['title'] as String,
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: isEnabled
-                      ? colors.textPrimary
-                      : colors.textTertiary,
+                  color: isEnabled ? colors.textPrimary : colors.textTertiary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -140,11 +126,7 @@ class QuickActionsCard extends StatelessWidget {
 
             // Flecha
             if (isEnabled)
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 14,
-                color: color,
-              ),
+              Icon(Icons.arrow_forward_ios, size: 14, color: color),
 
             // Indicator "Próximamente"
             if (!isEnabled)
@@ -222,4 +204,3 @@ class QuickActionsCard extends StatelessWidget {
     );
   }
 }
-

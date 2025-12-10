@@ -5,10 +5,10 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
 
 /// Campo de texto personalizado del Control Horario
-/// 
+///
 /// TextField reutilizable con diseño consistente, soporte para
 /// validación visual, prefijos, sufijos e íconos.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// CustomTextField(
@@ -20,7 +20,7 @@ import '../../../core/theme/app_spacing.dart';
 ///     print('Email: $value');
 ///   },
 /// )
-/// 
+///
 /// // Con validación
 /// CustomTextField(
 ///   label: 'Nombre',
@@ -28,7 +28,7 @@ import '../../../core/theme/app_spacing.dart';
 ///   errorText: 'El nombre es requerido',
 ///   maxLength: 50,
 /// )
-/// 
+///
 /// // Con sufijo personalizado
 /// CustomTextField(
 ///   label: 'Búsqueda',
@@ -205,8 +205,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   color: widget.errorText != null
                       ? AppColors.error
                       : _isFocused
-                          ? AppColors.primary
-                          : AppColors.textSecondary,
+                      ? AppColors.primary
+                      : AppColors.textSecondary,
                 ),
                 children: const [
                   TextSpan(
@@ -235,11 +235,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
           inputFormatters: widget.inputFormatters,
           style: AppTextStyles.bodyMedium,
           decoration: InputDecoration(
-            labelText: widget.label != null && !widget.required ? widget.label : null,
+            labelText: widget.label != null && !widget.required
+                ? widget.label
+                : null,
             hintText: widget.hintText,
             helperText: widget.helperText,
             errorText: widget.errorText,
-            
+
             // Prefijos
             prefixIcon: widget.prefixIcon != null
                 ? Icon(
@@ -248,13 +250,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     color: widget.errorText != null
                         ? AppColors.error
                         : _isFocused
-                            ? AppColors.primary
-                            : AppColors.textSecondary,
+                        ? AppColors.primary
+                        : AppColors.textSecondary,
                   )
                 : null,
             prefix: widget.prefix,
             prefixText: widget.prefixText,
-            
+
             // Sufijos
             suffixIcon: widget.suffixIcon != null
                 ? Icon(
@@ -263,16 +265,16 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     color: widget.errorText != null
                         ? AppColors.error
                         : _isFocused
-                            ? AppColors.primary
-                            : AppColors.textSecondary,
+                        ? AppColors.primary
+                        : AppColors.textSecondary,
                   )
                 : null,
             suffix: widget.suffix,
             suffixText: widget.suffixText,
-            
+
             // Ocultar contador si es necesario
             counterText: widget.hideCounter ? '' : null,
-            
+
             // Estados
             enabled: widget.enabled,
           ),
@@ -285,4 +287,3 @@ class _CustomTextFieldState extends State<CustomTextField> {
     );
   }
 }
-

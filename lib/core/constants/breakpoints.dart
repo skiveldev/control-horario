@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 /// Breakpoints para diseño responsive del Control Horario
-/// 
+///
 /// Define los puntos de quiebre para adaptar la UI a diferentes tamaños de pantalla.
 /// Basado en estándares comunes de diseño web.
-/// 
+///
 /// Ejemplo:
 /// ```dart
 /// final isMobile = MediaQuery.of(context).size.width < Breakpoints.tablet;
@@ -26,7 +26,7 @@ class Breakpoints {
   /// Uso: Teléfonos en modo portrait
   static const double mobile = 640.0;
 
-  /// Tablet - 640-767px  
+  /// Tablet - 640-767px
   /// Uso: Teléfonos grandes, tablets pequeñas en portrait
   static const double tablet = 768.0;
 
@@ -82,7 +82,7 @@ class Breakpoints {
   // ============================================================================
 
   /// Obtiene un valor según el breakpoint actual
-  /// 
+  ///
   /// Ejemplo:
   /// ```dart
   /// final columns = Breakpoints.valueFor(
@@ -169,7 +169,7 @@ class Breakpoints {
   // ============================================================================
 
   /// Construye diferentes widgets según el breakpoint
-  /// 
+  ///
   /// Ejemplo:
   /// ```dart
   /// Breakpoints.builder(
@@ -247,19 +247,13 @@ extension BreakpointsExtension on BuildContext {
 }
 
 /// Enum para tipos de dispositivo
-enum DeviceType {
-  mobile,
-  tablet,
-  desktop,
-  wide,
-  ultraWide,
-}
+enum DeviceType { mobile, tablet, desktop, wide, ultraWide }
 
 /// Extensión para obtener el tipo de dispositivo actual
 extension DeviceTypeExtension on BuildContext {
   DeviceType get deviceType {
     final width = MediaQuery.of(this).size.width;
-    
+
     if (width >= Breakpoints.ultraWide) {
       return DeviceType.ultraWide;
     } else if (width >= Breakpoints.wide) {
@@ -279,10 +273,10 @@ extension DeviceTypeExtension on BuildContext {
 // ==============================================================================
 
 /// Proporciones específicas para el layout del dashboard
-/// 
+///
 /// Define los anchos relativos de cada componente del dashboard según el breakpoint.
 /// Usado en dashboard_screen.dart para crear layouts flexibles y balanceados.
-/// 
+///
 /// Ejemplo:
 /// ```dart
 /// final clockWidth = totalWidth * LayoutProportions.desktopTimeClockWidth;
@@ -294,27 +288,27 @@ class LayoutProportions {
   // ============================================================================
   // DESKTOP PROPORTIONS (>1024px)
   // ============================================================================
-  
+
   /// Ancho del card de fichaje (Time Clock) en desktop
   /// 60% - Es el componente principal, necesita espacio para reloj y botones
   static const double desktopTimeClockWidth = 0.60;
-  
+
   /// Ancho del card de resumen del día (Summary) en desktop
   /// 25% - Información complementaria, importante pero secundaria
   static const double desktopSummaryWidth = 0.25;
-  
+
   /// Ancho de la tabla de registros recientes en desktop
   /// 100% - Ocupa todo el ancho en su propia fila (Fase 1.5)
   static const double desktopRecordsWidth = 1.0;
-  
+
   /// Ancho del calendario mensual en desktop
   /// 30% - Tamaño compacto pero legible (Fase 1.5.1)
   static const double desktopCalendarWidth = 0.30;
-  
+
   /// Ancho del gráfico de resumen semanal en desktop
   /// 35% - Balanceado para 7 barras verticales (Fase 1.5.1)
   static const double desktopWeeklyWidth = 0.35;
-  
+
   /// Ancho del card de acciones rápidas en desktop
   /// 35% - Integrado en Row 3 para mejor uso del espacio (Fase 1.5.1)
   static const double desktopActionsWidth = 0.35;
@@ -322,11 +316,11 @@ class LayoutProportions {
   // ============================================================================
   // TABLET PROPORTIONS (768-1024px)
   // ============================================================================
-  
+
   /// Ancho primario en tablet (columna izquierda)
   /// 60% - Para componentes principales (fichaje)
   static const double tabletPrimaryWidth = 0.60;
-  
+
   /// Ancho secundario en tablet (columna derecha)
   /// 40% - Para componentes complementarios (resumen)
   static const double tabletSecondaryWidth = 0.40;
@@ -334,15 +328,15 @@ class LayoutProportions {
   // ============================================================================
   // GAPS (Espaciado entre elementos)
   // ============================================================================
-  
+
   /// Gap entre elementos en desktop
   /// 24px - Espaciado generoso para pantallas grandes
   static const double desktopGap = 24.0;
-  
+
   /// Gap entre elementos en tablet
   /// 20px - Espaciado moderado
   static const double tabletGap = 20.0;
-  
+
   /// Gap entre elementos en mobile
   /// 16px - Espaciado compacto para aprovechar espacio
   static const double mobileGap = 16.0;
@@ -350,7 +344,7 @@ class LayoutProportions {
   // ============================================================================
   // HELPERS
   // ============================================================================
-  
+
   /// Obtiene el gap apropiado según el breakpoint
   static double gapFor(BuildContext context) {
     if (context.isDesktop) {
@@ -362,4 +356,3 @@ class LayoutProportions {
     }
   }
 }
-

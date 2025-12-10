@@ -11,16 +11,13 @@ import '../../../dashboard/presentation/widgets/records_table.dart';
 import '../widgets/week_schedule_viewer.dart';
 
 /// Pantalla de detalle de empleado (Admin)
-/// 
+///
 /// Muestra información completa y registros de un empleado.
 class EmployeeDetailScreen extends StatelessWidget {
   /// ID del empleado
   final String employeeId;
 
-  const EmployeeDetailScreen({
-    super.key,
-    required this.employeeId,
-  });
+  const EmployeeDetailScreen({super.key, required this.employeeId});
 
   @override
   Widget build(BuildContext context) {
@@ -142,14 +139,13 @@ class EmployeeDetailScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Información del Empleado',
-                        style: AppTextStyles.h5,
-                      ),
+                      Text('Información del Empleado', style: AppTextStyles.h5),
                       AppSpacing.verticalSpaceLg,
                       _buildInfoRow('ID', employee['id'] as String),
                       _buildInfoRow(
-                          'Departamento', employee['department'] as String),
+                        'Departamento',
+                        employee['department'] as String,
+                      ),
                       _buildInfoRow('Estado', employee['status'] as String),
                       _buildInfoRow(
                         'Fichado hoy',
@@ -185,9 +181,7 @@ class EmployeeDetailScreen extends StatelessWidget {
                         ],
                       ),
                       AppSpacing.verticalSpaceLg,
-                      WeekScheduleViewer(
-                        employeeId: employeeId,
-                      ),
+                      WeekScheduleViewer(employeeId: employeeId),
                     ],
                   ),
                 ),
@@ -201,14 +195,9 @@ class EmployeeDetailScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Registros Recientes',
-                        style: AppTextStyles.h5,
-                      ),
+                      Text('Registros Recientes', style: AppTextStyles.h5),
                       AppSpacing.verticalSpaceLg,
-                      RecordsTable(
-                        records: MockData.recentRecords,
-                      ),
+                      RecordsTable(records: MockData.recentRecords),
                     ],
                   ),
                 ),
@@ -223,9 +212,7 @@ class EmployeeDetailScreen extends StatelessWidget {
                     fullWidth: true,
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Edición en desarrollo'),
-                        ),
+                        const SnackBar(content: Text('Edición en desarrollo')),
                       );
                     },
                   ),
@@ -274,4 +261,3 @@ class EmployeeDetailScreen extends StatelessWidget {
     return name.substring(0, 2).toUpperCase();
   }
 }
-

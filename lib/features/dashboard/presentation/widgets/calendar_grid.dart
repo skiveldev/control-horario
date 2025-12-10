@@ -4,7 +4,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 
 /// Grid del calendario mensual
-/// 
+///
 /// Muestra los días del mes actual con indicadores visuales.
 class CalendarGrid extends StatelessWidget {
   /// Año a mostrar
@@ -94,7 +94,7 @@ class CalendarGrid extends StatelessWidget {
                   ),
                 ),
               );
-            }
+            },
           ),
         );
       }).toList(),
@@ -124,29 +124,29 @@ class CalendarGrid extends StatelessWidget {
           textColor = typeColor;
         }
 
-    return InkWell(
-      onTap: onDayTap != null ? () => onDayTap!(day) : null,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
-      child: Container(
-        decoration: BoxDecoration(
-          color: backgroundColor,
+        return InkWell(
+          onTap: onDayTap != null ? () => onDayTap!(day) : null,
           borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
-          border: borderColor != null
-              ? Border.all(color: borderColor, width: 2)
-              : null,
-        ),
-        child: Center(
-          child: Text(
-            day.toString(),
-            style: AppTextStyles.bodySmall.copyWith(
-              color: textColor,
-              fontWeight: isCurrentDay ? FontWeight.w700 : FontWeight.w500,
+          child: Container(
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+              border: borderColor != null
+                  ? Border.all(color: borderColor, width: 2)
+                  : null,
+            ),
+            child: Center(
+              child: Text(
+                day.toString(),
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: textColor,
+                  fontWeight: isCurrentDay ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-    );
-      }
+        );
+      },
     );
   }
 
@@ -168,4 +168,3 @@ class CalendarGrid extends StatelessWidget {
     }
   }
 }
-

@@ -7,11 +7,11 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/router/app_router.dart';
 
 /// Pantalla de splash (carga inicial)
-/// 
+///
 /// Primera pantalla que se muestra al abrir la app.
 /// Muestra el logo y nombre de la app con una animación.
 /// Después de 2 segundos navega a Login.
-/// 
+///
 /// TODO [FASE-2]: Agregar lógica para verificar sesión activa
 /// Si hay sesión activa, ir a Dashboard directamente.
 class SplashScreen extends StatefulWidget {
@@ -40,24 +40,12 @@ class _SplashScreenState extends State<SplashScreen>
       duration: AppConstants.durationSlow,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeIn,
-      ),
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
     );
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeOutBack,
-      ),
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
     );
 
     _animationController.forward();
@@ -74,7 +62,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Por ahora, siempre ir a login después de 2 segundos
     await Future.delayed(AppConstants.splashDuration);
-    
+
     if (mounted) {
       context.go(AppRouter.login);
     }
@@ -92,9 +80,7 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: AppColors.background,
       body: Container(
         // Gradiente sutil de fondo
-        decoration: const BoxDecoration(
-          gradient: AppColors.backgroundGradient,
-        ),
+        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
         child: Center(
           child: FadeTransition(
             opacity: _fadeAnimation,
@@ -129,9 +115,7 @@ class _SplashScreenState extends State<SplashScreen>
                   // Nombre de la app
                   Text(
                     AppConstants.appName,
-                    style: AppTextStyles.h1.copyWith(
-                      color: AppColors.primary,
-                    ),
+                    style: AppTextStyles.h1.copyWith(color: AppColors.primary),
                   ),
 
                   AppSpacing.verticalSpaceSm,
@@ -166,4 +150,3 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 }
-

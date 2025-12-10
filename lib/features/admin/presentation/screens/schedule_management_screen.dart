@@ -8,10 +8,10 @@ import '../../../../shared/widgets/layouts/custom_app_bar.dart';
 import '../../../../shared/widgets/cards/schedule_card.dart';
 
 /// Pantalla de gestión de horarios (Admin/RRHH)
-/// 
+///
 /// Muestra lista de plantillas de horarios predefinidas.
 /// En el MVP solo visualización, sin modales de edición.
-/// 
+///
 /// MOCK DATA: Usa MockSchedules.templates
 class ScheduleManagementScreen extends StatelessWidget {
   const ScheduleManagementScreen({super.key});
@@ -62,10 +62,7 @@ class ScheduleManagementScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Plantillas de Horario',
-          style: AppTextStyles.h3,
-        ),
+        Text('Plantillas de Horario', style: AppTextStyles.h3),
         AppSpacing.verticalSpaceSm,
         Text(
           'Plantillas predefinidas que puedes asignar a tus empleados. Tienes $templateCount ${templateCount == 1 ? 'plantilla disponible' : 'plantillas disponibles'}.',
@@ -78,13 +75,11 @@ class ScheduleManagementScreen extends StatelessWidget {
   }
 
   Widget _buildTemplatesList(
-      BuildContext context, List<Map<String, dynamic>> templates) {
+    BuildContext context,
+    List<Map<String, dynamic>> templates,
+  ) {
     // Determinar número de columnas según ancho
-    final columns = context.responsiveValue(
-      mobile: 1,
-      tablet: 2,
-      desktop: 2,
-    );
+    final columns = context.responsiveValue(mobile: 1, tablet: 2, desktop: 2);
 
     final gap = context.gridGap;
 
@@ -167,18 +162,12 @@ class ScheduleManagementScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.info.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-              border: Border.all(
-                color: AppColors.info.withValues(alpha: 0.3),
-              ),
+              border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.info_outline,
-                  size: 16,
-                  color: AppColors.info,
-                ),
+                Icon(Icons.info_outline, size: 16, color: AppColors.info),
                 AppSpacing.horizontalSpaceSm,
                 Text(
                   'Función de creación disponible en Fase 2',
@@ -194,5 +183,3 @@ class ScheduleManagementScreen extends StatelessWidget {
     );
   }
 }
-
-

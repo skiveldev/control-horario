@@ -11,10 +11,10 @@ import '../widgets/profile_edit_dialog.dart';
 import '../../../admin/presentation/widgets/week_schedule_viewer.dart';
 
 /// Pantalla de perfil del empleado
-/// 
+///
 /// Muestra la información personal y laboral del usuario.
 /// Incluye opción para editar (solo UI en Fase 1).
-/// 
+///
 /// MOCK DATA: Usa MockData.currentUser
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -136,7 +136,9 @@ class ProfileScreen extends StatelessWidget {
                         padding: AppSpacing.allMd,
                         decoration: BoxDecoration(
                           color: AppColors.info.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusSm,
+                          ),
                           border: Border.all(
                             color: AppColors.info.withValues(alpha: 0.3),
                           ),
@@ -203,10 +205,7 @@ class ProfileScreen extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(
-                color: AppColors.primary,
-                width: 4,
-              ),
+              border: Border.all(color: AppColors.primary, width: 4),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.primary.withValues(alpha: 0.3),
@@ -270,11 +269,7 @@ class ProfileScreen extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.verified_user,
-                  size: 16,
-                  color: AppColors.primary,
-                ),
+                Icon(Icons.verified_user, size: 16, color: AppColors.primary),
                 AppSpacing.horizontalSpaceSm,
                 Text(
                   'Empleado',
@@ -304,18 +299,9 @@ class ProfileScreen extends StatelessWidget {
           // Título de la sección
           Row(
             children: [
-              Icon(
-                icon,
-                size: AppSpacing.iconMd,
-                color: AppColors.primary,
-              ),
+              Icon(icon, size: AppSpacing.iconMd, color: AppColors.primary),
               AppSpacing.horizontalSpaceSm,
-              Expanded(
-                child: Text(
-                  title,
-                  style: AppTextStyles.h5,
-                ),
-              ),
+              Expanded(child: Text(title, style: AppTextStyles.h5)),
             ],
           ),
 
@@ -344,11 +330,7 @@ class ProfileScreen extends StatelessWidget {
             color: AppColors.surfaceVariant,
             borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
           ),
-          child: Icon(
-            item.icon,
-            size: 16,
-            color: AppColors.textSecondary,
-          ),
+          child: Icon(item.icon, size: 16, color: AppColors.textSecondary),
         ),
 
         AppSpacing.horizontalSpaceMd,
@@ -385,10 +367,5 @@ class _InfoItem {
   final String value;
   final IconData icon;
 
-  _InfoItem({
-    required this.label,
-    required this.value,
-    required this.icon,
-  });
+  _InfoItem({required this.label, required this.value, required this.icon});
 }
-

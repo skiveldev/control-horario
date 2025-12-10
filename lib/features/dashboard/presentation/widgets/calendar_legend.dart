@@ -4,7 +4,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 
 /// Leyenda del calendario
-/// 
+///
 /// Muestra los colores y sus significados para el calendario.
 class CalendarLegend extends StatelessWidget {
   const CalendarLegend({super.key});
@@ -12,7 +12,7 @@ class CalendarLegend extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppColorsHelper.of(context);
-    
+
     return Wrap(
       spacing: AppSpacing.md,
       runSpacing: AppSpacing.sm,
@@ -52,7 +52,7 @@ class CalendarLegend extends StatelessWidget {
     required IconData icon,
   }) {
     final colors = AppColorsHelper.of(context);
-    
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -61,19 +61,12 @@ class CalendarLegend extends StatelessWidget {
           height: 12,
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.2),
-            border: Border.all(
-              color: color,
-              width: 2,
-            ),
+            border: Border.all(color: color, width: 2),
             shape: BoxShape.circle,
           ),
         ),
         const SizedBox(width: 4),
-        Icon(
-          icon,
-          size: 12,
-          color: color,
-        ),
+        Icon(icon, size: 12, color: color),
         const SizedBox(width: 2),
         Flexible(
           child: Text(
@@ -88,4 +81,3 @@ class CalendarLegend extends StatelessWidget {
     );
   }
 }
-

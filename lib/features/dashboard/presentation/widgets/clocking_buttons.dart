@@ -3,35 +3,25 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
 
 /// Tipo de acción de fichaje
-enum ClockingAction {
-  entrance,
-  exit,
-  pause,
-  returnFromPause,
-}
+enum ClockingAction { entrance, exit, pause, returnFromPause }
 
 /// Estado actual del fichaje
-enum ClockingState {
-  notStarted,
-  working,
-  onPause,
-  finished,
-}
+enum ClockingState { notStarted, working, onPause, finished }
 
 /// Botones de fichaje (Entrada, Salida, Pausa, Retorno)
-/// 
+///
 /// Los 4 botones principales para gestionar el fichaje diario.
 /// Maneja los estados visuales de cada botón según el flujo.
-/// 
+///
 /// Flujo de fichaje:
 /// 1. Sin fichar → Solo Entrada habilitado
 /// 2. Trabajando → Salida y Pausa habilitados
 /// 3. En pausa → Solo Retorno habilitado
 /// 4. Completo → Entrada habilitado (permite múltiples ciclos en el día)
-/// 
+///
 /// MOCK DATA: Permite múltiples fichajes en el mismo día (Fase 1 - solo UI).
 /// TODO [FASE-2]: Validar con backend si permite múltiples entradas/salidas.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// ClockingButtons(
@@ -69,15 +59,9 @@ class ClockingButtons extends StatelessWidget {
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildRow([
-                _buildEntranceButton(),
-                _buildExitButton(),
-              ]),
+              _buildRow([_buildEntranceButton(), _buildExitButton()]),
               AppSpacing.verticalSpaceMd,
-              _buildRow([
-                _buildPauseButton(),
-                _buildReturnButton(),
-              ]),
+              _buildRow([_buildPauseButton(), _buildReturnButton()]),
             ],
           );
         }
@@ -114,21 +98,24 @@ class ClockingButtons extends StatelessWidget {
 
   Widget _buildEntranceButton() {
     // Habilitar en estado inicial O después de fichar salida (permitir múltiples ciclos)
-    final isEnabled = (currentState == ClockingState.notStarted || 
-                       currentState == ClockingState.finished) && 
-                      !isLoading;
+    final isEnabled =
+        (currentState == ClockingState.notStarted ||
+            currentState == ClockingState.finished) &&
+        !isLoading;
 
     return CustomButton(
       text: 'Entrada',
       icon: Icons.login,
-      variant: isEnabled ? ButtonVariant.primary : ButtonVariant.secondary, // ← GRADIENTE VERDE
+      variant: isEnabled
+          ? ButtonVariant.primary
+          : ButtonVariant.secondary, // ← GRADIENTE VERDE
       size: ButtonSize.large,
       fullWidth: true,
-      onPressed: isEnabled
-          ? () => onAction(ClockingAction.entrance)
-          : null,
-      isLoading: isLoading && (currentState == ClockingState.notStarted || 
-                               currentState == ClockingState.finished),
+      onPressed: isEnabled ? () => onAction(ClockingAction.entrance) : null,
+      isLoading:
+          isLoading &&
+          (currentState == ClockingState.notStarted ||
+              currentState == ClockingState.finished),
     );
   }
 
@@ -142,12 +129,12 @@ class ClockingButtons extends StatelessWidget {
     return CustomButton(
       text: 'Salida',
       icon: Icons.logout,
-      variant: isEnabled ? ButtonVariant.danger : ButtonVariant.secondary, // ← ROJO para salir
+      variant: isEnabled
+          ? ButtonVariant.danger
+          : ButtonVariant.secondary, // ← ROJO para salir
       size: ButtonSize.large,
       fullWidth: true,
-      onPressed: isEnabled
-          ? () => onAction(ClockingAction.exit)
-          : null,
+      onPressed: isEnabled ? () => onAction(ClockingAction.exit) : null,
       isLoading: isLoading && currentState == ClockingState.working,
     );
   }
@@ -162,12 +149,12 @@ class ClockingButtons extends StatelessWidget {
     return CustomButton(
       text: 'Pausa',
       icon: Icons.pause,
-      variant: isEnabled ? ButtonVariant.warning : ButtonVariant.secondary, // ← GRADIENTE NARANJA
+      variant: isEnabled
+          ? ButtonVariant.warning
+          : ButtonVariant.secondary, // ← GRADIENTE NARANJA
       size: ButtonSize.large,
       fullWidth: true,
-      onPressed: isEnabled
-          ? () => onAction(ClockingAction.pause)
-          : null,
+      onPressed: isEnabled ? () => onAction(ClockingAction.pause) : null,
     );
   }
 
@@ -191,4 +178,3 @@ class ClockingButtons extends StatelessWidget {
     );
   }
 }
-

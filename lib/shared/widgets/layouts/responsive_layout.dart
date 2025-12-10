@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/breakpoints.dart';
 
 /// Layout responsive que construye diferentes widgets según el tamaño de pantalla
-/// 
+///
 /// Facilita la creación de interfaces adaptativas sin repetir código.
 /// Usa los breakpoints definidos en la app.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// ResponsiveLayout(
@@ -13,7 +13,7 @@ import '../../../core/constants/breakpoints.dart';
 ///   tablet: (context) => TabletHomeScreen(),
 ///   desktop: (context) => DesktopHomeScreen(),
 /// )
-/// 
+///
 /// // Si tablet no se especifica, usa mobile
 /// ResponsiveLayout(
 ///   mobile: (context) => CompactView(),
@@ -51,10 +51,10 @@ class ResponsiveLayout extends StatelessWidget {
 }
 
 /// Widget que ayuda a crear layouts con máximo ancho
-/// 
+///
 /// Centra el contenido y aplica un ancho máximo según el breakpoint.
 /// Útil para pantallas muy anchas donde el contenido no debe expandirse infinitamente.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// MaxWidthContainer(
@@ -62,7 +62,7 @@ class ResponsiveLayout extends StatelessWidget {
 ///     children: [...],
 ///   ),
 /// )
-/// 
+///
 /// // Con padding personalizado
 /// MaxWidthContainer(
 ///   maxWidth: 1200,
@@ -94,16 +94,14 @@ class MaxWidthContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveMaxWidth = maxWidth ?? context.maxContentWidth;
-    final effectivePadding = padding ?? EdgeInsets.symmetric(
-      horizontal: context.pageHorizontalPadding,
-    );
+    final effectivePadding =
+        padding ??
+        EdgeInsets.symmetric(horizontal: context.pageHorizontalPadding);
 
     return Align(
       alignment: alignment,
       child: Container(
-        constraints: BoxConstraints(
-          maxWidth: effectiveMaxWidth,
-        ),
+        constraints: BoxConstraints(maxWidth: effectiveMaxWidth),
         padding: effectivePadding,
         child: child,
       ),
@@ -112,10 +110,10 @@ class MaxWidthContainer extends StatelessWidget {
 }
 
 /// Grid responsivo que ajusta el número de columnas según el breakpoint
-/// 
+///
 /// Wrapper sobre GridView que maneja automáticamente las columnas
 /// según el tamaño de pantalla.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// ResponsiveGrid(
@@ -125,7 +123,7 @@ class MaxWidthContainer extends StatelessWidget {
 ///     CustomCard(child: Text('Item 3')),
 ///   ],
 /// )
-/// 
+///
 /// // Con columnas personalizadas
 /// ResponsiveGrid(
 ///   mobileColumns: 1,
@@ -195,10 +193,10 @@ class ResponsiveGrid extends StatelessWidget {
 }
 
 /// Wrap responsivo con espaciado consistente
-/// 
+///
 /// Similar a ResponsiveGrid pero usando Wrap, ideal para elementos
 /// de diferentes tamaños.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// ResponsiveWrap(
@@ -247,4 +245,3 @@ class ResponsiveWrap extends StatelessWidget {
     );
   }
 }
-

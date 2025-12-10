@@ -19,20 +19,20 @@ enum SpinnerSize {
 }
 
 /// Spinner de carga personalizado
-/// 
+///
 /// Indicador de carga consistente con el diseño de la app.
 /// Soporta diferentes tamaños y puede incluir texto.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// LoadingSpinner()
-/// 
+///
 /// // Con texto
 /// LoadingSpinner(
 ///   message: 'Cargando datos...',
 ///   size: SpinnerSize.large,
 /// )
-/// 
+///
 /// // Solo spinner pequeño
 /// LoadingSpinner(
 ///   size: SpinnerSize.small,
@@ -89,7 +89,7 @@ class LoadingSpinner extends StatelessWidget {
             ),
           ),
         ),
-        
+
         if (message != null) ...[
           AppSpacing.verticalSpaceMd,
           Text(
@@ -132,10 +132,10 @@ class LoadingSpinner extends StatelessWidget {
 }
 
 /// Widget de carga con overlay
-/// 
+///
 /// Muestra un overlay semi-transparente con spinner.
 /// Útil para bloquear la UI durante operaciones.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// Stack(
@@ -155,11 +155,7 @@ class LoadingOverlay extends StatelessWidget {
   /// Opacidad del overlay (0.0 - 1.0)
   final double opacity;
 
-  const LoadingOverlay({
-    super.key,
-    this.message,
-    this.opacity = 0.5,
-  });
+  const LoadingOverlay({super.key, this.message, this.opacity = 0.5});
 
   @override
   Widget build(BuildContext context) {
@@ -172,13 +168,9 @@ class LoadingOverlay extends StatelessWidget {
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           ),
-          child: LoadingSpinner(
-            message: message,
-            size: SpinnerSize.large,
-          ),
+          child: LoadingSpinner(message: message, size: SpinnerSize.large),
         ),
       ),
     );
   }
 }
-

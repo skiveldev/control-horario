@@ -5,10 +5,10 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 
 /// Barra de progreso de horas trabajadas
-/// 
+///
 /// Muestra el progreso visual de las horas trabajadas vs esperadas.
 /// Incluye porcentaje y etiquetas de horas.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// WorkHoursProgress(
@@ -85,8 +85,8 @@ class WorkHoursProgress extends StatelessWidget {
                 height: 8,
                 decoration: BoxDecoration(
                   // Gradiente SOLO en dark mode
-                  gradient: Theme.of(context).brightness == Brightness.dark 
-                      ? AppGradients.progressBar 
+                  gradient: Theme.of(context).brightness == Brightness.dark
+                      ? AppGradients.progressBar
                       : LinearGradient(
                           colors: [
                             Theme.of(context).colorScheme.primary,
@@ -95,18 +95,24 @@ class WorkHoursProgress extends StatelessWidget {
                         ),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                   // Glow SOLO en dark mode
-                  boxShadow: Theme.of(context).brightness == Brightness.dark ? [
-                    BoxShadow(
-                      color: const Color(0xFF06B6D4).withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                    BoxShadow(
-                      color: const Color(0xFFD946EF).withValues(alpha: 0.2),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ] : null,
+                  boxShadow: Theme.of(context).brightness == Brightness.dark
+                      ? [
+                          BoxShadow(
+                            color: const Color(
+                              0xFF06B6D4,
+                            ).withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                          BoxShadow(
+                            color: const Color(
+                              0xFFD946EF,
+                            ).withValues(alpha: 0.2),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ]
+                      : null,
                 ),
               ),
             ),
@@ -140,4 +146,3 @@ class WorkHoursProgress extends StatelessWidget {
     }
   }
 }
-

@@ -4,7 +4,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
 
 /// Card para mostrar una plantilla de horario o un horario personalizado
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// ScheduleCard(
@@ -146,11 +146,7 @@ class ScheduleCard extends StatelessWidget {
               children: [
                 // Contador de empleados (solo para templates)
                 if (isTemplate && usedByCount != null) ...[
-                  Icon(
-                    Icons.people,
-                    size: 16,
-                    color: AppColors.textSecondary,
-                  ),
+                  Icon(Icons.people, size: 16, color: AppColors.textSecondary),
                   const SizedBox(width: 4),
                   Flexible(
                     child: Text(
@@ -164,9 +160,7 @@ class ScheduleCard extends StatelessWidget {
                 ],
 
                 // Separador
-                if (isTemplate &&
-                    usedByCount != null &&
-                    createdBy != null) ...[
+                if (isTemplate && usedByCount != null && createdBy != null) ...[
                   AppSpacing.horizontalSpaceSm,
                   Text(
                     '•',
@@ -227,5 +221,3 @@ class ScheduleCard extends StatelessWidget {
     }
   }
 }
-
-

@@ -5,10 +5,10 @@ import '../../core/theme/app_spacing.dart';
 import 'buttons/custom_button.dart';
 
 /// Estado de error personalizado
-/// 
+///
 /// Widget para mostrar cuando ocurre un error.
 /// Incluye ícono, mensaje y botón de reintento.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// ErrorState(
@@ -17,14 +17,14 @@ import 'buttons/custom_button.dart';
 ///     // Reintentar carga
 ///   },
 /// )
-/// 
+///
 /// // Error de red
 /// ErrorState.network(
 ///   onRetry: () {
 ///     _recargarDatos();
 ///   },
 /// )
-/// 
+///
 /// // Error personalizado
 /// ErrorState(
 ///   icon: Icons.warning,
@@ -70,10 +70,7 @@ class ErrorState extends StatelessWidget {
   });
 
   /// Constructor para error de red
-  factory ErrorState.network({
-    VoidCallback? onRetry,
-    bool fullScreen = false,
-  }) {
+  factory ErrorState.network({VoidCallback? onRetry, bool fullScreen = false}) {
     return ErrorState(
       icon: Icons.wifi_off,
       title: 'Sin conexión',
@@ -84,14 +81,12 @@ class ErrorState extends StatelessWidget {
   }
 
   /// Constructor para error genérico
-  factory ErrorState.generic({
-    VoidCallback? onRetry,
-    bool fullScreen = false,
-  }) {
+  factory ErrorState.generic({VoidCallback? onRetry, bool fullScreen = false}) {
     return ErrorState(
       icon: Icons.error_outline,
       title: 'Algo salió mal',
-      message: 'Ha ocurrido un error inesperado. Por favor, intenta nuevamente.',
+      message:
+          'Ha ocurrido un error inesperado. Por favor, intenta nuevamente.',
       onRetry: onRetry,
       fullScreen: fullScreen,
     );
@@ -157,11 +152,7 @@ class ErrorState extends StatelessWidget {
               color: (iconColor ?? AppColors.error).withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              icon,
-              size: 64.0,
-              color: iconColor ?? AppColors.error,
-            ),
+            child: Icon(icon, size: 64.0, color: iconColor ?? AppColors.error),
           ),
 
           AppSpacing.verticalSpaceXxl,
@@ -169,9 +160,7 @@ class ErrorState extends StatelessWidget {
           // Título
           Text(
             title,
-            style: AppTextStyles.h3.copyWith(
-              color: AppColors.textPrimary,
-            ),
+            style: AppTextStyles.h3.copyWith(color: AppColors.textPrimary),
             textAlign: TextAlign.center,
           ),
 
@@ -204,4 +193,3 @@ class ErrorState extends StatelessWidget {
     );
   }
 }
-

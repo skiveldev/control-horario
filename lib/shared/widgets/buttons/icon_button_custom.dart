@@ -30,10 +30,10 @@ enum IconButtonSize {
 }
 
 /// Botón de ícono personalizado
-/// 
+///
 /// Botón circular o cuadrado que contiene solo un ícono.
 /// Ideal para acciones secundarias, toolbars, o navegación.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// IconButtonCustom(
@@ -42,7 +42,7 @@ enum IconButtonSize {
 ///     print('Notificaciones');
 ///   },
 /// )
-/// 
+///
 /// // Con badge
 /// Stack(
 ///   children: [
@@ -108,10 +108,7 @@ class IconButtonCustom extends StatelessWidget {
     final button = _buildButton();
 
     if (tooltip != null) {
-      return Tooltip(
-        message: tooltip!,
-        child: button,
-      );
+      return Tooltip(message: tooltip!, child: button);
     }
 
     return button;
@@ -214,7 +211,9 @@ class IconButtonCustom extends StatelessWidget {
             foregroundColor: iconColor ?? AppColors.textPrimary,
             disabledForegroundColor: AppColors.textTertiary,
             side: BorderSide(
-              color: onPressed == null ? AppColors.borderLight : AppColors.border,
+              color: onPressed == null
+                  ? AppColors.borderLight
+                  : AppColors.border,
               width: 1,
             ),
             shape: circular
@@ -264,4 +263,3 @@ class IconButtonCustom extends StatelessWidget {
     }
   }
 }
-

@@ -11,7 +11,7 @@ part 'clocking_provider.g.dart';
 // ==============================================================================
 
 /// Provider para obtener el registro de fichajes de hoy
-/// 
+///
 /// Escucha en tiempo real el documento del día actual.
 /// Retorna:
 /// - null si no hay usuario autenticado o no hay fichajes hoy
@@ -19,7 +19,7 @@ part 'clocking_provider.g.dart';
 @riverpod
 Stream<DailyRecordModel?> todayRecord(TodayRecordRef ref) async* {
   final user = await ref.watch(currentUserProvider.future);
-  
+
   if (user == null) {
     yield null;
     return;
@@ -42,7 +42,7 @@ Stream<DailyRecordModel?> todayRecord(TodayRecordRef ref) async* {
 // ==============================================================================
 
 /// Notifier para acciones de fichaje
-/// 
+///
 /// Maneja las operaciones de fichar entrada y salida.
 /// Expone AsyncValue<void> como estado para manejar loading/error.
 @riverpod
@@ -53,10 +53,10 @@ class ClockingNotifier extends _$ClockingNotifier {
   }
 
   /// Fichar entrada
-  /// 
+  ///
   /// Crea un nuevo documento en daily_records con la hora de entrada.
   /// Solo permitido si no existe registro del día o está incompleto.
-  /// 
+  ///
   /// Uso:
   /// ```dart
   /// await ref.read(clockingNotifierProvider.notifier).clockIn();
@@ -78,26 +78,23 @@ class ClockingNotifier extends _$ClockingNotifier {
           .collection('daily_records')
           .doc(today)
           .set({
-        'date': today,
-        'userId': user.userId,
-        'clocks': {
-          'clockIn': timeString,
-          'clockOut': null,
-        },
-        'clockInTimestamp': Timestamp.fromDate(now),
-        'clockOutTimestamp': null,
-        'status': 'incomplete',
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+            'date': today,
+            'userId': user.userId,
+            'clocks': {'clockIn': timeString, 'clockOut': null},
+            'clockInTimestamp': Timestamp.fromDate(now),
+            'clockOutTimestamp': null,
+            'status': 'incomplete',
+            'createdAt': FieldValue.serverTimestamp(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
     });
   }
 
   /// Fichar salida
-  /// 
+  ///
   /// Actualiza el documento del día con la hora de salida.
   /// Solo permitido si ya existe un fichaje de entrada.
-  /// 
+  ///
   /// Uso:
   /// ```dart
   /// await ref.read(clockingNotifierProvider.notifier).clockOut();
@@ -119,11 +116,11 @@ class ClockingNotifier extends _$ClockingNotifier {
           .collection('daily_records')
           .doc(today)
           .update({
-        'clocks.clockOut': timeString,
-        'clockOutTimestamp': Timestamp.fromDate(now),
-        'status': 'complete',
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+            'clocks.clockOut': timeString,
+            'clockOutTimestamp': Timestamp.fromDate(now),
+            'status': 'complete',
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
     });
   }
 }
@@ -142,15 +139,3 @@ String _getTodayString() {
 String _formatTimeString(DateTime dateTime) {
   return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}';
 }
-
-
-
-
-
-
-
-
-
-
-
-

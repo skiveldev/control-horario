@@ -9,10 +9,10 @@ import 'calendar_grid.dart';
 import 'calendar_legend.dart';
 
 /// Card de calendario mensual
-/// 
+///
 /// Muestra el calendario del mes actual con indicadores
 /// de días especiales (festivos, vacaciones, eventos, etc.).
-/// 
+///
 /// MOCK DATA: Usa MockData.calendarDays
 class MonthlyCalendarCard extends StatefulWidget {
   const MonthlyCalendarCard({super.key});
@@ -32,19 +32,13 @@ class _MonthlyCalendarCardState extends State<MonthlyCalendarCard> {
 
   void _goToPreviousMonth() {
     setState(() {
-      _currentDate = DateTime(
-        _currentDate.year,
-        _currentDate.month - 1,
-      );
+      _currentDate = DateTime(_currentDate.year, _currentDate.month - 1);
     });
   }
 
   void _goToNextMonth() {
     setState(() {
-      _currentDate = DateTime(
-        _currentDate.year,
-        _currentDate.month + 1,
-      );
+      _currentDate = DateTime(_currentDate.year, _currentDate.month + 1);
     });
   }
 
@@ -58,7 +52,8 @@ class _MonthlyCalendarCardState extends State<MonthlyCalendarCard> {
   Widget build(BuildContext context) {
     final monthName = _getMonthName(_currentDate);
     final colors = AppColorsHelper.of(context);
-    final isCurrentMonth = _currentDate.year == DateTime.now().year &&
+    final isCurrentMonth =
+        _currentDate.year == DateTime.now().year &&
         _currentDate.month == DateTime.now().month;
 
     return CustomCard(
@@ -79,9 +74,7 @@ class _MonthlyCalendarCardState extends State<MonthlyCalendarCard> {
               Expanded(
                 child: Text(
                   monthName.capitalize(),
-                  style: AppTextStyles.h5.copyWith(
-                    color: colors.textPrimary,
-                  ),
+                  style: AppTextStyles.h5.copyWith(color: colors.textPrimary),
                 ),
               ),
 
@@ -132,11 +125,9 @@ class _MonthlyCalendarCardState extends State<MonthlyCalendarCard> {
             specialDays: MockData.calendarDays,
             onDayTap: (day) {
               // TODO [FASE-2]: Mostrar detalle del día
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Día $day seleccionado'),
-                ),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('Día $day seleccionado')));
             },
           ),
 
@@ -177,4 +168,3 @@ extension StringExtension on String {
     return this[0].toUpperCase() + substring(1);
   }
 }
-

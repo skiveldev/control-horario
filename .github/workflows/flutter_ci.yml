@@ -1,0 +1,203 @@
+# ============================================================================
+# GitHub Actions CI/CD - Control Horario
+# ============================================================================
+# Este workflow se ejecuta automáticamente en la nube de GitHub cada vez que:
+# - Haces PUSH a las ramas main o develop
+# - Creas un PULL REQUEST hacia main o develop
+#
+# ¿Qué hace?
+# 1. Descarga tu código
+# 2. Instala Flutter
+# 3. Ejecuta todas las verificaciones (linter, format, tests)
+# 4. Si algo falla, te notifica y bloquea el merge
+# ============================================================================
+
+name: Flutter CI
+
+# ============================================================================
+# TRIGGERS: ¿Cuándo se ejecuta este workflow?
+# ============================================================================
+on:
+  # Se ejecuta en cada PUSH a estas ramas
+  push:
+    branches: 
+      - main
+      - develop
+      - 'feature/**'  # Cualquier rama que empiece con feature/
+  
+  # Se ejecuta cuando creas o actualizas un Pull Request
+  pull_request:
+    branches: 
+      - main
+      - develop
+  
+  # Permite ejecutarlo manualmente desde GitHub
+  workflow_dispatch:
+
+# ============================================================================
+# PERMISOS: Qué puede hacer este workflow
+# ============================================================================
+permissions:
+  contents: read      # Leer el código del repositorio
+  pull-requests: write # Comentar en PRs (opcional)
+
+# ============================================================================
+# JOBS: Tareas que se ejecutarán
+# ============================================================================
+jobs:
+  # --------------------------------------------------------------------------
+  # JOB 1: ANALIZAR CÓDIGO
+  # --------------------------------------------------------------------------
+  analyze:
+    name: 🔍 Análisis Estático
+    runs-on: ubuntu-latest  # Ejecutar en servidor Ubuntu (gratis)
+    
+    steps:
+      # Paso 1: Descargar el código del repositorio
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+      
+      # Paso 2: Instalar Flutter
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'  # Versión específica de Flutter
+          channel: 'stable'
+          cache: true  # Cachear dependencias para ser más rápido
+      
+      # Paso 3: Mostrar versión de Flutter (debug)
+      - name: 📋 Flutter version
+        run: flutter --version
+      
+      # Paso 4: Descargar dependencias
+      - name: 📦 Get dependencies
+        run: flutter pub get
+      
+      # Paso 5: Verificar formato del código
+      - name: 📝 Check formatting
+        run: dart format --set-exit-if-changed lib/
+        continue-on-error: false  # Detener si falla
+      
+      # Paso 6: Analizar código con linter (CRÍTICO)
+      - name: 🔎 Analyze code
+        run: flutter analyze --fatal-infos --fatal-warnings
+      
+      # Paso 7: Verificar que no haya warnings deprecados
+      - name: ⚠️ Check deprecated APIs
+        run: flutter analyze --fatal-infos | grep -i deprecated || echo "No deprecated APIs found"
+        continue-on-error: false
+
+  # --------------------------------------------------------------------------
+  # JOB 2: EJECUTAR TESTS (Opcional - Descomentar cuando tengas tests)
+  # --------------------------------------------------------------------------
+  # test:
+  #   name: 🧪 Run Tests
+  #   runs-on: ubuntu-latest
+  #   needs: analyze  # Solo ejecutar si 'analyze' pasó
+  #   
+  #   steps:
+  #     - name: 📥 Checkout repository
+  #       uses: actions/checkout@v4
+  #     
+  #     - name: 🐦 Setup Flutter
+  #       uses: subosito/flutter-action@v2
+  #       with:
+  #         flutter-version: '3.19.0'
+  #         channel: 'stable'
+  #         cache: true
+  #     
+  #     - name: 📦 Get dependencies
+  #       run: flutter pub get
+  #     
+  #     - name: 🧪 Run unit tests
+  #       run: flutter test --coverage
+  #     
+  #     - name: 📊 Upload coverage to Codecov
+  #       uses: codecov/codecov-action@v3
+  #       with:
+  #         file: ./coverage/lcov.info
+
+  # --------------------------------------------------------------------------
+  # JOB 3: BUILD APK (Android)
+  # --------------------------------------------------------------------------
+  build-android:
+    name: 🤖 Build Android APK
+    runs-on: ubuntu-latest
+    needs: analyze  # Solo construir si el análisis pasó
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'
+          channel: 'stable'
+          cache: true
+      
+      - name: 📦 Get dependencies
+        run: flutter pub get
+      
+      - name: 🔨 Build APK
+        run: flutter build apk --release
+      
+      # Subir el APK como artifact (disponible para descargar)
+      - name: 📤 Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 7  # Mantener por 7 días
+
+  # --------------------------------------------------------------------------
+  # JOB 4: BUILD WEB
+  # --------------------------------------------------------------------------
+  build-web:
+    name: 🌐 Build Web
+    runs-on: ubuntu-latest
+    needs: analyze
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'
+          channel: 'stable'
+          cache: true
+      
+      - name: 📦 Get dependencies
+        run: flutter pub get
+      
+      - name: 🔨 Build Web
+        run: flutter build web --release
+      
+      # Subir build de web como artifact
+      - name: 📤 Upload Web Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: build/web/
+          retention-days: 7
+
+  # --------------------------------------------------------------------------
+  # JOB 5: NOTIFICACIÓN DE ÉXITO (Opcional)
+  # --------------------------------------------------------------------------
+  notify-success:
+    name: ✅ Notify Success
+    runs-on: ubuntu-latest
+    needs: [analyze, build-android, build-web]
+    if: success()  # Solo ejecutar si todo pasó
+    
+    steps:
+      - name: 🎉 Success message
+        run: |
+          echo "============================================"
+          echo "✅ Todas las verificaciones pasaron!"
+          echo "============================================"
+          echo "El código está listo para merge o deploy"
+          echo "============================================"
+

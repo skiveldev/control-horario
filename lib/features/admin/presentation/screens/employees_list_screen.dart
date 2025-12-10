@@ -12,9 +12,9 @@ import '../../../../shared/widgets/buttons/custom_button.dart';
 import '../widgets/employee_list_item.dart';
 
 /// Pantalla de lista de empleados
-/// 
+///
 /// Muestra todos los empleados con búsqueda y filtros.
-/// 
+///
 /// MOCK DATA: Usa MockData.employees
 class EmployeesListScreen extends StatefulWidget {
   const EmployeesListScreen({super.key});
@@ -43,12 +43,12 @@ class _EmployeesListScreenState extends State<EmployeesListScreen> {
   void _filterEmployees() {
     setState(() {
       _filteredEmployees = MockData.employees.where((emp) {
-        final matchesSearch = emp['name']
-            .toString()
-            .toLowerCase()
-            .contains(_searchController.text.toLowerCase());
+        final matchesSearch = emp['name'].toString().toLowerCase().contains(
+          _searchController.text.toLowerCase(),
+        );
 
-        final matchesDepartment = _selectedDepartment == 'todos' ||
+        final matchesDepartment =
+            _selectedDepartment == 'todos' ||
             emp['department'] == _selectedDepartment;
 
         return matchesSearch && matchesDepartment;
@@ -77,9 +77,7 @@ class _EmployeesListScreenState extends State<EmployeesListScreen> {
             ),
             decoration: const BoxDecoration(
               color: AppColors.surface,
-              border: Border(
-                bottom: BorderSide(color: AppColors.border),
-              ),
+              border: Border(bottom: BorderSide(color: AppColors.border)),
             ),
             child: Column(
               children: [
@@ -156,8 +154,10 @@ class _EmployeesListScreenState extends State<EmployeesListScreen> {
                         onTap: () {
                           // Navegar a detalle
                           context.push(
-                            AppRouter.adminEmployeeDetail
-                                .replaceFirst(':id', employee['id'] as String),
+                            AppRouter.adminEmployeeDetail.replaceFirst(
+                              ':id',
+                              employee['id'] as String,
+                            ),
                           );
                         },
                       );
@@ -170,9 +170,7 @@ class _EmployeesListScreenState extends State<EmployeesListScreen> {
             padding: AppSpacing.allLg,
             decoration: const BoxDecoration(
               color: AppColors.surface,
-              border: Border(
-                top: BorderSide(color: AppColors.border),
-              ),
+              border: Border(top: BorderSide(color: AppColors.border)),
             ),
             child: Text(
               'Mostrando ${_filteredEmployees.length} de ${MockData.employees.length} empleados',
@@ -213,16 +211,9 @@ class _EmployeesListScreenState extends State<EmployeesListScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.search_off,
-            size: 64,
-            color: AppColors.textTertiary,
-          ),
+          Icon(Icons.search_off, size: 64, color: AppColors.textTertiary),
           AppSpacing.verticalSpaceLg,
-          Text(
-            'No se encontraron empleados',
-            style: AppTextStyles.h4,
-          ),
+          Text('No se encontraron empleados', style: AppTextStyles.h4),
           AppSpacing.verticalSpaceSm,
           Text(
             'Intenta con otros filtros o búsqueda',
@@ -235,4 +226,3 @@ class _EmployeesListScreenState extends State<EmployeesListScreen> {
     );
   }
 }
-

@@ -5,10 +5,10 @@ import '../../core/theme/app_spacing.dart';
 import 'buttons/custom_button.dart';
 
 /// Estado vacío personalizado
-/// 
+///
 /// Widget para mostrar cuando no hay datos disponibles.
 /// Incluye ícono, mensaje y acción opcional.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// EmptyState(
@@ -16,7 +16,7 @@ import 'buttons/custom_button.dart';
 ///   title: 'No hay registros',
 ///   message: 'Aún no has realizado ningún fichaje.',
 /// )
-/// 
+///
 /// // Con acción
 /// EmptyState(
 ///   icon: Icons.people,
@@ -27,7 +27,7 @@ import 'buttons/custom_button.dart';
 ///     // Navegar a formulario
 ///   },
 /// )
-/// 
+///
 /// // Compacto
 /// EmptyState.compact(
 ///   message: 'No hay datos',
@@ -108,7 +108,9 @@ class EmptyState extends StatelessWidget {
           Container(
             padding: AppSpacing.allXl,
             decoration: BoxDecoration(
-              color: (iconColor ?? AppColors.textTertiary).withValues(alpha: 0.1),
+              color: (iconColor ?? AppColors.textTertiary).withValues(
+                alpha: 0.1,
+              ),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -123,9 +125,7 @@ class EmptyState extends StatelessWidget {
           // Título
           Text(
             title,
-            style: AppTextStyles.h3.copyWith(
-              color: AppColors.textPrimary,
-            ),
+            style: AppTextStyles.h3.copyWith(color: AppColors.textPrimary),
             textAlign: TextAlign.center,
           ),
 
@@ -158,4 +158,3 @@ class EmptyState extends StatelessWidget {
     );
   }
 }
-

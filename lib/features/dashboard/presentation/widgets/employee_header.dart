@@ -5,7 +5,7 @@ import '../../../../core/constants/breakpoints.dart';
 import '../../../../shared/widgets/buttons/icon_button_custom.dart';
 
 /// Header del dashboard de empleado
-/// 
+///
 /// Muestra información del usuario actual:
 /// - Avatar
 /// - Nombre completo
@@ -14,10 +14,10 @@ import '../../../../shared/widgets/buttons/icon_button_custom.dart';
 class EmployeeHeader extends StatelessWidget {
   /// Nombre completo del empleado
   final String employeeName;
-  
+
   /// ID del empleado (ej: EMP-003)
   final String employeeId;
-  
+
   /// Callback al presionar notificaciones
   final VoidCallback? onNotificationsTap;
 
@@ -38,7 +38,6 @@ class EmployeeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       width: double.infinity,
       padding: context.isMobile
@@ -50,10 +49,7 @@ class EmployeeHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         border: Border(
-          bottom: BorderSide(
-            color: Theme.of(context).dividerColor,
-            width: 1,
-          ),
+          bottom: BorderSide(color: Theme.of(context).dividerColor, width: 1),
         ),
         boxShadow: [
           BoxShadow(
@@ -81,7 +77,9 @@ class EmployeeHeader extends StatelessWidget {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.2),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -91,12 +89,12 @@ class EmployeeHeader extends StatelessWidget {
                       radius: context.isMobile ? 24 : 28,
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       child: Icon(
-                              Icons.person,
-                              size: context.isMobile
-                                  ? AppSpacing.iconLg
-                                  : AppSpacing.iconXl,
-                              color: Theme.of(context).colorScheme.onPrimary,
-                            ),
+                        Icons.person,
+                        size: context.isMobile
+                            ? AppSpacing.iconLg
+                            : AppSpacing.iconXl,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
                     ),
                   ),
                 ),
@@ -125,7 +123,9 @@ class EmployeeHeader extends StatelessWidget {
                       Text(
                         employeeId,
                         style: AppTextStyles.bodySmall.copyWith(
-                          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -150,7 +150,7 @@ class EmployeeHeader extends StatelessWidget {
                     onPressed: onNotificationsTap,
                     tooltip: 'Notificaciones',
                   ),
-                  
+
                   // Badge de notificaciones sin leer
                   Positioned(
                     right: 6,
@@ -194,6 +194,4 @@ class EmployeeHeader extends StatelessWidget {
       ),
     );
   }
-
 }
-

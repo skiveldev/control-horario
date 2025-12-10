@@ -10,7 +10,7 @@ import '../../../core/theme/app_spacing.dart';
 import 'navigation_items.dart';
 
 /// Drawer de navegación para mobile y tablet
-/// 
+///
 /// Características:
 /// - Slide-in desde la izquierda
 /// - Header con avatar y datos de usuario
@@ -18,12 +18,12 @@ import 'navigation_items.dart';
 /// - Cierre automático al navegar
 /// - Backdrop oscuro 50% opacity
 /// - Gesture swipe-right para cerrar
-/// 
+///
 /// Especificaciones:
 /// - Ancho: 280px
 /// - Animación: 250ms ease-out (nativa de Flutter)
 /// - Se cierra con: tap backdrop, swipe, o al seleccionar item
-/// 
+///
 /// Uso:
 /// ```dart
 /// Scaffold(
@@ -37,14 +37,14 @@ class MobileDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentRoute = GoRouterState.of(context).matchedLocation;
-    
+
     return Drawer(
       width: 280,
       child: Column(
         children: [
           // Header con avatar y datos de usuario
           _buildDrawerHeader(context),
-          
+
           // Lista de items de navegación
           Expanded(
             child: ListView(
@@ -58,7 +58,7 @@ class MobileDrawer extends ConsumerWidget {
               }).toList(),
             ),
           ),
-          
+
           // Divider y versión
           const Divider(),
           Padding(
@@ -79,10 +79,10 @@ class MobileDrawer extends ConsumerWidget {
   /// Construye el header del drawer con avatar y datos de usuario
   Widget _buildDrawerHeader(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return DrawerHeader(
       decoration: BoxDecoration(
-        gradient: isDark 
+        gradient: isDark
             ? LinearGradient(
                 colors: [
                   Theme.of(context).colorScheme.primary,
@@ -103,14 +103,12 @@ class MobileDrawer extends ConsumerWidget {
             backgroundColor: Colors.white.withValues(alpha: 0.2),
             child: Text(
               'MG',
-              style: AppTextStyles.h4.copyWith(
-                color: Colors.white,
-              ),
+              style: AppTextStyles.h4.copyWith(color: Colors.white),
             ),
           ),
-          
+
           AppSpacing.verticalSpaceSm,
-          
+
           // Nombre
           Text(
             'María García López', // TODO [FASE-2]: Conectar con user provider
@@ -121,9 +119,9 @@ class MobileDrawer extends ConsumerWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          
+
           AppSpacing.verticalSpaceXs,
-          
+
           // Cargo
           Text(
             'Desarrolladora Frontend', // TODO [FASE-2]: Conectar con user provider
@@ -133,9 +131,9 @@ class MobileDrawer extends ConsumerWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          
+
           AppSpacing.verticalSpaceXs,
-          
+
           // ID Empleado
           Container(
             padding: EdgeInsets.symmetric(
@@ -166,7 +164,7 @@ class MobileDrawer extends ConsumerWidget {
     required bool isSelected,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     // Si está seleccionado en DARK MODE, usar Container con gradiente cyan
     if (isSelected && isDark) {
       return Container(
@@ -198,27 +196,33 @@ class MobileDrawer extends ConsumerWidget {
         ),
       );
     }
-    
+
     // Item normal (seleccionado en light mode o no seleccionado)
     return ListTile(
       selected: isSelected,
-      selectedTileColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+      selectedTileColor: Theme.of(
+        context,
+      ).colorScheme.primary.withValues(alpha: 0.1),
       leading: Icon(
         item.icon,
         color: isSelected
             ? Theme.of(context).colorScheme.primary
-            : (isDark 
-                ? AppColorsDark.textPrimary // Blanco en dark
-                : Theme.of(context).colorScheme.onSurface), // Negro en light
+            : (isDark
+                  ? AppColorsDark
+                        .textPrimary // Blanco en dark
+                  : Theme.of(context).colorScheme.onSurface), // Negro en light
       ),
       title: Text(
         item.label,
         style: AppTextStyles.bodyMedium.copyWith(
           color: isSelected
               ? Theme.of(context).colorScheme.primary
-              : (isDark 
-                  ? AppColorsDark.textPrimary // Blanco en dark
-                  : Theme.of(context).colorScheme.onSurface), // Negro en light
+              : (isDark
+                    ? AppColorsDark
+                          .textPrimary // Blanco en dark
+                    : Theme.of(
+                        context,
+                      ).colorScheme.onSurface), // Negro en light
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
         ),
       ),
@@ -229,4 +233,3 @@ class MobileDrawer extends ConsumerWidget {
     );
   }
 }
-

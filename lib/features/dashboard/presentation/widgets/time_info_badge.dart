@@ -5,13 +5,13 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 
 /// Badge informativo de tiempo CON GRADIENTES
-/// 
+///
 /// Muestra información de hora con etiqueta y fondo con gradientes profesionales.
 /// Detecta el tipo de badge por la etiqueta y aplica el gradiente correspondiente:
 /// - "Hora de entrada" → Gradiente CYAN
 /// - "Salida estimada" / "pausa" → Gradiente MAGENTA
 /// - Otros → Color sólido
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// TimeInfoBadge(
@@ -46,7 +46,7 @@ class TimeInfoBadge extends StatelessWidget {
     // Detectar tipo de badge por label para aplicar gradiente
     final badgeType = _detectBadgeType(label);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Container(
       padding: AppSpacing.symmetric(
         horizontal: AppSpacing.md,
@@ -62,19 +62,13 @@ class TimeInfoBadge extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (icon != null) ...[
-                Icon(
-                  icon,
-                  size: 12,
-                  color: color,
-                ),
+                Icon(icon, size: 12, color: color),
                 const SizedBox(width: 4),
               ],
               Flexible(
                 child: Text(
                   label,
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: color,
-                  ),
+                  style: AppTextStyles.labelSmall.copyWith(color: color),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -96,7 +90,7 @@ class TimeInfoBadge extends StatelessWidget {
       ),
     );
   }
-  
+
   /// Detecta el tipo de badge por su label
   _BadgeType _detectBadgeType(String label) {
     final lowerLabel = label.toLowerCase();
@@ -107,7 +101,7 @@ class TimeInfoBadge extends StatelessWidget {
     }
     return _BadgeType.other; // Color sólido
   }
-  
+
   /// Construye la decoración - gradiente en dark mode, color sólido en light mode
   BoxDecoration _buildDecoration(_BadgeType type, bool isDark) {
     // En DARK MODE: usar gradientes
@@ -124,7 +118,7 @@ class TimeInfoBadge extends StatelessWidget {
             ),
             boxShadow: AppShadows.cardCyanGlow,
           );
-          
+
         case _BadgeType.exit:
           // MAGENTA: Salida estimada / Tiempo de pausa (dark mode)
           return BoxDecoration(
@@ -136,27 +130,21 @@ class TimeInfoBadge extends StatelessWidget {
             ),
             boxShadow: AppShadows.cardMagentaGlow,
           );
-          
+
         case _BadgeType.other:
           return BoxDecoration(
             color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-            border: Border.all(
-              color: color.withValues(alpha: 0.3),
-              width: 1,
-            ),
+            border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
           );
       }
     }
-    
+
     // En LIGHT MODE: usar colores sólidos (como tu imagen)
     return BoxDecoration(
       color: color.withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-      border: Border.all(
-        color: color.withValues(alpha: 0.3),
-        width: 1,
-      ),
+      border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
     );
   }
 }
@@ -164,6 +152,6 @@ class TimeInfoBadge extends StatelessWidget {
 /// Tipos de badges para aplicar gradientes específicos
 enum _BadgeType {
   entrance, // Cyan gradient
-  exit,     // Magenta gradient
-  other,    // Solid color
+  exit, // Magenta gradient
+  other, // Solid color
 }

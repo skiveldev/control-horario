@@ -5,7 +5,7 @@ part 'daily_record_model.freezed.dart';
 part 'daily_record_model.g.dart';
 
 /// Modelo de Registro Diario de fichajes
-/// 
+///
 /// Representa los fichajes de un empleado en un día específico.
 /// Un documento por día con entrada, salida y timestamps.
 @freezed
@@ -28,7 +28,7 @@ class DailyRecordModel with _$DailyRecordModel {
   factory DailyRecordModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     final clocks = data['clocks'] as Map<String, dynamic>;
-    
+
     return DailyRecordModel(
       date: doc.id,
       userId: data['userId'] ?? '',
@@ -48,10 +48,7 @@ class DailyRecordModel with _$DailyRecordModel {
 /// Tiempos de fichaje (formato HH:mm:ss)
 @freezed
 class ClockTimes with _$ClockTimes {
-  const factory ClockTimes({
-    String? clockIn,
-    String? clockOut,
-  }) = _ClockTimes;
+  const factory ClockTimes({String? clockIn, String? clockOut}) = _ClockTimes;
 
   factory ClockTimes.fromJson(Map<String, dynamic> json) =>
       _$ClockTimesFromJson(json);
@@ -61,19 +58,7 @@ class ClockTimes with _$ClockTimes {
 enum RecordStatus {
   /// Fichaje incompleto - falta entrada o salida
   incomplete,
-  
+
   /// Fichaje completo - tiene entrada y salida
   complete,
 }
-
-
-
-
-
-
-
-
-
-
-
-

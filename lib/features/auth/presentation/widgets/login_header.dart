@@ -4,7 +4,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 
 /// Header del formulario de login
-/// 
+///
 /// Contiene el gradiente de marca, ícono de reloj y título.
 /// Parte visual superior de la pantalla de login.
 class LoginHeader extends StatelessWidget {
@@ -47,9 +47,7 @@ class LoginHeader extends StatelessWidget {
           // Título
           Text(
             'Sistema de Control de Tiempo',
-            style: AppTextStyles.h3.copyWith(
-              color: AppColors.textOnPrimary,
-            ),
+            style: AppTextStyles.h3.copyWith(color: AppColors.textOnPrimary),
             textAlign: TextAlign.center,
           ),
 
@@ -68,4 +66,3 @@ class LoginHeader extends StatelessWidget {
     );
   }
 }
-

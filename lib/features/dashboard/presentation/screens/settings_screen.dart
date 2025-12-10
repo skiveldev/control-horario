@@ -13,7 +13,7 @@ import '../../../auth/presentation/widgets/change_password_dialog.dart';
 import '../../../auth/providers/auth_provider.dart';
 
 /// Pantalla de configuración
-/// 
+///
 /// Permite al usuario ajustar preferencias de la aplicación.
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -99,10 +99,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       title: 'Idioma',
                       subtitle: 'Selecciona el idioma de la interfaz',
                       value: _language,
-                      options: const {
-                        'es': 'Español',
-                        'en': 'English',
-                      },
+                      options: const {'es': 'Español', 'en': 'English'},
                       onChanged: (value) {
                         setState(() => _language = value!);
                         // TODO [FASE-2]: Cambiar idioma de la app
@@ -147,10 +144,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   title: 'Acerca de',
                   icon: Icons.info,
                   children: [
-                    _buildInfoItem(
-                      title: 'Versión',
-                      value: '1.0.0',
-                    ),
+                    _buildInfoItem(title: 'Versión', value: '1.0.0'),
                     _buildInfoItem(
                       title: 'Última actualización',
                       value: 'Noviembre 2025',
@@ -166,9 +160,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   padding: AppSpacing.cardLarge,
                   borderColor: AppColors.error,
                   child: InkWell(
-                    onTap: isLoggingOut ? null : () {
-                      _showLogoutDialog(context);
-                    },
+                    onTap: isLoggingOut
+                        ? null
+                        : () {
+                            _showLogoutDialog(context);
+                          },
                     child: Row(
                       children: [
                         if (isLoggingOut)
@@ -181,14 +177,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             ),
                           )
                         else
-                          Icon(
-                            Icons.logout,
-                            color: AppColors.error,
-                          ),
+                          Icon(Icons.logout, color: AppColors.error),
                         AppSpacing.horizontalSpaceMd,
                         Expanded(
                           child: Text(
-                            isLoggingOut ? 'Cerrando sesión...' : 'Cerrar sesión',
+                            isLoggingOut
+                                ? 'Cerrando sesión...'
+                                : 'Cerrar sesión',
                             style: AppTextStyles.bodyMedium.copyWith(
                               color: AppColors.error,
                               fontWeight: FontWeight.w600,
@@ -226,18 +221,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           padding: AppSpacing.horizontalSm,
           child: Row(
             children: [
-              Icon(
-                icon,
-                size: AppSpacing.iconMd,
-                color: AppColors.primary,
-              ),
+              Icon(icon, size: AppSpacing.iconMd, color: AppColors.primary),
               AppSpacing.horizontalSpaceSm,
-              Expanded(
-                child: Text(
-                  title,
-                  style: AppTextStyles.h5,
-                ),
-              ),
+              Expanded(child: Text(title, style: AppTextStyles.h5)),
             ],
           ),
         ),
@@ -248,9 +234,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         CustomCard(
           elevation: CardElevation.low,
           padding: EdgeInsets.zero,
-          child: Column(
-            children: children,
-          ),
+          child: Column(children: children),
         ),
       ],
     );
@@ -259,8 +243,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget _buildThemeToggle() {
     return Consumer(
       builder: (context, ref, child) {
-        final isDark = ref.watch(themeNotifierProvider.select((mode) => mode == ThemeMode.dark));
-        
+        final isDark = ref.watch(
+          themeNotifierProvider.select((mode) => mode == ThemeMode.dark),
+        );
+
         return ListTile(
           contentPadding: AppSpacing.symmetric(
             horizontal: AppSpacing.lg,
@@ -310,14 +296,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       title: Text(title, style: AppTextStyles.bodyMedium),
       subtitle: Text(
         subtitle,
-        style: AppTextStyles.bodySmall.copyWith(
-          color: AppColors.textSecondary,
-        ),
+        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
       ),
-      trailing: Switch(
-        value: value,
-        onChanged: onChanged,
-      ),
+      trailing: Switch(value: value, onChanged: onChanged),
     );
   }
 
@@ -336,9 +317,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       title: Text(title, style: AppTextStyles.bodyMedium),
       subtitle: Text(
         subtitle,
-        style: AppTextStyles.bodySmall.copyWith(
-          color: AppColors.textSecondary,
-        ),
+        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
       ),
       trailing: DropdownButton<String>(
         value: value,
@@ -371,31 +350,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           color: AppColors.surfaceVariant,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
         ),
-        child: Icon(
-          icon,
-          size: AppSpacing.iconMd,
-          color: AppColors.primary,
-        ),
+        child: Icon(icon, size: AppSpacing.iconMd, color: AppColors.primary),
       ),
       title: Text(title, style: AppTextStyles.bodyMedium),
       subtitle: Text(
         subtitle,
-        style: AppTextStyles.bodySmall.copyWith(
-          color: AppColors.textSecondary,
-        ),
+        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
       ),
-      trailing: const Icon(
-        Icons.arrow_forward_ios,
-        size: 16,
-      ),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: onTap,
     );
   }
 
-  Widget _buildInfoItem({
-    required String title,
-    required String value,
-  }) {
+  Widget _buildInfoItem({required String title, required String value}) {
     return ListTile(
       contentPadding: AppSpacing.symmetric(
         horizontal: AppSpacing.lg,
@@ -425,18 +392,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ElevatedButton(
             onPressed: () async {
               Navigator.of(dialogContext).pop();
-              
+
               // Ejecutar logout real con Firebase
               await ref.read(authNotifierProvider.notifier).signOut();
-              
+
               // Navegar a login (el authStateChanges se encargará de esto también)
               if (context.mounted) {
                 context.go(AppRouter.login);
               }
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
             child: const Text('Cerrar sesión'),
           ),
         ],
@@ -444,4 +409,3 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 }
-

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 /// Sistema de espaciado del Control Horario
-/// 
+///
 /// Basado en una escala de 4px que garantiza consistencia visual.
 /// Todos los espaciados deben usar estos valores en lugar de números mágicos.
-/// 
+///
 /// Ejemplo:
 /// ```dart
 /// Padding(
@@ -84,7 +84,9 @@ class AppSpacing {
   static const EdgeInsets horizontalLg = EdgeInsets.symmetric(horizontal: lg);
   static const EdgeInsets horizontalXl = EdgeInsets.symmetric(horizontal: xl);
   static const EdgeInsets horizontalXxl = EdgeInsets.symmetric(horizontal: xxl);
-  static const EdgeInsets horizontalXxxl = EdgeInsets.symmetric(horizontal: xxxl);
+  static const EdgeInsets horizontalXxxl = EdgeInsets.symmetric(
+    horizontal: xxxl,
+  );
 
   // Paddings verticales (arriba y abajo)
   static const EdgeInsets verticalXs = EdgeInsets.symmetric(vertical: xs);
@@ -200,7 +202,8 @@ class AppSpacing {
   static BorderRadius get borderRadiusMd => BorderRadius.circular(radiusMd);
   static BorderRadius get borderRadiusLg => BorderRadius.circular(radiusLg);
   static BorderRadius get borderRadiusXl => BorderRadius.circular(radiusXl);
-  static BorderRadius get borderRadiusCircular => BorderRadius.circular(radiusCircular);
+  static BorderRadius get borderRadiusCircular =>
+      BorderRadius.circular(radiusCircular);
 
   // ============================================================================
   // ICON SIZES (Tamaños de íconos)
@@ -285,14 +288,10 @@ class AppSpacing {
   }
 
   /// Crear EdgeInsets simétrico personalizado
-  static EdgeInsets symmetric({
-    double? horizontal,
-    double? vertical,
-  }) {
+  static EdgeInsets symmetric({double? horizontal, double? vertical}) {
     return EdgeInsets.symmetric(
       horizontal: horizontal ?? 0,
       vertical: vertical ?? 0,
     );
   }
 }
-

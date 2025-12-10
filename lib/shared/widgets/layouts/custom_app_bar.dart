@@ -4,10 +4,10 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
 
 /// AppBar personalizado del Control Horario
-/// 
+///
 /// Barra superior consistente con el diseño de la app.
 /// Incluye soporte para avatar, notificaciones y acciones.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// Scaffold(
@@ -26,7 +26,7 @@ import '../../../core/theme/app_spacing.dart';
 ///   ),
 ///   body: MyContent(),
 /// )
-/// 
+///
 /// // Con búsqueda
 /// CustomAppBar(
 ///   title: 'Empleados',
@@ -98,9 +98,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
-  Size get preferredSize => Size.fromHeight(
-    showSearch ? 120.0 : kToolbarHeight,
-  );
+  Size get preferredSize =>
+      Size.fromHeight(showSearch ? 120.0 : kToolbarHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -111,12 +110,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: transparent ? 0 : (elevation ?? 1),
       automaticallyImplyLeading: automaticallyImplyLeading,
       leading: leading,
-      title: titleWidget ?? (title != null
-          ? Text(
-              title!,
-              style: AppTextStyles.h4,
-            )
-          : null),
+      title:
+          titleWidget ??
+          (title != null ? Text(title!, style: AppTextStyles.h4) : null),
       actions: _buildActions(),
       flexibleSpace: showSearch ? _buildSearchBar() : null,
     );
@@ -188,4 +184,3 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 }
-

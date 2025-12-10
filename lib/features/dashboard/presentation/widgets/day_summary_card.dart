@@ -13,13 +13,13 @@ import 'work_hours_progress.dart';
 import 'time_info_badge.dart';
 
 /// Card de resumen del día
-/// 
+///
 /// Muestra:
 /// - Progreso de horas trabajadas
 /// - Hora de entrada
 /// - Salida estimada
 /// - Tiempo de pausa acumulado
-/// 
+///
 /// Conectado con Riverpod para mostrar datos reales desde Firebase.
 class DaySummaryCard extends ConsumerWidget {
   const DaySummaryCard({super.key});
@@ -46,7 +46,8 @@ class DaySummaryCard extends ConsumerWidget {
           // Calcular datos
           final entranceTime = _formatTime(todayRecord.clockInTimestamp!);
           final totalHours = todayMinutes / 60.0;
-          final expectedHours = user.weeklyHours / 5.0; // Horas diarias esperadas
+          final expectedHours =
+              user.weeklyHours / 5.0; // Horas diarias esperadas
           final estimatedExit = _calculateEstimatedExit(
             todayRecord.clockInTimestamp!,
             expectedHours,
@@ -89,18 +90,12 @@ class DaySummaryCard extends ConsumerWidget {
           // Título del card
           Row(
             children: [
-              Icon(
-                Icons.today,
-                size: AppSpacing.iconMd,
-                color: colors.info,
-              ),
+              Icon(Icons.today, size: AppSpacing.iconMd, color: colors.info),
               AppSpacing.horizontalSpaceSm,
               Flexible(
                 child: Text(
                   'Resumen del Día',
-                  style: AppTextStyles.h5.copyWith(
-                    color: colors.textPrimary,
-                  ),
+                  style: AppTextStyles.h5.copyWith(color: colors.textPrimary),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -183,9 +178,7 @@ class DaySummaryCard extends ConsumerWidget {
     return CustomCard(
       elevation: CardElevation.medium,
       padding: AppSpacing.cardLarge,
-      child: const Center(
-        child: CircularProgressIndicator(),
-      ),
+      child: const Center(child: CircularProgressIndicator()),
     );
   }
 
@@ -243,7 +236,7 @@ class DaySummaryCard extends ConsumerWidget {
             ],
           ),
         );
-      }
+      },
     );
   }
 
@@ -296,7 +289,7 @@ class DaySummaryCard extends ConsumerWidget {
             ],
           ),
         );
-      }
+      },
     );
   }
 
@@ -319,4 +312,3 @@ class DaySummaryCard extends ConsumerWidget {
     return _formatTime(estimatedExit);
   }
 }
-

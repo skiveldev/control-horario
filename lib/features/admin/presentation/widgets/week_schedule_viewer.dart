@@ -5,13 +5,13 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/mock_schedules.dart';
 
 /// Visualizador de horario semanal
-/// 
+///
 /// Muestra el horario completo de un empleado (lunes a domingo).
 /// Si el empleado usa plantilla, muestra un resumen simple.
 /// Si tiene horario personalizado, muestra turnos detallados.
-/// 
+///
 /// MOCK DATA: Usa MockSchedules.getEmployeeSchedule()
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// WeekScheduleViewer(
@@ -129,7 +129,9 @@ class WeekScheduleViewer extends StatelessWidget {
   }
 
   Widget _buildScheduleTable(
-      Map<String, dynamic> weekSchedule, bool isTemplate) {
+    Map<String, dynamic> weekSchedule,
+    bool isTemplate,
+  ) {
     final days = [
       'monday',
       'tuesday',
@@ -152,11 +154,7 @@ class WeekScheduleViewer extends StatelessWidget {
           final dayData = weekSchedule[dayKey] as Map<String, dynamic>?;
           final isLast = index == days.length - 1;
 
-          return _buildDayRow(
-            dayKey,
-            dayData,
-            isLast: isLast,
-          );
+          return _buildDayRow(dayKey, dayData, isLast: isLast);
         }).toList(),
       ),
     );
@@ -177,10 +175,7 @@ class WeekScheduleViewer extends StatelessWidget {
         border: isLast
             ? null
             : Border(
-                bottom: BorderSide(
-                  color: AppColors.borderLight,
-                  width: 1,
-                ),
+                bottom: BorderSide(color: AppColors.borderLight, width: 1),
               ),
       ),
       child: Padding(
@@ -196,8 +191,7 @@ class WeekScheduleViewer extends StatelessWidget {
                   color: isWorkDay
                       ? AppColors.textPrimary
                       : AppColors.textTertiary,
-                  fontWeight:
-                      isWorkDay ? FontWeight.w600 : FontWeight.normal,
+                  fontWeight: isWorkDay ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
             ),
@@ -246,9 +240,7 @@ class WeekScheduleViewer extends StatelessWidget {
     if (shifts.isEmpty) {
       return Text(
         'Sin horario',
-        style: AppTextStyles.bodySmall.copyWith(
-          color: AppColors.textTertiary,
-        ),
+        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textTertiary),
       );
     }
 
@@ -257,9 +249,7 @@ class WeekScheduleViewer extends StatelessWidget {
       final shift = shifts[0] as Map<String, dynamic>;
       return Text(
         '${shift['startTime']} - ${shift['endTime']}',
-        style: AppTextStyles.bodySmall.copyWith(
-          color: AppColors.textPrimary,
-        ),
+        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textPrimary),
       );
     }
 
@@ -331,5 +321,3 @@ class WeekScheduleViewer extends StatelessWidget {
     );
   }
 }
-
-

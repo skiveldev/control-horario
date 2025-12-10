@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/router/app_router.dart';
 
 /// Modelo para items de navegación
-/// 
+///
 /// Representa un item del menú lateral o drawer con:
 /// - Label: Texto a mostrar
 /// - Icon: Ícono Material
@@ -11,7 +11,7 @@ class NavigationItem {
   final String label;
   final IconData icon;
   final String route;
-  
+
   const NavigationItem({
     required this.label,
     required this.icon,
@@ -20,11 +20,11 @@ class NavigationItem {
 }
 
 /// Clase estática con todos los items de navegación
-/// 
+///
 /// Define los items del menú principal compartidos entre:
 /// - Mobile Drawer
 /// - Desktop Sidebar
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// NavigationItems.items.map((item) {
@@ -38,7 +38,7 @@ class NavigationItem {
 class NavigationItems {
   // Prevenir instanciación
   NavigationItems._();
-  
+
   /// Lista de todos los items de navegación
   static const List<NavigationItem> items = [
     NavigationItem(
@@ -62,7 +62,7 @@ class NavigationItems {
       route: AppRouter.settings,
     ),
   ];
-  
+
   /// Obtiene un item por su ruta
   static NavigationItem? getItemByRoute(String route) {
     try {
@@ -71,10 +71,9 @@ class NavigationItems {
       return null;
     }
   }
-  
+
   /// Verifica si una ruta es un item de navegación
   static bool isNavigationRoute(String route) {
     return items.any((item) => item.route == route);
   }
 }
-

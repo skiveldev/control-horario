@@ -1,0 +1,114 @@
+[33mcommit f8a15d7cd6ba856bb30902a290bb41764a960e18[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m
+Author: Emanul skivel <skivelingenieros@gmail.com>
+Date:   Tue Dec 9 01:36:26 2025 +0100
+
+    feat: Sistema Dual Theme + Navegación Responsive
+    
+    ✨ Características Principales:
+    - Sistema dual theme (Light + Dark) con persistencia
+    - Navegación responsive (Sidebar desktop + Drawer mobile)
+    - Paleta profesional con 200+ colores y escalas 50-900
+    - Gradientes y glow effects en botones y cards
+    - 25+ componentes adaptados a dual theme
+    
+    🎨 Sistema de Colores:
+    - app_colors_dark.dart: Paleta completa dark mode
+    - app_colors_helper.dart: Helper theme-aware
+    - app_gradients.dart: Gradientes para botones/cards
+    - app_shadows.dart: Sombras con efectos glow
+    
+    🧭 Navegación:
+    - desktop_sidebar.dart: Sidebar colapsable (240px ↔ 64px)
+    - mobile_drawer.dart: Drawer temporal para mobile/tablet
+    - responsive_navigation.dart: Wrapper responsive
+    - navigation_items.dart: Lista centralizada de items
+    
+    🔧 State Management:
+    - theme_provider.dart: ThemeNotifier con Riverpod
+    - Persistencia con SharedPreferences
+    - sidebar_notifier: Estado del sidebar persistente
+    
+    🎯 Botones de Fichaje:
+    - Entrada: Verde con gradiente
+    - Salida: Rojo con gradiente
+    - Pausa: Naranja con gradiente
+    - Retorno: Azul con gradiente
+    
+    ✅ Mejoras de Calidad:
+    - 0 errores de linter
+    - Texto 100% visible en ambos temas
+    - Responsive en mobile, tablet y desktop
+    - Animaciones suaves (200ms)
+    - Código documentado
+    
+    📚 Documentación:
+    - DUAL_THEME_NAVIGATION_SUMMARY.md: Resumen completo
+    - PROJECT_STATUS.md: Estado actual del proyecto
+    - ESTRUCTURA_PROYECTO.md: Árbol de archivos
+    
+    🐛 Fixes:
+    - Texto invisible en dark mode (onSurface: Colors.white)
+    - Icono hamburguesa duplicado
+    - Contraste insuficiente en navegación
+    - Overflow en sidebar colapsado
+    - 117 errores de linter corregidos
+    
+    Co-authored-by: Claude Sonnet 4.5
+
+ DEPLOYMENT_QUICKSTART.md                           |    8 [32m+[m
+ DEPLOYMENT_SUCCESS.md                              |    8 [32m+[m
+ RESUMEN_IMPLEMENTACION.md                          |    8 [32m+[m
+ docs/DUAL_THEME_NAVIGATION_SUMMARY.md              | 1015 [32m++++++++++++++++++++[m
+ docs/ESTRUCTURA_PROYECTO.md                        |  545 [32m+++++++++++[m
+ docs/PROJECT_STATUS.md                             |  348 [32m+++++++[m
+ lib/app.dart                                       |   11 [32m+[m[31m-[m
+ lib/core/providers/theme_provider.dart             |   99 [32m++[m
+ lib/core/providers/theme_provider.g.dart           |   45 [32m+[m
+ lib/core/router/auth_notifier.dart                 |    8 [32m+[m
+ lib/core/services/auth_service.dart                |    8 [32m+[m
+ lib/core/services/firebase_service.dart            |    8 [32m+[m
+ lib/core/services/seed_service.dart                |    8 [32m+[m
+ lib/core/theme/app_colors_dark.dart                |  374 [32m++++++++[m
+ lib/core/theme/app_colors_helper.dart              |  226 [32m+++++[m
+ lib/core/theme/app_gradients.dart                  |  266 [32m+++++[m
+ lib/core/theme/app_shadows.dart                    |  160 [32m+++[m
+ lib/core/theme/app_theme.dart                      |  482 [32m+++++++++[m[31m-[m
+ lib/features/auth/providers/auth_provider.dart     |    8 [32m+[m
+ .../dashboard/models/daily_record_model.dart       |    8 [32m+[m
+ .../presentation/screens/dashboard_screen.dart     |  119 [32m++[m[31m-[m
+ .../presentation/screens/settings_screen.dart      |   63 [32m+[m[31m-[m
+ .../presentation/widgets/calendar_grid.dart        |   77 [32m+[m[31m-[m
+ .../presentation/widgets/calendar_legend.dart      |   19 [32m+[m[31m-[m
+ .../presentation/widgets/clock_display.dart        |   16 [32m+[m[31m-[m
+ .../presentation/widgets/clocking_buttons.dart     |    6 [32m+[m[31m-[m
+ .../presentation/widgets/day_summary_card.dart     |  194 [32m++[m[31m--[m
+ .../presentation/widgets/early_exit_dialog.dart    |   38 [32m+[m[31m-[m
+ .../presentation/widgets/edit_entrance_dialog.dart |  111 [32m++[m[31m-[m
+ .../presentation/widgets/employee_header.dart      |   27 [32m+[m[31m-[m
+ .../widgets/monthly_calendar_card.dart             |    9 [32m+[m[31m-[m
+ .../presentation/widgets/profile_edit_dialog.dart  |   55 [32m+[m[31m-[m
+ .../presentation/widgets/quick_actions_card.dart   |   42 [32m+[m[31m-[m
+ .../presentation/widgets/recent_records_card.dart  |  242 [32m++[m[31m---[m
+ .../presentation/widgets/record_status_badge.dart  |   15 [32m+[m[31m-[m
+ .../presentation/widgets/records_table.dart        |  215 [32m+++[m[31m--[m
+ .../presentation/widgets/time_clock_card.dart      |   92 [32m+[m[31m-[m
+ .../presentation/widgets/time_info_badge.dart      |   95 [32m+[m[31m-[m
+ .../presentation/widgets/weekly_summary_card.dart  |   50 [32m+[m[31m-[m
+ .../presentation/widgets/work_hours_progress.dart  |   47 [32m+[m[31m-[m
+ .../dashboard/providers/clocking_provider.dart     |    8 [32m+[m
+ .../dashboard/providers/dashboard_provider.dart    |    8 [32m+[m
+ lib/main.dart                                      |    7 [32m+[m
+ lib/shared/widgets/buttons/custom_button.dart      |  123 [32m++[m[31m-[m
+ .../widgets/cards/clocking_status_badge.dart       |   68 [32m+[m[31m-[m
+ lib/shared/widgets/cards/custom_card.dart          |    3 [32m+[m[31m-[m
+ lib/shared/widgets/navigation/README.md            |  144 [32m+++[m
+ lib/shared/widgets/navigation/desktop_sidebar.dart |  289 [32m++++++[m
+ .../widgets/navigation/desktop_sidebar.g.dart      |   33 [32m+[m
+ lib/shared/widgets/navigation/mobile_drawer.dart   |  232 [32m+++++[m
+ .../widgets/navigation/navigation_items.dart       |   80 [32m++[m
+ .../widgets/navigation/responsive_navigation.dart  |   55 [32m++[m
+ macos/Flutter/GeneratedPluginRegistrant.swift      |    2 [32m+[m
+ pubspec.lock                                       |   56 [32m++[m
+ pubspec.yaml                                       |    1 [32m+[m
+ scripts/seed_users.dart                            |    8 [32m+[m
+ 56 files changed, 5618 insertions(+), 674 deletions(-)

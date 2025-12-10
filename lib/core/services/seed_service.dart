@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 /// Servicio temporal para poblar la base de datos con datos iniciales
 class SeedService {
@@ -10,7 +11,7 @@ class SeedService {
   /// Retorna true si todo salió bien
   Future<bool> seedInitialData() async {
     try {
-      print('🌱 Iniciando Seed de base de datos...');
+      debugPrint('🌱 Iniciando Seed de base de datos...');
 
       // 1. Crear Horarios Base
       await _seedSchedules();
@@ -18,10 +19,10 @@ class SeedService {
       // 2. Crear Configuración del Sistema
       await _seedSystemConfig();
 
-      print('✅ Seed completado con éxito');
+      debugPrint('✅ Seed completado con éxito');
       return true;
     } catch (e) {
-      print('❌ Error en Seed: $e');
+      debugPrint('❌ Error en Seed: $e');
       return false;
     }
   }
@@ -52,12 +53,14 @@ class SeedService {
     final batch = _db.batch();
 
     for (var schedule in schedules) {
-      final docRef = _db.collection('schedules').doc(schedule['scheduleId'] as String);
+      final docRef = _db
+          .collection('schedules')
+          .doc(schedule['scheduleId'] as String);
       batch.set(docRef, schedule);
     }
 
     await batch.commit();
-    print('   -> Horarios creados');
+    debugPrint('   -> Horarios creados');
   }
 
   /// Crea la configuración global
@@ -71,14 +74,14 @@ class SeedService {
       },
       'updatedAt': FieldValue.serverTimestamp(),
     });
-    print('   -> Configuración del sistema creada');
+    debugPrint('   -> Configuración del sistema creada');
   }
 
   /// Promueve el usuario actual a Admin
   Future<void> promoteCurrentUserToAdmin() async {
     final user = _auth.currentUser;
     if (user == null) {
-      print('❌ No hay usuario logueado para promover');
+      debugPrint('❌ No hay usuario logueado para promover');
       return;
     }
 
@@ -96,7 +99,7 @@ class SeedService {
       'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
 
-    print('👑 Usuario ${user.email} promovido a ADMIN');
+    debugPrint('👑 Usuario ${user.email} promovido a ADMIN');
   }
 
   // Helpers para generar horarios
@@ -150,15 +153,3 @@ class SeedService {
     };
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-

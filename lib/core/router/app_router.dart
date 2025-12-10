@@ -19,13 +19,13 @@ import '../../features/admin/presentation/screens/employee_detail_screen.dart';
 import '../../features/admin/presentation/screens/schedule_management_screen.dart';
 
 /// Sistema de navegación de la aplicación
-/// 
+///
 /// Usa go_router para manejar las rutas de forma declarativa.
 /// Incluye protección de rutas basada en autenticación.
 class AppRouter {
   // Prevenir instanciación
   AppRouter._();
-  
+
   // Instancia del AuthNotifier para go_router
   static final _authNotifier = AuthNotifier(FirebaseAuth.instance);
 
@@ -51,26 +51,26 @@ class AppRouter {
     initialLocation: splash,
     debugLogDiagnostics: true,
     refreshListenable: _authNotifier,
-    
+
     // Redirect para proteger rutas
     redirect: (context, state) {
       final isAuthenticated = _authNotifier.isAuthenticated;
       final isGoingToLogin = state.matchedLocation == login;
       final isGoingToSplash = state.matchedLocation == splash;
-      
+
       // Si no está autenticado y no va a login o splash, redirigir a login
       if (!isAuthenticated && !isGoingToLogin && !isGoingToSplash) {
         return login;
       }
-      
+
       // Si está autenticado y va a login, redirigir a dashboard
       if (isAuthenticated && isGoingToLogin) {
         return dashboard;
       }
-      
+
       return null; // No redirigir
     },
-    
+
     routes: [
       // ========================================================================
       // SPLASH SCREEN
@@ -191,9 +191,8 @@ class AppRouter {
     // ========================================================================
     // ERROR HANDLING
     // ========================================================================
-    errorBuilder: (context, state) => _ErrorScreen(
-      error: state.error.toString(),
-    ),
+    errorBuilder: (context, state) =>
+        _ErrorScreen(error: state.error.toString()),
   );
 
   // ============================================================================
@@ -231,35 +230,23 @@ class _ErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Error'),
-      ),
+      appBar: AppBar(title: const Text('Error')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red,
-            ),
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             const Text(
               'Ruta no encontrada',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
                 error,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -274,4 +261,3 @@ class _ErrorScreen extends StatelessWidget {
     );
   }
 }
-

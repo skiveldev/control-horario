@@ -7,10 +7,10 @@ import '../../../../shared/widgets/inputs/custom_password_field.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
 
 /// Dialog para cambiar contraseña
-/// 
+///
 /// Permite al usuario actualizar su contraseña de forma segura,
 /// con validaciones de fortaleza y coincidencia.
-/// 
+///
 /// MOCK UI: Solo muestra SnackBar de éxito, sin persistencia real.
 /// TODO [FASE-2]: Conectar con Firebase Auth para cambio real de contraseña
 class ChangePasswordDialog extends StatefulWidget {
@@ -76,8 +76,8 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
   /// Verifica si el formulario es válido para enviar
   bool get _isFormValid {
     // Campos no vacíos
-    if (_currentPassword.isEmpty || 
-        _newPassword.isEmpty || 
+    if (_currentPassword.isEmpty ||
+        _newPassword.isEmpty ||
         _confirmPassword.isEmpty) {
       return false;
     }
@@ -135,9 +135,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
         constraints: const BoxConstraints(maxWidth: 500),
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(
-              isMobile ? AppSpacing.lg : AppSpacing.xxl,
-            ),
+            padding: EdgeInsets.all(isMobile ? AppSpacing.lg : AppSpacing.xxl),
             child: Form(
               key: _formKey,
               child: Column(
@@ -232,12 +230,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
         AppSpacing.horizontalSpaceMd,
 
         // Título
-        Expanded(
-          child: Text(
-            'Cambiar Contraseña',
-            style: AppTextStyles.h4,
-          ),
-        ),
+        Expanded(child: Text('Cambiar Contraseña', style: AppTextStyles.h4)),
 
         // Botón cerrar
         IconButton(
@@ -272,9 +265,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
           Expanded(
             child: Text(
               'Tu contraseña debe tener al menos 8 caracteres y combinar mayúsculas, minúsculas, números y símbolos para mayor seguridad.',
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.info,
-              ),
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.info),
             ),
           ),
         ],
@@ -322,6 +313,3 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
     );
   }
 }
-
-
-

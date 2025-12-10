@@ -8,25 +8,25 @@ import '../../../core/theme/app_spacing.dart';
 enum ClockingStatus {
   /// Fichaje completado correctamente
   complete,
-  
+
   /// Fichaje incompleto (sin salida registrada)
   incomplete,
-  
+
   /// Fichaje cerrado automáticamente por el sistema
   autoClosed,
-  
+
   /// Fichaje editado manualmente
   edited,
-  
+
   /// Fichaje en curso (usuario trabajando actualmente)
   ongoing,
 }
 
 /// Badge de estado de fichaje tipo píldora
-/// 
+///
 /// Muestra visualmente el estado de un registro de fichaje con colores
 /// semánticos, iconos descriptivos y tooltips informativos.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// ClockingStatusBadge(
@@ -51,13 +51,10 @@ class ClockingStatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final data = _getStatusData(status, isDark);
-    
+
     final badge = Container(
       padding: small
-          ? AppSpacing.symmetric(
-              horizontal: AppSpacing.xs,
-              vertical: 2,
-            )
+          ? AppSpacing.symmetric(horizontal: AppSpacing.xs, vertical: 2)
           : AppSpacing.symmetric(
               horizontal: AppSpacing.sm,
               vertical: AppSpacing.xs,
@@ -65,10 +62,7 @@ class ClockingStatusBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: data['backgroundColor'] as Color,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: data['borderColor'] as Color,
-          width: 1,
-        ),
+        border: Border.all(color: data['borderColor'] as Color, width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -82,13 +76,14 @@ class ClockingStatusBadge extends StatelessWidget {
           Flexible(
             child: Text(
               data['text'] as String,
-              style: (small 
-                  ? AppTextStyles.labelSmall.copyWith(fontSize: 10)
-                  : AppTextStyles.labelSmall
-              ).copyWith(
-                color: data['textColor'] as Color,
-                fontWeight: FontWeight.w600,
-              ),
+              style:
+                  (small
+                          ? AppTextStyles.labelSmall.copyWith(fontSize: 10)
+                          : AppTextStyles.labelSmall)
+                      .copyWith(
+                        color: data['textColor'] as Color,
+                        fontWeight: FontWeight.w600,
+                      ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -99,10 +94,7 @@ class ClockingStatusBadge extends StatelessWidget {
     // Aplicar tooltip solo si existe
     final tooltip = data['tooltip'] as String?;
     if (tooltip != null && tooltip.isNotEmpty) {
-      return Tooltip(
-        message: tooltip,
-        child: badge,
-      );
+      return Tooltip(message: tooltip, child: badge);
     }
 
     return badge;
@@ -115,14 +107,17 @@ class ClockingStatusBadge extends StatelessWidget {
       case ClockingStatus.complete:
         // Badge "Completo" - Verde teal con colores específicos
         return {
-          'backgroundColor': isDark 
-              ? AppColorsDark.clockingCompleteBackground  // #134E4A
+          'backgroundColor': isDark
+              ? AppColorsDark
+                    .clockingCompleteBackground // #134E4A
               : AppColors.clockingComplete.withValues(alpha: 0.1),
-          'textColor': isDark 
-              ? AppColorsDark.clockingCompleteText  // #5EEAD4
+          'textColor': isDark
+              ? AppColorsDark
+                    .clockingCompleteText // #5EEAD4
               : AppColors.clockingComplete,
-          'borderColor': isDark 
-              ? AppColorsDark.clockingCompleteBorder  // #0F766E
+          'borderColor': isDark
+              ? AppColorsDark
+                    .clockingCompleteBorder // #0F766E
               : AppColors.clockingComplete.withValues(alpha: 0.2),
           'icon': Icons.check_circle,
           'text': 'Completo',
@@ -131,13 +126,13 @@ class ClockingStatusBadge extends StatelessWidget {
 
       case ClockingStatus.incomplete:
         return {
-          'backgroundColor': isDark 
+          'backgroundColor': isDark
               ? AppColors.clockingIncomplete.withValues(alpha: 0.1)
               : AppColors.clockingIncomplete.withValues(alpha: 0.1),
-          'textColor': isDark 
+          'textColor': isDark
               ? AppColors.clockingIncomplete
               : AppColors.clockingIncomplete,
-          'borderColor': isDark 
+          'borderColor': isDark
               ? AppColors.clockingIncomplete.withValues(alpha: 0.2)
               : AppColors.clockingIncomplete.withValues(alpha: 0.2),
           'icon': Icons.warning_rounded,
@@ -147,13 +142,13 @@ class ClockingStatusBadge extends StatelessWidget {
 
       case ClockingStatus.autoClosed:
         return {
-          'backgroundColor': isDark 
+          'backgroundColor': isDark
               ? AppColors.clockingAutoClosed.withValues(alpha: 0.1)
               : AppColors.clockingAutoClosed.withValues(alpha: 0.1),
-          'textColor': isDark 
+          'textColor': isDark
               ? AppColors.clockingAutoClosed
               : AppColors.clockingAutoClosed,
-          'borderColor': isDark 
+          'borderColor': isDark
               ? AppColors.clockingAutoClosed.withValues(alpha: 0.2)
               : AppColors.clockingAutoClosed.withValues(alpha: 0.2),
           'icon': Icons.settings_rounded,
@@ -163,13 +158,13 @@ class ClockingStatusBadge extends StatelessWidget {
 
       case ClockingStatus.edited:
         return {
-          'backgroundColor': isDark 
+          'backgroundColor': isDark
               ? AppColors.clockingEdited.withValues(alpha: 0.1)
               : AppColors.clockingEdited.withValues(alpha: 0.1),
-          'textColor': isDark 
+          'textColor': isDark
               ? AppColors.clockingEdited
               : AppColors.clockingEdited,
-          'borderColor': isDark 
+          'borderColor': isDark
               ? AppColors.clockingEdited.withValues(alpha: 0.2)
               : AppColors.clockingEdited.withValues(alpha: 0.2),
           'icon': Icons.edit_rounded,
@@ -179,13 +174,13 @@ class ClockingStatusBadge extends StatelessWidget {
 
       case ClockingStatus.ongoing:
         return {
-          'backgroundColor': isDark 
+          'backgroundColor': isDark
               ? AppColors.clockingOnBreak.withValues(alpha: 0.1)
               : AppColors.clockingOnBreak.withValues(alpha: 0.1),
-          'textColor': isDark 
+          'textColor': isDark
               ? AppColors.clockingOnBreak
               : AppColors.clockingOnBreak,
-          'borderColor': isDark 
+          'borderColor': isDark
               ? AppColors.clockingOnBreak.withValues(alpha: 0.2)
               : AppColors.clockingOnBreak.withValues(alpha: 0.2),
           'icon': Icons.access_time_rounded,
@@ -195,4 +190,3 @@ class ClockingStatusBadge extends StatelessWidget {
     }
   }
 }
-

@@ -11,6 +11,9 @@ enum ButtonVariant {
   /// Botón primario - Acción principal (gradiente verde)
   primary,
 
+  /// Botón brand - Login y acciones de marca (gradiente azul-violeta)
+  brand,
+
   /// Botón secundario - Acción secundaria (fondo gris)
   secondary,
 
@@ -46,10 +49,10 @@ enum ButtonSize {
 }
 
 /// Botón personalizado del proyecto Control Horario
-/// 
+///
 /// Widget de botón reutilizable con múltiples variantes y tamaños.
 /// Soporta íconos, estados de carga y deshabilitado.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// CustomButton(
@@ -59,7 +62,7 @@ enum ButtonSize {
 ///     print('Botón presionado');
 ///   },
 /// )
-/// 
+///
 /// // Con ícono
 /// CustomButton(
 ///   text: 'Descargar',
@@ -68,7 +71,7 @@ enum ButtonSize {
 ///   size: ButtonSize.large,
 ///   onPressed: () {},
 /// )
-/// 
+///
 /// // Estado de carga
 /// CustomButton(
 ///   text: 'Procesando...',
@@ -140,6 +143,8 @@ class CustomButton extends StatelessWidget {
     switch (variant) {
       case ButtonVariant.primary:
         return _buildPrimaryButton(isDisabled);
+      case ButtonVariant.brand:
+        return _buildBrandButton(isDisabled);
       case ButtonVariant.secondary:
         return _buildSecondaryButton(isDisabled);
       case ButtonVariant.text:
@@ -169,7 +174,7 @@ class CustomButton extends StatelessWidget {
         textColor: AppColorsDark.textOnPrimary,
       );
     }
-    
+
     // Si hay backgroundColor personalizado, usar botón sólido estándar
     final bgColor = backgroundColor!;
     return ElevatedButton(
@@ -192,9 +197,20 @@ class CustomButton extends StatelessWidget {
       child: _buildContent(),
     );
   }
-  
+
+  Widget _buildBrandButton(bool isDisabled) {
+    // Usar GRADIENTE AZUL-VIOLETA (coherente con header de login)
+    return _buildGradientButton(
+      isDisabled,
+      gradient: AppGradients.buttonBrand,
+      glowShadow: AppShadows.buttonBrandGlow,
+      textColor: Colors.white,
+    );
+  }
+
   /// Botón con gradiente + glow genérico (TODOS los botones principales)
-  Widget _buildGradientButton(bool isDisabled, {
+  Widget _buildGradientButton(
+    bool isDisabled, {
     required LinearGradient gradient,
     required List<BoxShadow> glowShadow,
     Color textColor = Colors.white,
@@ -203,14 +219,18 @@ class CustomButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: isDisabled ? null : onPressed,
-        borderRadius: BorderRadius.circular(borderRadius ?? AppSpacing.radiusMd),
+        borderRadius: BorderRadius.circular(
+          borderRadius ?? AppSpacing.radiusMd,
+        ),
         child: Opacity(
           opacity: isDisabled ? 0.5 : 1.0,
           child: Container(
             padding: _getPadding(),
             decoration: BoxDecoration(
               gradient: gradient, // ← Gradiente personalizado
-              borderRadius: BorderRadius.circular(borderRadius ?? AppSpacing.radiusMd),
+              borderRadius: BorderRadius.circular(
+                borderRadius ?? AppSpacing.radiusMd,
+              ),
               boxShadow: isDisabled ? null : glowShadow, // ← Glow personalizado
             ),
             child: Center(
@@ -235,10 +255,12 @@ class CustomButton extends StatelessWidget {
         onPressed: isDisabled ? null : onPressed,
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.textPrimary,
-          disabledForegroundColor: AppColors.textTertiary.withValues(alpha: 0.5),
+          disabledForegroundColor: AppColors.textTertiary.withValues(
+            alpha: 0.5,
+          ),
           side: BorderSide(
-            color: isDisabled 
-                ? AppColors.border.withValues(alpha: 0.4) 
+            color: isDisabled
+                ? AppColors.border.withValues(alpha: 0.4)
                 : AppColors.border,
             width: 2,
           ),
@@ -253,13 +275,15 @@ class CustomButton extends StatelessWidget {
         child: _buildContent(),
       );
     }
-    
+
     return ElevatedButton(
       onPressed: isDisabled ? null : onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.surfaceVariant,
         foregroundColor: AppColors.textPrimary,
-        disabledBackgroundColor: AppColors.surfaceVariant.withValues(alpha: 0.4),
+        disabledBackgroundColor: AppColors.surfaceVariant.withValues(
+          alpha: 0.4,
+        ),
         disabledForegroundColor: AppColors.textPrimary.withValues(alpha: 0.5),
         elevation: 0,
         padding: _getPadding(),
@@ -299,8 +323,8 @@ class CustomButton extends StatelessWidget {
         foregroundColor: AppColors.primary,
         disabledForegroundColor: AppColors.primary.withValues(alpha: 0.4),
         side: BorderSide(
-          color: isDisabled 
-              ? AppColors.primary.withValues(alpha: 0.3) 
+          color: isDisabled
+              ? AppColors.primary.withValues(alpha: 0.3)
               : AppColors.primary,
           width: 2,
         ),
@@ -357,9 +381,7 @@ class CustomButton extends StatelessWidget {
         width: _getIconSize(),
         child: CircularProgressIndicator(
           strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(
-            _getLoadingColor(),
-          ),
+          valueColor: AlwaysStoppedAnimation<Color>(_getLoadingColor()),
         ),
       );
     }
@@ -368,29 +390,19 @@ class CustomButton extends StatelessWidget {
 
     // Ícono izquierdo
     if (icon != null) {
-      children.add(
-        Icon(icon, size: _getIconSize()),
-      );
+      children.add(Icon(icon, size: _getIconSize()));
       children.add(AppSpacing.horizontalSpaceSm);
     }
 
     // Texto - envuelto en Flexible para evitar overflow
     children.add(
-      Flexible(
-        child: Text(
-          text,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-        ),
-      ),
+      Flexible(child: Text(text, overflow: TextOverflow.ellipsis, maxLines: 1)),
     );
 
     // Ícono derecho
     if (suffixIcon != null) {
       children.add(AppSpacing.horizontalSpaceSm);
-      children.add(
-        Icon(suffixIcon, size: _getIconSize()),
-      );
+      children.add(Icon(suffixIcon, size: _getIconSize()));
     }
 
     return Row(
@@ -470,6 +482,7 @@ class CustomButton extends StatelessWidget {
   Color _getLoadingColor() {
     switch (variant) {
       case ButtonVariant.primary:
+      case ButtonVariant.brand:
       case ButtonVariant.success:
       case ButtonVariant.danger:
       case ButtonVariant.warning:
@@ -482,4 +495,3 @@ class CustomButton extends StatelessWidget {
     }
   }
 }
-

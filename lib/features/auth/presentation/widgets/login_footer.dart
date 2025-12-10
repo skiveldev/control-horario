@@ -4,7 +4,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 
 /// Footer del formulario de login
-/// 
+///
 /// Contiene el link de registro y nota legal.
 class LoginFooter extends StatelessWidget {
   const LoginFooter({super.key});
@@ -32,15 +32,14 @@ class LoginFooter extends StatelessWidget {
                   // Por ahora solo mostramos mensaje
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Contacta al administrador para crear tu cuenta'),
+                      content: Text(
+                        'Contacta al administrador para crear tu cuenta',
+                      ),
                       duration: Duration(seconds: 3),
                     ),
                   );
                 },
-                child: Text(
-                  'Regístrate aquí',
-                  style: AppTextStyles.link,
-                ),
+                child: Text('Regístrate aquí', style: AppTextStyles.link),
               ),
             ],
           ),
@@ -76,4 +75,3 @@ class LoginFooter extends StatelessWidget {
     );
   }
 }
-

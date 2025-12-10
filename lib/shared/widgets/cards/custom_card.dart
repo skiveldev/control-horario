@@ -17,10 +17,10 @@ enum CardElevation {
 }
 
 /// Card personalizado del Control Horario
-/// 
+///
 /// Contenedor reutilizable con diseño consistente.
 /// Soporta diferentes elevaciones, padding y puede ser clickeable.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// CustomCard(
@@ -31,7 +31,7 @@ enum CardElevation {
 ///     ],
 ///   ),
 /// )
-/// 
+///
 /// // Card clickeable
 /// CustomCard(
 ///   onTap: () {
@@ -43,7 +43,7 @@ enum CardElevation {
 ///     trailing: Icon(Icons.arrow_forward),
 ///   ),
 /// )
-/// 
+///
 /// // Card sin padding
 /// CustomCard(
 ///   padding: EdgeInsets.zero,
@@ -110,7 +110,7 @@ class CustomCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = borderRadius ?? AppSpacing.radiusMd;
-    
+
     // Usar Container con BoxShadow personalizado para mejor control
     final card = Container(
       width: width,
@@ -120,20 +120,14 @@ class CustomCard extends StatelessWidget {
         color: backgroundColor ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(radius),
         border: borderColor != null
-            ? Border.all(
-                color: borderColor!,
-                width: borderWidth,
-              )
+            ? Border.all(color: borderColor!, width: borderWidth)
             : null,
         boxShadow: _getBoxShadow(),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(radius),
         clipBehavior: clipBehavior,
-        child: Container(
-          padding: padding ?? AppSpacing.card,
-          child: child,
-        ),
+        child: Container(padding: padding ?? AppSpacing.card, child: child),
       ),
     );
 
@@ -154,13 +148,13 @@ class CustomCard extends StatelessWidget {
   }
 
   /// Obtiene la sombra según el nivel de elevación
-  /// 
+  ///
   /// Fase 1.5.1: Medium usa BoxShadow personalizado (opacity 0.10, blur 12)
   List<BoxShadow> _getBoxShadow() {
     switch (elevation) {
       case CardElevation.none:
         return [];
-      
+
       case CardElevation.low:
         return [
           BoxShadow(
@@ -170,7 +164,7 @@ class CustomCard extends StatelessWidget {
             spreadRadius: 0,
           ),
         ];
-      
+
       case CardElevation.medium:
         // Fase 1.5.1: Elevación media personalizada para mejor contraste
         return [
@@ -181,7 +175,7 @@ class CustomCard extends StatelessWidget {
             spreadRadius: 0,
           ),
         ];
-      
+
       case CardElevation.high:
         return [
           BoxShadow(
@@ -194,4 +188,3 @@ class CustomCard extends StatelessWidget {
     }
   }
 }
-

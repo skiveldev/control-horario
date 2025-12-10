@@ -1,5 +1,5 @@
 /// Constantes generales del Control Horario
-/// 
+///
 /// Centraliza todos los valores constantes usados en la aplicación.
 /// Incluye duraciones, límites, configuraciones, etc.
 class AppConstants {
@@ -17,7 +17,8 @@ class AppConstants {
   static const String appVersion = '1.0.0';
 
   /// Descripción de la aplicación
-  static const String appDescription = 'Sistema de control horario para escuela de música';
+  static const String appDescription =
+      'Sistema de control horario para escuela de música';
 
   // ============================================================================
   // ANIMATION DURATIONS (Duraciones de animaciones)
@@ -316,7 +317,8 @@ class AppConstants {
   // ============================================================================
 
   /// Error genérico
-  static const String errorGeneric = 'Ha ocurrido un error. Por favor, intenta de nuevo.';
+  static const String errorGeneric =
+      'Ha ocurrido un error. Por favor, intenta de nuevo.';
 
   /// Error de red
   static const String errorNetwork = 'Error de conexión. Verifica tu internet.';
@@ -334,7 +336,8 @@ class AppConstants {
   static const String errorEmailInvalid = 'Email inválido.';
 
   /// Contraseña corta
-  static const String errorPasswordShort = 'La contraseña debe tener al menos 6 caracteres.';
+  static const String errorPasswordShort =
+      'La contraseña debe tener al menos 6 caracteres.';
 
   // ============================================================================
   // SUCCESS MESSAGES (Mensajes de éxito)
@@ -374,4 +377,3 @@ class AppConstants {
   /// Texto sin resultados
   static const String textNoResults = 'No se encontraron resultados';
 }
-

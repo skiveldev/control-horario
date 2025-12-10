@@ -7,10 +7,10 @@ import '../../../../shared/widgets/inputs/custom_text_field.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
 
 /// Dialog para editar perfil del usuario
-/// 
+///
 /// Permite actualizar información personal editable como nombre,
 /// teléfono y preferencias de notificaciones.
-/// 
+///
 /// MOCK UI: Solo muestra SnackBar de éxito, sin persistencia real.
 /// TODO [FASE-2]: Conectar con Riverpod provider para actualizar datos
 class ProfileEditDialog extends StatefulWidget {
@@ -20,11 +20,7 @@ class ProfileEditDialog extends StatefulWidget {
   /// Callback al guardar cambios
   final Function(Map<String, dynamic>)? onSave;
 
-  const ProfileEditDialog({
-    super.key,
-    required this.user,
-    this.onSave,
-  });
+  const ProfileEditDialog({super.key, required this.user, this.onSave});
 
   @override
   State<ProfileEditDialog> createState() => _ProfileEditDialogState();
@@ -38,8 +34,12 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.user['name'] as String);
-    _phoneController = TextEditingController(text: '+34 600 123 456'); // Mock phone
+    _nameController = TextEditingController(
+      text: widget.user['name'] as String,
+    );
+    _phoneController = TextEditingController(
+      text: '+34 600 123 456',
+    ); // Mock phone
   }
 
   @override
@@ -84,9 +84,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
         constraints: const BoxConstraints(maxWidth: 600),
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(
-              isMobile ? AppSpacing.lg : AppSpacing.xxl,
-            ),
+            padding: EdgeInsets.all(isMobile ? AppSpacing.lg : AppSpacing.xxl),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -143,12 +141,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
   Widget _buildHeader() {
     return Row(
       children: [
-        Expanded(
-          child: Text(
-            'Editar Perfil',
-            style: AppTextStyles.h4,
-          ),
-        ),
+        Expanded(child: Text('Editar Perfil', style: AppTextStyles.h4)),
         IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.of(context).pop(),
@@ -160,7 +153,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
 
   Widget _buildAvatarSection() {
     final colors = AppColorsHelper.of(context);
-    
+
     return Center(
       child: Stack(
         children: [
@@ -168,10 +161,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(
-                color: colors.primary,
-                width: 3,
-              ),
+              border: Border.all(color: colors.primary, width: 3),
             ),
             child: CircleAvatar(
               radius: 60,
@@ -180,11 +170,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                   ? NetworkImage(widget.user['avatarUrl'] as String)
                   : null,
               child: widget.user['avatarUrl'] == null
-                  ? Icon(
-                      Icons.person,
-                      size: 60,
-                      color: colors.textOnPrimary,
-                    )
+                  ? Icon(Icons.person, size: 60, color: colors.textOnPrimary)
                   : null,
             ),
           ),
@@ -197,10 +183,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
               decoration: BoxDecoration(
                 color: colors.primary,
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: colors.surface,
-                  width: 3,
-                ),
+                border: Border.all(color: colors.surface, width: 3),
                 boxShadow: [
                   BoxShadow(
                     color: colors.shadow.withValues(alpha: 0.2),
@@ -234,15 +217,12 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
 
   Widget _buildNotificationSwitch() {
     final colors = AppColorsHelper.of(context);
-    
+
     return Container(
       decoration: BoxDecoration(
         color: colors.surfaceVariant,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(
-          color: colors.border,
-          width: 1,
-        ),
+        border: Border.all(color: colors.border, width: 1),
       ),
       child: SwitchListTile(
         title: Text(
@@ -251,9 +231,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
         ),
         subtitle: Text(
           'Recibe alertas y resúmenes en tu correo',
-          style: AppTextStyles.bodySmall.copyWith(
-            color: colors.textSecondary,
-          ),
+          style: AppTextStyles.bodySmall.copyWith(color: colors.textSecondary),
         ),
         value: _emailNotifications,
         onChanged: (value) {
@@ -274,15 +252,13 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
 
   Widget _buildReadOnlySection() {
     final colors = AppColorsHelper.of(context);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Información de solo lectura',
-          style: AppTextStyles.labelLarge.copyWith(
-            color: colors.textSecondary,
-          ),
+          style: AppTextStyles.labelLarge.copyWith(color: colors.textSecondary),
         ),
 
         AppSpacing.verticalSpaceMd,
@@ -318,24 +294,17 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
     required IconData icon,
   }) {
     final colors = AppColorsHelper.of(context);
-    
+
     return Container(
       padding: AppSpacing.allMd,
       decoration: BoxDecoration(
         color: colors.surfaceVariant,
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-        border: Border.all(
-          color: colors.borderLight,
-          width: 1,
-        ),
+        border: Border.all(color: colors.borderLight, width: 1),
       ),
       child: Row(
         children: [
-          Icon(
-            icon,
-            size: AppSpacing.iconSm,
-            color: colors.textSecondary,
-          ),
+          Icon(icon, size: AppSpacing.iconSm, color: colors.textSecondary),
           AppSpacing.horizontalSpaceMd,
           Expanded(
             child: Column(
@@ -348,10 +317,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                   ),
                 ),
                 AppSpacing.verticalSpaceXs,
-                Text(
-                  value,
-                  style: AppTextStyles.bodyMedium,
-                ),
+                Text(value, style: AppTextStyles.bodyMedium),
               ],
             ),
           ),
@@ -400,4 +366,3 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
     );
   }
 }
-

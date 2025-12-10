@@ -10,10 +10,10 @@ import '../../providers/dashboard_provider.dart';
 import 'records_table.dart';
 
 /// Card de registros recientes
-/// 
+///
 /// Muestra una tabla con los últimos 5 fichajes del empleado.
 /// Incluye navegación para ver historial completo.
-/// 
+///
 /// Conectado con Riverpod para mostrar datos reales desde Firebase.
 class RecentRecordsCard extends ConsumerWidget {
   const RecentRecordsCard({super.key});
@@ -52,7 +52,10 @@ class RecentRecordsCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, List<Map<String, dynamic>> records) {
+  Widget _buildContent(
+    BuildContext context,
+    List<Map<String, dynamic>> records,
+  ) {
     final colors = AppColorsHelper.of(context);
 
     return CustomCard(
@@ -99,9 +102,7 @@ class RecentRecordsCard extends ConsumerWidget {
                 },
                 icon: const Icon(Icons.arrow_forward, size: 16),
                 label: const Text('Ver todo'),
-                style: TextButton.styleFrom(
-                  foregroundColor: colors.primary,
-                ),
+                style: TextButton.styleFrom(foregroundColor: colors.primary),
               ),
             ],
           ),
@@ -114,9 +115,7 @@ class RecentRecordsCard extends ConsumerWidget {
             onRecordTap: (record) {
               // TODO [FASE-2-SPRINT-2]: Mostrar detalle del registro
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Detalle de ${record['date']}'),
-                ),
+                SnackBar(content: Text('Detalle de ${record['date']}')),
               );
             },
           ),
@@ -141,9 +140,7 @@ class RecentRecordsCard extends ConsumerWidget {
                 Expanded(
                   child: Text(
                     'Mostrando los últimos ${records.length} registros. Ver historial completo para más.',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: colors.info,
-                    ),
+                    style: AppTextStyles.bodySmall.copyWith(color: colors.info),
                   ),
                 ),
               ],
@@ -184,13 +181,11 @@ class RecentRecordsCard extends ConsumerWidget {
                 ],
               ),
               AppSpacing.verticalSpaceLg,
-              const Center(
-                child: CircularProgressIndicator(),
-              ),
+              const Center(child: CircularProgressIndicator()),
             ],
           ),
         );
-      }
+      },
     );
   }
 
@@ -246,7 +241,7 @@ class RecentRecordsCard extends ConsumerWidget {
             ],
           ),
         );
-      }
+      },
     );
   }
 
@@ -284,11 +279,7 @@ class RecentRecordsCard extends ConsumerWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: colors.error,
-                    ),
+                    Icon(Icons.error_outline, size: 48, color: colors.error),
                     AppSpacing.verticalSpaceMd,
                     Text(
                       'Error al cargar registros',
@@ -302,7 +293,7 @@ class RecentRecordsCard extends ConsumerWidget {
             ],
           ),
         );
-      }
+      },
     );
   }
 
@@ -327,12 +318,12 @@ class RecentRecordsCard extends ConsumerWidget {
       return '--:--';
     }
 
-    final duration = record.clockOutTimestamp!
-        .difference(record.clockInTimestamp!);
+    final duration = record.clockOutTimestamp!.difference(
+      record.clockInTimestamp!,
+    );
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
 
     return '${hours}h ${minutes}min';
   }
 }
-

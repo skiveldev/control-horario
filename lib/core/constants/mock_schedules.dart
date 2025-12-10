@@ -1,5 +1,5 @@
 /// Mock data para plantillas de horarios y horarios personalizados de empleados
-/// 
+///
 /// MOCK DATA: Este archivo contiene datos de prueba para Fase 1.
 /// TODO [FASE-2]: Reemplazar con datos reales desde Firestore
 class MockSchedules {
@@ -23,54 +23,54 @@ class MockSchedules {
         'monday': {
           'isWorkDay': true,
           'shifts': [
-            {'startTime': '09:00', 'endTime': '17:00'}
+            {'startTime': '09:00', 'endTime': '17:00'},
           ],
           'breakMinutes': 60,
-          'dailyHours': 8
+          'dailyHours': 8,
         },
         'tuesday': {
           'isWorkDay': true,
           'shifts': [
-            {'startTime': '09:00', 'endTime': '17:00'}
+            {'startTime': '09:00', 'endTime': '17:00'},
           ],
           'breakMinutes': 60,
-          'dailyHours': 8
+          'dailyHours': 8,
         },
         'wednesday': {
           'isWorkDay': true,
           'shifts': [
-            {'startTime': '09:00', 'endTime': '17:00'}
+            {'startTime': '09:00', 'endTime': '17:00'},
           ],
           'breakMinutes': 60,
-          'dailyHours': 8
+          'dailyHours': 8,
         },
         'thursday': {
           'isWorkDay': true,
           'shifts': [
-            {'startTime': '09:00', 'endTime': '17:00'}
+            {'startTime': '09:00', 'endTime': '17:00'},
           ],
           'breakMinutes': 60,
-          'dailyHours': 8
+          'dailyHours': 8,
         },
         'friday': {
           'isWorkDay': true,
           'shifts': [
-            {'startTime': '09:00', 'endTime': '17:00'}
+            {'startTime': '09:00', 'endTime': '17:00'},
           ],
           'breakMinutes': 60,
-          'dailyHours': 8
+          'dailyHours': 8,
         },
         'saturday': {
           'isWorkDay': false,
           'shifts': [],
           'breakMinutes': 0,
-          'dailyHours': 0
+          'dailyHours': 0,
         },
         'sunday': {
           'isWorkDay': false,
           'shifts': [],
           'breakMinutes': 0,
-          'dailyHours': 0
+          'dailyHours': 0,
         },
       },
       'createdAt': '2024-01-15',
@@ -87,54 +87,54 @@ class MockSchedules {
         'monday': {
           'isWorkDay': true,
           'shifts': [
-            {'startTime': '15:00', 'endTime': '20:00'}
+            {'startTime': '15:00', 'endTime': '20:00'},
           ],
           'breakMinutes': 0,
-          'dailyHours': 5
+          'dailyHours': 5,
         },
         'tuesday': {
           'isWorkDay': true,
           'shifts': [
-            {'startTime': '15:00', 'endTime': '20:00'}
+            {'startTime': '15:00', 'endTime': '20:00'},
           ],
           'breakMinutes': 0,
-          'dailyHours': 5
+          'dailyHours': 5,
         },
         'wednesday': {
           'isWorkDay': true,
           'shifts': [
-            {'startTime': '15:00', 'endTime': '20:00'}
+            {'startTime': '15:00', 'endTime': '20:00'},
           ],
           'breakMinutes': 0,
-          'dailyHours': 5
+          'dailyHours': 5,
         },
         'thursday': {
           'isWorkDay': true,
           'shifts': [
-            {'startTime': '15:00', 'endTime': '20:00'}
+            {'startTime': '15:00', 'endTime': '20:00'},
           ],
           'breakMinutes': 0,
-          'dailyHours': 5
+          'dailyHours': 5,
         },
         'friday': {
           'isWorkDay': true,
           'shifts': [
-            {'startTime': '15:00', 'endTime': '20:00'}
+            {'startTime': '15:00', 'endTime': '20:00'},
           ],
           'breakMinutes': 0,
-          'dailyHours': 5
+          'dailyHours': 5,
         },
         'saturday': {
           'isWorkDay': false,
           'shifts': [],
           'breakMinutes': 0,
-          'dailyHours': 0
+          'dailyHours': 0,
         },
         'sunday': {
           'isWorkDay': false,
           'shifts': [],
           'breakMinutes': 0,
-          'dailyHours': 0
+          'dailyHours': 0,
         },
       },
       'createdAt': '2024-02-20',
@@ -151,50 +151,50 @@ class MockSchedules {
         'monday': {
           'isWorkDay': true,
           'shifts': [
-            {'startTime': '15:00', 'endTime': '20:00'}
+            {'startTime': '15:00', 'endTime': '20:00'},
           ],
           'breakMinutes': 0,
-          'dailyHours': 5
+          'dailyHours': 5,
         },
         'tuesday': {
           'isWorkDay': false,
           'shifts': [],
           'breakMinutes': 0,
-          'dailyHours': 0
+          'dailyHours': 0,
         },
         'wednesday': {
           'isWorkDay': true,
           'shifts': [
-            {'startTime': '15:00', 'endTime': '20:00'}
+            {'startTime': '15:00', 'endTime': '20:00'},
           ],
           'breakMinutes': 0,
-          'dailyHours': 5
+          'dailyHours': 5,
         },
         'thursday': {
           'isWorkDay': false,
           'shifts': [],
           'breakMinutes': 0,
-          'dailyHours': 0
+          'dailyHours': 0,
         },
         'friday': {
           'isWorkDay': true,
           'shifts': [
-            {'startTime': '15:00', 'endTime': '20:00'}
+            {'startTime': '15:00', 'endTime': '20:00'},
           ],
           'breakMinutes': 0,
-          'dailyHours': 5
+          'dailyHours': 5,
         },
         'saturday': {
           'isWorkDay': false,
           'shifts': [],
           'breakMinutes': 0,
-          'dailyHours': 0
+          'dailyHours': 0,
         },
         'sunday': {
           'isWorkDay': false,
           'shifts': [],
           'breakMinutes': 0,
-          'dailyHours': 0
+          'dailyHours': 0,
         },
       },
       'createdAt': '2024-03-10',
@@ -219,46 +219,34 @@ class MockSchedules {
           'isWorkDay': true,
           'shifts': [
             {'startTime': '09:00', 'endTime': '13:00'},
-            {'startTime': '16:00', 'endTime': '20:00'}
+            {'startTime': '16:00', 'endTime': '20:00'},
           ],
-          'dailyHours': 8
+          'dailyHours': 8,
         },
         'tuesday': {
           'isWorkDay': true,
           'shifts': [
-            {'startTime': '10:00', 'endTime': '18:00'}
+            {'startTime': '10:00', 'endTime': '18:00'},
           ],
-          'dailyHours': 8
+          'dailyHours': 8,
         },
-        'wednesday': {
-          'isWorkDay': false,
-          'shifts': [],
-          'dailyHours': 0
-        },
+        'wednesday': {'isWorkDay': false, 'shifts': [], 'dailyHours': 0},
         'thursday': {
           'isWorkDay': true,
           'shifts': [
-            {'startTime': '10:00', 'endTime': '18:00'}
+            {'startTime': '10:00', 'endTime': '18:00'},
           ],
-          'dailyHours': 8
+          'dailyHours': 8,
         },
         'friday': {
           'isWorkDay': true,
           'shifts': [
-            {'startTime': '09:00', 'endTime': '13:00'}
+            {'startTime': '09:00', 'endTime': '13:00'},
           ],
-          'dailyHours': 4
+          'dailyHours': 4,
         },
-        'saturday': {
-          'isWorkDay': false,
-          'shifts': [],
-          'dailyHours': 0
-        },
-        'sunday': {
-          'isWorkDay': false,
-          'shifts': [],
-          'dailyHours': 0
-        },
+        'saturday': {'isWorkDay': false, 'shifts': [], 'dailyHours': 0},
+        'sunday': {'isWorkDay': false, 'shifts': [], 'dailyHours': 0},
       },
       'lastModified': '2025-03-01',
       'lastModifiedBy': 'María García (RRHH)',
@@ -274,49 +262,37 @@ class MockSchedules {
           'isWorkDay': true,
           'shifts': [
             {'startTime': '10:00', 'endTime': '14:00'},
-            {'startTime': '15:00', 'endTime': '19:00'}
+            {'startTime': '15:00', 'endTime': '19:00'},
           ],
-          'dailyHours': 8
+          'dailyHours': 8,
         },
         'tuesday': {
           'isWorkDay': true,
           'shifts': [
             {'startTime': '10:00', 'endTime': '14:00'},
-            {'startTime': '15:00', 'endTime': '19:00'}
+            {'startTime': '15:00', 'endTime': '19:00'},
           ],
-          'dailyHours': 8
+          'dailyHours': 8,
         },
         'wednesday': {
           'isWorkDay': true,
           'shifts': [
             {'startTime': '10:00', 'endTime': '14:00'},
-            {'startTime': '15:00', 'endTime': '19:00'}
+            {'startTime': '15:00', 'endTime': '19:00'},
           ],
-          'dailyHours': 8
+          'dailyHours': 8,
         },
         'thursday': {
           'isWorkDay': true,
           'shifts': [
             {'startTime': '10:00', 'endTime': '14:00'},
-            {'startTime': '15:00', 'endTime': '19:00'}
+            {'startTime': '15:00', 'endTime': '19:00'},
           ],
-          'dailyHours': 8
+          'dailyHours': 8,
         },
-        'friday': {
-          'isWorkDay': false,
-          'shifts': [],
-          'dailyHours': 0
-        },
-        'saturday': {
-          'isWorkDay': false,
-          'shifts': [],
-          'dailyHours': 0
-        },
-        'sunday': {
-          'isWorkDay': false,
-          'shifts': [],
-          'dailyHours': 0
-        },
+        'friday': {'isWorkDay': false, 'shifts': [], 'dailyHours': 0},
+        'saturday': {'isWorkDay': false, 'shifts': [], 'dailyHours': 0},
+        'sunday': {'isWorkDay': false, 'shifts': [], 'dailyHours': 0},
       },
       'lastModified': '2025-02-15',
       'lastModifiedBy': 'Admin',
@@ -335,16 +311,8 @@ class MockSchedules {
       'templateId': 'template_001',
       'weeklyHours': 40,
     },
-    'EMP-042': {
-      'type': 'custom',
-      'templateId': null,
-      'weeklyHours': 28,
-    },
-    'EMP-089': {
-      'type': 'custom',
-      'templateId': null,
-      'weeklyHours': 32,
-    },
+    'EMP-042': {'type': 'custom', 'templateId': null, 'weeklyHours': 28},
+    'EMP-089': {'type': 'custom', 'templateId': null, 'weeklyHours': 32},
   };
 
   // ============================================================================
@@ -354,7 +322,7 @@ class MockSchedules {
   /// Obtiene el horario de un empleado por su ID
   static Map<String, dynamic>? getEmployeeSchedule(String employeeId) {
     final assignment = employeeSchedules[employeeId];
-    
+
     if (assignment == null) {
       // Por defecto, usa Jornada Completa
       return {
@@ -411,11 +379,11 @@ class MockSchedules {
   /// Formatea los turnos de un día
   static String formatShifts(List<dynamic> shifts) {
     if (shifts.isEmpty) return 'Libre';
-    
-    return shifts.map((shift) {
-      return '${shift['startTime']}-${shift['endTime']}';
-    }).join(' / ');
+
+    return shifts
+        .map((shift) {
+          return '${shift['startTime']}-${shift['endTime']}';
+        })
+        .join(' / ');
   }
 }
-
-

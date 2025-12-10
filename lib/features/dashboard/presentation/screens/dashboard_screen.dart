@@ -16,12 +16,12 @@ import '../widgets/weekly_summary_card.dart';
 import '../widgets/quick_actions_card.dart';
 
 /// Pantalla principal del Dashboard de Empleado
-/// 
+///
 /// Muestra:
 /// - Header con información del empleado
 /// - Layout responsivo optimizado
 /// - Datos en tiempo real desde Firebase + Riverpod
-/// 
+///
 /// Layout adaptativo mejorado:
 /// - Desktop: Multi-columna (60% + 40%)
 /// - Tablet: 2 columnas balanceadas (60/40)
@@ -33,25 +33,21 @@ class DashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Observar usuario actual
     final userAsync = ref.watch(currentUserProvider);
-    
+
     return userAsync.when(
       data: (user) {
         if (user == null) {
           // No debería pasar si las rutas están protegidas
           return const Scaffold(
-            body: Center(
-              child: Text('Usuario no autenticado'),
-            ),
+            body: Center(child: Text('Usuario no autenticado')),
           );
         }
-        
+
         return _buildDashboard(context, ref, user);
       },
       loading: () => Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: const Center(child: CircularProgressIndicator()),
       ),
       error: (error, stack) => Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -80,10 +76,10 @@ class DashboardScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildDashboard(BuildContext context, WidgetRef ref, user) {
     final isMobile = context.isMobile || context.isTablet;
-    
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       // Drawer solo en mobile/tablet
@@ -112,17 +108,19 @@ class DashboardScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   /// Construye el header con el botón hamburguesa integrado
-  Widget _buildHeaderWithHamburger(BuildContext context, WidgetRef ref, user, bool isMobile) {
+  Widget _buildHeaderWithHamburger(
+    BuildContext context,
+    WidgetRef ref,
+    user,
+    bool isMobile,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         border: Border(
-          bottom: BorderSide(
-            color: Theme.of(context).dividerColor,
-            width: 1,
-          ),
+          bottom: BorderSide(color: Theme.of(context).dividerColor, width: 1),
         ),
       ),
       child: SafeArea(
@@ -147,7 +145,7 @@ class DashboardScreen extends ConsumerWidget {
                 ),
                 AppSpacing.horizontalSpaceMd,
               ],
-              
+
               // Contenido del EmployeeHeader (expandido)
               Expanded(
                 child: EmployeeHeader(
@@ -197,14 +195,14 @@ class DashboardScreen extends ConsumerWidget {
           children: [
             // Row 1: TimeClock 60% + Summary 40%
             _buildDesktopTopRow(context, ref, width, gap),
-            
+
             SizedBox(height: gap),
-            
+
             // Row 2: Recent Records 100%
             _buildDesktopRecordsRow(context, ref, width, gap),
-            
+
             SizedBox(height: gap),
-            
+
             // Row 3: Calendar 30% + Weekly 35% + Actions 35% (Fase 1.5.1)
             _buildDesktopBottomRow(context, width, gap),
           ],
@@ -213,41 +211,51 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDesktopTopRow(BuildContext context, WidgetRef ref, double width, double gap) {
+  Widget _buildDesktopTopRow(
+    BuildContext context,
+    WidgetRef ref,
+    double width,
+    double gap,
+  ) {
     // Para 2 elementos con 1 gap: (width - 1*gap) * proportion
     final availableWidth = width - gap;
     final clockWidth = availableWidth * LayoutProportions.desktopTimeClockWidth;
-    final summaryWidth = availableWidth * (1 - LayoutProportions.desktopTimeClockWidth);
+    final summaryWidth =
+        availableWidth * (1 - LayoutProportions.desktopTimeClockWidth);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Time Clock Card (60%)
-        SizedBox(
-          width: clockWidth,
-          child: const TimeClockCard(),
-        ),
-        
+        SizedBox(width: clockWidth, child: const TimeClockCard()),
+
         SizedBox(width: gap),
-        
+
         // Day Summary Card (40%)
-        SizedBox(
-          width: summaryWidth,
-          child: const DaySummaryCard(),
-        ),
+        SizedBox(width: summaryWidth, child: const DaySummaryCard()),
       ],
     );
   }
 
-  Widget _buildDesktopRecordsRow(BuildContext context, WidgetRef ref, double width, double gap) {
+  Widget _buildDesktopRecordsRow(
+    BuildContext context,
+    WidgetRef ref,
+    double width,
+    double gap,
+  ) {
     // Recent Records al 100%
     return const RecentRecordsCard();
   }
 
-  Widget _buildDesktopBottomRow(BuildContext context, double width, double gap) {
+  Widget _buildDesktopBottomRow(
+    BuildContext context,
+    double width,
+    double gap,
+  ) {
     // Para 3 elementos con 2 gaps: (width - 2*gap) * proportion
     final availableWidth = width - (2 * gap);
-    final calendarWidth = availableWidth * LayoutProportions.desktopCalendarWidth;
+    final calendarWidth =
+        availableWidth * LayoutProportions.desktopCalendarWidth;
     final weeklyWidth = availableWidth * LayoutProportions.desktopWeeklyWidth;
     final actionsWidth = availableWidth * LayoutProportions.desktopActionsWidth;
 
@@ -255,26 +263,17 @@ class DashboardScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Monthly Calendar (30%)
-        SizedBox(
-          width: calendarWidth,
-          child: const MonthlyCalendarCard(),
-        ),
-        
+        SizedBox(width: calendarWidth, child: const MonthlyCalendarCard()),
+
         SizedBox(width: gap),
-        
+
         // Weekly Summary (35%)
-        SizedBox(
-          width: weeklyWidth,
-          child: const WeeklySummaryCard(),
-        ),
-        
+        SizedBox(width: weeklyWidth, child: const WeeklySummaryCard()),
+
         SizedBox(width: gap),
-        
+
         // Quick Actions (35%)
-        SizedBox(
-          width: actionsWidth,
-          child: const QuickActionsCard(),
-        ),
+        SizedBox(width: actionsWidth, child: const QuickActionsCard()),
       ],
     );
   }
@@ -290,19 +289,19 @@ class DashboardScreen extends ConsumerWidget {
       children: [
         const TimeClockCard(),
         SizedBox(height: gap),
-        
+
         const DaySummaryCard(),
         SizedBox(height: gap),
-        
+
         const RecentRecordsCard(),
         SizedBox(height: gap),
-        
+
         const MonthlyCalendarCard(),
         SizedBox(height: gap),
-        
+
         const WeeklySummaryCard(),
         SizedBox(height: gap),
-        
+
         const QuickActionsCard(),
       ],
     );
@@ -317,12 +316,14 @@ class DashboardScreen extends ConsumerWidget {
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         final gap = LayoutProportions.tabletGap;
-        
+
         // Para 2 elementos con 1 gap: (width - 1*gap) * proportion
         final availableWidthRow1 = width - gap;
-        final primaryWidth = availableWidthRow1 * LayoutProportions.tabletPrimaryWidth;
-        final secondaryWidth = availableWidthRow1 * LayoutProportions.tabletSecondaryWidth;
-        
+        final primaryWidth =
+            availableWidthRow1 * LayoutProportions.tabletPrimaryWidth;
+        final secondaryWidth =
+            availableWidthRow1 * LayoutProportions.tabletSecondaryWidth;
+
         // Row 3: 50/50
         final availableWidthRow3 = width - gap;
         final calendarWidthTablet = availableWidthRow3 * 0.5;
@@ -334,25 +335,19 @@ class DashboardScreen extends ConsumerWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: primaryWidth,
-                  child: const TimeClockCard(),
-                ),
+                SizedBox(width: primaryWidth, child: const TimeClockCard()),
                 SizedBox(width: gap),
-                SizedBox(
-                  width: secondaryWidth,
-                  child: const DaySummaryCard(),
-                ),
+                SizedBox(width: secondaryWidth, child: const DaySummaryCard()),
               ],
             ),
-            
+
             SizedBox(height: gap),
-            
+
             // Row 2: Recent Records 100%
             const RecentRecordsCard(),
-            
+
             SizedBox(height: gap),
-            
+
             // Row 3: Calendar 50% + Weekly 50%
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -368,9 +363,9 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ],
             ),
-            
+
             SizedBox(height: gap),
-            
+
             // Row 4: Quick Actions 100%
             const QuickActionsCard(),
           ],
@@ -379,4 +374,3 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 }
-

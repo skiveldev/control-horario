@@ -6,12 +6,12 @@ import 'app_text_styles.dart';
 import 'app_spacing.dart';
 
 /// Tema principal de la aplicación Control Horario
-/// 
+///
 /// Integra todos los elementos del sistema de diseño:
 /// - Colores (AppColors)
-/// - Tipografía (AppTextStyles) 
+/// - Tipografía (AppTextStyles)
 /// - Espaciados (AppSpacing)
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// MaterialApp(
@@ -35,7 +35,7 @@ class AppTheme {
       // ========================================================================
       useMaterial3: true,
       brightness: Brightness.light,
-      
+
       // ========================================================================
       // COLOR SCHEME
       // ========================================================================
@@ -45,34 +45,34 @@ class AppTheme {
         onPrimary: AppColors.textOnPrimary,
         primaryContainer: AppColors.primaryLight,
         onPrimaryContainer: AppColors.primaryDark,
-        
+
         // Colores secundarios
         secondary: AppColors.secondary,
         onSecondary: AppColors.textOnDark,
         secondaryContainer: AppColors.secondaryLight,
         onSecondaryContainer: AppColors.secondaryDark,
-        
+
         // Colores terciarios (accent)
         tertiary: AppColors.accent,
         onTertiary: AppColors.textOnDark,
         tertiaryContainer: AppColors.accentLight,
         onTertiaryContainer: AppColors.accentDark,
-        
+
         // Superficies
         surface: AppColors.surface,
         onSurface: AppColors.textPrimary,
         surfaceContainerHighest: AppColors.surfaceVariant,
-        
+
         // Background - deprecated, usando surface en su lugar
         // background: AppColors.background,  // DEPRECATED en Flutter 3.18+
         // onBackground: AppColors.textPrimary, // DEPRECATED en Flutter 3.18+
-        
+
         // Error
         error: AppColors.error,
         onError: AppColors.textOnDark,
         errorContainer: AppColors.errorLight,
         onErrorContainer: AppColors.errorDark,
-        
+
         // Otros
         outline: AppColors.border,
         outlineVariant: AppColors.borderLight,
@@ -84,7 +84,7 @@ class AppTheme {
       // SCAFFOLD
       // ========================================================================
       scaffoldBackgroundColor: AppColors.background,
-      
+
       // ========================================================================
       // APP BAR
       // ========================================================================
@@ -109,9 +109,7 @@ class AppTheme {
         color: AppColors.surface,
         shadowColor: AppColors.shadow,
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: AppSpacing.borderRadiusMd,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: AppSpacing.borderRadiusMd),
         margin: EdgeInsets.zero,
       ),
 
@@ -160,10 +158,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
-          side: const BorderSide(
-            color: AppColors.primary,
-            width: 2,
-          ),
+          side: const BorderSide(color: AppColors.primary, width: 2),
           padding: AppSpacing.symmetric(
             horizontal: AppSpacing.xxl,
             vertical: AppSpacing.md,
@@ -208,61 +203,43 @@ class AppTheme {
           horizontal: AppSpacing.lg,
           vertical: AppSpacing.md,
         ),
-        
+
         // Border normal
         border: OutlineInputBorder(
           borderRadius: AppSpacing.borderRadiusMd,
-          borderSide: const BorderSide(
-            color: AppColors.border,
-            width: 1,
-          ),
+          borderSide: const BorderSide(color: AppColors.border, width: 1),
         ),
-        
+
         // Border habilitado
         enabledBorder: OutlineInputBorder(
           borderRadius: AppSpacing.borderRadiusMd,
-          borderSide: const BorderSide(
-            color: AppColors.border,
-            width: 1,
-          ),
+          borderSide: const BorderSide(color: AppColors.border, width: 1),
         ),
-        
+
         // Border enfocado
         focusedBorder: OutlineInputBorder(
           borderRadius: AppSpacing.borderRadiusMd,
-          borderSide: const BorderSide(
-            color: AppColors.primary,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: AppColors.primary, width: 2),
         ),
-        
+
         // Border error
         errorBorder: OutlineInputBorder(
           borderRadius: AppSpacing.borderRadiusMd,
-          borderSide: const BorderSide(
-            color: AppColors.error,
-            width: 1,
-          ),
+          borderSide: const BorderSide(color: AppColors.error, width: 1),
         ),
-        
+
         // Border error enfocado
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: AppSpacing.borderRadiusMd,
-          borderSide: const BorderSide(
-            color: AppColors.error,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: AppColors.error, width: 2),
         ),
-        
+
         // Border deshabilitado
         disabledBorder: OutlineInputBorder(
           borderRadius: AppSpacing.borderRadiusMd,
-          borderSide: const BorderSide(
-            color: AppColors.borderLight,
-            width: 1,
-          ),
+          borderSide: const BorderSide(color: AppColors.borderLight, width: 1),
         ),
-        
+
         // Estilos de texto
         labelStyle: AppTextStyles.labelLarge.copyWith(
           color: AppColors.textSecondary,
@@ -273,13 +250,11 @@ class AppTheme {
         hintStyle: AppTextStyles.bodyMedium.copyWith(
           color: AppColors.textTertiary,
         ),
-        errorStyle: AppTextStyles.bodySmall.copyWith(
-          color: AppColors.error,
-        ),
+        errorStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.error),
         helperStyle: AppTextStyles.bodySmall.copyWith(
           color: AppColors.textSecondary,
         ),
-        
+
         // Íconos
         prefixIconColor: AppColors.textSecondary,
         suffixIconColor: AppColors.textSecondary,
@@ -296,9 +271,7 @@ class AppTheme {
           return AppColors.border;
         }),
         checkColor: WidgetStateProperty.all(AppColors.textOnPrimary),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       ),
 
       // ========================================================================
@@ -346,9 +319,7 @@ class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.surface,
         elevation: 24,
-        shape: RoundedRectangleBorder(
-          borderRadius: AppSpacing.borderRadiusLg,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: AppSpacing.borderRadiusLg),
         titleTextStyle: AppTextStyles.h3,
         contentTextStyle: AppTextStyles.bodyMedium,
       ),
@@ -362,9 +333,7 @@ class AppTheme {
           color: AppColors.textOnDark,
         ),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: AppSpacing.borderRadiusMd,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: AppSpacing.borderRadiusMd),
         elevation: 6,
       ),
 
@@ -393,9 +362,7 @@ class AppTheme {
           horizontal: AppSpacing.md,
           vertical: AppSpacing.sm,
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: AppSpacing.borderRadiusSm,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: AppSpacing.borderRadiusSm),
       ),
 
       // ========================================================================
@@ -432,22 +399,22 @@ class AppTheme {
         displayLarge: AppTextStyles.displayLarge,
         displayMedium: AppTextStyles.displayMedium,
         displaySmall: AppTextStyles.displaySmall,
-        
+
         // Headline
         headlineLarge: AppTextStyles.h1,
         headlineMedium: AppTextStyles.h2,
         headlineSmall: AppTextStyles.h3,
-        
+
         // Title
         titleLarge: AppTextStyles.h4,
         titleMedium: AppTextStyles.h5,
         titleSmall: AppTextStyles.h6,
-        
+
         // Body
         bodyLarge: AppTextStyles.bodyLarge,
         bodyMedium: AppTextStyles.bodyMedium,
         bodySmall: AppTextStyles.bodySmall,
-        
+
         // Label
         labelLarge: AppTextStyles.labelLarge,
         labelMedium: AppTextStyles.labelMedium,
@@ -483,7 +450,7 @@ class AppTheme {
       // ========================================================================
       useMaterial3: true,
       brightness: Brightness.dark,
-      
+
       // ========================================================================
       // COLOR SCHEME
       // ========================================================================
@@ -493,30 +460,30 @@ class AppTheme {
         onPrimary: Colors.black87, // Texto oscuro sobre verde
         primaryContainer: AppColorsDark.primary600,
         onPrimaryContainer: Colors.white,
-        
+
         // Colores secundarios - Cyan (badges info)
         secondary: AppColorsDark.secondary500, // Cyan #06B6D4
         onSecondary: Colors.white,
         secondaryContainer: AppColorsDark.secondary600,
         onSecondaryContainer: Colors.white,
-        
+
         // Colores terciarios - Magenta (salida estimada)
         tertiary: AppColorsDark.accent500, // Magenta #D946EF
         onTertiary: Colors.white,
         tertiaryContainer: AppColorsDark.accent600,
         onTertiaryContainer: Colors.white,
-        
+
         // Superficies
         surface: AppColorsDark.surface,
         onSurface: Colors.white, // ← FORZAR BLANCO PURO
         surfaceContainerHighest: AppColorsDark.surfaceVariant,
-        
+
         // Error
         error: AppColorsDark.error,
         onError: AppColorsDark.textOnDark,
         errorContainer: AppColorsDark.errorLight,
         onErrorContainer: AppColorsDark.errorDark,
-        
+
         // Otros
         outline: AppColorsDark.border,
         outlineVariant: AppColorsDark.borderLight,
@@ -528,7 +495,7 @@ class AppTheme {
       // SCAFFOLD
       // ========================================================================
       scaffoldBackgroundColor: AppColorsDark.background,
-      
+
       // ========================================================================
       // APP BAR
       // ========================================================================
@@ -555,9 +522,7 @@ class AppTheme {
         color: AppColorsDark.surface,
         shadowColor: AppColorsDark.shadow,
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: AppSpacing.borderRadiusMd,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: AppSpacing.borderRadiusMd),
         margin: EdgeInsets.zero,
       ),
 
@@ -567,7 +532,9 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColorsDark.primary500, // Verde principal #22C55E
-          foregroundColor: Color(0xFF0F172A), // Texto oscuro sobre verde brillante
+          foregroundColor: Color(
+            0xFF0F172A,
+          ), // Texto oscuro sobre verde brillante
           elevation: 2,
           shadowColor: AppColorsDark.shadow,
           padding: AppSpacing.symmetric(
@@ -606,10 +573,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColorsDark.primary,
-          side: const BorderSide(
-            color: AppColorsDark.primary,
-            width: 2,
-          ),
+          side: const BorderSide(color: AppColorsDark.primary, width: 2),
           padding: AppSpacing.symmetric(
             horizontal: AppSpacing.xxl,
             vertical: AppSpacing.md,
@@ -639,7 +603,9 @@ class AppTheme {
       // ========================================================================
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColorsDark.primary500, // Verde #22C55E
-        foregroundColor: Color(0xFF0F172A), // Texto oscuro sobre verde brillante
+        foregroundColor: Color(
+          0xFF0F172A,
+        ), // Texto oscuro sobre verde brillante
         elevation: 6,
         shape: CircleBorder(),
       ),
@@ -654,52 +620,37 @@ class AppTheme {
           horizontal: AppSpacing.lg,
           vertical: AppSpacing.md,
         ),
-        
+
         // Border normal
         border: OutlineInputBorder(
           borderRadius: AppSpacing.borderRadiusMd,
-          borderSide: const BorderSide(
-            color: AppColorsDark.border,
-            width: 1,
-          ),
+          borderSide: const BorderSide(color: AppColorsDark.border, width: 1),
         ),
-        
+
         // Border habilitado
         enabledBorder: OutlineInputBorder(
           borderRadius: AppSpacing.borderRadiusMd,
-          borderSide: const BorderSide(
-            color: AppColorsDark.border,
-            width: 1,
-          ),
+          borderSide: const BorderSide(color: AppColorsDark.border, width: 1),
         ),
-        
+
         // Border enfocado
         focusedBorder: OutlineInputBorder(
           borderRadius: AppSpacing.borderRadiusMd,
-          borderSide: const BorderSide(
-            color: AppColorsDark.primary,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: AppColorsDark.primary, width: 2),
         ),
-        
+
         // Border error
         errorBorder: OutlineInputBorder(
           borderRadius: AppSpacing.borderRadiusMd,
-          borderSide: const BorderSide(
-            color: AppColorsDark.error,
-            width: 1,
-          ),
+          borderSide: const BorderSide(color: AppColorsDark.error, width: 1),
         ),
-        
+
         // Border error enfocado
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: AppSpacing.borderRadiusMd,
-          borderSide: const BorderSide(
-            color: AppColorsDark.error,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: AppColorsDark.error, width: 2),
         ),
-        
+
         // Border deshabilitado
         disabledBorder: OutlineInputBorder(
           borderRadius: AppSpacing.borderRadiusMd,
@@ -708,7 +659,7 @@ class AppTheme {
             width: 1,
           ),
         ),
-        
+
         // Estilos de texto
         labelStyle: AppTextStyles.labelLarge.copyWith(
           color: AppColorsDark.textSecondary,
@@ -725,7 +676,7 @@ class AppTheme {
         helperStyle: AppTextStyles.bodySmall.copyWith(
           color: AppColorsDark.textSecondary,
         ),
-        
+
         // Íconos
         prefixIconColor: AppColorsDark.textSecondary,
         suffixIconColor: AppColorsDark.textSecondary,
@@ -742,9 +693,7 @@ class AppTheme {
           return AppColorsDark.border;
         }),
         checkColor: WidgetStateProperty.all(AppColorsDark.textOnPrimary),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       ),
 
       // ========================================================================
@@ -792,9 +741,7 @@ class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: AppColorsDark.surface,
         elevation: 24,
-        shape: RoundedRectangleBorder(
-          borderRadius: AppSpacing.borderRadiusLg,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: AppSpacing.borderRadiusLg),
         titleTextStyle: AppTextStyles.h3.copyWith(
           color: AppColorsDark.textPrimary,
         ),
@@ -812,9 +759,7 @@ class AppTheme {
           color: AppColorsDark.textPrimary,
         ),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: AppSpacing.borderRadiusMd,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: AppSpacing.borderRadiusMd),
         elevation: 6,
       ),
 
@@ -845,9 +790,7 @@ class AppTheme {
           horizontal: AppSpacing.md,
           vertical: AppSpacing.sm,
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: AppSpacing.borderRadiusSm,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: AppSpacing.borderRadiusSm),
       ),
 
       // ========================================================================
@@ -890,7 +833,7 @@ class AppTheme {
         displaySmall: AppTextStyles.displaySmall.copyWith(
           color: AppColorsDark.textPrimary,
         ),
-        
+
         // Headline
         headlineLarge: AppTextStyles.h1.copyWith(
           color: AppColorsDark.textPrimary,
@@ -901,18 +844,14 @@ class AppTheme {
         headlineSmall: AppTextStyles.h3.copyWith(
           color: AppColorsDark.textPrimary,
         ),
-        
+
         // Title
-        titleLarge: AppTextStyles.h4.copyWith(
-          color: AppColorsDark.textPrimary,
-        ),
+        titleLarge: AppTextStyles.h4.copyWith(color: AppColorsDark.textPrimary),
         titleMedium: AppTextStyles.h5.copyWith(
           color: AppColorsDark.textPrimary,
         ),
-        titleSmall: AppTextStyles.h6.copyWith(
-          color: AppColorsDark.textPrimary,
-        ),
-        
+        titleSmall: AppTextStyles.h6.copyWith(color: AppColorsDark.textPrimary),
+
         // Body
         bodyLarge: AppTextStyles.bodyLarge.copyWith(
           color: AppColorsDark.textPrimary,
@@ -923,7 +862,7 @@ class AppTheme {
         bodySmall: AppTextStyles.bodySmall.copyWith(
           color: AppColorsDark.textSecondary,
         ),
-        
+
         // Label
         labelLarge: AppTextStyles.labelLarge.copyWith(
           color: AppColorsDark.textPrimary,
@@ -954,4 +893,3 @@ class AppTheme {
     );
   }
 }
-

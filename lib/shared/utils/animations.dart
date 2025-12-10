@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_constants.dart';
 
 /// Utilidades de animación reutilizables
-/// 
+///
 /// Contiene curvas, duraciones y builders de animación comunes.
 class AnimationUtils {
   AnimationUtils._();
@@ -40,12 +40,7 @@ class AnimationUtils {
       position: Tween<Offset>(
         begin: const Offset(0, 1),
         end: Offset.zero,
-      ).animate(
-        CurvedAnimation(
-          parent: animation,
-          curve: defaultCurve,
-        ),
-      ),
+      ).animate(CurvedAnimation(parent: animation, curve: defaultCurve)),
       child: child,
     );
   }
@@ -60,12 +55,7 @@ class AnimationUtils {
       position: Tween<Offset>(
         begin: const Offset(1, 0),
         end: Offset.zero,
-      ).animate(
-        CurvedAnimation(
-          parent: animation,
-          curve: defaultCurve,
-        ),
-      ),
+      ).animate(CurvedAnimation(parent: animation, curve: defaultCurve)),
       child: child,
     );
   }
@@ -80,12 +70,7 @@ class AnimationUtils {
       position: Tween<Offset>(
         begin: const Offset(-1, 0),
         end: Offset.zero,
-      ).animate(
-        CurvedAnimation(
-          parent: animation,
-          curve: defaultCurve,
-        ),
-      ),
+      ).animate(CurvedAnimation(parent: animation, curve: defaultCurve)),
       child: child,
     );
   }
@@ -118,12 +103,7 @@ class AnimationUtils {
         scale: Tween<double>(
           begin: 0.9,
           end: 1.0,
-        ).animate(
-          CurvedAnimation(
-            parent: animation,
-            curve: smoothCurve,
-          ),
-        ),
+        ).animate(CurvedAnimation(parent: animation, curve: smoothCurve)),
         child: child,
       ),
     );
@@ -159,16 +139,8 @@ class AnimationUtils {
       position: Tween<Offset>(
         begin: const Offset(0, 0.1),
         end: Offset.zero,
-      ).animate(
-        CurvedAnimation(
-          parent: animation,
-          curve: defaultCurve,
-        ),
-      ),
-      child: FadeTransition(
-        opacity: animation,
-        child: child,
-      ),
+      ).animate(CurvedAnimation(parent: animation, curve: defaultCurve)),
+      child: FadeTransition(opacity: animation, child: child),
     );
   }
 }
@@ -198,15 +170,9 @@ class _FadeInWidgetState extends State<FadeInWidget>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: widget.duration,
-    );
+    _controller = AnimationController(vsync: this, duration: widget.duration);
 
-    _animation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeIn,
-    );
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
 
     Future.delayed(widget.delay, () {
       if (mounted) {
@@ -223,10 +189,7 @@ class _FadeInWidgetState extends State<FadeInWidget>
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _animation,
-      child: widget.child,
-    );
+    return FadeTransition(opacity: _animation, child: widget.child);
   }
 }
 
@@ -255,20 +218,12 @@ class _SlideUpWidgetState extends State<SlideUpWidget>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: widget.duration,
-    );
+    _controller = AnimationController(vsync: this, duration: widget.duration);
 
     _animation = Tween<Offset>(
       begin: const Offset(0, 0.1),
       end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOut,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     Future.delayed(widget.delay, () {
       if (mounted) {
@@ -285,10 +240,6 @@ class _SlideUpWidgetState extends State<SlideUpWidget>
 
   @override
   Widget build(BuildContext context) {
-    return SlideTransition(
-      position: _animation,
-      child: widget.child,
-    );
+    return SlideTransition(position: _animation, child: widget.child);
   }
 }
-

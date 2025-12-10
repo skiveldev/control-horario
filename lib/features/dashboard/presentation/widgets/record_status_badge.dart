@@ -4,9 +4,9 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 
 /// Badge de estado de registro
-/// 
+///
 /// Muestra el estado de un fichaje (Completo, Incompleto, Sin fichar).
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// RecordStatusBadge(
@@ -112,4 +112,3 @@ class RecordStatusBadge extends StatelessWidget {
     }
   }
 }
-

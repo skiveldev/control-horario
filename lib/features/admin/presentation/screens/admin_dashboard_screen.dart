@@ -10,9 +10,9 @@ import '../../../../shared/widgets/layouts/custom_app_bar.dart';
 import '../../../../shared/widgets/cards/stat_card.dart';
 
 /// Panel de administración
-/// 
+///
 /// Vista principal del admin con estadísticas y accesos rápidos.
-/// 
+///
 /// MOCK DATA: Usa MockData.adminStats
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -40,10 +40,7 @@ class AdminDashboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Título
-            Text(
-              'Resumen General',
-              style: AppTextStyles.h3,
-            ),
+            Text('Resumen General', style: AppTextStyles.h3),
 
             AppSpacing.verticalSpaceLg,
 
@@ -53,10 +50,7 @@ class AdminDashboardScreen extends StatelessWidget {
             AppSpacing.verticalSpaceXxl,
 
             // Accesos rápidos
-            Text(
-              'Accesos Rápidos',
-              style: AppTextStyles.h4,
-            ),
+            Text('Accesos Rápidos', style: AppTextStyles.h4),
 
             AppSpacing.verticalSpaceLg,
 
@@ -216,10 +210,7 @@ class AdminDashboardScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    item['title'] as String,
-                    style: AppTextStyles.h5,
-                  ),
+                  Text(item['title'] as String, style: AppTextStyles.h5),
                   AppSpacing.verticalSpaceXs,
                   Text(
                     item['subtitle'] as String,
@@ -242,4 +233,3 @@ class AdminDashboardScreen extends StatelessWidget {
     );
   }
 }
-

@@ -9,12 +9,12 @@ import 'clock_display.dart';
 import 'clocking_buttons.dart';
 
 /// Card principal de fichaje
-/// 
+///
 /// Contiene:
 /// - Reloj digital con hora actual
 /// - 4 botones de acción (Entrada, Salida, Pausa, Retorno)
 /// - Mensaje de estado actual
-/// 
+///
 /// Maneja el flujo de fichaje diario con estados visuales.
 /// Conectado con Riverpod para fichaje real en Firebase.
 class TimeClockCard extends ConsumerStatefulWidget {
@@ -25,12 +25,11 @@ class TimeClockCard extends ConsumerStatefulWidget {
 }
 
 class _TimeClockCardState extends ConsumerState<TimeClockCard> {
-
   @override
   Widget build(BuildContext context) {
     // Observar el registro de hoy
     final todayRecordAsync = ref.watch(todayRecordProvider);
-    
+
     // Observar el estado de las acciones de fichaje
     final clockingState = ref.watch(clockingNotifierProvider);
 
@@ -83,7 +82,10 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
                   vertical: AppSpacing.md,
                 ),
                 decoration: BoxDecoration(
-                  color: _getStatusColor(context, currentState).withValues(alpha: 0.1),
+                  color: _getStatusColor(
+                    context,
+                    currentState,
+                  ).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
                 child: Row(
@@ -124,9 +126,7 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
       loading: () => CustomCard(
         elevation: CardElevation.medium,
         padding: AppSpacing.cardLarge,
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        child: const Center(child: CircularProgressIndicator()),
       ),
       error: (error, stack) {
         final colors = AppColorsHelper.of(context);
@@ -137,17 +137,11 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 48,
-                  color: colors.error,
-                ),
+                Icon(Icons.error_outline, size: 48, color: colors.error),
                 AppSpacing.verticalSpaceMd,
                 Text(
                   'Error al cargar el registro',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: colors.error,
-                  ),
+                  style: AppTextStyles.bodyMedium.copyWith(color: colors.error),
                 ),
               ],
             ),
@@ -268,14 +262,9 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.check_circle,
-              color: colors.textOnDark,
-            ),
+            Icon(Icons.check_circle, color: colors.textOnDark),
             AppSpacing.horizontalSpaceMd,
-            Expanded(
-              child: Text(message),
-            ),
+            Expanded(child: Text(message)),
           ],
         ),
         backgroundColor: colors.success,
@@ -290,14 +279,9 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.error,
-              color: colors.textOnDark,
-            ),
+            Icon(Icons.error, color: colors.textOnDark),
             AppSpacing.horizontalSpaceMd,
-            Expanded(
-              child: Text(message),
-            ),
+            Expanded(child: Text(message)),
           ],
         ),
         backgroundColor: colors.error,
@@ -312,14 +296,9 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              Icons.info,
-              color: colors.textOnDark,
-            ),
+            Icon(Icons.info, color: colors.textOnDark),
             AppSpacing.horizontalSpaceMd,
-            Expanded(
-              child: Text(message),
-            ),
+            Expanded(child: Text(message)),
           ],
         ),
         backgroundColor: colors.info,
@@ -328,4 +307,3 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
     );
   }
 }
-

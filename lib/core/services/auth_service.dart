@@ -15,7 +15,7 @@ AuthService authService(AuthServiceRef ref) {
 }
 
 /// Servicio de Autenticación
-/// 
+///
 /// Gestiona todas las operaciones relacionadas con la autenticación
 /// de usuarios usando Firebase Auth y Firestore.
 class AuthService {
@@ -25,15 +25,15 @@ class AuthService {
   AuthService({
     required FirebaseAuth auth,
     required FirebaseFirestore firestore,
-  })  : _auth = auth,
-        _firestore = firestore;
+  }) : _auth = auth,
+       _firestore = firestore;
 
   // ==========================================================================
   // STREAMS Y GETTERS
   // ==========================================================================
 
   /// Stream del estado de autenticación de Firebase
-  /// 
+  ///
   /// Emite el User actual cuando hay cambios en la autenticación
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
@@ -45,7 +45,7 @@ class AuthService {
   // ==========================================================================
 
   /// Login con email y contraseña
-  /// 
+  ///
   /// Retorna UserCredential de Firebase Auth.
   /// Lanza excepción si las credenciales son inválidas.
   Future<UserCredential> signInWithEmailAndPassword({
@@ -59,7 +59,7 @@ class AuthService {
   }
 
   /// Cerrar sesión
-  /// 
+  ///
   /// Cierra la sesión del usuario actual.
   Future<void> signOut() async {
     await _auth.signOut();
@@ -70,7 +70,7 @@ class AuthService {
   // ==========================================================================
 
   /// Obtener datos del usuario desde Firestore (snapshot)
-  /// 
+  ///
   /// Retorna UserModel con la información completa del empleado
   /// o null si el documento no existe.
   Future<UserModel?> getUserData(String userId) async {
@@ -80,7 +80,7 @@ class AuthService {
   }
 
   /// Stream de datos del usuario desde Firestore
-  /// 
+  ///
   /// Emite UserModel cada vez que el documento cambia.
   /// Útil para mantener la UI actualizada en tiempo real.
   Stream<UserModel?> userDataStream(String userId) {
@@ -91,15 +91,3 @@ class AuthService {
         .map((doc) => doc.exists ? UserModel.fromFirestore(doc) : null);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-

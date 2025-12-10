@@ -4,7 +4,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 
 /// Item de empleado en lista
-/// 
+///
 /// Muestra información resumida de un empleado.
 /// Versión responsive para mobile y desktop.
 class EmployeeListItem extends StatelessWidget {
@@ -14,11 +14,7 @@ class EmployeeListItem extends StatelessWidget {
   /// Callback al hacer tap
   final VoidCallback? onTap;
 
-  const EmployeeListItem({
-    super.key,
-    required this.employee,
-    this.onTap,
-  });
+  const EmployeeListItem({super.key, required this.employee, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -60,10 +56,7 @@ class EmployeeListItem extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: AppColors.success,
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.surface,
-                          width: 2,
-                        ),
+                        border: Border.all(color: AppColors.surface, width: 2),
                       ),
                     ),
                   ),
@@ -182,4 +175,3 @@ class EmployeeListItem extends StatelessWidget {
     );
   }
 }
-

@@ -3,10 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 /// Sistema de estilos de texto del Control Horario
-/// 
+///
 /// Utiliza la fuente Inter de Google Fonts con una escala tipográfica clara.
 /// Todos los textos de la app deben usar estos estilos para mantener consistencia.
-/// 
+///
 /// Ejemplo:
 /// ```dart
 /// Text(
@@ -191,9 +191,7 @@ class AppTextStyles {
     height: 1.6,
     letterSpacing: 1.5,
     color: AppColors.textSecondary,
-  ).copyWith(
-    textBaseline: TextBaseline.alphabetic,
-  );
+  ).copyWith(textBaseline: TextBaseline.alphabetic);
 
   /// Display Large - Números grandes
   /// Peso: 700 (Bold), Tamaño: 48px
@@ -318,4 +316,3 @@ extension AppTextStylesExtension on TextStyle {
   /// Aplicar color de info
   TextStyle get info => copyWith(color: AppColors.info);
 }
-

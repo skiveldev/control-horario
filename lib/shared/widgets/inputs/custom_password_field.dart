@@ -4,10 +4,10 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
 
 /// Campo de contraseña personalizado
-/// 
+///
 /// TextField especializado para contraseñas con toggle de visibilidad.
 /// Incluye indicador de fortaleza opcional y validaciones comunes.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// CustomPasswordField(
@@ -17,7 +17,7 @@ import '../../../core/theme/app_spacing.dart';
 ///     print('Password: $value');
 ///   },
 /// )
-/// 
+///
 /// // Con indicador de fortaleza
 /// CustomPasswordField(
 ///   label: 'Nueva Contraseña',
@@ -25,7 +25,7 @@ import '../../../core/theme/app_spacing.dart';
 ///   minLength: 8,
 ///   helperText: 'Mínimo 8 caracteres',
 /// )
-/// 
+///
 /// // Con validación
 /// CustomPasswordField(
 ///   label: 'Confirmar Contraseña',
@@ -117,7 +117,7 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
     super.initState();
     _focusNode = widget.focusNode ?? FocusNode();
     _focusNode.addListener(_handleFocusChange);
-    
+
     // Inicializar con el valor del controller si existe
     if (widget.controller != null) {
       _currentValue = widget.controller!.text;
@@ -168,8 +168,8 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
                   color: widget.errorText != null
                       ? AppColors.error
                       : _isFocused
-                          ? AppColors.primary
-                          : AppColors.textSecondary,
+                      ? AppColors.primary
+                      : AppColors.textSecondary,
                 ),
                 children: const [
                   TextSpan(
@@ -193,11 +193,13 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
           textInputAction: TextInputAction.done,
           style: AppTextStyles.bodyMedium,
           decoration: InputDecoration(
-            labelText: widget.label != null && !widget.required ? widget.label : null,
+            labelText: widget.label != null && !widget.required
+                ? widget.label
+                : null,
             hintText: widget.hintText ?? '••••••••',
             helperText: widget.helperText,
             errorText: widget.errorText,
-            
+
             // Ícono de candado
             prefixIcon: Icon(
               Icons.lock_outline,
@@ -205,28 +207,32 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
               color: widget.errorText != null
                   ? AppColors.error
                   : _isFocused
-                      ? AppColors.primary
-                      : AppColors.textSecondary,
+                  ? AppColors.primary
+                  : AppColors.textSecondary,
             ),
-            
+
             // Toggle de visibilidad
             suffixIcon: IconButton(
               icon: Icon(
-                _obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                _obscureText
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
                 size: AppSpacing.iconMd,
               ),
               color: widget.errorText != null
                   ? AppColors.error
                   : _isFocused
-                      ? AppColors.primary
-                      : AppColors.textSecondary,
+                  ? AppColors.primary
+                  : AppColors.textSecondary,
               onPressed: _toggleVisibility,
-              tooltip: _obscureText ? 'Mostrar contraseña' : 'Ocultar contraseña',
+              tooltip: _obscureText
+                  ? 'Mostrar contraseña'
+                  : 'Ocultar contraseña',
             ),
-            
+
             // Ocultar contador
             counterText: '',
-            
+
             enabled: widget.enabled,
           ),
           onChanged: _handleChanged,
@@ -263,12 +269,14 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
             value: strength / 4,
             minHeight: 4,
             backgroundColor: AppColors.borderLight,
-            valueColor: AlwaysStoppedAnimation<Color>(strengthData['color'] as Color),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              strengthData['color'] as Color,
+            ),
           ),
         ),
-        
+
         AppSpacing.verticalSpaceXs,
-        
+
         // Texto de fortaleza
         Text(
           strengthData['text'] as String,
@@ -312,31 +320,15 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
     switch (strength) {
       case 0:
       case 1:
-        return {
-          'text': 'Contraseña débil',
-          'color': AppColors.error,
-        };
+        return {'text': 'Contraseña débil', 'color': AppColors.error};
       case 2:
-        return {
-          'text': 'Contraseña media',
-          'color': AppColors.warning,
-        };
+        return {'text': 'Contraseña media', 'color': AppColors.warning};
       case 3:
-        return {
-          'text': 'Contraseña fuerte',
-          'color': AppColors.info,
-        };
+        return {'text': 'Contraseña fuerte', 'color': AppColors.info};
       case 4:
-        return {
-          'text': 'Contraseña muy fuerte',
-          'color': AppColors.success,
-        };
+        return {'text': 'Contraseña muy fuerte', 'color': AppColors.success};
       default:
-        return {
-          'text': '',
-          'color': AppColors.textSecondary,
-        };
+        return {'text': '', 'color': AppColors.textSecondary};
     }
   }
 }
-

@@ -6,10 +6,10 @@ import '../../../../core/constants/breakpoints.dart';
 import '../../../../shared/widgets/cards/clocking_status_badge.dart';
 
 /// Tabla responsiva de registros de fichaje
-/// 
+///
 /// Muestra una lista de registros con fecha, entrada, salida, total y estado.
 /// Se adapta a mobile con cards en lugar de tabla.
-/// 
+///
 /// Ejemplo de uso:
 /// ```dart
 /// RecordsTable(
@@ -32,11 +32,7 @@ class RecordsTable extends StatelessWidget {
   /// Callback al hacer tap en un registro
   final void Function(Map<String, dynamic>)? onRecordTap;
 
-  const RecordsTable({
-    super.key,
-    required this.records,
-    this.onRecordTap,
-  });
+  const RecordsTable({super.key, required this.records, this.onRecordTap});
 
   @override
   Widget build(BuildContext context) {
@@ -98,10 +94,7 @@ class RecordsTable extends StatelessWidget {
             decoration: BoxDecoration(
               color: colors.surfaceVariant,
               borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-              border: Border.all(
-                color: colors.border,
-                width: 1,
-              ),
+              border: Border.all(color: colors.border, width: 1),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,26 +154,25 @@ class RecordsTable extends StatelessWidget {
             ),
           ),
         );
-      }
+      },
     );
   }
 
-  Widget _buildInfoItem(BuildContext context, String label, String value, IconData icon) {
+  Widget _buildInfoItem(
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+  ) {
     final colors = AppColorsHelper.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          size: 14,
-          color: colors.textSecondary,
-        ),
+        Icon(icon, size: 14, color: colors.textSecondary),
         const SizedBox(width: 4),
         Text(
           '$label: ',
-          style: AppTextStyles.bodySmall.copyWith(
-            color: colors.textSecondary,
-          ),
+          style: AppTextStyles.bodySmall.copyWith(color: colors.textSecondary),
         ),
         Flexible(
           child: Text(
@@ -213,10 +205,7 @@ class RecordsTable extends StatelessWidget {
             4: FlexColumnWidth(2), // Estado
           },
           border: TableBorder(
-            horizontalInside: BorderSide(
-              color: colors.border,
-              width: 1,
-            ),
+            horizontalInside: BorderSide(color: colors.border, width: 1),
           ),
           children: [
             // Header
@@ -226,7 +215,7 @@ class RecordsTable extends StatelessWidget {
             ...records.map((record) => _buildTableRow(context, record)),
           ],
         );
-      }
+      },
     );
   }
 
@@ -271,9 +260,7 @@ class RecordsTable extends StatelessWidget {
   TableRow _buildTableRow(BuildContext context, Map<String, dynamic> record) {
     final colors = AppColorsHelper.of(context);
     return TableRow(
-      decoration: BoxDecoration(
-        color: colors.surface,
-      ),
+      decoration: BoxDecoration(color: colors.surface),
       children: [
         _buildTableCell(context, record['date'] as String),
         _buildTableCell(context, record['entrance'] as String),
@@ -292,7 +279,11 @@ class RecordsTable extends StatelessWidget {
     );
   }
 
-  Widget _buildTableCell(BuildContext context, String text, {bool bold = false}) {
+  Widget _buildTableCell(
+    BuildContext context,
+    String text, {
+    bool bold = false,
+  }) {
     final colors = AppColorsHelper.of(context);
     return Padding(
       padding: AppSpacing.symmetric(
@@ -309,4 +300,3 @@ class RecordsTable extends StatelessWidget {
     );
   }
 }
-

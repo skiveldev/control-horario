@@ -1,5 +1,5 @@
 /// Datos mock para Fase 1
-/// 
+///
 /// Contiene datos de prueba para simular el funcionamiento de la app.
 /// TODO [FASE-2]: Reemplazar con datos reales de Firebase
 class MockData {
@@ -248,4 +248,3 @@ class MockData {
     'incompleteRecords': 5,
   };
 }
-
