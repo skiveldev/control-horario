@@ -33,6 +33,43 @@ service cloud.firestore {
         // No permitir eliminar registros
         allow delete: if false;
       }
+      
+      // Subcolección de registros de tiempo (Mi Control Horario)
+      match /time_records/{recordId} {
+        // Helper: Verificar si el usuario tiene rol admin
+        function isAdmin() {
+          return exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+                 get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+        }
+        
+        // Helper: Verificar si el registro está bloqueado
+        function isBlocked() {
+          return resource.data.validationStatus == 'blocked';
+        }
+        
+        // Los usuarios pueden leer sus propios registros
+        allow read: if request.auth != null && request.auth.uid == userId;
+        
+        // Los usuarios pueden crear nuevos registros
+        allow create: if request.auth != null 
+                      && request.auth.uid == userId
+                      && request.resource.data.userId == userId
+                      && request.resource.data.validationStatus == 'editable';
+        
+        // Los usuarios pueden actualizar sus registros si no están bloqueados
+        allow update: if request.auth != null 
+                      && request.auth.uid == userId
+                      && resource.data.userId == userId
+                      && !isBlocked()
+                      // Solo admin puede cambiar validationStatus a blocked
+                      && (request.resource.data.validationStatus != 'blocked' || isAdmin());
+        
+        // Los usuarios pueden eliminar sus registros si no están bloqueados
+        allow delete: if request.auth != null 
+                      && request.auth.uid == userId
+                      && resource.data.userId == userId
+                      && !isBlocked();
+      }
     }
     
     // Denegar acceso a cualquier otra colección no especificada

@@ -12,8 +12,7 @@ part of 'daily_record_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 DailyRecordModel _$DailyRecordModelFromJson(Map<String, dynamic> json) {
   return _DailyRecordModel.fromJson(json);
@@ -43,20 +42,18 @@ mixin _$DailyRecordModel {
 /// @nodoc
 abstract class $DailyRecordModelCopyWith<$Res> {
   factory $DailyRecordModelCopyWith(
-    DailyRecordModel value,
-    $Res Function(DailyRecordModel) then,
-  ) = _$DailyRecordModelCopyWithImpl<$Res, DailyRecordModel>;
+          DailyRecordModel value, $Res Function(DailyRecordModel) then) =
+      _$DailyRecordModelCopyWithImpl<$Res, DailyRecordModel>;
   @useResult
-  $Res call({
-    String date,
-    String userId,
-    ClockTimes clocks,
-    DateTime? clockInTimestamp,
-    DateTime? clockOutTimestamp,
-    RecordStatus status,
-    DateTime createdAt,
-    DateTime updatedAt,
-  });
+  $Res call(
+      {String date,
+      String userId,
+      ClockTimes clocks,
+      DateTime? clockInTimestamp,
+      DateTime? clockOutTimestamp,
+      RecordStatus status,
+      DateTime createdAt,
+      DateTime updatedAt});
 
   $ClockTimesCopyWith<$Res> get clocks;
 }
@@ -85,42 +82,40 @@ class _$DailyRecordModelCopyWithImpl<$Res, $Val extends DailyRecordModel>
     Object? createdAt = null,
     Object? updatedAt = null,
   }) {
-    return _then(
-      _value.copyWith(
-        date: null == date
-            ? _value.date
-            : date // ignore: cast_nullable_to_non_nullable
-                as String,
-        userId: null == userId
-            ? _value.userId
-            : userId // ignore: cast_nullable_to_non_nullable
-                as String,
-        clocks: null == clocks
-            ? _value.clocks
-            : clocks // ignore: cast_nullable_to_non_nullable
-                as ClockTimes,
-        clockInTimestamp: freezed == clockInTimestamp
-            ? _value.clockInTimestamp
-            : clockInTimestamp // ignore: cast_nullable_to_non_nullable
-                as DateTime?,
-        clockOutTimestamp: freezed == clockOutTimestamp
-            ? _value.clockOutTimestamp
-            : clockOutTimestamp // ignore: cast_nullable_to_non_nullable
-                as DateTime?,
-        status: null == status
-            ? _value.status
-            : status // ignore: cast_nullable_to_non_nullable
-                as RecordStatus,
-        createdAt: null == createdAt
-            ? _value.createdAt
-            : createdAt // ignore: cast_nullable_to_non_nullable
-                as DateTime,
-        updatedAt: null == updatedAt
-            ? _value.updatedAt
-            : updatedAt // ignore: cast_nullable_to_non_nullable
-                as DateTime,
-      ) as $Val,
-    );
+    return _then(_value.copyWith(
+      date: null == date
+          ? _value.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      clocks: null == clocks
+          ? _value.clocks
+          : clocks // ignore: cast_nullable_to_non_nullable
+              as ClockTimes,
+      clockInTimestamp: freezed == clockInTimestamp
+          ? _value.clockInTimestamp
+          : clockInTimestamp // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      clockOutTimestamp: freezed == clockOutTimestamp
+          ? _value.clockOutTimestamp
+          : clockOutTimestamp // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as RecordStatus,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ) as $Val);
   }
 
   /// Create a copy of DailyRecordModel
@@ -137,22 +132,20 @@ class _$DailyRecordModelCopyWithImpl<$Res, $Val extends DailyRecordModel>
 /// @nodoc
 abstract class _$$DailyRecordModelImplCopyWith<$Res>
     implements $DailyRecordModelCopyWith<$Res> {
-  factory _$$DailyRecordModelImplCopyWith(
-    _$DailyRecordModelImpl value,
-    $Res Function(_$DailyRecordModelImpl) then,
-  ) = __$$DailyRecordModelImplCopyWithImpl<$Res>;
+  factory _$$DailyRecordModelImplCopyWith(_$DailyRecordModelImpl value,
+          $Res Function(_$DailyRecordModelImpl) then) =
+      __$$DailyRecordModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String date,
-    String userId,
-    ClockTimes clocks,
-    DateTime? clockInTimestamp,
-    DateTime? clockOutTimestamp,
-    RecordStatus status,
-    DateTime createdAt,
-    DateTime updatedAt,
-  });
+  $Res call(
+      {String date,
+      String userId,
+      ClockTimes clocks,
+      DateTime? clockInTimestamp,
+      DateTime? clockOutTimestamp,
+      RecordStatus status,
+      DateTime createdAt,
+      DateTime updatedAt});
 
   @override
   $ClockTimesCopyWith<$Res> get clocks;
@@ -162,10 +155,9 @@ abstract class _$$DailyRecordModelImplCopyWith<$Res>
 class __$$DailyRecordModelImplCopyWithImpl<$Res>
     extends _$DailyRecordModelCopyWithImpl<$Res, _$DailyRecordModelImpl>
     implements _$$DailyRecordModelImplCopyWith<$Res> {
-  __$$DailyRecordModelImplCopyWithImpl(
-    _$DailyRecordModelImpl _value,
-    $Res Function(_$DailyRecordModelImpl) _then,
-  ) : super(_value, _then);
+  __$$DailyRecordModelImplCopyWithImpl(_$DailyRecordModelImpl _value,
+      $Res Function(_$DailyRecordModelImpl) _then)
+      : super(_value, _then);
 
   /// Create a copy of DailyRecordModel
   /// with the given fields replaced by the non-null parameter values.
@@ -181,58 +173,55 @@ class __$$DailyRecordModelImplCopyWithImpl<$Res>
     Object? createdAt = null,
     Object? updatedAt = null,
   }) {
-    return _then(
-      _$DailyRecordModelImpl(
-        date: null == date
-            ? _value.date
-            : date // ignore: cast_nullable_to_non_nullable
-                as String,
-        userId: null == userId
-            ? _value.userId
-            : userId // ignore: cast_nullable_to_non_nullable
-                as String,
-        clocks: null == clocks
-            ? _value.clocks
-            : clocks // ignore: cast_nullable_to_non_nullable
-                as ClockTimes,
-        clockInTimestamp: freezed == clockInTimestamp
-            ? _value.clockInTimestamp
-            : clockInTimestamp // ignore: cast_nullable_to_non_nullable
-                as DateTime?,
-        clockOutTimestamp: freezed == clockOutTimestamp
-            ? _value.clockOutTimestamp
-            : clockOutTimestamp // ignore: cast_nullable_to_non_nullable
-                as DateTime?,
-        status: null == status
-            ? _value.status
-            : status // ignore: cast_nullable_to_non_nullable
-                as RecordStatus,
-        createdAt: null == createdAt
-            ? _value.createdAt
-            : createdAt // ignore: cast_nullable_to_non_nullable
-                as DateTime,
-        updatedAt: null == updatedAt
-            ? _value.updatedAt
-            : updatedAt // ignore: cast_nullable_to_non_nullable
-                as DateTime,
-      ),
-    );
+    return _then(_$DailyRecordModelImpl(
+      date: null == date
+          ? _value.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      clocks: null == clocks
+          ? _value.clocks
+          : clocks // ignore: cast_nullable_to_non_nullable
+              as ClockTimes,
+      clockInTimestamp: freezed == clockInTimestamp
+          ? _value.clockInTimestamp
+          : clockInTimestamp // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      clockOutTimestamp: freezed == clockOutTimestamp
+          ? _value.clockOutTimestamp
+          : clockOutTimestamp // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as RecordStatus,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DailyRecordModelImpl implements _DailyRecordModel {
-  const _$DailyRecordModelImpl({
-    required this.date,
-    required this.userId,
-    required this.clocks,
-    this.clockInTimestamp,
-    this.clockOutTimestamp,
-    required this.status,
-    required this.createdAt,
-    required this.updatedAt,
-  });
+  const _$DailyRecordModelImpl(
+      {required this.date,
+      required this.userId,
+      required this.clocks,
+      this.clockInTimestamp,
+      this.clockOutTimestamp,
+      required this.status,
+      required this.createdAt,
+      required this.updatedAt});
 
   factory _$DailyRecordModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$DailyRecordModelImplFromJson(json);
@@ -280,17 +269,8 @@ class _$DailyRecordModelImpl implements _DailyRecordModel {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-        runtimeType,
-        date,
-        userId,
-        clocks,
-        clockInTimestamp,
-        clockOutTimestamp,
-        status,
-        createdAt,
-        updatedAt,
-      );
+  int get hashCode => Object.hash(runtimeType, date, userId, clocks,
+      clockInTimestamp, clockOutTimestamp, status, createdAt, updatedAt);
 
   /// Create a copy of DailyRecordModel
   /// with the given fields replaced by the non-null parameter values.
@@ -299,27 +279,26 @@ class _$DailyRecordModelImpl implements _DailyRecordModel {
   @pragma('vm:prefer-inline')
   _$$DailyRecordModelImplCopyWith<_$DailyRecordModelImpl> get copyWith =>
       __$$DailyRecordModelImplCopyWithImpl<_$DailyRecordModelImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DailyRecordModelImplToJson(this);
+    return _$$DailyRecordModelImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _DailyRecordModel implements DailyRecordModel {
-  const factory _DailyRecordModel({
-    required final String date,
-    required final String userId,
-    required final ClockTimes clocks,
-    final DateTime? clockInTimestamp,
-    final DateTime? clockOutTimestamp,
-    required final RecordStatus status,
-    required final DateTime createdAt,
-    required final DateTime updatedAt,
-  }) = _$DailyRecordModelImpl;
+  const factory _DailyRecordModel(
+      {required final String date,
+      required final String userId,
+      required final ClockTimes clocks,
+      final DateTime? clockInTimestamp,
+      final DateTime? clockOutTimestamp,
+      required final RecordStatus status,
+      required final DateTime createdAt,
+      required final DateTime updatedAt}) = _$DailyRecordModelImpl;
 
   factory _DailyRecordModel.fromJson(Map<String, dynamic> json) =
       _$DailyRecordModelImpl.fromJson;
@@ -371,9 +350,8 @@ mixin _$ClockTimes {
 /// @nodoc
 abstract class $ClockTimesCopyWith<$Res> {
   factory $ClockTimesCopyWith(
-    ClockTimes value,
-    $Res Function(ClockTimes) then,
-  ) = _$ClockTimesCopyWithImpl<$Res, ClockTimes>;
+          ClockTimes value, $Res Function(ClockTimes) then) =
+      _$ClockTimesCopyWithImpl<$Res, ClockTimes>;
   @useResult
   $Res call({String? clockIn, String? clockOut});
 }
@@ -392,19 +370,20 @@ class _$ClockTimesCopyWithImpl<$Res, $Val extends ClockTimes>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? clockIn = freezed, Object? clockOut = freezed}) {
-    return _then(
-      _value.copyWith(
-        clockIn: freezed == clockIn
-            ? _value.clockIn
-            : clockIn // ignore: cast_nullable_to_non_nullable
-                as String?,
-        clockOut: freezed == clockOut
-            ? _value.clockOut
-            : clockOut // ignore: cast_nullable_to_non_nullable
-                as String?,
-      ) as $Val,
-    );
+  $Res call({
+    Object? clockIn = freezed,
+    Object? clockOut = freezed,
+  }) {
+    return _then(_value.copyWith(
+      clockIn: freezed == clockIn
+          ? _value.clockIn
+          : clockIn // ignore: cast_nullable_to_non_nullable
+              as String?,
+      clockOut: freezed == clockOut
+          ? _value.clockOut
+          : clockOut // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
   }
 }
 
@@ -412,9 +391,8 @@ class _$ClockTimesCopyWithImpl<$Res, $Val extends ClockTimes>
 abstract class _$$ClockTimesImplCopyWith<$Res>
     implements $ClockTimesCopyWith<$Res> {
   factory _$$ClockTimesImplCopyWith(
-    _$ClockTimesImpl value,
-    $Res Function(_$ClockTimesImpl) then,
-  ) = __$$ClockTimesImplCopyWithImpl<$Res>;
+          _$ClockTimesImpl value, $Res Function(_$ClockTimesImpl) then) =
+      __$$ClockTimesImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String? clockIn, String? clockOut});
@@ -425,27 +403,27 @@ class __$$ClockTimesImplCopyWithImpl<$Res>
     extends _$ClockTimesCopyWithImpl<$Res, _$ClockTimesImpl>
     implements _$$ClockTimesImplCopyWith<$Res> {
   __$$ClockTimesImplCopyWithImpl(
-    _$ClockTimesImpl _value,
-    $Res Function(_$ClockTimesImpl) _then,
-  ) : super(_value, _then);
+      _$ClockTimesImpl _value, $Res Function(_$ClockTimesImpl) _then)
+      : super(_value, _then);
 
   /// Create a copy of ClockTimes
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? clockIn = freezed, Object? clockOut = freezed}) {
-    return _then(
-      _$ClockTimesImpl(
-        clockIn: freezed == clockIn
-            ? _value.clockIn
-            : clockIn // ignore: cast_nullable_to_non_nullable
-                as String?,
-        clockOut: freezed == clockOut
-            ? _value.clockOut
-            : clockOut // ignore: cast_nullable_to_non_nullable
-                as String?,
-      ),
-    );
+  $Res call({
+    Object? clockIn = freezed,
+    Object? clockOut = freezed,
+  }) {
+    return _then(_$ClockTimesImpl(
+      clockIn: freezed == clockIn
+          ? _value.clockIn
+          : clockIn // ignore: cast_nullable_to_non_nullable
+              as String?,
+      clockOut: freezed == clockOut
+          ? _value.clockOut
+          : clockOut // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
   }
 }
 
@@ -491,7 +469,9 @@ class _$ClockTimesImpl implements _ClockTimes {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ClockTimesImplToJson(this);
+    return _$$ClockTimesImplToJson(
+      this,
+    );
   }
 }
 

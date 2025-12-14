@@ -54,7 +54,7 @@ class NavigationItems {
     NavigationItem(
       label: 'Mi Control Horario',
       icon: Icons.access_time_outlined,
-      route: '/my-hours', // TODO [FASE-2]: Definir ruta de control horario
+      route: AppRouter.myTimeControl,
     ),
     NavigationItem(
       label: 'Configuración',

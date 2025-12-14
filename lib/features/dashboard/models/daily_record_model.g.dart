@@ -7,8 +7,7 @@ part of 'daily_record_model.dart';
 // **************************************************************************
 
 _$DailyRecordModelImpl _$$DailyRecordModelImplFromJson(
-  Map<String, dynamic> json,
-) =>
+        Map<String, dynamic> json) =>
     _$DailyRecordModelImpl(
       date: json['date'] as String,
       userId: json['userId'] as String,
@@ -25,8 +24,7 @@ _$DailyRecordModelImpl _$$DailyRecordModelImplFromJson(
     );
 
 Map<String, dynamic> _$$DailyRecordModelImplToJson(
-  _$DailyRecordModelImpl instance,
-) =>
+        _$DailyRecordModelImpl instance) =>
     <String, dynamic>{
       'date': instance.date,
       'userId': instance.userId,
