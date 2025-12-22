@@ -4,8 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/app_colors_dark.dart';
-import '../../../core/theme/app_gradients.dart';
-import '../../../core/theme/app_shadows.dart';
 import '../../../core/theme/app_spacing.dart';
 import 'navigation_items.dart';
 
@@ -14,7 +12,7 @@ part 'desktop_sidebar.g.dart';
 /// Provider para gestionar el estado del sidebar (expandido/colapsado)
 ///
 /// Funcionalidades:
-/// - Toggle entre expandido (240px) y colapsado (64px)
+/// - Toggle entre expandido y colapsado
 /// - Persistencia de estado con SharedPreferences
 /// - Carga automática del estado guardado
 @riverpod
@@ -63,18 +61,17 @@ class SidebarNotifier extends _$SidebarNotifier {
   }
 }
 
-/// Sidebar de navegación para desktop
+/// Sidebar de navegación para desktop usando NavigationRail
 ///
-/// Características:
-/// - Colapsable: expandido (240px) o mini (64px)
-/// - Animación suave de 200ms
-/// - Tooltips en modo colapsado
-/// - Item activo destacado visualmente
-/// - Estado persiste entre sesiones
+/// Implementación profesional usando Material Design 3:
+/// - NavigationRail es el widget oficial de Flutter para sidebars
+/// - Maneja automáticamente animaciones y constraints
+/// - Responsive por diseño, sin anchos hardcodeados
+/// - Accesibilidad incluida
 ///
 /// Estados:
-/// - **Expandido**: 240px ancho, iconos + texto
-/// - **Colapsado**: 64px ancho, solo iconos con tooltip
+/// - **Expandido**: Muestra iconos + labels
+/// - **Colapsado**: Solo iconos con tooltips
 ///
 /// Uso:
 /// ```dart
@@ -92,197 +89,178 @@ class DesktopSidebar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isExpanded = ref.watch(sidebarNotifierProvider);
     final currentRoute = GoRouterState.of(context).matchedLocation;
-
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeInOut,
-      width: isExpanded ? 240 : 64,
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColorsDark.sidebarBackground // Navy oscuro
-            : Theme.of(context).colorScheme.surface,
-        border: Border(
-          right: BorderSide(color: Theme.of(context).dividerColor, width: 1),
-        ),
-      ),
-      child: Column(
-        children: [
-          // Header con botón de colapso
-          _buildHeader(context, ref, isExpanded),
+    // Encontrar el índice seleccionado basado en la ruta actual
+    final selectedIndex = _getSelectedIndex(currentRoute);
 
-          // Items de navegación
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
-              children: NavigationItems.items.map((item) {
-                return _buildNavItem(
-                  context,
-                  item,
-                  isExpanded,
-                  isSelected: currentRoute == item.route,
-                );
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+    // Colores según tema
+    final backgroundColor = isDark
+        ? AppColorsDark.sidebarBackground
+        : Theme.of(context).colorScheme.surface;
 
-  /// Construye el header con logo y botón de colapso
-  Widget _buildHeader(BuildContext context, WidgetRef ref, bool isExpanded) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final selectedIconColor = isDark
+        ? const Color(0xFF22D3EE) // Cyan brillante en dark
+        : Theme.of(context).colorScheme.primary;
+
+    final unselectedIconColor =
+        isDark ? Colors.white70 : Theme.of(context).colorScheme.onSurface;
+
+    final selectedLabelColor = isDark
+        ? const Color(0xFF22D3EE) // Cyan brillante en dark
+        : Theme.of(context).colorScheme.primary;
+
+    final unselectedLabelColor =
+        isDark ? Colors.white70 : Theme.of(context).colorScheme.onSurface;
 
     return Container(
-      height: 64,
-      padding: EdgeInsets.symmetric(horizontal: isExpanded ? AppSpacing.md : 0),
       decoration: BoxDecoration(
+        color: backgroundColor,
         border: Border(
-          bottom: BorderSide(color: Theme.of(context).dividerColor, width: 1),
+          right: BorderSide(
+            color: Theme.of(context).dividerColor,
+            width: 1,
+          ),
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (isExpanded) ...[
-            // Logo/Icono
-            Icon(
-              Icons.access_time,
-              color: Theme.of(context).colorScheme.primary,
-              size: 28,
-            ),
-
-            AppSpacing.horizontalSpaceSm,
-
-            // Título
-            Expanded(
-              child: Text(
-                'Control Horario',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: isDark
-                      ? Colors.white
-                      : Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-
-            // Botón de colapso
-            IconButton(
-              icon: Icon(
-                Icons.menu_open,
-                size: 20,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-              onPressed: () =>
-                  ref.read(sidebarNotifierProvider.notifier).toggle(),
-              tooltip: 'Colapsar menú',
-            ),
-          ] else ...[
-            // Solo botón de hamburguesa cuando está colapsado
-            IconButton(
-              icon: Icon(
-                Icons.menu,
-                size: 24,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-              onPressed: () =>
-                  ref.read(sidebarNotifierProvider.notifier).toggle(),
-              tooltip: 'Expandir menú',
-            ),
-          ],
-        ],
+      child: NavigationRail(
+        extended: isExpanded,
+        backgroundColor: Colors.transparent,
+        minWidth: 72,
+        minExtendedWidth: 220,
+        selectedIndex: selectedIndex >= 0 ? selectedIndex : 0,
+        onDestinationSelected: (index) =>
+            _onDestinationSelected(context, index),
+        labelType: NavigationRailLabelType.none,
+        useIndicator: true,
+        indicatorColor: isDark
+            ? const Color(0xFF22D3EE).withValues(alpha: 0.15)
+            : Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+        selectedIconTheme: IconThemeData(
+          color: selectedIconColor,
+          size: 24,
+        ),
+        unselectedIconTheme: IconThemeData(
+          color: unselectedIconColor,
+          size: 24,
+        ),
+        selectedLabelTextStyle: TextStyle(
+          color: selectedLabelColor,
+          fontWeight: FontWeight.w600,
+          fontSize: 14,
+        ),
+        unselectedLabelTextStyle: TextStyle(
+          color: unselectedLabelColor,
+          fontWeight: FontWeight.normal,
+          fontSize: 14,
+        ),
+        leading: _buildLeading(context, ref, isExpanded, isDark),
+        destinations: _buildDestinations(),
       ),
     );
   }
 
-  /// Construye un item de navegación
-  Widget _buildNavItem(
+  /// Construye el widget leading (header con logo)
+  ///
+  /// Cuando expandido: Logo + texto "Control Horario"
+  /// Cuando colapsado: Solo logo centrado
+  Widget _buildLeading(
     BuildContext context,
-    NavigationItem item,
-    bool isExpanded, {
-    required bool isSelected,
-  }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    WidgetRef ref,
+    bool isExpanded,
+    bool isDark,
+  ) {
+    // El leading necesita un ancho definido porque NavigationRail
+    // no provee constraints de ancho al leading widget
+    final leadingWidth = isExpanded ? 196.0 : 48.0;
 
-    final widget = Container(
-      height: 56,
-      margin: EdgeInsets.symmetric(
-        horizontal: AppSpacing.xs,
-        vertical: AppSpacing.xs / 2,
-      ),
-      decoration: BoxDecoration(
-        // Gradiente cyan SOLO en dark mode, color sólido en light mode
-        gradient: isSelected && isDark ? AppGradients.cardCyanSubtle : null,
-        color: isSelected && !isDark
-            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
-            : null,
-        borderRadius: BorderRadius.circular(8),
-        // Glow cyan sutil SOLO en dark mode
-        boxShadow: isSelected && isDark ? AppShadows.cardCyanGlow : null,
-      ),
-      child: InkWell(
-        onTap: () => context.go(item.route),
-        borderRadius: BorderRadius.circular(8),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: isExpanded ? AppSpacing.md : AppSpacing.sm,
-          ),
-          child: Row(
-            children: [
-              // Icono
-              Icon(
-                item.icon,
-                size: 24,
-                color: isSelected
-                    ? (isDark
-                        ? const Color(
-                            0xFF22D3EE,
-                          ) // Cyan brillante en dark mode
-                        : Theme.of(context)
-                            .colorScheme
-                            .primary) // Primary color en light mode
-                    : (isDark
-                        ? Colors.white // Blanco puro en dark mode
-                        : Colors.black87), // Negro en light mode
+    return SizedBox(
+      width: leadingWidth,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: AppSpacing.md,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header: Logo + texto (expandido) o solo logo (colapsado)
+            if (isExpanded)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.access_time,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 28,
+                  ),
+                  AppSpacing.horizontalSpaceSm,
+                  Flexible(
+                    child: Text(
+                      'Control Horario',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: isDark
+                            ? Colors.white
+                            : Theme.of(context).colorScheme.primary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              )
+            else
+              // Solo logo centrado cuando colapsado
+              Center(
+                child: Icon(
+                  Icons.access_time,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 28,
+                ),
               ),
 
-              // Texto (solo si está expandido)
-              if (isExpanded) ...[
-                AppSpacing.horizontalSpaceMd,
-                Expanded(
-                  child: Text(
-                    item.label,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: isSelected
-                          ? (isDark
-                              ? const Color(
-                                  0xFF22D3EE,
-                                ) // Cyan brillante en dark mode
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .primary) // Primary color en light mode
-                          : (isDark
-                              ? Colors.white // Blanco puro en dark mode
-                              : Colors.black87), // Negro en light mode
-                      fontWeight:
-                          isSelected ? FontWeight.w600 : FontWeight.normal,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ],
-          ),
+            AppSpacing.verticalSpaceMd,
+            Divider(
+              color: Theme.of(context).dividerColor,
+              height: 1,
+            ),
+          ],
         ),
       ),
     );
+  }
 
-    // Tooltip cuando está colapsado
-    return isExpanded ? widget : Tooltip(message: item.label, child: widget);
+  /// Construye las destinations del NavigationRail
+  List<NavigationRailDestination> _buildDestinations() {
+    return NavigationItems.items.map((item) {
+      return NavigationRailDestination(
+        icon: Icon(item.icon),
+        selectedIcon: Icon(item.icon),
+        label: Text(item.label),
+      );
+    }).toList();
+  }
+
+  /// Obtiene el índice seleccionado basado en la ruta actual
+  int _getSelectedIndex(String currentRoute) {
+    for (int i = 0; i < NavigationItems.items.length; i++) {
+      if (NavigationItems.items[i].route == currentRoute) {
+        return i;
+      }
+    }
+    // Si no encuentra la ruta exacta, buscar coincidencia parcial
+    for (int i = 0; i < NavigationItems.items.length; i++) {
+      if (currentRoute.startsWith(NavigationItems.items[i].route)) {
+        return i;
+      }
+    }
+    return 0; // Default al primer item
+  }
+
+  /// Navega a la ruta del destination seleccionado
+  void _onDestinationSelected(BuildContext context, int index) {
+    if (index >= 0 && index < NavigationItems.items.length) {
+      context.go(NavigationItems.items[index].route);
+    }
   }
 }

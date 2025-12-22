@@ -16,6 +16,9 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       weeklyHours: (json['weeklyHours'] as num).toDouble(),
       isActive: json['isActive'] as bool? ?? true,
       createdAt: DateTime.parse(json['createdAt'] as String),
+      position: json['position'] as String?,
+      department: json['department'] as String?,
+      schedule: json['schedule'] as String?,
     );
 
 Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
@@ -28,6 +31,9 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'weeklyHours': instance.weeklyHours,
       'isActive': instance.isActive,
       'createdAt': instance.createdAt.toIso8601String(),
+      'position': instance.position,
+      'department': instance.department,
+      'schedule': instance.schedule,
     };
 
 const _$UserRoleEnumMap = {

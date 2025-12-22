@@ -19,6 +19,11 @@ class UserModel with _$UserModel {
     required double weeklyHours,
     @Default(true) bool isActive,
     required DateTime createdAt,
+
+    // Información adicional del empleado
+    String? position, // Cargo (ej: "Desarrolladora Frontend Senior")
+    String? department, // Departamento (ej: "Tecnología")
+    String? schedule, // Horario laboral (ej: "09:00 - 18:00")
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
@@ -46,6 +51,9 @@ class UserModel with _$UserModel {
       weeklyHours: (data['weeklyHours'] ?? 40).toDouble(),
       isActive: data['isActive'] ?? true,
       createdAt: createdAtDate,
+      position: data['position'] as String?,
+      department: data['department'] as String?,
+      schedule: data['schedule'] as String?,
     );
   }
 }

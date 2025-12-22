@@ -142,3 +142,4 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 **Mantenido por:** Control Horario Team  
 **Última actualización:** 14 de Diciembre de 2025
+

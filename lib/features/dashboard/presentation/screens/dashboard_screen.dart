@@ -7,6 +7,7 @@ import '../../../../core/constants/breakpoints.dart';
 import '../../../../shared/widgets/navigation/mobile_drawer.dart';
 import '../../../../shared/widgets/navigation/responsive_navigation.dart';
 import '../../../auth/providers/auth_provider.dart';
+import '../../providers/work_schedule_status_provider.dart';
 import '../widgets/employee_header.dart';
 import '../widgets/time_clock_card.dart';
 import '../widgets/day_summary_card.dart';
@@ -88,7 +89,11 @@ class DashboardScreen extends ConsumerWidget {
         child: Column(
           children: [
             // Header con información del empleado + botón hamburguesa
-            _buildHeaderWithHamburger(context, ref, user, isMobile),
+            // IMPORTANTE: Usar Builder para el contexto correcto del Scaffold
+            Builder(
+              builder: (scaffoldContext) => _buildHeaderWithHamburger(
+                  scaffoldContext, ref, user, isMobile),
+            ),
 
             // Contenido principal con scroll
             Expanded(
@@ -110,29 +115,47 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   /// Construye el header con el botón hamburguesa integrado
+  ///
+  /// IMPORTANTE: El parámetro scaffoldContext es el contexto del Builder
+  /// que envuelve este widget, necesario para acceder al Scaffold.of()
+  /// y poder abrir el drawer en mobile.
   Widget _buildHeaderWithHamburger(
-    BuildContext context,
+    BuildContext scaffoldContext,
     WidgetRef ref,
     user,
     bool isMobile,
   ) {
+    // Observar estado de horario laboral
+    final scheduleStatus = ref.watch(workScheduleStatusNotifierProvider);
+
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: Theme.of(scaffoldContext).colorScheme.surface,
         border: Border(
-          bottom: BorderSide(color: Theme.of(context).dividerColor, width: 1),
+          bottom: BorderSide(
+            color: Theme.of(scaffoldContext).dividerColor,
+            width: 1,
+          ),
         ),
+        boxShadow: [
+          BoxShadow(
+            color:
+                Theme.of(scaffoldContext).shadowColor.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: SafeArea(
         bottom: false,
         child: Padding(
           padding: EdgeInsets.symmetric(
-            horizontal: context.responsiveValue(
+            horizontal: scaffoldContext.responsiveValue(
               mobile: AppSpacing.md,
               tablet: AppSpacing.lg,
               desktop: AppSpacing.xxl,
             ),
-            vertical: AppSpacing.md,
+            vertical: AppSpacing.lg,
           ),
           child: Row(
             children: [
@@ -140,7 +163,20 @@ class DashboardScreen extends ConsumerWidget {
               if (isMobile) ...[
                 IconButton(
                   icon: const Icon(Icons.menu),
-                  onPressed: () => Scaffold.of(context).openDrawer(),
+                  onPressed: () {
+                    // Debug: Verificar que se está llamando
+                    debugPrint('🔴 DRAWER: Intentando abrir drawer...');
+                    debugPrint('🔴 DRAWER: isMobile = $isMobile');
+                    debugPrint('🔴 DRAWER: scaffoldContext = $scaffoldContext');
+
+                    try {
+                      Scaffold.of(scaffoldContext).openDrawer();
+                      debugPrint(
+                          '✅ DRAWER: openDrawer() ejecutado exitosamente');
+                    } catch (e) {
+                      debugPrint('❌ DRAWER ERROR: $e');
+                    }
+                  },
                   tooltip: 'Abrir menú',
                 ),
                 AppSpacing.horizontalSpaceMd,
@@ -151,15 +187,21 @@ class DashboardScreen extends ConsumerWidget {
                 child: EmployeeHeader(
                   employeeName: user.displayName,
                   employeeId: user.employeeId,
-                  onAvatarTap: () => context.push(AppRouter.profile),
+                  position: user.position,
+                  department: user.department,
+                  isActive:
+                      true, // TODO [FASE-2]: Implementar estado online real
+                  isInWorkSchedule: scheduleStatus.isInWorkSchedule,
+                  currentDate: scheduleStatus.formattedDate,
+                  onAvatarTap: () => scaffoldContext.push(AppRouter.profile),
                   onNotificationsTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                       const SnackBar(
                         content: Text('Notificaciones en desarrollo'),
                       ),
                     );
                   },
-                  onSettingsTap: () => context.push(AppRouter.settings),
+                  onSettingsTap: () => scaffoldContext.push(AppRouter.settings),
                 ),
               ),
             ],

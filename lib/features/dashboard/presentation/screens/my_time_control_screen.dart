@@ -52,7 +52,12 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
         child: Column(
           children: [
             // Header con hamburger en mobile
-            if (isMobile) _buildMobileHeader(context),
+            // IMPORTANTE: Usar Builder para obtener el contexto correcto del Scaffold
+            if (isMobile)
+              Builder(
+                builder: (scaffoldContext) =>
+                    _buildMobileHeader(scaffoldContext),
+              ),
 
             // Contenido principal
             Expanded(
@@ -66,7 +71,11 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
     );
   }
 
-  Widget _buildMobileHeader(BuildContext context) {
+  /// Construye el header mobile con botón hamburguesa
+  ///
+  /// IMPORTANTE: El parámetro scaffoldContext viene del Builder
+  /// y tiene acceso al Scaffold para poder abrir el drawer
+  Widget _buildMobileHeader(BuildContext scaffoldContext) {
     return Container(
       padding: AppSpacing.allLg,
       decoration: const BoxDecoration(
@@ -83,8 +92,10 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
           IconButton(
             icon: const Icon(Icons.menu),
             onPressed: () {
-              Scaffold.of(context).openDrawer();
+              debugPrint('🔴 DRAWER (Mi Control): Abriendo drawer...');
+              Scaffold.of(scaffoldContext).openDrawer();
             },
+            tooltip: 'Abrir menú',
           ),
           AppSpacing.horizontalSpaceMd,
           const Text(

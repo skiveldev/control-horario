@@ -114,3 +114,7 @@ firebase deploy --only firestore:indexes
 - Una vez creados, se aplican a todas las subcolecciones `time_records` de todos los usuarios
 
 
+
+
+
+

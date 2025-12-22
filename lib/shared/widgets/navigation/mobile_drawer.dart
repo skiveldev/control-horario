@@ -107,50 +107,17 @@ class MobileDrawer extends ConsumerWidget {
             ),
           ),
 
-          AppSpacing.verticalSpaceSm,
+          AppSpacing.verticalSpaceMd,
 
-          // Nombre
+          // Nombre - Información principal
           Text(
             'María García López', // TODO [FASE-2]: Conectar con user provider
             style: AppTextStyles.h5.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.w600,
             ),
-            maxLines: 1,
+            maxLines: 2, // Permitir 2 líneas para nombres largos
             overflow: TextOverflow.ellipsis,
-          ),
-
-          AppSpacing.verticalSpaceXs,
-
-          // Cargo
-          Text(
-            'Desarrolladora Frontend', // TODO [FASE-2]: Conectar con user provider
-            style: AppTextStyles.bodySmall.copyWith(
-              color: Colors.white.withValues(alpha: 0.8),
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-
-          AppSpacing.verticalSpaceXs,
-
-          // ID Empleado
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.xs,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-            ),
-            child: Text(
-              'EMP-2024-001', // TODO [FASE-2]: Conectar con user provider
-              style: AppTextStyles.bodySmall.copyWith(
-                color: Colors.white,
-                fontSize: 10,
-              ),
-            ),
           ),
         ],
       ),

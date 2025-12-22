@@ -691,7 +691,7 @@ class _CanEditRecordProviderElement
 }
 
 String _$timeRecordsNotifierHash() =>
-    r'5534f1367f3ea921803b1ea8e38aafd2bee2547a';
+    r'2cd07ff597b1a92ecae61433af3332de22dbb43f';
 
 /// Notifier para operaciones CRUD sobre registros
 ///

@@ -27,7 +27,13 @@ mixin _$UserModel {
   UserRole get role => throw _privateConstructorUsedError;
   double get weeklyHours => throw _privateConstructorUsedError;
   bool get isActive => throw _privateConstructorUsedError;
-  DateTime get createdAt => throw _privateConstructorUsedError;
+  DateTime get createdAt =>
+      throw _privateConstructorUsedError; // Información adicional del empleado
+  String? get position =>
+      throw _privateConstructorUsedError; // Cargo (ej: "Desarrolladora Frontend Senior")
+  String? get department =>
+      throw _privateConstructorUsedError; // Departamento (ej: "Tecnología")
+  String? get schedule => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -52,7 +58,10 @@ abstract class $UserModelCopyWith<$Res> {
       UserRole role,
       double weeklyHours,
       bool isActive,
-      DateTime createdAt});
+      DateTime createdAt,
+      String? position,
+      String? department,
+      String? schedule});
 }
 
 /// @nodoc
@@ -78,6 +87,9 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? weeklyHours = null,
     Object? isActive = null,
     Object? createdAt = null,
+    Object? position = freezed,
+    Object? department = freezed,
+    Object? schedule = freezed,
   }) {
     return _then(_value.copyWith(
       userId: null == userId
@@ -112,6 +124,18 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      position: freezed == position
+          ? _value.position
+          : position // ignore: cast_nullable_to_non_nullable
+              as String?,
+      department: freezed == department
+          ? _value.department
+          : department // ignore: cast_nullable_to_non_nullable
+              as String?,
+      schedule: freezed == schedule
+          ? _value.schedule
+          : schedule // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -132,7 +156,10 @@ abstract class _$$UserModelImplCopyWith<$Res>
       UserRole role,
       double weeklyHours,
       bool isActive,
-      DateTime createdAt});
+      DateTime createdAt,
+      String? position,
+      String? department,
+      String? schedule});
 }
 
 /// @nodoc
@@ -156,6 +183,9 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? weeklyHours = null,
     Object? isActive = null,
     Object? createdAt = null,
+    Object? position = freezed,
+    Object? department = freezed,
+    Object? schedule = freezed,
   }) {
     return _then(_$UserModelImpl(
       userId: null == userId
@@ -190,6 +220,18 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      position: freezed == position
+          ? _value.position
+          : position // ignore: cast_nullable_to_non_nullable
+              as String?,
+      department: freezed == department
+          ? _value.department
+          : department // ignore: cast_nullable_to_non_nullable
+              as String?,
+      schedule: freezed == schedule
+          ? _value.schedule
+          : schedule // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -205,7 +247,10 @@ class _$UserModelImpl implements _UserModel {
       required this.role,
       required this.weeklyHours,
       this.isActive = true,
-      required this.createdAt});
+      required this.createdAt,
+      this.position,
+      this.department,
+      this.schedule});
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserModelImplFromJson(json);
@@ -227,10 +272,19 @@ class _$UserModelImpl implements _UserModel {
   final bool isActive;
   @override
   final DateTime createdAt;
+// Información adicional del empleado
+  @override
+  final String? position;
+// Cargo (ej: "Desarrolladora Frontend Senior")
+  @override
+  final String? department;
+// Departamento (ej: "Tecnología")
+  @override
+  final String? schedule;
 
   @override
   String toString() {
-    return 'UserModel(userId: $userId, employeeId: $employeeId, email: $email, displayName: $displayName, role: $role, weeklyHours: $weeklyHours, isActive: $isActive, createdAt: $createdAt)';
+    return 'UserModel(userId: $userId, employeeId: $employeeId, email: $email, displayName: $displayName, role: $role, weeklyHours: $weeklyHours, isActive: $isActive, createdAt: $createdAt, position: $position, department: $department, schedule: $schedule)';
   }
 
   @override
@@ -250,13 +304,30 @@ class _$UserModelImpl implements _UserModel {
             (identical(other.isActive, isActive) ||
                 other.isActive == isActive) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.position, position) ||
+                other.position == position) &&
+            (identical(other.department, department) ||
+                other.department == department) &&
+            (identical(other.schedule, schedule) ||
+                other.schedule == schedule));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, userId, employeeId, email,
-      displayName, role, weeklyHours, isActive, createdAt);
+  int get hashCode => Object.hash(
+      runtimeType,
+      userId,
+      employeeId,
+      email,
+      displayName,
+      role,
+      weeklyHours,
+      isActive,
+      createdAt,
+      position,
+      department,
+      schedule);
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -283,7 +354,10 @@ abstract class _UserModel implements UserModel {
       required final UserRole role,
       required final double weeklyHours,
       final bool isActive,
-      required final DateTime createdAt}) = _$UserModelImpl;
+      required final DateTime createdAt,
+      final String? position,
+      final String? department,
+      final String? schedule}) = _$UserModelImpl;
 
   factory _UserModel.fromJson(Map<String, dynamic> json) =
       _$UserModelImpl.fromJson;
@@ -303,7 +377,13 @@ abstract class _UserModel implements UserModel {
   @override
   bool get isActive;
   @override
-  DateTime get createdAt;
+  DateTime get createdAt; // Información adicional del empleado
+  @override
+  String? get position; // Cargo (ej: "Desarrolladora Frontend Senior")
+  @override
+  String? get department; // Departamento (ej: "Tecnología")
+  @override
+  String? get schedule;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
