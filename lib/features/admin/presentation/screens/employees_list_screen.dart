@@ -6,7 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
 import '../../../../core/constants/mock_data.dart';
 import '../../../../core/router/app_router.dart';
-import '../../../../shared/widgets/layouts/custom_app_bar.dart';
+import '../../../../shared/widgets/layouts/admin_layout.dart';
 import '../../../../shared/widgets/inputs/custom_text_field.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
 import '../widgets/employee_list_item.dart';
@@ -57,92 +57,77 @@ class _EmployeesListScreenState extends State<EmployeesListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: const CustomAppBar(
-        title: 'Gestión de Empleados',
-        automaticallyImplyLeading: true,
-      ),
-      body: Column(
-        children: [
-          // Barra de búsqueda y filtros
-          Container(
-            padding: EdgeInsets.all(
-              context.responsiveValue(
-                mobile: AppSpacing.lg,
-                tablet: AppSpacing.xxl,
-                desktop: AppSpacing.xxl,
-              ),
-            ),
-            decoration: const BoxDecoration(
-              color: AppColors.surface,
-              border: Border(bottom: BorderSide(color: AppColors.border)),
-            ),
-            child: Column(
+    return AdminLayout(
+      currentRoute: AppRouter.adminEmployees,
+      child: SingleChildScrollView(
+        padding: AppSpacing.allXxl,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Título
+            Text('Gestión de Empleados', style: AppTextStyles.h3),
+
+            AppSpacing.verticalSpaceLg,
+
+            // Búsqueda y botón nuevo
+            Row(
               children: [
-                // Búsqueda
-                Row(
-                  children: [
-                    Expanded(
-                      child: CustomTextField(
-                        controller: _searchController,
-                        hintText: 'Buscar por nombre...',
-                        prefixIcon: Icons.search,
-                        onChanged: (_) => _filterEmployees(),
-                      ),
-                    ),
-                    AppSpacing.horizontalSpaceMd,
-                    CustomButton(
-                      text: 'Nuevo',
-                      icon: Icons.add,
-                      variant: ButtonVariant.primary,
-                      onPressed: () {
-                        // TODO [FASE-2]: Crear nuevo empleado
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Crear empleado en desarrollo'),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-
-                AppSpacing.verticalSpaceMd,
-
-                // Filtros
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildFilterChip('Todos', 'todos'),
-                      AppSpacing.horizontalSpaceSm,
-                      _buildFilterChip('Tecnología', 'Tecnología'),
-                      AppSpacing.horizontalSpaceSm,
-                      _buildFilterChip('Docente', 'Docente'),
-                      AppSpacing.horizontalSpaceSm,
-                      _buildFilterChip('Administración', 'Administración'),
-                      AppSpacing.horizontalSpaceSm,
-                      _buildFilterChip('RRHH', 'Recursos Humanos'),
-                    ],
+                Expanded(
+                  child: CustomTextField(
+                    controller: _searchController,
+                    hintText: 'Buscar por nombre...',
+                    prefixIcon: Icons.search,
+                    onChanged: (_) => _filterEmployees(),
                   ),
+                ),
+                AppSpacing.horizontalSpaceMd,
+                CustomButton(
+                  text: 'Nuevo',
+                  icon: Icons.add,
+                  variant: ButtonVariant.primary,
+                  onPressed: () {
+                    // TODO [FASE-2]: Crear nuevo empleado
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Crear empleado en desarrollo'),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
-          ),
 
-          // Lista de empleados
-          Expanded(
-            child: _filteredEmployees.isEmpty
-                ? _buildEmptyState()
+            AppSpacing.verticalSpaceMd,
+
+            // Filtros
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildFilterChip('Todos', 'todos'),
+                  AppSpacing.horizontalSpaceSm,
+                  _buildFilterChip('Tecnología', 'Tecnología'),
+                  AppSpacing.horizontalSpaceSm,
+                  _buildFilterChip('Docente', 'Docente'),
+                  AppSpacing.horizontalSpaceSm,
+                  _buildFilterChip('Administración', 'Administración'),
+                  AppSpacing.horizontalSpaceSm,
+                  _buildFilterChip('RRHH', 'Recursos Humanos'),
+                ],
+              ),
+            ),
+
+            AppSpacing.verticalSpaceLg,
+
+            // Lista de empleados
+            _filteredEmployees.isEmpty
+                ? SizedBox(
+                    height: 400,
+                    child: _buildEmptyState(),
+                  )
                 : ListView.separated(
-                    padding: EdgeInsets.all(
-                      context.responsiveValue(
-                        mobile: AppSpacing.lg,
-                        tablet: AppSpacing.xxl,
-                        desktop: AppSpacing.xxl,
-                      ),
-                    ),
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: _filteredEmployees.length,
                     separatorBuilder: (context, index) =>
                         AppSpacing.verticalSpaceMd,
@@ -162,24 +147,18 @@ class _EmployeesListScreenState extends State<EmployeesListScreen> {
                       );
                     },
                   ),
-          ),
 
-          // Footer con contador
-          Container(
-            padding: AppSpacing.allLg,
-            decoration: const BoxDecoration(
-              color: AppColors.surface,
-              border: Border(top: BorderSide(color: AppColors.border)),
-            ),
-            child: Text(
+            // Footer con contador
+            AppSpacing.verticalSpaceMd,
+            Text(
               'Mostrando ${_filteredEmployees.length} de ${MockData.employees.length} empleados',
               style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

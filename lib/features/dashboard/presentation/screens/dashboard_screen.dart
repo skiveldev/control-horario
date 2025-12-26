@@ -115,12 +115,8 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   /// Construye el header con el botón hamburguesa integrado
-  ///
-  /// IMPORTANTE: El parámetro scaffoldContext es el contexto del Builder
-  /// que envuelve este widget, necesario para acceder al Scaffold.of()
-  /// y poder abrir el drawer en mobile.
   Widget _buildHeaderWithHamburger(
-    BuildContext scaffoldContext,
+    BuildContext context,
     WidgetRef ref,
     user,
     bool isMobile,
@@ -130,17 +126,13 @@ class DashboardScreen extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(scaffoldContext).colorScheme.surface,
+        color: Theme.of(context).colorScheme.surface,
         border: Border(
-          bottom: BorderSide(
-            color: Theme.of(scaffoldContext).dividerColor,
-            width: 1,
-          ),
+          bottom: BorderSide(color: Theme.of(context).dividerColor, width: 1),
         ),
         boxShadow: [
           BoxShadow(
-            color:
-                Theme.of(scaffoldContext).shadowColor.withValues(alpha: 0.05),
+            color: Theme.of(context).shadowColor.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -150,7 +142,7 @@ class DashboardScreen extends ConsumerWidget {
         bottom: false,
         child: Padding(
           padding: EdgeInsets.symmetric(
-            horizontal: scaffoldContext.responsiveValue(
+            horizontal: context.responsiveValue(
               mobile: AppSpacing.md,
               tablet: AppSpacing.lg,
               desktop: AppSpacing.xxl,
@@ -163,20 +155,7 @@ class DashboardScreen extends ConsumerWidget {
               if (isMobile) ...[
                 IconButton(
                   icon: const Icon(Icons.menu),
-                  onPressed: () {
-                    // Debug: Verificar que se está llamando
-                    debugPrint('🔴 DRAWER: Intentando abrir drawer...');
-                    debugPrint('🔴 DRAWER: isMobile = $isMobile');
-                    debugPrint('🔴 DRAWER: scaffoldContext = $scaffoldContext');
-
-                    try {
-                      Scaffold.of(scaffoldContext).openDrawer();
-                      debugPrint(
-                          '✅ DRAWER: openDrawer() ejecutado exitosamente');
-                    } catch (e) {
-                      debugPrint('❌ DRAWER ERROR: $e');
-                    }
-                  },
+                  onPressed: () => Scaffold.of(context).openDrawer(),
                   tooltip: 'Abrir menú',
                 ),
                 AppSpacing.horizontalSpaceMd,
@@ -193,15 +172,15 @@ class DashboardScreen extends ConsumerWidget {
                       true, // TODO [FASE-2]: Implementar estado online real
                   isInWorkSchedule: scheduleStatus.isInWorkSchedule,
                   currentDate: scheduleStatus.formattedDate,
-                  onAvatarTap: () => scaffoldContext.push(AppRouter.profile),
+                  onAvatarTap: () => context.push(AppRouter.profile),
                   onNotificationsTap: () {
-                    ScaffoldMessenger.of(scaffoldContext).showSnackBar(
+                    ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Notificaciones en desarrollo'),
                       ),
                     );
                   },
-                  onSettingsTap: () => scaffoldContext.push(AppRouter.settings),
+                  onSettingsTap: () => context.push(AppRouter.settings),
                 ),
               ),
             ],

@@ -247,4 +247,57 @@ class MockData {
     'pendingRequests': 12,
     'incompleteRecords': 5,
   };
+
+  // ============================================================================
+  // ACTIVIDAD SEMANAL (Para gráfico)
+  // ============================================================================
+
+  static const Map<String, int> weeklyActivity = {
+    'Lun': 420,
+    'Mar': 450,
+    'Mie': 480,
+    'Jue': 470,
+    'Vie': 490,
+    'Sab': 410,
+    'Dom': 380,
+  };
+
+  // ============================================================================
+  // SOLICITUDES RECIENTES (Para lista)
+  // ============================================================================
+
+  static const List<Map<String, String>> recentRequests = [
+    {
+      'name': 'Usuario 1',
+      'type': 'Solicitud de vacaciones',
+      'status': 'Pendiente',
+    },
+    {
+      'name': 'Usuario 2',
+      'type': 'Solicitud de vacaciones',
+      'status': 'Pendiente',
+    },
+    {
+      'name': 'Usuario 3',
+      'type': 'Solicitud de vacaciones',
+      'status': 'Pendiente',
+    },
+  ];
+
+  // ============================================================================
+  // ALERTAS DE CONTROL (Para panel)
+  // ============================================================================
+
+  static const List<Map<String, String>> controlAlerts = [
+    {
+      'type': 'warning',
+      'title': 'Fichajes Incompletos',
+      'message': '3 empleados no han registrado su salida ayer.',
+    },
+    {
+      'type': 'success',
+      'title': 'Sistema operativo',
+      'message': 'El terminal de acceso Norte está funcionando correctamente.',
+    },
+  ];
 }

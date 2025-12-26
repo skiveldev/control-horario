@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -26,31 +27,35 @@ class LoginScreen extends ConsumerWidget {
     ref.listen(currentUserProvider, (previous, next) {
       next.whenData((user) {
         if (user != null) {
-          // Redirigir según el rol del usuario
-          switch (user.role) {
-            case UserRole.admin:
-            case UserRole.rrhh:
-              context.go(AppRouter.admin);
-              break;
-            case UserRole.employee:
-              context.go(AppRouter.dashboard);
-              break;
-          }
+          // Esperar un frame para asegurar que el contexto es válido
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted) {
+              // Redirigir según el rol del usuario
+              final targetRoute =
+                  (user.role == UserRole.admin || user.role == UserRole.rrhh)
+                      ? AppRouter.admin
+                      : AppRouter.dashboard;
+
+              context.go(targetRoute);
+            }
+          });
         }
       });
     });
 
-    // Observar el estado del AuthNotifier para mostrar errores
+    // Observar el estado del AuthNotifier para mostrar errores de login
     ref.listen(authNotifierProvider, (previous, next) {
       next.whenOrNull(
         error: (error, stackTrace) {
           // Mostrar error en snackbar
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error: ${error.toString()}'),
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-          );
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error de autenticación: ${error.toString()}'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
         },
       );
     });

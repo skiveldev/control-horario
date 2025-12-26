@@ -282,3 +282,5 @@ Campos a añadir en Firestore (colección `users`):
 **Estado**: ✅ Completado  
 **Version**: 1.0.0  
 **Desarrollador**: AI Assistant siguiendo reglas de .cursorrules
+
+

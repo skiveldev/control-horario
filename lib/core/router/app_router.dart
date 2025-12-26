@@ -65,10 +65,9 @@ class AppRouter {
         return login;
       }
 
-      // Si está autenticado y va a login, redirigir a dashboard
-      if (isAuthenticated && isGoingToLogin) {
-        return dashboard;
-      }
+      // NOTA: Ya NO redirigimos automáticamente desde login cuando está autenticado
+      // Dejamos que LoginScreen maneje la redirección basada en el rol del usuario
+      // Esto permite que admin vaya a /admin y employee a /dashboard
 
       return null; // No redirigir
     },

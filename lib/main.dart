@@ -46,9 +46,6 @@ void main() async {
 
     // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
     // FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
-
-    debugPrint('🔧 Modo DEBUG: Emuladores deshabilitados');
-    debugPrint('   Para habilitar, descomentar líneas en main.dart');
   }
 
   // ============================================================================
