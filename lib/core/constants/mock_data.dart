@@ -161,7 +161,7 @@ class MockData {
   // EMPLEADOS (Para panel admin)
   // ============================================================================
 
-  static const List<Map<String, dynamic>> employees = [
+  static List<Map<String, dynamic>> employees = [
     {
       'id': 'EMP-001',
       'name': 'María García López',
@@ -300,4 +300,36 @@ class MockData {
       'message': 'El terminal de acceso Norte está funcionando correctamente.',
     },
   ];
+
+  // ============================================================================
+  // MÉTODOS HELPER (FASE 1)
+  // ============================================================================
+
+  /// Añade un nuevo empleado a la lista mock
+  ///
+  /// MOCK: En Fase 1, solo agrega a la lista en memoria.
+  /// TODO [FASE-2]: Guardar en Firestore
+  static void addEmployee(Map<String, dynamic> employeeData) {
+    employees.add(employeeData);
+  }
+
+  /// Genera el siguiente employeeId secuencial
+  ///
+  /// Formato: EMP-XXX (ej: EMP-009, EMP-010)
+  ///
+  /// MOCK: En Fase 1, calcula basándose en la última ID.
+  /// TODO [FASE-2]: Generar en Cloud Function con transacciones
+  static String generateEmployeeId() {
+    if (employees.isEmpty) {
+      return 'EMP-001';
+    }
+
+    // Obtener el último ID y extraer el número
+    final lastId = employees.last['id'] as String;
+    final lastNumber = int.parse(lastId.split('-')[1]);
+    final nextNumber = lastNumber + 1;
+
+    // Formatear con padding de 3 dígitos
+    return 'EMP-${nextNumber.toString().padLeft(3, '0')}';
+  }
 }

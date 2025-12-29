@@ -284,3 +284,7 @@ Campos a añadir en Firestore (colección `users`):
 **Desarrollador**: AI Assistant siguiendo reglas de .cursorrules
 
 
+
+
+
+
