@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/constants/breakpoints.dart';
+import '../../../core/router/app_router.dart';
 import '../../../features/admin/presentation/widgets/admin_sidebar.dart';
 
 /// Layout base para pantallas de administrador
@@ -228,43 +230,62 @@ class _AdminHeaderState extends State<_AdminHeader> {
 
           AppSpacing.horizontalSpaceSm,
 
-          // Avatar y nombre
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: AppColors.primary,
-                child: Text(
-                  'AD',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textOnPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
+          // Avatar y nombre (clickeable)
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: InkWell(
+              onTap: () {
+                context.push(AppRouter.adminProfile);
+              },
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+              child: Padding(
+                padding: AppSpacing.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.xs,
                 ),
-              ),
-              AppSpacing.horizontalSpaceSm,
-              if (!context.isMobile)
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'Administrador',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                    CircleAvatar(
+                      radius: 16,
+                      backgroundColor: AppColors.primary,
+                      child: Text(
+                        'AD',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.textOnPrimary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
                     ),
-                    Text(
-                      'Gestión de RRHH',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.textSecondary,
-                            fontSize: 11,
+                    AppSpacing.horizontalSpaceSm,
+                    if (!context.isMobile)
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Administrador',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
                           ),
-                    ),
+                          Text(
+                            'Gestión de RRHH',
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 11,
+                                    ),
+                          ),
+                        ],
+                      ),
                   ],
                 ),
-            ],
+              ),
+            ),
           ),
         ],
       ),

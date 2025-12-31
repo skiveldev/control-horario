@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
-import '../../../../core/constants/mock_data.dart';
 import '../../../../core/constants/mock_schedules.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
 import '../../../../shared/widgets/inputs/custom_text_field.dart';
+import '../../../auth/models/user_model.dart';
+import '../../providers/user_management_provider.dart';
 
 /// Drawer lateral para crear nuevo empleado
 ///
@@ -16,9 +18,12 @@ import '../../../../shared/widgets/inputs/custom_text_field.dart';
 /// - Backdrop oscuro con tap para cerrar
 /// - Formulario con 3 secciones: Personal, Laboral, Control Horario
 ///
-/// FASE 1: Solo UI/UX con datos mock
-/// TODO [FASE-2]: Conectar con EmployeeNotifier (Riverpod)
-class NewEmployeeDrawer extends StatefulWidget {
+/// FASE 2 - SPRINT 1.3: Conectado con Firebase
+/// - Crea usuarios reales en Firebase Auth + Firestore
+/// - Genera employeeId automático si no se especifica
+/// - Genera displayName automático
+/// - Solo 3 campos obligatorios: Nombre, Apellido1, Email
+class NewEmployeeDrawer extends ConsumerStatefulWidget {
   /// Controla si el drawer está abierto
   final bool isOpen;
 
@@ -36,10 +41,10 @@ class NewEmployeeDrawer extends StatefulWidget {
   });
 
   @override
-  State<NewEmployeeDrawer> createState() => _NewEmployeeDrawerState();
+  ConsumerState<NewEmployeeDrawer> createState() => _NewEmployeeDrawerState();
 }
 
-class _NewEmployeeDrawerState extends State<NewEmployeeDrawer> {
+class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
   // ============================================================================
   // CONTROLLERS - Sección 1: Información Personal
   // ============================================================================
@@ -108,28 +113,28 @@ class _NewEmployeeDrawerState extends State<NewEmployeeDrawer> {
       _showValidation = true;
       _errors.clear();
 
-      // Validar campos obligatorios
+      // ✅ SOLO 3 CAMPOS OBLIGATORIOS (Sprint 1.3)
+      // 1. Nombre
       if (_nombreController.text.trim().isEmpty) {
         _errors['nombre'] = 'Campo obligatorio';
       }
+
+      // 2. Primer Apellido
       if (_apellido1Controller.text.trim().isEmpty) {
         _errors['apellido1'] = 'Campo obligatorio';
       }
-      if (_dniController.text.trim().isEmpty) {
-        _errors['dni'] = 'Campo obligatorio';
-      } else if (_dniController.text.trim().length < 8) {
-        _errors['dni'] = 'DNI/NIE muy corto';
-      }
+
+      // 3. Email
       if (_emailController.text.trim().isEmpty) {
         _errors['email'] = 'Campo obligatorio';
       } else if (!_emailController.text.contains('@')) {
         _errors['email'] = 'Email inválido';
       }
-      if (_selectedDepartamento == null) {
-        _errors['departamento'] = 'Selecciona un departamento';
-      }
-      if (_cargoController.text.trim().isEmpty) {
-        _errors['cargo'] = 'Campo obligatorio';
+
+      // ⚠️ Validaciones opcionales (solo si hay valor)
+      if (_dniController.text.trim().isNotEmpty &&
+          _dniController.text.trim().length < 8) {
+        _errors['dni'] = 'DNI/NIE muy corto';
       }
     });
 
@@ -137,10 +142,10 @@ class _NewEmployeeDrawerState extends State<NewEmployeeDrawer> {
   }
 
   // ============================================================================
-  // MÉTODOS DE GUARDADO
+  // MÉTODOS DE GUARDADO - FASE 2 (Sprint 1.3)
   // ============================================================================
 
-  void _save() {
+  Future<void> _save() async {
     if (!_validateForm()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -151,21 +156,20 @@ class _NewEmployeeDrawerState extends State<NewEmployeeDrawer> {
       return;
     }
 
-    final newEmployee = _buildEmployeeData();
-    MockData.addEmployee(newEmployee);
+    // Llamar al provider de Riverpod para crear usuario
+    final result = await _createEmployeeInFirebase();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Empleado ${newEmployee['displayName']} creado'),
-        backgroundColor: AppColors.success,
-      ),
-    );
-
-    widget.onEmployeeCreated?.call();
-    widget.onClose();
+    if (result != null) {
+      if (mounted) {
+        // Mostrar credenciales temporales
+        _showSuccessDialog(result);
+        widget.onEmployeeCreated?.call();
+        widget.onClose();
+      }
+    }
   }
 
-  void _saveAndAddAnother() {
+  Future<void> _saveAndAddAnother() async {
     if (!_validateForm()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -176,21 +180,219 @@ class _NewEmployeeDrawerState extends State<NewEmployeeDrawer> {
       return;
     }
 
-    final newEmployee = _buildEmployeeData();
-    MockData.addEmployee(newEmployee);
+    // Llamar al provider de Riverpod para crear usuario
+    final result = await _createEmployeeInFirebase();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Empleado ${newEmployee['displayName']} creado'),
-        backgroundColor: AppColors.success,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    if (result != null) {
+      if (mounted) {
+        // Mostrar credenciales temporales (más breve)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Usuario creado: ${_emailController.text}\nContraseña: ${result['temporaryPassword']}'),
+            backgroundColor: AppColors.success,
+            duration: const Duration(seconds: 5),
+            action: SnackBarAction(
+              label: 'COPIAR',
+              textColor: AppColors.surface,
+              onPressed: () {
+                // TODO: Copiar al portapapeles
+              },
+            ),
+          ),
+        );
 
-    widget.onEmployeeCreated?.call();
-    _clearForm();
+        widget.onEmployeeCreated?.call();
+        _clearForm();
+      }
+    }
   }
 
+  /// Crea el empleado en Firebase usando el provider
+  Future<Map<String, String>?> _createEmployeeInFirebase() async {
+    // Convertir role de String a UserRole
+    UserRole role = UserRole.employee;
+    switch (_selectedRole) {
+      case 'admin':
+        role = UserRole.admin;
+        break;
+      case 'rrhh':
+        role = UserRole.rrhh;
+        break;
+      default:
+        role = UserRole.employee;
+    }
+
+    // Parsear weeklyHours (default 40.0 si está vacío)
+    final weeklyHours = _weeklyHoursController.text.trim().isEmpty
+        ? 40.0
+        : double.tryParse(_weeklyHoursController.text.trim()) ?? 40.0;
+
+    try {
+      final result =
+          await ref.read(userManagementProvider.notifier).createEmployee(
+                email: _emailController.text.trim(),
+                nombre: _nombreController.text.trim(),
+                apellido1: _apellido1Controller.text.trim(),
+                apellido2: _apellido2Controller.text.trim().isEmpty
+                    ? null
+                    : _apellido2Controller.text.trim(),
+                employeeId: _employeeIdController.text.trim().isEmpty
+                    ? null
+                    : _employeeIdController.text.trim(),
+                weeklyHours: weeklyHours,
+                dni: _dniController.text.trim().isEmpty
+                    ? null
+                    : _dniController.text.trim(),
+                telefono: _telefonoController.text.trim().isEmpty
+                    ? null
+                    : _telefonoController.text.trim(),
+                cargo: _cargoController.text.trim().isEmpty
+                    ? null
+                    : _cargoController.text.trim(),
+                departamento: _selectedDepartamento,
+                role: role,
+              );
+
+      if (result == null) {
+        // Hubo un error, mostrar mensaje
+        final error = ref.read(userManagementProvider).error;
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error ?? 'Error desconocido al crear usuario'),
+              backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 10), // Más tiempo para leer
+            ),
+          );
+
+          // DEBUGGING: Imprimir error en consola
+          print('❌ ERROR AL CREAR USUARIO: $error');
+        }
+      }
+
+      return result;
+    } catch (e) {
+      // DEBUGGING: Imprimir error completo en consola
+      print('❌ EXCEPCIÓN AL CREAR USUARIO: $e');
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 10),
+          ),
+        );
+      }
+      return null;
+    }
+  }
+
+  /// Muestra un diálogo con las credenciales temporales
+  void _showSuccessDialog(Map<String, String> credentials) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.check_circle, color: AppColors.success, size: 32),
+            const SizedBox(width: AppSpacing.md),
+            Flexible(
+              child: Text(
+                'Usuario Creado',
+                style: AppTextStyles.h3,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Credenciales de acceso temporal:',
+              style: AppTextStyles.bodyMedium,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceVariant,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.email,
+                          size: 16, color: AppColors.textSecondary),
+                      const SizedBox(width: AppSpacing.sm),
+                      Flexible(
+                        child: Text(
+                          _emailController.text.trim(),
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Row(
+                    children: [
+                      const Icon(Icons.lock,
+                          size: 16, color: AppColors.textSecondary),
+                      const SizedBox(width: AppSpacing.sm),
+                      Flexible(
+                        child: Text(
+                          credentials['temporaryPassword'] ?? '',
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'monospace',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            const Text(
+              '⚠️ El empleado deberá cambiar la contraseña en su primer acceso.',
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.textSecondary,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // TODO: Copiar credenciales al portapapeles
+              Navigator.of(context).pop();
+            },
+            child: const Text('COPIAR CREDENCIALES'),
+          ),
+          CustomButton(
+            text: 'CERRAR',
+            onPressed: () => Navigator.of(context).pop(),
+            variant: ButtonVariant.primary,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // TODO [COMENTADO Sprint 1.3]: Ya no se usa, se crea directamente en Firebase
+  // El método _buildEmployeeData() se reemplazó por _createEmployeeInFirebase()
+  /*
   Map<String, dynamic> _buildEmployeeData() {
     final nombre = _nombreController.text.trim();
     final apellido1 = _apellido1Controller.text.trim();
@@ -241,6 +443,7 @@ class _NewEmployeeDrawerState extends State<NewEmployeeDrawer> {
       'isClockedIn': false,
     };
   }
+  */
 
   void _clearForm() {
     setState(() {
@@ -264,11 +467,14 @@ class _NewEmployeeDrawerState extends State<NewEmployeeDrawer> {
     });
   }
 
+  // TODO [COMENTADO Sprint 1.3]: Ya no se usa, se genera automáticamente en Firebase
+  /*
   void _generateEmployeeId() {
     setState(() {
       _employeeIdController.text = MockData.generateEmployeeId();
     });
   }
+  */
 
   // ============================================================================
   // BUILD
@@ -460,7 +666,7 @@ class _NewEmployeeDrawerState extends State<NewEmployeeDrawer> {
             Expanded(
               child: CustomTextField(
                 controller: _dniController,
-                label: 'DNI/NIE *',
+                label: 'DNI/NIE',
                 hintText: '12345678A',
                 errorText: _showValidation ? _errors['dni'] : null,
               ),
@@ -505,29 +711,36 @@ class _NewEmployeeDrawerState extends State<NewEmployeeDrawer> {
         ),
         AppSpacing.verticalSpaceMd,
 
-        // Employee ID con botón generar
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Expanded(
-              flex: 2,
-              child: CustomTextField(
-                controller: _employeeIdController,
-                label: 'Código empleado',
-                hintText: 'Ej: EMP-009',
-              ),
-            ),
-            AppSpacing.horizontalSpaceSm,
-            CustomButton(
-              text: 'Generar',
-              variant: ButtonVariant.outline,
-              onPressed: _generateEmployeeId,
-            ),
-          ],
+        // Employee ID con botón generar (COMENTADO Sprint 1.3 - se genera automático)
+        // Row(
+        //   crossAxisAlignment: CrossAxisAlignment.end,
+        //   children: [
+        //     Expanded(
+        //       flex: 2,
+        //       child: CustomTextField(
+        //         controller: _employeeIdController,
+        //         label: 'Código empleado',
+        //         hintText: 'Ej: EMP-009',
+        //       ),
+        //     ),
+        //     AppSpacing.horizontalSpaceSm,
+        //     CustomButton(
+        //       text: 'Generar',
+        //       variant: ButtonVariant.outline,
+        //       onPressed: _generateEmployeeId,
+        //     ),
+        //   ],
+        // ),
+
+        // Código empleado (opcional, se genera automático)
+        CustomTextField(
+          controller: _employeeIdController,
+          label: 'Código empleado (opcional)',
+          hintText: 'Ej: EMP-009',
         ),
         AppSpacing.verticalSpaceXs,
         Text(
-          'Si se deja vacío, se generará automáticamente',
+          '✨ Si se deja vacío, se generará automáticamente (EMP-001, EMP-002...)',
           style: AppTextStyles.bodySmall.copyWith(
             color: AppColors.textTertiary,
           ),
@@ -550,7 +763,7 @@ class _NewEmployeeDrawerState extends State<NewEmployeeDrawer> {
                 isExpanded: true,
                 hint: const Text('Seleccionar'),
                 decoration: InputDecoration(
-                  labelText: 'Departamento *',
+                  labelText: 'Departamento',
                   labelStyle: AppTextStyles.labelMedium.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -592,7 +805,7 @@ class _NewEmployeeDrawerState extends State<NewEmployeeDrawer> {
             Expanded(
               child: CustomTextField(
                 controller: _cargoController,
-                label: 'Cargo/Puesto *',
+                label: 'Cargo/Puesto',
                 hintText: 'Ej: Profesor Piano',
                 errorText: _showValidation ? _errors['cargo'] : null,
               ),

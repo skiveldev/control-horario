@@ -241,6 +241,14 @@ Services (Firebase)
    - ✅ Widgets se testean con ProviderScope + overrides
    - ✅ Mockear providers fácilmente
 
+5. **Simplicidad Arquitectónica (EVITAR SOBREINGENIERÍA):**
+   - ✅ **Comenzar con estructura mínima viable**: Implementar lo más simple que funcione
+   - ✅ **Iteración progresiva**: Agregar capas adicionales o complejidad SOLO cuando sea necesaria
+   - ✅ **YAGNI** (You Aren't Gonna Need It): No implementar funcionalidades "por si acaso"
+   - ✅ **Refactorizar cuando surja la necesidad**, no anticipar todos los casos posibles
+   - ❌ **No crear abstracciones prematuras**: Esperar a tener 2-3 casos de uso reales antes de generalizar
+   - ❌ **No diseñar para el futuro lejano**: Resolver los problemas actuales, no los hipotéticos
+
 ### Marcar código pendiente:
 ```dart
 // TODO [FASE-2-SPRINT-1]: Conectar con AuthProvider
@@ -391,6 +399,13 @@ final isMobile = MediaQuery.of(context).size.width < Breakpoints.tablet;
 ---
 
 ## 🚫 Restricciones y Buenas Prácticas
+
+### Principios Generales:
+- ✅ **Evitar la Sobreingeniería**: Priorizar la simplicidad en el diseño arquitectónico
+- ✅ **Iteración progresiva**: Comenzar con una estructura sencilla e introducir capas adicionales o complejidad SOLO cuando sea necesario
+- ✅ **YAGNI** (You Aren't Gonna Need It): No implementar funcionalidades "por si acaso"
+- ✅ **Refactorizar cuando surja la necesidad**, no anticipar todos los casos posibles
+- ✅ **Código legible sobre código "inteligente"**: Preferir claridad y mantenibilidad
 
 ### NO hacer:
 - ❌ Usar colores hardcoded (`Colors.blue`), usar siempre `AppColors.primary`

@@ -15,6 +15,7 @@ import '../../features/dashboard/presentation/screens/settings_screen.dart';
 
 // Pantallas de admin
 import '../../features/admin/presentation/screens/admin_dashboard_screen.dart';
+import '../../features/admin/presentation/screens/admin_profile_screen.dart';
 import '../../features/admin/presentation/screens/employees_list_screen.dart';
 import '../../features/admin/presentation/screens/employee_detail_screen.dart';
 import '../../features/admin/presentation/screens/schedule_management_screen.dart';
@@ -41,6 +42,7 @@ class AppRouter {
   static const String profile = '/profile';
   static const String settings = '/settings';
   static const String admin = '/admin';
+  static const String adminProfile = '/admin/profile';
   static const String adminEmployees = '/admin/employees';
   static const String adminEmployeeDetail = '/admin/employees/:id';
   static const String adminSchedules = '/admin/schedules';
@@ -163,6 +165,16 @@ class AppRouter {
           child: const AdminDashboardScreen(),
         ),
         routes: [
+          // Perfil del administrador
+          GoRoute(
+            path: 'profile',
+            name: 'admin-profile',
+            pageBuilder: (context, state) => _buildPageWithTransition(
+              context: context,
+              state: state,
+              child: const AdminProfileScreen(),
+            ),
+          ),
           // Lista de empleados
           GoRoute(
             path: 'employees',

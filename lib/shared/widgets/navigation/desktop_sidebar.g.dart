@@ -11,7 +11,7 @@ String _$sidebarNotifierHash() => r'c039ac56d0770ed8b3f5ad72f50c9a3c03bbd2c8';
 /// Provider para gestionar el estado del sidebar (expandido/colapsado)
 ///
 /// Funcionalidades:
-/// - Toggle entre expandido y colapsado
+/// - Toggle entre expandido (240px) y colapsado (64px)
 /// - Persistencia de estado con SharedPreferences
 /// - Carga automática del estado guardado
 ///

@@ -2,17 +2,34 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // ========================================
-    // REGLAS DE PRODUCCIÓN - MVP Sprint 1
+    // REGLAS DE PRODUCCIÓN - MVP Sprint 1.4
     // ========================================
+    
+    // Helper global: Verificar si el usuario tiene rol admin o rrhh
+    function isAdmin() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'rrhh'];
+    }
     
     // Colección de usuarios
     match /users/{userId} {
-      // Los usuarios solo pueden leer su propio documento
-      allow read: if request.auth != null && request.auth.uid == userId;
+      // Los usuarios pueden leer su propio documento
+      // Admin y RRHH pueden leer todos los documentos
+      allow read: if request.auth != null && 
+                  (request.auth.uid == userId || isAdmin());
       
-      // Solo admins pueden escribir datos de usuario (implementar en Sprint 2)
-      // Por ahora, nadie puede modificar directamente los documentos de usuario
-      allow write: if false;
+      // Solo admin y RRHH pueden crear usuarios (Sprint 1.4)
+      // WORKAROUND: Permitir que usuario cree su propio documento (para creación desde cliente)
+      // TODO [POST-MVP]: Mover a Cloud Function para mayor seguridad
+      allow create: if isAdmin() || 
+                    (request.auth != null && request.auth.uid == userId);
+      
+      // Solo admin y RRHH pueden actualizar usuarios (Sprint 1.4)
+      allow update: if isAdmin();
+      
+      // No permitir eliminar usuarios (seguridad)
+      allow delete: if false;
       
       // Subcolección de registros diarios
       match /daily_records/{recordId} {

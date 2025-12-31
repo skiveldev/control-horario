@@ -48,5 +48,27 @@ final firebaseAuthProvider = AutoDisposeProvider<FirebaseAuth>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef FirebaseAuthRef = AutoDisposeProviderRef<FirebaseAuth>;
+String _$employeeCreationServiceHash() =>
+    r'ad681cd637964a38dd8affdbbe8083f86c6df40d';
+
+/// Provider para el servicio de creación de empleados
+///
+/// Copied from [employeeCreationService].
+@ProviderFor(employeeCreationService)
+final employeeCreationServiceProvider =
+    AutoDisposeProvider<EmployeeCreationService>.internal(
+  employeeCreationService,
+  name: r'employeeCreationServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$employeeCreationServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef EmployeeCreationServiceRef
+    = AutoDisposeProviderRef<EmployeeCreationService>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
