@@ -6,36 +6,64 @@ part of 'clocking_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$todayRecordHash() => r'b3d6197094efcbd169e9105407be56c1cfd9e917';
+String _$todayRecordsHash() => r'1ee77253541c051a2d39382412e4bcc1ce2e4005';
 
-/// Provider para obtener el registro de fichajes de hoy
+/// Provider para obtener los registros de fichaje de hoy
 ///
-/// Escucha en tiempo real el documento del día actual.
-/// Retorna:
-/// - null si no hay usuario autenticado o no hay fichajes hoy
-/// - DailyRecordModel con los fichajes del día
+/// Escucha en tiempo real los documentos en time_records del día actual.
+/// Retorna lista de TimeRecordModel ordenados por startTime.
 ///
-/// Copied from [todayRecord].
-@ProviderFor(todayRecord)
-final todayRecordProvider =
-    AutoDisposeStreamProvider<DailyRecordModel?>.internal(
-  todayRecord,
-  name: r'todayRecordProvider',
+/// Copied from [todayRecords].
+@ProviderFor(todayRecords)
+final todayRecordsProvider =
+    AutoDisposeStreamProvider<List<TimeRecordModel>>.internal(
+  todayRecords,
+  name: r'todayRecordsProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$todayRecordHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$todayRecordsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef TodayRecordRef = AutoDisposeStreamProviderRef<DailyRecordModel?>;
-String _$clockingNotifierHash() => r'ad2369b570d5ad9a2104830017fe22e8304b0cac';
+typedef TodayRecordsRef = AutoDisposeStreamProviderRef<List<TimeRecordModel>>;
+String _$clockingSessionNotifierHash() =>
+    r'7f9ce9eed940f6a4ce84351a1da0fd8197ebe9d9';
+
+/// Provider para mantener el estado temporal del fichaje
+///
+/// Guarda el ID del registro activo para poder actualizarlo.
+///
+/// Copied from [ClockingSessionNotifier].
+@ProviderFor(ClockingSessionNotifier)
+final clockingSessionNotifierProvider = AutoDisposeNotifierProvider<
+    ClockingSessionNotifier, ClockingSession>.internal(
+  ClockingSessionNotifier.new,
+  name: r'clockingSessionNotifierProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$clockingSessionNotifierHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$ClockingSessionNotifier = AutoDisposeNotifier<ClockingSession>;
+String _$clockingNotifierHash() => r'3048ebf6bd89742ef5f074a9eb544f1ba96ef48b';
 
 /// Notifier para acciones de fichaje
 ///
-/// Maneja las operaciones de fichar entrada y salida.
-/// Expone AsyncValue<void> como estado para manejar loading/error.
+/// OPCIÓN B: Registros inmediatos con actualizaciones
+///
+/// Flujo con pausa:
+/// 1. clockIn → CREA registro work (09:00-09:00) "en curso"
+/// 2. startBreak → ACTUALIZA registro anterior (09:00-12:30) + CREA breakTime (12:30-12:30)
+/// 3. endBreak → ACTUALIZA registro pausa (12:30-13:00) + CREA work (13:00-13:00)
+/// 4. clockOut → ACTUALIZA registro anterior (13:00-18:00)
+///
+/// Flujo sin pausa:
+/// 1. clockIn → CREA registro work (09:00-09:00) "en curso"
+/// 2. clockOut → ACTUALIZA registro (09:00-18:00)
 ///
 /// Copied from [ClockingNotifier].
 @ProviderFor(ClockingNotifier)

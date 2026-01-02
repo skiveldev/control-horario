@@ -65,64 +65,36 @@ class TimeRecordsNotifier extends _$TimeRecordsNotifier {
 
   /// Añadir un nuevo registro
   Future<String> addRecord(TimeRecordModel record) async {
-    state = const AsyncValue.loading();
-
-    final result = await AsyncValue.guard(() async {
-      final service = ref.read(timeRecordsServiceProvider);
-      return await service.addRecord(record);
-    });
-
-    state = result;
-
-    if (result.hasError) {
-      throw result.error!;
-    }
-
-    return result.value!;
+    final service = ref.read(timeRecordsServiceProvider);
+    // ✅ Ejecutar directamente, sin doble throw
+    return await service.addRecord(record);
   }
 
   /// Actualizar un registro existente
   ///
   /// Si el registro estaba validado, cambia el estado a 'modified_after_validation'
   Future<void> updateRecord(TimeRecordModel record) async {
-    state = const AsyncValue.loading();
+    final service = ref.read(timeRecordsServiceProvider);
 
-    state = await AsyncValue.guard(() async {
-      final service = ref.read(timeRecordsServiceProvider);
+    // Si estaba validado, cambiar a modificado post-validación
+    final updatedRecord = record.isValidated &&
+            record.validationStatus != ValidationStatus.modifiedAfterValidation
+        ? record.copyWith(
+            validationStatus: ValidationStatus.modifiedAfterValidation,
+          )
+        : record;
 
-      // Si estaba validado, cambiar a modificado post-validación
-      final updatedRecord = record.isValidated &&
-              record.validationStatus !=
-                  ValidationStatus.modifiedAfterValidation
-          ? record.copyWith(
-              validationStatus: ValidationStatus.modifiedAfterValidation,
-            )
-          : record;
-
-      await service.updateRecord(updatedRecord);
-      return null;
-    });
-
-    if (state.hasError) {
-      throw state.error!;
-    }
+    // ✅ Ejecutar directamente, sin AsyncValue.guard que causa problemas
+    await service.updateRecord(updatedRecord);
   }
 
   /// Eliminar un registro
   ///
   /// No permite eliminar registros bloqueados
   Future<void> deleteRecord(String userId, String recordId) async {
-    state = const AsyncValue.loading();
-
-    state = await AsyncValue.guard(() async {
-      final service = ref.read(timeRecordsServiceProvider);
-      await service.deleteRecord(userId, recordId);
-      return null;
-    });
-
-    if (state.hasError) {
-      throw state.error!;
-    }
+    final service = ref.read(timeRecordsServiceProvider);
+    // ✅ Ejecutar directamente, sin doble throw
+    await service.deleteRecord(userId, recordId);
   }
 
   /// Copiar un registro a otra fecha
@@ -131,24 +103,8 @@ class TimeRecordsNotifier extends _$TimeRecordsNotifier {
     String recordId,
     DateTime targetDate,
   ) async {
-    state = const AsyncValue.loading();
-
-    final result = await AsyncValue.guard(() async {
-      final service = ref.read(timeRecordsServiceProvider);
-      return await service.copyRecord(
-        userId,
-        recordId,
-        targetDate,
-      );
-    });
-
-    state = result;
-
-    if (result.hasError) {
-      throw result.error!;
-    }
-
-    return result.value!;
+    final service = ref.read(timeRecordsServiceProvider);
+    return await service.copyRecord(userId, recordId, targetDate);
   }
 
   /// Validar un registro (solo admin)
@@ -157,17 +113,8 @@ class TimeRecordsNotifier extends _$TimeRecordsNotifier {
     String recordId,
     String validatedBy,
   ) async {
-    state = const AsyncValue.loading();
-
-    state = await AsyncValue.guard(() async {
-      final service = ref.read(timeRecordsServiceProvider);
-      await service.validateRecord(userId, recordId, validatedBy);
-      return null;
-    });
-
-    if (state.hasError) {
-      throw state.error!;
-    }
+    final service = ref.read(timeRecordsServiceProvider);
+    await service.validateRecord(userId, recordId, validatedBy);
   }
 
   /// Bloquear un registro (solo admin)
@@ -177,36 +124,13 @@ class TimeRecordsNotifier extends _$TimeRecordsNotifier {
     String blockedBy, {
     String? reason,
   }) async {
-    state = const AsyncValue.loading();
-
-    state = await AsyncValue.guard(() async {
-      final service = ref.read(timeRecordsServiceProvider);
-      await service.blockRecord(
-        userId,
-        recordId,
-        blockedBy,
-        reason: reason,
-      );
-      return null;
-    });
-
-    if (state.hasError) {
-      throw state.error!;
-    }
+    final service = ref.read(timeRecordsServiceProvider);
+    await service.blockRecord(userId, recordId, blockedBy, reason: reason);
   }
 
   /// Desbloquear un registro (solo admin)
   Future<void> unblockRecord(String userId, String recordId) async {
-    state = const AsyncValue.loading();
-
-    state = await AsyncValue.guard(() async {
-      final service = ref.read(timeRecordsServiceProvider);
-      await service.unblockRecord(userId, recordId);
-      return null;
-    });
-
-    if (state.hasError) {
-      throw state.error!;
-    }
+    final service = ref.read(timeRecordsServiceProvider);
+    await service.unblockRecord(userId, recordId);
   }
 }

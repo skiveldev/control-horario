@@ -33,6 +33,8 @@ mixin _$TimeRecordModel {
   String get createdBy => throw _privateConstructorUsedError;
   bool get isManual => throw _privateConstructorUsedError;
   String? get copiedFrom =>
+      throw _privateConstructorUsedError; // Estado del registro (activo/completado)
+  RecordStatus get recordStatus =>
       throw _privateConstructorUsedError; // Campos de validación
   ValidationStatus get validationStatus => throw _privateConstructorUsedError;
   String? get validatedBy => throw _privateConstructorUsedError;
@@ -71,6 +73,7 @@ abstract class $TimeRecordModelCopyWith<$Res> {
       String createdBy,
       bool isManual,
       String? copiedFrom,
+      RecordStatus recordStatus,
       ValidationStatus validationStatus,
       String? validatedBy,
       DateTime? validatedAt,
@@ -107,6 +110,7 @@ class _$TimeRecordModelCopyWithImpl<$Res, $Val extends TimeRecordModel>
     Object? createdBy = null,
     Object? isManual = null,
     Object? copiedFrom = freezed,
+    Object? recordStatus = null,
     Object? validationStatus = null,
     Object? validatedBy = freezed,
     Object? validatedAt = freezed,
@@ -167,6 +171,10 @@ class _$TimeRecordModelCopyWithImpl<$Res, $Val extends TimeRecordModel>
           ? _value.copiedFrom
           : copiedFrom // ignore: cast_nullable_to_non_nullable
               as String?,
+      recordStatus: null == recordStatus
+          ? _value.recordStatus
+          : recordStatus // ignore: cast_nullable_to_non_nullable
+              as RecordStatus,
       validationStatus: null == validationStatus
           ? _value.validationStatus
           : validationStatus // ignore: cast_nullable_to_non_nullable
@@ -217,6 +225,7 @@ abstract class _$$TimeRecordModelImplCopyWith<$Res>
       String createdBy,
       bool isManual,
       String? copiedFrom,
+      RecordStatus recordStatus,
       ValidationStatus validationStatus,
       String? validatedBy,
       DateTime? validatedAt,
@@ -251,6 +260,7 @@ class __$$TimeRecordModelImplCopyWithImpl<$Res>
     Object? createdBy = null,
     Object? isManual = null,
     Object? copiedFrom = freezed,
+    Object? recordStatus = null,
     Object? validationStatus = null,
     Object? validatedBy = freezed,
     Object? validatedAt = freezed,
@@ -311,6 +321,10 @@ class __$$TimeRecordModelImplCopyWithImpl<$Res>
           ? _value.copiedFrom
           : copiedFrom // ignore: cast_nullable_to_non_nullable
               as String?,
+      recordStatus: null == recordStatus
+          ? _value.recordStatus
+          : recordStatus // ignore: cast_nullable_to_non_nullable
+              as RecordStatus,
       validationStatus: null == validationStatus
           ? _value.validationStatus
           : validationStatus // ignore: cast_nullable_to_non_nullable
@@ -356,6 +370,7 @@ class _$TimeRecordModelImpl implements _TimeRecordModel {
       required this.createdBy,
       required this.isManual,
       this.copiedFrom,
+      this.recordStatus = RecordStatus.active,
       this.validationStatus = ValidationStatus.editable,
       this.validatedBy,
       this.validatedAt,
@@ -395,6 +410,10 @@ class _$TimeRecordModelImpl implements _TimeRecordModel {
   final bool isManual;
   @override
   final String? copiedFrom;
+// Estado del registro (activo/completado)
+  @override
+  @JsonKey()
+  final RecordStatus recordStatus;
 // Campos de validación
   @override
   @JsonKey()
@@ -412,7 +431,7 @@ class _$TimeRecordModelImpl implements _TimeRecordModel {
 
   @override
   String toString() {
-    return 'TimeRecordModel(id: $id, userId: $userId, date: $date, category: $category, startTime: $startTime, endTime: $endTime, location: $location, durationMinutes: $durationMinutes, createdAt: $createdAt, updatedAt: $updatedAt, createdBy: $createdBy, isManual: $isManual, copiedFrom: $copiedFrom, validationStatus: $validationStatus, validatedBy: $validatedBy, validatedAt: $validatedAt, blockedBy: $blockedBy, blockedAt: $blockedAt, blockReason: $blockReason)';
+    return 'TimeRecordModel(id: $id, userId: $userId, date: $date, category: $category, startTime: $startTime, endTime: $endTime, location: $location, durationMinutes: $durationMinutes, createdAt: $createdAt, updatedAt: $updatedAt, createdBy: $createdBy, isManual: $isManual, copiedFrom: $copiedFrom, recordStatus: $recordStatus, validationStatus: $validationStatus, validatedBy: $validatedBy, validatedAt: $validatedAt, blockedBy: $blockedBy, blockedAt: $blockedAt, blockReason: $blockReason)';
   }
 
   @override
@@ -442,6 +461,8 @@ class _$TimeRecordModelImpl implements _TimeRecordModel {
                 other.isManual == isManual) &&
             (identical(other.copiedFrom, copiedFrom) ||
                 other.copiedFrom == copiedFrom) &&
+            (identical(other.recordStatus, recordStatus) ||
+                other.recordStatus == recordStatus) &&
             (identical(other.validationStatus, validationStatus) ||
                 other.validationStatus == validationStatus) &&
             (identical(other.validatedBy, validatedBy) ||
@@ -473,6 +494,7 @@ class _$TimeRecordModelImpl implements _TimeRecordModel {
         createdBy,
         isManual,
         copiedFrom,
+        recordStatus,
         validationStatus,
         validatedBy,
         validatedAt,
@@ -513,6 +535,7 @@ abstract class _TimeRecordModel implements TimeRecordModel {
       required final String createdBy,
       required final bool isManual,
       final String? copiedFrom,
+      final RecordStatus recordStatus,
       final ValidationStatus validationStatus,
       final String? validatedBy,
       final DateTime? validatedAt,
@@ -548,7 +571,9 @@ abstract class _TimeRecordModel implements TimeRecordModel {
   @override
   bool get isManual;
   @override
-  String? get copiedFrom; // Campos de validación
+  String? get copiedFrom; // Estado del registro (activo/completado)
+  @override
+  RecordStatus get recordStatus; // Campos de validación
   @override
   ValidationStatus get validationStatus;
   @override

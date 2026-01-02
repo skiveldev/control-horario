@@ -15,12 +15,13 @@ enum ClockingState { notStarted, working, onPause, finished }
 ///
 /// Flujo de fichaje:
 /// 1. Sin fichar → Solo Entrada habilitado
-/// 2. Trabajando → Salida y Pausa habilitados
+/// 2. Trabajando (primera vez) → Salida y Pausa habilitados
 /// 3. En pausa → Solo Retorno habilitado
-/// 4. Completo → Entrada habilitado (permite múltiples ciclos en el día)
+/// 4. De vuelta de pausa → Solo Salida habilitado (Pausa deshabilitado)
+/// 5. Completo → Entrada habilitado (permite múltiples ciclos en el día)
 ///
-/// MOCK DATA: Permite múltiples fichajes en el mismo día (Fase 1 - solo UI).
-/// TODO [FASE-2]: Validar con backend si permite múltiples entradas/salidas.
+/// ⚠️ IMPORTANTE: Solo se permite UNA pausa por día para optimizar costos de Firebase.
+/// Después del primer retorno, el botón Pausa queda permanentemente deshabilitado.
 ///
 /// Ejemplo de uso:
 /// ```dart
@@ -41,11 +42,16 @@ class ClockingButtons extends StatelessWidget {
   /// Si está procesando una acción
   final bool isLoading;
 
+  /// Si se puede pausar (false después del primer retorno)
+  /// ⚠️ Usado para limitar a 1 pausa por día y optimizar costos Firebase
+  final bool canPause;
+
   const ClockingButtons({
     super.key,
     required this.currentState,
     required this.onAction,
     this.isLoading = false,
+    this.canPause = true, // Por defecto permitido
   });
 
   @override
@@ -122,6 +128,7 @@ class ClockingButtons extends StatelessWidget {
   // ==========================================================================
 
   Widget _buildExitButton() {
+    // ✨ Permitir salida cuando está trabajando (incluye después de pausas)
     final isEnabled = currentState == ClockingState.working && !isLoading;
 
     return CustomButton(
@@ -142,14 +149,20 @@ class ClockingButtons extends StatelessWidget {
   // ==========================================================================
 
   Widget _buildPauseButton() {
-    final isEnabled = currentState == ClockingState.working && !isLoading;
+    // ✨ Solo permitir pausar UNA VEZ por día (antes del primer retorno)
+    // - currentState debe ser "working"
+    // - canPause debe ser true (se vuelve false después del primer retorno)
+    //
+    // RAZÓN: Limitar a 1 pausa por día para optimizar costos de Firebase
+    final isEnabled =
+        currentState == ClockingState.working && canPause && !isLoading;
 
     return CustomButton(
       text: 'Pausa',
       icon: Icons.pause,
       variant: isEnabled
           ? ButtonVariant.warning
-          : ButtonVariant.secondary, // ← GRADIENTE NARANJA
+          : ButtonVariant.secondary, // ← GRADIENTE NARANJA (solo si habilitado)
       size: ButtonSize.large,
       fullWidth: true,
       onPressed: isEnabled ? () => onAction(ClockingAction.pause) : null,

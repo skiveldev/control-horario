@@ -6,6 +6,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
 import '../../../../shared/widgets/cards/custom_card.dart';
+import '../../models/time_record_model.dart'; // ✨ AGREGADO para RecordCategory
 import '../../providers/dashboard_provider.dart';
 import 'records_table.dart';
 
@@ -33,15 +34,46 @@ class RecentRecordsCard extends ConsumerWidget {
           return _buildEmptyState();
         }
 
-        // Mapear DailyRecordModel a estructura esperada por RecordsTable
-        final mappedRecords = records.map((record) {
-          final totalHours = _calculateTotalHours(record);
+        // Agrupar registros por fecha
+        final groupedByDate = <String, List<dynamic>>{};
+        for (final record in records) {
+          groupedByDate.putIfAbsent(record.date, () => []).add(record);
+        }
+
+        // Mapear a estructura esperada por RecordsTable (1 fila por día)
+        final mappedRecords = groupedByDate.entries.map((entry) {
+          final date = entry.key;
+          final dayRecords = entry.value;
+
+          // Calcular totales del día
+          final workRecords = dayRecords
+              .where((r) => r.category == RecordCategory.work)
+              .toList();
+          final breakRecords = dayRecords
+              .where((r) => r.category == RecordCategory.breakTime)
+              .toList();
+
+          final entrance =
+              workRecords.isNotEmpty ? workRecords.first.startTime : '--:--';
+          final exit =
+              workRecords.isNotEmpty ? workRecords.last.endTime : '--:--';
+
+          final totalMinutes = workRecords.fold<int>(
+            0,
+            (sum, r) => sum + (r.durationMinutes as int),
+          );
+          final totalHours = _formatDuration(totalMinutes);
+
+          final hadBreak = breakRecords.isNotEmpty;
+
           return {
-            'date': _formatDate(record.date),
-            'entrance': record.clocks.clockIn ?? '--:--',
-            'exit': record.clocks.clockOut ?? '--:--',
+            'date': _formatDate(date),
+            'entrance': entrance,
+            'exit': exit,
             'total': totalHours,
-            'status': record.status.toString().split('.').last,
+            'hadBreak': hadBreak,
+            'status':
+                'complete', // Todos los registros en time_records son completos
           };
         }).toList();
 
@@ -312,18 +344,13 @@ class RecentRecordsCard extends ConsumerWidget {
     }
   }
 
-  /// Calcular total de horas trabajadas
-  String _calculateTotalHours(dynamic record) {
-    if (record.clockInTimestamp == null || record.clockOutTimestamp == null) {
-      return '--:--';
-    }
+  /// Formatear duración en minutos a "Xh Ymin"
+  String _formatDuration(int minutes) {
+    if (minutes == 0) return '--:--';
 
-    final duration = record.clockOutTimestamp!.difference(
-      record.clockInTimestamp!,
-    );
-    final hours = duration.inHours;
-    final minutes = duration.inMinutes.remainder(60);
+    final hours = minutes ~/ 60;
+    final mins = minutes % 60;
 
-    return '${hours}h ${minutes}min';
+    return '${hours}h ${mins}min';
   }
 }

@@ -22,6 +22,9 @@ _$TimeRecordModelImpl _$$TimeRecordModelImplFromJson(
       createdBy: json['createdBy'] as String,
       isManual: json['isManual'] as bool,
       copiedFrom: json['copiedFrom'] as String?,
+      recordStatus:
+          $enumDecodeNullable(_$RecordStatusEnumMap, json['recordStatus']) ??
+              RecordStatus.active,
       validationStatus: $enumDecodeNullable(
               _$ValidationStatusEnumMap, json['validationStatus']) ??
           ValidationStatus.editable,
@@ -52,6 +55,7 @@ Map<String, dynamic> _$$TimeRecordModelImplToJson(
       'createdBy': instance.createdBy,
       'isManual': instance.isManual,
       'copiedFrom': instance.copiedFrom,
+      'recordStatus': _$RecordStatusEnumMap[instance.recordStatus]!,
       'validationStatus': _$ValidationStatusEnumMap[instance.validationStatus]!,
       'validatedBy': instance.validatedBy,
       'validatedAt': instance.validatedAt?.toIso8601String(),
@@ -63,6 +67,11 @@ Map<String, dynamic> _$$TimeRecordModelImplToJson(
 const _$RecordCategoryEnumMap = {
   RecordCategory.work: 'work',
   RecordCategory.breakTime: 'breakTime',
+};
+
+const _$RecordStatusEnumMap = {
+  RecordStatus.active: 'active',
+  RecordStatus.completed: 'completed',
 };
 
 const _$ValidationStatusEnumMap = {

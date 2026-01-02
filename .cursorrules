@@ -534,6 +534,101 @@ final width1 = availableWidth * 0.6;
 - [ ] Restar gaps ANTES de multiplicar por proporciones
 - [ ] Probar en múltiples resoluciones
 
+### Modelado de Datos y Estados (CRÍTICO)
+
+**Problema**: Usar valores calculados/derivados para determinar estados causa bugs difíciles de detectar.
+
+**Anti-patrón detectado:**
+```dart
+// ❌ MAL: Usar durationMinutes == 0 para saber si está "activo"
+final isActive = record.durationMinutes == 0;
+
+// Problema: Si fichas entrada y salida en el mismo minuto,
+// duration = 0 pero el registro está CERRADO
+// Esto causa loops infinitos, botones que no responden, etc.
+```
+
+**Solución correcta:**
+```dart
+// ✅ BIEN: Usar campo de estado EXPLÍCITO
+enum RecordStatus { active, completed }
+
+final isActive = record.recordStatus == RecordStatus.active;
+
+// Al crear: recordStatus = RecordStatus.active
+// Al cerrar: recordStatus = RecordStatus.completed
+```
+
+**Reglas obligatorias para modelado:**
+
+1. **Estados explícitos, NO derivados:**
+   - ❌ `isActive = (endTime == startTime)` → Ambiguo
+   - ❌ `isActive = (durationMinutes == 0)` → Ambiguo
+   - ✅ `isActive = (status == Status.active)` → Explícito
+
+2. **Consistencia Firestore (serialización):**
+   ```dart
+   // ❌ MAL: Escribir un valor, leer otro
+   toFirestore: 'category': record.category.name  // → "breakTime"
+   fromFirestore: data['category'] == 'break'     // → Nunca coincide!
+
+   // ✅ BIEN: Escribir y leer el MISMO valor
+   toFirestore: 'category': record.category.name  // → "breakTime"
+   fromFirestore: data['category'] == 'breakTime' // → Coincide ✓
+   ```
+
+3. **Nunca asumir valores por defecto para estados:**
+   - Siempre definir explícitamente el estado inicial
+   - Documentar qué significa cada estado
+   - Usar enums en lugar de strings o booleans
+
+**Checklist antes de crear modelos:**
+- [ ] ¿Los estados son explícitos (enum) o derivados (cálculo)?
+- [ ] ¿El valor que escribo en Firestore es el mismo que leo?
+- [ ] ¿Qué pasa si dos acciones ocurren en el mismo segundo/minuto?
+- [ ] ¿Hay compatibilidad hacia atrás con datos existentes?
+
+### Debugging Sistemático (ANTES de codificar soluciones)
+
+**Problema**: Implementar "soluciones" sin identificar la causa raíz genera más bugs.
+
+**Anti-patrón detectado:**
+```
+Usuario: "Los botones parpadean"
+  ↓
+Claude: Implementa debouncing, delays, optimistic UI...
+  ↓
+Problema real: Campo mal parseado en Firestore
+  ↓
+Resultado: Horas perdidas en soluciones incorrectas
+```
+
+**Proceso correcto de debugging:**
+
+1. **PRIMERO: Leer los logs COMPLETOS**
+   - ¿Qué valores se están escribiendo?
+   - ¿Qué valores se están leyendo?
+   - ¿Hay discrepancias?
+
+2. **SEGUNDO: Verificar el flujo de datos**
+   ```
+   Modelo → toFirestore() → Firestore → fromFirestore() → Modelo
+   ```
+   - ¿Se pierde información en algún paso?
+   - ¿Los tipos coinciden?
+
+3. **TERCERO: Probar el caso más simple**
+   - ¿Funciona con datos limpios?
+   - ¿El problema es con datos existentes?
+
+4. **CUARTO: Solo entonces proponer solución**
+   - Explicar la CAUSA RAÍZ encontrada
+   - Proponer solución específica para esa causa
+
+**Regla de oro:**
+> Si no puedes explicar POR QUÉ ocurre el bug, NO implementes una solución.
+> Primero diagnóstico, después tratamiento.
+
 ---
 
 ## 🤖 Instrucciones para Claude/Cursor

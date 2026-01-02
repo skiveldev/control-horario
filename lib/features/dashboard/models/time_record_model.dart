@@ -24,6 +24,8 @@ class TimeRecordModel with _$TimeRecordModel {
     required String createdBy,
     required bool isManual,
     String? copiedFrom,
+    // Estado del registro (activo/completado)
+    @Default(RecordStatus.active) RecordStatus recordStatus,
     // Campos de validación
     @Default(ValidationStatus.editable) ValidationStatus validationStatus,
     String? validatedBy,
@@ -44,7 +46,7 @@ class TimeRecordModel with _$TimeRecordModel {
       id: doc.id,
       userId: data['userId'] ?? '',
       date: data['date'] ?? '',
-      category: data['category'] == 'break'
+      category: data['category'] == 'breakTime'
           ? RecordCategory.breakTime
           : RecordCategory.work,
       startTime: data['startTime'] ?? '',
@@ -56,6 +58,9 @@ class TimeRecordModel with _$TimeRecordModel {
       createdBy: data['createdBy'] ?? '',
       isManual: data['isManual'] ?? false,
       copiedFrom: data['copiedFrom'],
+      // recordStatus: Compatible con datos existentes (sin campo = active por durationMinutes)
+      recordStatus:
+          _parseRecordStatus(data['recordStatus'], data['durationMinutes']),
       validationStatus: _parseValidationStatus(data['validationStatus']),
       validatedBy: data['validatedBy'],
       validatedAt: (data['validatedAt'] as Timestamp?)?.toDate(),
@@ -75,6 +80,7 @@ class TimeRecordModel with _$TimeRecordModel {
       'endTime': record.endTime,
       'location': record.location,
       'durationMinutes': record.durationMinutes,
+      'recordStatus': record.recordStatus.name, // ✨ Nuevo campo explícito
       'createdAt': Timestamp.fromDate(record.createdAt),
       'updatedAt': Timestamp.fromDate(record.updatedAt),
       'createdBy': record.createdBy,
@@ -99,6 +105,28 @@ class TimeRecordModel with _$TimeRecordModel {
       return ValidationStatus.editable;
     }
   }
+
+  /// Parsear recordStatus con compatibilidad hacia atrás
+  ///
+  /// Para datos existentes sin el campo, infiere del durationMinutes:
+  /// - durationMinutes == 0 → active
+  /// - durationMinutes > 0 → completed
+  static RecordStatus _parseRecordStatus(
+      dynamic status, dynamic durationMinutes) {
+    // Si tiene el campo explícito, usarlo
+    if (status != null) {
+      try {
+        return RecordStatus.values.byName(status);
+      } catch (e) {
+        // Fallback si el valor es inválido
+      }
+    }
+
+    // Compatibilidad con datos existentes (sin campo recordStatus)
+    // Inferir del durationMinutes como antes
+    final duration = durationMinutes as int? ?? 0;
+    return duration == 0 ? RecordStatus.active : RecordStatus.completed;
+  }
 }
 
 /// Categoría de registro
@@ -122,8 +150,26 @@ enum ValidationStatus {
   modifiedAfterValidation,
 }
 
+/// Estado del registro (activo o completado)
+///
+/// Solución definitiva para saber si un fichaje está en progreso
+/// independientemente de la duración en minutos.
+enum RecordStatus {
+  /// Registro en progreso (no ha fichado salida/retorno)
+  active,
+
+  /// Registro completado (ya fichó salida/retorno)
+  completed,
+}
+
 /// Extensión para TimeRecordModel
 extension TimeRecordModelX on TimeRecordModel {
+  /// Si el registro está activo (en progreso)
+  bool get isActive => recordStatus == RecordStatus.active;
+
+  /// Si el registro está completado
+  bool get isCompleted => recordStatus == RecordStatus.completed;
+
   /// Si el registro puede ser editado por el empleado
   bool get canEdit => validationStatus != ValidationStatus.blocked;
 

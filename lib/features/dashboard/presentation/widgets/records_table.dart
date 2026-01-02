@@ -143,12 +143,25 @@ class RecordsTable extends StatelessWidget {
 
                 AppSpacing.verticalSpaceSm,
 
-                // Total
-                _buildInfoItem(
-                  context,
-                  'Total',
-                  record['total'] as String,
-                  Icons.schedule,
+                // Total + Pausa
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildInfoItem(
+                        context,
+                        'Total',
+                        record['total'] as String,
+                        Icons.schedule,
+                      ),
+                    ),
+                    AppSpacing.horizontalSpaceMd,
+                    Expanded(
+                      child: _buildBreakIndicator(
+                        context,
+                        record['hadBreak'] as bool? ?? false,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -188,6 +201,36 @@ class RecordsTable extends StatelessWidget {
     );
   }
 
+  /// ✨ Indicador de pausa en mobile
+  Widget _buildBreakIndicator(BuildContext context, bool hadBreak) {
+    final colors = AppColorsHelper.of(context);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          hadBreak ? Icons.coffee : Icons.coffee_outlined,
+          size: 14,
+          color: hadBreak ? colors.warning : colors.textTertiary,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          'Pausa: ',
+          style: AppTextStyles.bodySmall.copyWith(color: colors.textSecondary),
+        ),
+        Flexible(
+          child: Text(
+            hadBreak ? 'Sí' : 'No',
+            style: AppTextStyles.bodySmall.copyWith(
+              fontWeight: FontWeight.w600,
+              color: hadBreak ? colors.warning : colors.textTertiary,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+
   // ==========================================================================
   // TABLE VIEW (Desktop/Tablet)
   // ==========================================================================
@@ -202,7 +245,8 @@ class RecordsTable extends StatelessWidget {
             1: FlexColumnWidth(1.5), // Entrada
             2: FlexColumnWidth(1.5), // Salida
             3: FlexColumnWidth(1.5), // Total
-            4: FlexColumnWidth(2), // Estado
+            4: FlexColumnWidth(1), // Pausa ✨ NUEVO
+            5: FlexColumnWidth(2), // Estado
           },
           border: TableBorder(
             horizontalInside: BorderSide(color: colors.border, width: 1),
@@ -234,6 +278,7 @@ class RecordsTable extends StatelessWidget {
         _buildHeaderCell(context, 'ENTRADA'),
         _buildHeaderCell(context, 'SALIDA'),
         _buildHeaderCell(context, 'TOTAL'),
+        _buildHeaderCell(context, 'PAUSA'), // ✨ NUEVO
         _buildHeaderCell(context, 'ESTADO'),
       ],
     );
@@ -259,6 +304,8 @@ class RecordsTable extends StatelessWidget {
 
   TableRow _buildTableRow(BuildContext context, Map<String, dynamic> record) {
     final colors = AppColorsHelper.of(context);
+    final hadBreak = record['hadBreak'] as bool? ?? false;
+
     return TableRow(
       decoration: BoxDecoration(color: colors.surface),
       children: [
@@ -266,6 +313,31 @@ class RecordsTable extends StatelessWidget {
         _buildTableCell(context, record['entrance'] as String),
         _buildTableCell(context, record['exit'] as String),
         _buildTableCell(context, record['total'] as String, bold: true),
+        // ✨ NUEVO: Celda de pausa
+        Padding(
+          padding: AppSpacing.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.md,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                hadBreak ? Icons.coffee : Icons.coffee_outlined,
+                size: 16,
+                color: hadBreak ? colors.warning : colors.textTertiary,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                hadBreak ? 'Sí' : 'No',
+                style: AppTextStyles.bodySmall.copyWith(
+                  fontWeight: hadBreak ? FontWeight.w600 : FontWeight.normal,
+                  color: hadBreak ? colors.warning : colors.textTertiary,
+                ),
+              ),
+            ],
+          ),
+        ),
         Padding(
           padding: AppSpacing.symmetric(
             horizontal: AppSpacing.md,

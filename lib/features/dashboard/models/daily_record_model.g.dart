@@ -18,6 +18,13 @@ _$DailyRecordModelImpl _$$DailyRecordModelImplFromJson(
       clockOutTimestamp: json['clockOutTimestamp'] == null
           ? null
           : DateTime.parse(json['clockOutTimestamp'] as String),
+      breakStartTimestamp: json['breakStartTimestamp'] == null
+          ? null
+          : DateTime.parse(json['breakStartTimestamp'] as String),
+      breakEndTimestamp: json['breakEndTimestamp'] == null
+          ? null
+          : DateTime.parse(json['breakEndTimestamp'] as String),
+      totalMinutes: (json['totalMinutes'] as num?)?.toInt(),
       status: $enumDecode(_$RecordStatusEnumMap, json['status']),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
@@ -31,6 +38,9 @@ Map<String, dynamic> _$$DailyRecordModelImplToJson(
       'clocks': instance.clocks,
       'clockInTimestamp': instance.clockInTimestamp?.toIso8601String(),
       'clockOutTimestamp': instance.clockOutTimestamp?.toIso8601String(),
+      'breakStartTimestamp': instance.breakStartTimestamp?.toIso8601String(),
+      'breakEndTimestamp': instance.breakEndTimestamp?.toIso8601String(),
+      'totalMinutes': instance.totalMinutes,
       'status': _$RecordStatusEnumMap[instance.status]!,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
@@ -44,11 +54,15 @@ const _$RecordStatusEnumMap = {
 _$ClockTimesImpl _$$ClockTimesImplFromJson(Map<String, dynamic> json) =>
     _$ClockTimesImpl(
       clockIn: json['clockIn'] as String?,
+      breakStart: json['breakStart'] as String?,
+      breakEnd: json['breakEnd'] as String?,
       clockOut: json['clockOut'] as String?,
     );
 
 Map<String, dynamic> _$$ClockTimesImplToJson(_$ClockTimesImpl instance) =>
     <String, dynamic>{
       'clockIn': instance.clockIn,
+      'breakStart': instance.breakStart,
+      'breakEnd': instance.breakEnd,
       'clockOut': instance.clockOut,
     };

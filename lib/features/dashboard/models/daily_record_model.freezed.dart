@@ -25,6 +25,12 @@ mixin _$DailyRecordModel {
   ClockTimes get clocks => throw _privateConstructorUsedError;
   DateTime? get clockInTimestamp => throw _privateConstructorUsedError;
   DateTime? get clockOutTimestamp => throw _privateConstructorUsedError;
+  DateTime? get breakStartTimestamp =>
+      throw _privateConstructorUsedError; // ✨ NUEVO: Timestamp inicio pausa
+  DateTime? get breakEndTimestamp =>
+      throw _privateConstructorUsedError; // ✨ NUEVO: Timestamp fin pausa
+  int? get totalMinutes =>
+      throw _privateConstructorUsedError; // ✨ NUEVO: Total minutos trabajados (pausa incluida)
   RecordStatus get status => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
   DateTime get updatedAt => throw _privateConstructorUsedError;
@@ -51,6 +57,9 @@ abstract class $DailyRecordModelCopyWith<$Res> {
       ClockTimes clocks,
       DateTime? clockInTimestamp,
       DateTime? clockOutTimestamp,
+      DateTime? breakStartTimestamp,
+      DateTime? breakEndTimestamp,
+      int? totalMinutes,
       RecordStatus status,
       DateTime createdAt,
       DateTime updatedAt});
@@ -78,6 +87,9 @@ class _$DailyRecordModelCopyWithImpl<$Res, $Val extends DailyRecordModel>
     Object? clocks = null,
     Object? clockInTimestamp = freezed,
     Object? clockOutTimestamp = freezed,
+    Object? breakStartTimestamp = freezed,
+    Object? breakEndTimestamp = freezed,
+    Object? totalMinutes = freezed,
     Object? status = null,
     Object? createdAt = null,
     Object? updatedAt = null,
@@ -103,6 +115,18 @@ class _$DailyRecordModelCopyWithImpl<$Res, $Val extends DailyRecordModel>
           ? _value.clockOutTimestamp
           : clockOutTimestamp // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      breakStartTimestamp: freezed == breakStartTimestamp
+          ? _value.breakStartTimestamp
+          : breakStartTimestamp // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      breakEndTimestamp: freezed == breakEndTimestamp
+          ? _value.breakEndTimestamp
+          : breakEndTimestamp // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      totalMinutes: freezed == totalMinutes
+          ? _value.totalMinutes
+          : totalMinutes // ignore: cast_nullable_to_non_nullable
+              as int?,
       status: null == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -143,6 +167,9 @@ abstract class _$$DailyRecordModelImplCopyWith<$Res>
       ClockTimes clocks,
       DateTime? clockInTimestamp,
       DateTime? clockOutTimestamp,
+      DateTime? breakStartTimestamp,
+      DateTime? breakEndTimestamp,
+      int? totalMinutes,
       RecordStatus status,
       DateTime createdAt,
       DateTime updatedAt});
@@ -169,6 +196,9 @@ class __$$DailyRecordModelImplCopyWithImpl<$Res>
     Object? clocks = null,
     Object? clockInTimestamp = freezed,
     Object? clockOutTimestamp = freezed,
+    Object? breakStartTimestamp = freezed,
+    Object? breakEndTimestamp = freezed,
+    Object? totalMinutes = freezed,
     Object? status = null,
     Object? createdAt = null,
     Object? updatedAt = null,
@@ -194,6 +224,18 @@ class __$$DailyRecordModelImplCopyWithImpl<$Res>
           ? _value.clockOutTimestamp
           : clockOutTimestamp // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      breakStartTimestamp: freezed == breakStartTimestamp
+          ? _value.breakStartTimestamp
+          : breakStartTimestamp // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      breakEndTimestamp: freezed == breakEndTimestamp
+          ? _value.breakEndTimestamp
+          : breakEndTimestamp // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      totalMinutes: freezed == totalMinutes
+          ? _value.totalMinutes
+          : totalMinutes // ignore: cast_nullable_to_non_nullable
+              as int?,
       status: null == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -219,6 +261,9 @@ class _$DailyRecordModelImpl implements _DailyRecordModel {
       required this.clocks,
       this.clockInTimestamp,
       this.clockOutTimestamp,
+      this.breakStartTimestamp,
+      this.breakEndTimestamp,
+      this.totalMinutes,
       required this.status,
       required this.createdAt,
       required this.updatedAt});
@@ -237,6 +282,15 @@ class _$DailyRecordModelImpl implements _DailyRecordModel {
   @override
   final DateTime? clockOutTimestamp;
   @override
+  final DateTime? breakStartTimestamp;
+// ✨ NUEVO: Timestamp inicio pausa
+  @override
+  final DateTime? breakEndTimestamp;
+// ✨ NUEVO: Timestamp fin pausa
+  @override
+  final int? totalMinutes;
+// ✨ NUEVO: Total minutos trabajados (pausa incluida)
+  @override
   final RecordStatus status;
   @override
   final DateTime createdAt;
@@ -245,7 +299,7 @@ class _$DailyRecordModelImpl implements _DailyRecordModel {
 
   @override
   String toString() {
-    return 'DailyRecordModel(date: $date, userId: $userId, clocks: $clocks, clockInTimestamp: $clockInTimestamp, clockOutTimestamp: $clockOutTimestamp, status: $status, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'DailyRecordModel(date: $date, userId: $userId, clocks: $clocks, clockInTimestamp: $clockInTimestamp, clockOutTimestamp: $clockOutTimestamp, breakStartTimestamp: $breakStartTimestamp, breakEndTimestamp: $breakEndTimestamp, totalMinutes: $totalMinutes, status: $status, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -260,6 +314,12 @@ class _$DailyRecordModelImpl implements _DailyRecordModel {
                 other.clockInTimestamp == clockInTimestamp) &&
             (identical(other.clockOutTimestamp, clockOutTimestamp) ||
                 other.clockOutTimestamp == clockOutTimestamp) &&
+            (identical(other.breakStartTimestamp, breakStartTimestamp) ||
+                other.breakStartTimestamp == breakStartTimestamp) &&
+            (identical(other.breakEndTimestamp, breakEndTimestamp) ||
+                other.breakEndTimestamp == breakEndTimestamp) &&
+            (identical(other.totalMinutes, totalMinutes) ||
+                other.totalMinutes == totalMinutes) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
@@ -269,8 +329,19 @@ class _$DailyRecordModelImpl implements _DailyRecordModel {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, date, userId, clocks,
-      clockInTimestamp, clockOutTimestamp, status, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+      runtimeType,
+      date,
+      userId,
+      clocks,
+      clockInTimestamp,
+      clockOutTimestamp,
+      breakStartTimestamp,
+      breakEndTimestamp,
+      totalMinutes,
+      status,
+      createdAt,
+      updatedAt);
 
   /// Create a copy of DailyRecordModel
   /// with the given fields replaced by the non-null parameter values.
@@ -296,6 +367,9 @@ abstract class _DailyRecordModel implements DailyRecordModel {
       required final ClockTimes clocks,
       final DateTime? clockInTimestamp,
       final DateTime? clockOutTimestamp,
+      final DateTime? breakStartTimestamp,
+      final DateTime? breakEndTimestamp,
+      final int? totalMinutes,
       required final RecordStatus status,
       required final DateTime createdAt,
       required final DateTime updatedAt}) = _$DailyRecordModelImpl;
@@ -313,6 +387,12 @@ abstract class _DailyRecordModel implements DailyRecordModel {
   DateTime? get clockInTimestamp;
   @override
   DateTime? get clockOutTimestamp;
+  @override
+  DateTime? get breakStartTimestamp; // ✨ NUEVO: Timestamp inicio pausa
+  @override
+  DateTime? get breakEndTimestamp; // ✨ NUEVO: Timestamp fin pausa
+  @override
+  int? get totalMinutes; // ✨ NUEVO: Total minutos trabajados (pausa incluida)
   @override
   RecordStatus get status;
   @override
@@ -335,6 +415,10 @@ ClockTimes _$ClockTimesFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$ClockTimes {
   String? get clockIn => throw _privateConstructorUsedError;
+  String? get breakStart =>
+      throw _privateConstructorUsedError; // ✨ NUEVO: Hora inicio pausa
+  String? get breakEnd =>
+      throw _privateConstructorUsedError; // ✨ NUEVO: Hora fin pausa
   String? get clockOut => throw _privateConstructorUsedError;
 
   /// Serializes this ClockTimes to a JSON map.
@@ -353,7 +437,11 @@ abstract class $ClockTimesCopyWith<$Res> {
           ClockTimes value, $Res Function(ClockTimes) then) =
       _$ClockTimesCopyWithImpl<$Res, ClockTimes>;
   @useResult
-  $Res call({String? clockIn, String? clockOut});
+  $Res call(
+      {String? clockIn,
+      String? breakStart,
+      String? breakEnd,
+      String? clockOut});
 }
 
 /// @nodoc
@@ -372,12 +460,22 @@ class _$ClockTimesCopyWithImpl<$Res, $Val extends ClockTimes>
   @override
   $Res call({
     Object? clockIn = freezed,
+    Object? breakStart = freezed,
+    Object? breakEnd = freezed,
     Object? clockOut = freezed,
   }) {
     return _then(_value.copyWith(
       clockIn: freezed == clockIn
           ? _value.clockIn
           : clockIn // ignore: cast_nullable_to_non_nullable
+              as String?,
+      breakStart: freezed == breakStart
+          ? _value.breakStart
+          : breakStart // ignore: cast_nullable_to_non_nullable
+              as String?,
+      breakEnd: freezed == breakEnd
+          ? _value.breakEnd
+          : breakEnd // ignore: cast_nullable_to_non_nullable
               as String?,
       clockOut: freezed == clockOut
           ? _value.clockOut
@@ -395,7 +493,11 @@ abstract class _$$ClockTimesImplCopyWith<$Res>
       __$$ClockTimesImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? clockIn, String? clockOut});
+  $Res call(
+      {String? clockIn,
+      String? breakStart,
+      String? breakEnd,
+      String? clockOut});
 }
 
 /// @nodoc
@@ -412,12 +514,22 @@ class __$$ClockTimesImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? clockIn = freezed,
+    Object? breakStart = freezed,
+    Object? breakEnd = freezed,
     Object? clockOut = freezed,
   }) {
     return _then(_$ClockTimesImpl(
       clockIn: freezed == clockIn
           ? _value.clockIn
           : clockIn // ignore: cast_nullable_to_non_nullable
+              as String?,
+      breakStart: freezed == breakStart
+          ? _value.breakStart
+          : breakStart // ignore: cast_nullable_to_non_nullable
+              as String?,
+      breakEnd: freezed == breakEnd
+          ? _value.breakEnd
+          : breakEnd // ignore: cast_nullable_to_non_nullable
               as String?,
       clockOut: freezed == clockOut
           ? _value.clockOut
@@ -430,7 +542,8 @@ class __$$ClockTimesImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$ClockTimesImpl implements _ClockTimes {
-  const _$ClockTimesImpl({this.clockIn, this.clockOut});
+  const _$ClockTimesImpl(
+      {this.clockIn, this.breakStart, this.breakEnd, this.clockOut});
 
   factory _$ClockTimesImpl.fromJson(Map<String, dynamic> json) =>
       _$$ClockTimesImplFromJson(json);
@@ -438,11 +551,17 @@ class _$ClockTimesImpl implements _ClockTimes {
   @override
   final String? clockIn;
   @override
+  final String? breakStart;
+// ✨ NUEVO: Hora inicio pausa
+  @override
+  final String? breakEnd;
+// ✨ NUEVO: Hora fin pausa
+  @override
   final String? clockOut;
 
   @override
   String toString() {
-    return 'ClockTimes(clockIn: $clockIn, clockOut: $clockOut)';
+    return 'ClockTimes(clockIn: $clockIn, breakStart: $breakStart, breakEnd: $breakEnd, clockOut: $clockOut)';
   }
 
   @override
@@ -451,13 +570,18 @@ class _$ClockTimesImpl implements _ClockTimes {
         (other.runtimeType == runtimeType &&
             other is _$ClockTimesImpl &&
             (identical(other.clockIn, clockIn) || other.clockIn == clockIn) &&
+            (identical(other.breakStart, breakStart) ||
+                other.breakStart == breakStart) &&
+            (identical(other.breakEnd, breakEnd) ||
+                other.breakEnd == breakEnd) &&
             (identical(other.clockOut, clockOut) ||
                 other.clockOut == clockOut));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, clockIn, clockOut);
+  int get hashCode =>
+      Object.hash(runtimeType, clockIn, breakStart, breakEnd, clockOut);
 
   /// Create a copy of ClockTimes
   /// with the given fields replaced by the non-null parameter values.
@@ -476,14 +600,21 @@ class _$ClockTimesImpl implements _ClockTimes {
 }
 
 abstract class _ClockTimes implements ClockTimes {
-  const factory _ClockTimes({final String? clockIn, final String? clockOut}) =
-      _$ClockTimesImpl;
+  const factory _ClockTimes(
+      {final String? clockIn,
+      final String? breakStart,
+      final String? breakEnd,
+      final String? clockOut}) = _$ClockTimesImpl;
 
   factory _ClockTimes.fromJson(Map<String, dynamic> json) =
       _$ClockTimesImpl.fromJson;
 
   @override
   String? get clockIn;
+  @override
+  String? get breakStart; // ✨ NUEVO: Hora inicio pausa
+  @override
+  String? get breakEnd; // ✨ NUEVO: Hora fin pausa
   @override
   String? get clockOut;
 

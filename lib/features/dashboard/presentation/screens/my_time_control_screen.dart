@@ -248,9 +248,10 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
                 records: dayRecords,
                 plannedMinutes: 8 * 60, // 8h planificadas
                 isToday: isToday,
-                onAddRecord: () => _handleAddRecord(context, day, userId),
+                onAddRecord: () =>
+                    _handleAddRecord(context, day, userId, dayRecords),
                 onEditRecord: (record) =>
-                    _handleEditRecord(context, record, userId),
+                    _handleEditRecord(context, record, userId, dayRecords),
                 onCopyRecord: (record) =>
                     _handleCopyRecord(context, record, userId),
                 onDeleteRecord: (record) =>
@@ -263,10 +264,16 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
     );
   }
 
-  void _handleAddRecord(BuildContext context, DateTime date, String userId) {
+  void _handleAddRecord(
+    BuildContext context,
+    DateTime date,
+    String userId,
+    List<TimeRecordModel> existingRecords,
+  ) {
     AddEditRecordModal.show(
       context,
       date: date,
+      existingRecords: existingRecords, // ✅ Para validar solapamiento
       availableLocations: const [
         'Oficina',
         'Delegación Madrid',
@@ -274,35 +281,15 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
         'Cliente',
       ],
       onSave: (record) async {
-        try {
-          // Añadir userId al registro
-          final recordWithUserId = record.copyWith(
-            userId: userId,
-            createdBy: userId,
-          );
+        // Añadir userId al registro
+        final recordWithUserId = record.copyWith(
+          userId: userId,
+          createdBy: userId,
+        );
 
-          await ref.read(timeRecordsNotifierProvider.notifier).addRecord(
-                recordWithUserId,
-              );
-
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('✓ Registro guardado'),
-                backgroundColor: AppColors.success,
-              ),
+        await ref.read(timeRecordsNotifierProvider.notifier).addRecord(
+              recordWithUserId,
             );
-          }
-        } catch (e) {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error al guardar: $e'),
-                backgroundColor: AppColors.error,
-              ),
-            );
-          }
-        }
       },
     );
   }
@@ -311,6 +298,7 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
     BuildContext context,
     TimeRecordModel record,
     String userId,
+    List<TimeRecordModel> existingRecords,
   ) {
     // Verificar si está bloqueado
     if (record.isBlocked) {
@@ -328,6 +316,7 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
       context,
       date: date,
       recordToEdit: record,
+      existingRecords: existingRecords, // ✅ Para validar solapamiento
       availableLocations: const [
         'Oficina',
         'Delegación Madrid',
@@ -335,29 +324,9 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
         'Cliente',
       ],
       onSave: (updatedRecord) async {
-        try {
-          await ref.read(timeRecordsNotifierProvider.notifier).updateRecord(
-                updatedRecord,
-              );
-
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('✓ Registro actualizado'),
-                backgroundColor: AppColors.success,
-              ),
+        await ref.read(timeRecordsNotifierProvider.notifier).updateRecord(
+              updatedRecord,
             );
-          }
-        } catch (e) {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error al actualizar: $e'),
-                backgroundColor: AppColors.error,
-              ),
-            );
-          }
-        }
       },
     );
   }
@@ -440,27 +409,30 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
               Navigator.of(context).pop();
 
               try {
+                // ✨ Usar mounted check antes de cada operación asíncrona
+                if (!context.mounted) return;
+
                 await ref
                     .read(timeRecordsNotifierProvider.notifier)
                     .deleteRecord(userId, record.id);
 
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('✓ Registro eliminado'),
-                      backgroundColor: AppColors.success,
-                    ),
-                  );
-                }
+                if (!context.mounted) return;
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('✓ Registro eliminado'),
+                    backgroundColor: AppColors.success,
+                  ),
+                );
               } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Error al eliminar: $e'),
-                      backgroundColor: AppColors.error,
-                    ),
-                  );
-                }
+                if (!context.mounted) return;
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error al eliminar: $e'),
+                    backgroundColor: AppColors.error,
+                  ),
+                );
               }
             },
             style: ElevatedButton.styleFrom(

@@ -27,32 +27,35 @@ class DaySummaryCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Observar providers
-    final todayRecordAsync = ref.watch(todayRecordProvider);
+    final todayRecordsAsync = ref.watch(todayRecordsProvider);
     final todayMinutes = ref.watch(todayTotalMinutesProvider);
+    final todayClockIn = ref.watch(todayClockInTimeProvider);
+    final todayBreakMinutes = ref.watch(todayBreakMinutesProvider);
     final userAsync = ref.watch(currentUserProvider);
 
-    return todayRecordAsync.when(
-      data: (todayRecord) => userAsync.when(
+    return todayRecordsAsync.when(
+      data: (todayRecords) => userAsync.when(
         data: (user) {
           if (user == null) {
             return _buildEmptyState('Usuario no encontrado');
           }
 
-          // Si no hay registro de hoy
-          if (todayRecord == null || todayRecord.clockInTimestamp == null) {
+          // Si no hay registros de hoy
+          if (todayRecords.isEmpty || todayClockIn == null) {
             return _buildEmptyState('Sin registro de entrada hoy');
           }
 
           // Calcular datos
-          final entranceTime = _formatTime(todayRecord.clockInTimestamp!);
+          final entranceTime = todayClockIn;
           final totalHours = todayMinutes / 60.0;
           final expectedHours =
               user.weeklyHours / 5.0; // Horas diarias esperadas
           final estimatedExit = _calculateEstimatedExit(
-            todayRecord.clockInTimestamp!,
+            entranceTime,
             expectedHours,
           );
-          final breakTime = 0; // TODO [FASE-2-SPRINT-2]: Calcular pausas reales
+          // ✨ Tiempo de pausa desde provider
+          final breakTime = todayBreakMinutes;
 
           return _buildContent(
             context: context,
@@ -244,6 +247,14 @@ class DaySummaryCard extends ConsumerWidget {
     return Builder(
       builder: (context) {
         final colors = AppColorsHelper.of(context);
+        final hours = breakMinutes ~/ 60;
+        final minutes = breakMinutes % 60;
+
+        // ✨ Mostrar mensaje diferente si no hay pausa
+        final subtitle = breakMinutes == 0
+            ? 'No has tomado pausas hoy'
+            : '${hours}h ${minutes}min acumulados (cuenta como trabajo)';
+
         return Container(
           padding: AppSpacing.symmetric(
             horizontal: AppSpacing.md,
@@ -260,7 +271,7 @@ class DaySummaryCard extends ConsumerWidget {
           child: Row(
             children: [
               Icon(
-                Icons.coffee,
+                breakMinutes == 0 ? Icons.coffee_outlined : Icons.coffee,
                 size: AppSpacing.iconMd,
                 color: colors.warning,
               ),
@@ -278,7 +289,7 @@ class DaySummaryCard extends ConsumerWidget {
                     ),
                     AppSpacing.verticalSpaceXs,
                     Text(
-                      '${(breakMinutes ~/ 60)}h ${breakMinutes % 60}min acumulados hoy',
+                      subtitle,
                       style: AppTextStyles.bodySmall.copyWith(
                         color: colors.textSecondary,
                       ),
@@ -305,10 +316,24 @@ class DaySummaryCard extends ConsumerWidget {
   }
 
   /// Calcular hora estimada de salida
-  String _calculateEstimatedExit(DateTime clockInTime, double expectedHours) {
-    final estimatedExit = clockInTime.add(
-      Duration(minutes: (expectedHours * 60).round()),
-    );
-    return _formatTime(estimatedExit);
+  String _calculateEstimatedExit(String clockInTime, double expectedHours) {
+    try {
+      // Parsear hora de entrada "HH:mm"
+      final parts = clockInTime.split(':');
+      final hour = int.parse(parts[0]);
+      final minute = int.parse(parts[1]);
+
+      final now = DateTime.now();
+      final clockInDateTime =
+          DateTime(now.year, now.month, now.day, hour, minute);
+
+      final estimatedExit = clockInDateTime.add(
+        Duration(minutes: (expectedHours * 60).round()),
+      );
+
+      return _formatTime(estimatedExit);
+    } catch (e) {
+      return '--:--';
+    }
   }
 }

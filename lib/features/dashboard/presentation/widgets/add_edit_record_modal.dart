@@ -21,7 +21,8 @@ class AddEditRecordModal extends StatefulWidget {
   final DateTime date;
   final TimeRecordModel? recordToEdit;
   final List<String> availableLocations;
-  final Function(TimeRecordModel) onSave;
+  final Future<void> Function(TimeRecordModel) onSave;
+  final List<TimeRecordModel> existingRecords; // Para validar solapamiento
 
   const AddEditRecordModal({
     super.key,
@@ -29,6 +30,7 @@ class AddEditRecordModal extends StatefulWidget {
     this.recordToEdit,
     required this.availableLocations,
     required this.onSave,
+    this.existingRecords = const [],
   });
 
   static Future<void> show(
@@ -36,7 +38,8 @@ class AddEditRecordModal extends StatefulWidget {
     required DateTime date,
     TimeRecordModel? recordToEdit,
     required List<String> availableLocations,
-    required Function(TimeRecordModel) onSave,
+    required Future<void> Function(TimeRecordModel) onSave,
+    List<TimeRecordModel> existingRecords = const [],
   }) {
     return showDialog(
       context: context,
@@ -45,6 +48,7 @@ class AddEditRecordModal extends StatefulWidget {
         recordToEdit: recordToEdit,
         availableLocations: availableLocations,
         onSave: onSave,
+        existingRecords: existingRecords,
       ),
     );
   }
@@ -457,40 +461,110 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
   Future<void> _handleSave() async {
     if (!_canSave()) return;
 
+    // Validar solapamiento con registros existentes
+    final overlapError = _checkOverlap();
+    if (overlapError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(overlapError),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
 
-    // Simular guardado
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      // Determinar recordStatus:
+      // - Si EDITAMOS: preservar el estado original (puede ser active o completed)
+      // - Si es NUEVO registro manual: siempre completed
+      final recordStatus =
+          widget.recordToEdit?.recordStatus ?? RecordStatus.completed;
 
-    // Crear registro
-    final record = TimeRecordModel(
-      id: widget.recordToEdit?.id ??
-          DateTime.now().millisecondsSinceEpoch.toString(),
-      userId: widget.recordToEdit?.userId ?? 'user123', // TODO: Get from auth
-      date: _formatDate(widget.date),
-      category: _selectedCategory,
-      startTime: _formatTimeOfDay(_startTime!),
-      endTime: _formatTimeOfDay(_endTime!),
-      location: _selectedLocation!,
-      durationMinutes: _calculateDuration(),
-      createdAt: widget.recordToEdit?.createdAt ?? DateTime.now(),
-      updatedAt: DateTime.now(),
-      createdBy:
-          widget.recordToEdit?.createdBy ?? 'user123', // TODO: Get from auth
-      isManual: true,
-      validationStatus: widget.recordToEdit?.isValidated ?? false
-          ? ValidationStatus.modifiedAfterValidation
-          : ValidationStatus.editable,
-      validatedBy: widget.recordToEdit?.validatedBy,
-      validatedAt: widget.recordToEdit?.validatedAt,
-    );
+      final record = TimeRecordModel(
+        id: widget.recordToEdit?.id ??
+            DateTime.now().millisecondsSinceEpoch.toString(),
+        userId: widget.recordToEdit?.userId ?? 'user123', // TODO: Get from auth
+        date: _formatDate(widget.date),
+        category: _selectedCategory,
+        startTime: _formatTimeOfDay(_startTime!),
+        endTime: _formatTimeOfDay(_endTime!),
+        location: _selectedLocation!,
+        durationMinutes: _calculateDuration(),
+        recordStatus: recordStatus, // ✅ Preservar estado si es edición
+        createdAt: widget.recordToEdit?.createdAt ?? DateTime.now(),
+        updatedAt: DateTime.now(),
+        createdBy:
+            widget.recordToEdit?.createdBy ?? 'user123', // TODO: Get from auth
+        isManual:
+            widget.recordToEdit?.isManual ?? true, // Preservar si era manual
+        validationStatus: widget.recordToEdit?.isValidated ?? false
+            ? ValidationStatus.modifiedAfterValidation
+            : ValidationStatus.editable,
+        validatedBy: widget.recordToEdit?.validatedBy,
+        validatedAt: widget.recordToEdit?.validatedAt,
+      );
 
-    widget.onSave(record);
+      // ✅ ESPERAR a que termine el guardado antes de cerrar
+      await widget.onSave(record);
 
-    if (mounted) {
-      Navigator.of(context).pop();
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al guardar: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Verificar si el nuevo registro se solapa con registros existentes
+  String? _checkOverlap() {
+    if (_startTime == null || _endTime == null) return null;
+
+    final newStart = _timeToMinutes(_startTime!);
+    final newEnd = _timeToMinutes(_endTime!);
+
+    for (final existing in widget.existingRecords) {
+      // Ignorar el registro que estamos editando
+      if (widget.recordToEdit?.id == existing.id) continue;
+
+      final existingStart = _parseTimeToMinutes(existing.startTime);
+      final existingEnd = _parseTimeToMinutes(existing.endTime);
+
+      if (existingStart == null || existingEnd == null) continue;
+
+      // Verificar solapamiento
+      // Solapan si: newStart < existingEnd AND newEnd > existingStart
+      if (newStart < existingEnd && newEnd > existingStart) {
+        return 'El horario se solapa con un registro existente (${existing.startTime} - ${existing.endTime})';
+      }
+    }
+
+    return null; // Sin solapamiento
+  }
+
+  int _timeToMinutes(TimeOfDay time) {
+    return time.hour * 60 + time.minute;
+  }
+
+  int? _parseTimeToMinutes(String time) {
+    try {
+      final parts = time.split(':');
+      return int.parse(parts[0]) * 60 + int.parse(parts[1]);
+    } catch (e) {
+      return null;
     }
   }
 

@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../../core/services/firebase_service.dart';
 import '../../auth/providers/auth_provider.dart';
-import '../models/daily_record_model.dart';
+import '../models/time_record_model.dart';
+import '../services/time_records_service.dart';
 import 'clocking_provider.dart';
 
 part 'dashboard_provider.g.dart';
@@ -12,12 +12,12 @@ part 'dashboard_provider.g.dart';
 
 /// Provider para obtener registros del mes actual
 ///
-/// Escucha en tiempo real todos los fichajes del mes.
-/// Ordena por fecha descendente (más recientes primero).
+/// Escucha en tiempo real todos los fichajes del mes desde time_records.
+/// Ordena por fecha y hora de inicio.
 ///
 /// Retorna lista vacía si no hay usuario autenticado.
 @riverpod
-Stream<List<DailyRecordModel>> monthlyRecords(MonthlyRecordsRef ref) async* {
+Stream<List<TimeRecordModel>> monthlyRecords(MonthlyRecordsRef ref) async* {
   final user = await ref.watch(currentUserProvider.future);
 
   if (user == null) {
@@ -26,27 +26,9 @@ Stream<List<DailyRecordModel>> monthlyRecords(MonthlyRecordsRef ref) async* {
   }
 
   final now = DateTime.now();
-  final startOfMonth = DateTime(now.year, now.month, 1);
-  final endOfMonth = DateTime(now.year, now.month + 1, 0);
+  final timeRecordsService = TimeRecordsService();
 
-  final startDate = _formatDateString(startOfMonth);
-  final endDate = _formatDateString(endOfMonth);
-
-  final firestore = ref.watch(firestoreProvider);
-
-  yield* firestore
-      .collection('users')
-      .doc(user.userId)
-      .collection('daily_records')
-      .where('date', isGreaterThanOrEqualTo: startDate)
-      .where('date', isLessThanOrEqualTo: endDate)
-      .orderBy('date', descending: true)
-      .snapshots()
-      .map(
-        (snapshot) => snapshot.docs
-            .map((doc) => DailyRecordModel.fromFirestore(doc))
-            .toList(),
-      );
+  yield* timeRecordsService.getMonthRecords(user.userId, now);
 }
 
 // ==============================================================================
@@ -55,53 +37,76 @@ Stream<List<DailyRecordModel>> monthlyRecords(MonthlyRecordsRef ref) async* {
 
 /// Provider computado: Total de minutos trabajados hoy
 ///
-/// Calcula la diferencia entre entrada y salida del día actual.
-/// Retorna 0 si:
-/// - No hay registro hoy
-/// - Falta entrada o salida
-@riverpod
-int todayTotalMinutes(TodayTotalMinutesRef ref) {
-  final todayRecord = ref.watch(todayRecordProvider).valueOrNull;
-
-  if (todayRecord == null ||
-      todayRecord.clockInTimestamp == null ||
-      todayRecord.clockOutTimestamp == null) {
-    return 0;
-  }
-
-  final duration = todayRecord.clockOutTimestamp!.difference(
-    todayRecord.clockInTimestamp!,
-  );
-
-  return duration.inMinutes;
-}
-
-/// Provider computado: Total de minutos trabajados en el mes
-///
-/// Suma todos los minutos de registros completos del mes.
+/// Suma los minutos de todos los registros work del día (excluye pausas).
 /// Retorna 0 si no hay registros.
 @riverpod
-int monthTotalMinutes(MonthTotalMinutesRef ref) {
-  final records = ref.watch(monthlyRecordsProvider).valueOrNull ?? [];
+int todayTotalMinutes(TodayTotalMinutesRef ref) {
+  final todayRecords = ref.watch(todayRecordsProvider).valueOrNull ?? [];
 
+  // Sumar solo registros de trabajo (excluir pausas)
   int total = 0;
-  for (final record in records) {
-    if (record.clockInTimestamp != null && record.clockOutTimestamp != null) {
-      final duration = record.clockOutTimestamp!.difference(
-        record.clockInTimestamp!,
-      );
-      total += duration.inMinutes;
+  for (final record in todayRecords) {
+    if (record.category == RecordCategory.work) {
+      total += record.durationMinutes;
     }
   }
 
   return total;
 }
 
-// ==============================================================================
-// HELPERS - Formateo de Fechas
-// ==============================================================================
+/// Provider computado: Total de minutos trabajados en el mes
+///
+/// Suma todos los minutos de registros work del mes (excluye pausas).
+/// Retorna 0 si no hay registros.
+@riverpod
+int monthTotalMinutes(MonthTotalMinutesRef ref) {
+  final records = ref.watch(monthlyRecordsProvider).valueOrNull ?? [];
 
-/// Formatear DateTime a string YYYY-MM-DD
-String _formatDateString(DateTime date) {
-  return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  // Sumar solo registros de trabajo (excluir pausas)
+  int total = 0;
+  for (final record in records) {
+    if (record.category == RecordCategory.work) {
+      total += record.durationMinutes;
+    }
+  }
+
+  return total;
+}
+
+/// Provider computado: Total de minutos en pausa hoy
+///
+/// Suma los minutos de todos los registros breakTime del día.
+/// Retorna 0 si no hay pausas.
+@riverpod
+int todayBreakMinutes(TodayBreakMinutesRef ref) {
+  final todayRecords = ref.watch(todayRecordsProvider).valueOrNull ?? [];
+
+  // Sumar solo registros de pausa
+  int total = 0;
+  for (final record in todayRecords) {
+    if (record.category == RecordCategory.breakTime) {
+      total += record.durationMinutes;
+    }
+  }
+
+  return total;
+}
+
+/// Provider computado: Hora de entrada de hoy
+///
+/// Retorna el startTime del primer registro work del día.
+/// Retorna null si no hay registros.
+@riverpod
+String? todayClockInTime(TodayClockInTimeRef ref) {
+  final todayRecords = ref.watch(todayRecordsProvider).valueOrNull ?? [];
+
+  if (todayRecords.isEmpty) return null;
+
+  // Buscar el primer registro work
+  final firstWorkRecord = todayRecords.firstWhere(
+    (r) => r.category == RecordCategory.work,
+    orElse: () => todayRecords.first,
+  );
+
+  return firstWorkRecord.startTime;
 }

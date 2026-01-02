@@ -7,7 +7,7 @@ part 'daily_record_model.g.dart';
 /// Modelo de Registro Diario de fichajes
 ///
 /// Representa los fichajes de un empleado en un día específico.
-/// Un documento por día con entrada, salida y timestamps.
+/// Un documento por día con entrada, salida, pausas y timestamps.
 @freezed
 class DailyRecordModel with _$DailyRecordModel {
   const factory DailyRecordModel({
@@ -16,6 +16,9 @@ class DailyRecordModel with _$DailyRecordModel {
     required ClockTimes clocks,
     DateTime? clockInTimestamp,
     DateTime? clockOutTimestamp,
+    DateTime? breakStartTimestamp, // ✨ NUEVO: Timestamp inicio pausa
+    DateTime? breakEndTimestamp, // ✨ NUEVO: Timestamp fin pausa
+    int? totalMinutes, // ✨ NUEVO: Total minutos trabajados (pausa incluida)
     required RecordStatus status,
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -34,10 +37,17 @@ class DailyRecordModel with _$DailyRecordModel {
       userId: data['userId'] ?? '',
       clocks: ClockTimes(
         clockIn: clocks['clockIn'],
+        breakStart: clocks['breakStart'], // ✨ NUEVO
+        breakEnd: clocks['breakEnd'], // ✨ NUEVO
         clockOut: clocks['clockOut'],
       ),
       clockInTimestamp: (data['clockInTimestamp'] as Timestamp?)?.toDate(),
       clockOutTimestamp: (data['clockOutTimestamp'] as Timestamp?)?.toDate(),
+      breakStartTimestamp:
+          (data['breakStartTimestamp'] as Timestamp?)?.toDate(), // ✨ NUEVO
+      breakEndTimestamp:
+          (data['breakEndTimestamp'] as Timestamp?)?.toDate(), // ✨ NUEVO
+      totalMinutes: data['totalMinutes'] as int?, // ✨ NUEVO
       status: RecordStatus.values.byName(data['status'] ?? 'incomplete'),
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
@@ -48,7 +58,12 @@ class DailyRecordModel with _$DailyRecordModel {
 /// Tiempos de fichaje (formato HH:mm:ss)
 @freezed
 class ClockTimes with _$ClockTimes {
-  const factory ClockTimes({String? clockIn, String? clockOut}) = _ClockTimes;
+  const factory ClockTimes({
+    String? clockIn,
+    String? breakStart, // ✨ NUEVO: Hora inicio pausa
+    String? breakEnd, // ✨ NUEVO: Hora fin pausa
+    String? clockOut,
+  }) = _ClockTimes;
 
   factory ClockTimes.fromJson(Map<String, dynamic> json) =>
       _$ClockTimesFromJson(json);

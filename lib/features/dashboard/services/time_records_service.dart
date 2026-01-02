@@ -99,6 +99,38 @@ class TimeRecordsService {
     }
   }
 
+  /// Actualizar registro y crear nuevo en transacción atómica
+  ///
+  /// Garantiza que ambas operaciones se ejecuten o ninguna
+  Future<String> updateAndCreateRecord({
+    required TimeRecordModel recordToUpdate,
+    required TimeRecordModel recordToCreate,
+  }) async {
+    try {
+      final newDocRef = _getRecordsCollection(recordToCreate.userId).doc();
+
+      await _firestore.runTransaction((transaction) async {
+        // 1. Actualizar registro existente
+        final updateRef =
+            _getRecordsCollection(recordToUpdate.userId).doc(recordToUpdate.id);
+        transaction.update(
+          updateRef,
+          TimeRecordModel.toFirestore(recordToUpdate),
+        );
+
+        // 2. Crear nuevo registro
+        transaction.set(
+          newDocRef,
+          TimeRecordModel.toFirestore(recordToCreate),
+        );
+      });
+
+      return newDocRef.id;
+    } catch (e) {
+      throw Exception('Error en transacción: $e');
+    }
+  }
+
   /// Eliminar un registro
   ///
   /// No permite eliminar registros bloqueados
