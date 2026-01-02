@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/auth/models/user_model.dart';
 
@@ -163,8 +164,8 @@ class EmployeeCreationService {
     String? departamento,
     UserRole role = UserRole.employee,
   }) async {
-    print('🚀 EmployeeCreationService.createEmployee() iniciado');
-    print('📧 Email: $email');
+    debugPrint('🚀 EmployeeCreationService.createEmployee() iniciado');
+    debugPrint('📧 Email: $email');
 
     // Validar email
     if (email.trim().isEmpty) {
@@ -179,13 +180,13 @@ class EmployeeCreationService {
 
     // 1. Generar contraseña temporal
     final temporaryPassword = _generateTemporaryPassword();
-    print('🔑 Contraseña temporal generada: $temporaryPassword');
+    debugPrint('🔑 Contraseña temporal generada: $temporaryPassword');
 
     // 2. EmployeeId: Dejarlo vacío por ahora (se asignará en lote más adelante)
     // TODO [DÍA-6]: Crear script para asignar employeeIds secuenciales a todos los usuarios
     final finalEmployeeId =
         employeeId?.trim() ?? ''; // Vacío si no se especifica
-    print(
+    debugPrint(
         '🆔 EmployeeId: ${finalEmployeeId.isEmpty ? "(vacío - se asignará después)" : finalEmployeeId}');
 
     // 3. Construir displayName
@@ -194,20 +195,20 @@ class EmployeeCreationService {
       apellido1: apellido1.trim(),
       apellido2: apellido2?.trim(),
     );
-    print('👤 DisplayName: $displayName');
+    debugPrint('👤 DisplayName: $displayName');
 
     // 4. Crear usuario en Firebase Authentication
     // ⚠️ Esto cerrará la sesión del admin actual
     UserCredential userCredential;
     try {
-      print('🔐 Creando usuario en Firebase Auth...');
+      debugPrint('🔐 Creando usuario en Firebase Auth...');
       userCredential = await auth.createUserWithEmailAndPassword(
         email: email.trim(),
         password: temporaryPassword,
       );
-      print('✅ Usuario creado en Auth: ${userCredential.user!.uid}');
+      debugPrint('✅ Usuario creado en Auth: ${userCredential.user!.uid}');
     } on FirebaseAuthException catch (e) {
-      print('❌ FirebaseAuthException: ${e.code} - ${e.message}');
+      debugPrint('❌ FirebaseAuthException: ${e.code} - ${e.message}');
       if (e.code == 'email-already-in-use') {
         throw Exception('El email ya está registrado');
       } else if (e.code == 'invalid-email') {
@@ -222,7 +223,7 @@ class EmployeeCreationService {
       // 5. Crear documento en Firestore
       // ⚠️ AHORA el usuario autenticado es el recién creado, NO el admin
       // Por eso necesitamos que las reglas permitan que el usuario cree su propio documento
-      print('📝 Creando documento en Firestore...');
+      debugPrint('📝 Creando documento en Firestore...');
       await firestore.collection('users').doc(userId).set({
         'userId': userId,
         'employeeId': finalEmployeeId,
@@ -240,28 +241,28 @@ class EmployeeCreationService {
         if (departamento != null && departamento.trim().isNotEmpty)
           'department': departamento.trim(),
       });
-      print('✅ Documento creado en Firestore');
+      debugPrint('✅ Documento creado en Firestore');
 
       // 6. Cerrar sesión del usuario recién creado
-      print('🚪 Cerrando sesión del usuario creado...');
+      debugPrint('🚪 Cerrando sesión del usuario creado...');
       await auth.signOut();
-      print('✅ Sesión cerrada');
+      debugPrint('✅ Sesión cerrada');
 
       // 7. Retornar credenciales
-      print('🎉 createEmployee completado exitosamente');
+      debugPrint('🎉 createEmployee completado exitosamente');
       return {
         'userId': userId,
         'temporaryPassword': temporaryPassword,
         'employeeId': finalEmployeeId,
       };
     } catch (e) {
-      print('❌ ERROR al crear documento Firestore: $e');
+      debugPrint('❌ ERROR al crear documento Firestore: $e');
       // Si falla la creación en Firestore, intentar eliminar el usuario de Auth
       try {
         await userCredential.user!.delete();
-        print('🗑️ Usuario eliminado de Auth tras fallo');
+        debugPrint('🗑️ Usuario eliminado de Auth tras fallo');
       } catch (_) {
-        print('⚠️ No se pudo eliminar usuario de Auth');
+        debugPrint('⚠️ No se pudo eliminar usuario de Auth');
       }
 
       // Cerrar sesión para limpiar estado

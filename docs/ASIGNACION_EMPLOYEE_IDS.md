@@ -161,3 +161,4 @@ Es **seguro** ejecutar el script múltiples veces:
 **Última actualización:** 31 Diciembre 2025  
 **Script:** `scripts/assign_employee_ids.dart`
 
+

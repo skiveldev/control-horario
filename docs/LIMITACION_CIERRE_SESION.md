@@ -199,3 +199,4 @@ Si no quieres usar Cloud Functions, otra opción es:
 **Prioridad:** Media (no bloquea MVP)  
 **ETA Solución Definitiva:** Post-Día 7
 
+

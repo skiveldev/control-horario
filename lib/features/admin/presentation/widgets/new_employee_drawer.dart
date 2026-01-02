@@ -267,14 +267,14 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
           );
 
           // DEBUGGING: Imprimir error en consola
-          print('❌ ERROR AL CREAR USUARIO: $error');
+          debugPrint('❌ ERROR AL CREAR USUARIO: $error');
         }
       }
 
       return result;
     } catch (e) {
       // DEBUGGING: Imprimir error completo en consola
-      print('❌ EXCEPCIÓN AL CREAR USUARIO: $e');
+      debugPrint('❌ EXCEPCIÓN AL CREAR USUARIO: $e');
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

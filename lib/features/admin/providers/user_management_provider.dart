@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/services/firebase_service.dart';
 import '../../auth/models/user_model.dart';
@@ -74,9 +75,9 @@ class UserManagement extends _$UserManagement {
     UserRole role = UserRole.employee,
   }) async {
     // DEBUGGING
-    print('🔄 UserManagementProvider.createEmployee() iniciado');
-    print('📧 Email: $email');
-    print('👤 Nombre: $nombre $apellido1');
+    debugPrint('🔄 UserManagementProvider.createEmployee() iniciado');
+    debugPrint('📧 Email: $email');
+    debugPrint('👤 Nombre: $nombre $apellido1');
 
     // Validaciones básicas
     if (email.trim().isEmpty) {
@@ -97,11 +98,11 @@ class UserManagement extends _$UserManagement {
     // (por ahora el servicio ya maneja esto)
 
     state = state.copyWith(isLoading: true, error: null);
-    print('⏳ Estado: isLoading = true');
+    debugPrint('⏳ Estado: isLoading = true');
 
     try {
       final service = ref.read(employeeCreationServiceProvider);
-      print('📞 Llamando a employeeCreationService.createEmployee()...');
+      debugPrint('📞 Llamando a employeeCreationService.createEmployee()...');
 
       final result = await service.createEmployee(
         email: email,
@@ -117,9 +118,9 @@ class UserManagement extends _$UserManagement {
         role: role,
       );
 
-      print('✅ Usuario creado exitosamente');
-      print('🆔 userId: ${result['userId']}');
-      print('🔑 password: ${result['temporaryPassword']}');
+      debugPrint('✅ Usuario creado exitosamente');
+      debugPrint('🆔 userId: ${result['userId']}');
+      debugPrint('🔑 password: ${result['temporaryPassword']}');
 
       state = state.copyWith(
         isLoading: false,
@@ -129,8 +130,8 @@ class UserManagement extends _$UserManagement {
 
       return result;
     } catch (e) {
-      print('❌ ERROR en createEmployee: $e');
-      print('❌ Tipo de error: ${e.runtimeType}');
+      debugPrint('❌ ERROR en createEmployee: $e');
+      debugPrint('❌ Tipo de error: ${e.runtimeType}');
 
       state = state.copyWith(
         isLoading: false,
