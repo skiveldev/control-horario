@@ -24,8 +24,8 @@
 - Panel admin para ver y editar fichajes
 - **Campos obligatorios para crear usuario:** Nombre, Primer Apellido, Email
 - **Campos auto-generados:** employeeId (EMP-XXX secuencial), displayName (nombre completo)
-- **Campos con valor por defecto:** weeklyHours (40.0)
-- **Campos opcionales:** Segundo apellido, DNI, teléfono, cargo, departamento
+- **Campos con valor por defecto:** weeklyHours (40.0), empresa ("Escuela Música")
+- **Campos opcionales:** Segundo apellido, DNI, teléfono, cargo, departamento, scheduleId, fechaInicio, fechaFin
 
 ---
 
