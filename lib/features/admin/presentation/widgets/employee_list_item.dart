@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../auth/models/user_model.dart';
 
 /// Item de empleado en lista
 ///
 /// Muestra información resumida de un empleado.
 /// Versión responsive para mobile y desktop.
+///
+/// DÍA 4: Refactorizado para aceptar UserModel directamente
 class EmployeeListItem extends StatelessWidget {
-  /// Datos del empleado
-  final Map<String, dynamic> employee;
+  /// Modelo del empleado
+  final UserModel employee;
 
   /// Callback al hacer tap
   final VoidCallback? onTap;
@@ -18,9 +21,6 @@ class EmployeeListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isClockedIn = employee['isClockedIn'] as bool;
-    final status = employee['status'] as String;
-
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
@@ -34,33 +34,15 @@ class EmployeeListItem extends StatelessWidget {
         child: Row(
           children: [
             // Avatar
-            Stack(
-              children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: AppColors.primary,
-                  child: Text(
-                    _getInitials(employee['name'] as String),
-                    style: AppTextStyles.labelLarge.copyWith(
-                      color: AppColors.textOnPrimary,
-                    ),
-                  ),
+            CircleAvatar(
+              radius: 24,
+              backgroundColor: AppColors.primary,
+              child: Text(
+                _getInitials(employee.displayName),
+                style: AppTextStyles.labelLarge.copyWith(
+                  color: AppColors.textOnPrimary,
                 ),
-                if (isClockedIn)
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: AppColors.success,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.surface, width: 2),
-                      ),
-                    ),
-                  ),
-              ],
+              ),
             ),
 
             AppSpacing.horizontalSpaceMd,
@@ -70,20 +52,23 @@ class EmployeeListItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Nombre completo
                   Text(
-                    employee['name'] as String,
+                    employee.displayName,
                     style: AppTextStyles.bodyMedium.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   AppSpacing.verticalSpaceXs,
+                  // Cargo
                   Text(
-                    employee['position'] as String,
+                    employee.position ?? 'Sin cargo',
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textSecondary,
                     ),
                   ),
                   AppSpacing.verticalSpaceXs,
+                  // Departamento
                   Row(
                     children: [
                       Icon(
@@ -94,7 +79,7 @@ class EmployeeListItem extends StatelessWidget {
                       const SizedBox(width: 4),
                       Flexible(
                         child: Text(
-                          employee['department'] as String,
+                          employee.department ?? 'Sin asignar',
                           style: AppTextStyles.labelSmall.copyWith(
                             color: AppColors.textTertiary,
                           ),
@@ -111,7 +96,7 @@ class EmployeeListItem extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _buildStatusBadge(status),
+                _buildStatusBadge(),
                 AppSpacing.verticalSpaceXs,
                 Icon(
                   Icons.arrow_forward_ios,
@@ -131,29 +116,35 @@ class EmployeeListItem extends StatelessWidget {
     if (parts.length >= 2) {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     }
-    return name.substring(0, 2).toUpperCase();
+    return name.length >= 2
+        ? name.substring(0, 2).toUpperCase()
+        : name.toUpperCase();
   }
 
-  Widget _buildStatusBadge(String status) {
+  Widget _buildStatusBadge() {
+    // Determinar estado basado en isActive y role
     Color color;
     String label;
 
-    switch (status) {
-      case 'activo':
-        color = AppColors.success;
-        label = 'Activo';
-        break;
-      case 'vacaciones':
-        color = AppColors.info;
-        label = 'Vacaciones';
-        break;
-      case 'inactivo':
-        color = AppColors.textTertiary;
-        label = 'Inactivo';
-        break;
-      default:
-        color = AppColors.textSecondary;
-        label = status;
+    if (!employee.isActive) {
+      color = AppColors.textTertiary;
+      label = 'Inactivo';
+    } else {
+      // Activo: mostrar rol
+      switch (employee.role) {
+        case UserRole.admin:
+          color = AppColors.error;
+          label = 'Admin';
+          break;
+        case UserRole.rrhh:
+          color = AppColors.warning;
+          label = 'RRHH';
+          break;
+        case UserRole.employee:
+          color = AppColors.success;
+          label = 'Activo';
+          break;
+      }
     }
 
     return Container(

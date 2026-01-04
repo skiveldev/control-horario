@@ -8,9 +8,12 @@ part 'user_model.g.dart';
 ///
 /// Representa a un empleado con su información laboral y de autenticación.
 /// Usa Freezed para inmutabilidad y JSON serialization.
+///
+/// DÍA 4: Actualizado con estructura híbrida completa
 @freezed
 class UserModel with _$UserModel {
   const factory UserModel({
+    // === Campos básicos obligatorios ===
     required String userId,
     required String employeeId,
     required String email,
@@ -20,10 +23,24 @@ class UserModel with _$UserModel {
     @Default(true) bool isActive,
     required DateTime createdAt,
 
-    // Información adicional del empleado
-    String? position, // Cargo (ej: "Desarrolladora Frontend Senior")
-    String? department, // Departamento (ej: "Tecnología")
-    String? schedule, // Horario laboral (ej: "09:00 - 18:00")
+    // === Información personal (opcional) ===
+    String? dni, // DNI/NIE del empleado
+    String? telefono, // Teléfono de contacto
+
+    // === Información laboral (opcional, desnormalizado) ===
+    String? position, // Cargo (ej: "Desarrollador Frontend Senior")
+    String? department, // Departamento (ej: "Tecnología", "Docente")
+
+    // === Control horario (opcional, híbrido) ===
+    String?
+        scheduleId, // Referencia a plantilla de horario (ej: "template_40h_001")
+    DateTime?
+        fechaInicio, // Fecha de inicio en la APLICACIÓN (no en la empresa)
+    DateTime? fechaFin, // Fecha de fin en la APLICACIÓN (baja/baja temporal)
+
+    // DEPRECATED: Mantener por compatibilidad con código existente
+    @Deprecated('Usar scheduleId en su lugar')
+    String? schedule, // Horario en formato texto (ej: "09:00 - 18:00")
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
@@ -42,6 +59,18 @@ class UserModel with _$UserModel {
       createdAtDate = DateTime.now();
     }
 
+    // Manejar fechaInicio que puede ser null o Timestamp
+    DateTime? fechaInicioDate;
+    if (data['fechaInicio'] != null) {
+      fechaInicioDate = (data['fechaInicio'] as Timestamp).toDate();
+    }
+
+    // Manejar fechaFin que puede ser null o Timestamp
+    DateTime? fechaFinDate;
+    if (data['fechaFin'] != null) {
+      fechaFinDate = (data['fechaFin'] as Timestamp).toDate();
+    }
+
     return UserModel(
       userId: doc.id,
       employeeId: data['employeeId'] ?? '',
@@ -51,8 +80,21 @@ class UserModel with _$UserModel {
       weeklyHours: (data['weeklyHours'] ?? 40).toDouble(),
       isActive: data['isActive'] ?? true,
       createdAt: createdAtDate,
+
+      // Información personal
+      dni: data['dni'] as String?,
+      telefono: data['telefono'] as String?,
+
+      // Información laboral
       position: data['position'] as String?,
       department: data['department'] as String?,
+
+      // Control horario
+      scheduleId: data['scheduleId'] as String?,
+      fechaInicio: fechaInicioDate,
+      fechaFin: fechaFinDate,
+
+      // DEPRECATED: Mantener por compatibilidad
       schedule: data['schedule'] as String?,
     );
   }

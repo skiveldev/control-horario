@@ -16,8 +16,17 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       weeklyHours: (json['weeklyHours'] as num).toDouble(),
       isActive: json['isActive'] as bool? ?? true,
       createdAt: DateTime.parse(json['createdAt'] as String),
+      dni: json['dni'] as String?,
+      telefono: json['telefono'] as String?,
       position: json['position'] as String?,
       department: json['department'] as String?,
+      scheduleId: json['scheduleId'] as String?,
+      fechaInicio: json['fechaInicio'] == null
+          ? null
+          : DateTime.parse(json['fechaInicio'] as String),
+      fechaFin: json['fechaFin'] == null
+          ? null
+          : DateTime.parse(json['fechaFin'] as String),
       schedule: json['schedule'] as String?,
     );
 
@@ -31,8 +40,13 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'weeklyHours': instance.weeklyHours,
       'isActive': instance.isActive,
       'createdAt': instance.createdAt.toIso8601String(),
+      'dni': instance.dni,
+      'telefono': instance.telefono,
       'position': instance.position,
       'department': instance.department,
+      'scheduleId': instance.scheduleId,
+      'fechaInicio': instance.fechaInicio?.toIso8601String(),
+      'fechaFin': instance.fechaFin?.toIso8601String(),
       'schedule': instance.schedule,
     };
 

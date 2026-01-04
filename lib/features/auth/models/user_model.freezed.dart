@@ -20,6 +20,7 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$UserModel {
+// === Campos básicos obligatorios ===
   String get userId => throw _privateConstructorUsedError;
   String get employeeId => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
@@ -28,11 +29,24 @@ mixin _$UserModel {
   double get weeklyHours => throw _privateConstructorUsedError;
   bool get isActive => throw _privateConstructorUsedError;
   DateTime get createdAt =>
-      throw _privateConstructorUsedError; // Información adicional del empleado
+      throw _privateConstructorUsedError; // === Información personal (opcional) ===
+  String? get dni => throw _privateConstructorUsedError; // DNI/NIE del empleado
+  String? get telefono =>
+      throw _privateConstructorUsedError; // Teléfono de contacto
+// === Información laboral (opcional, desnormalizado) ===
   String? get position =>
-      throw _privateConstructorUsedError; // Cargo (ej: "Desarrolladora Frontend Senior")
+      throw _privateConstructorUsedError; // Cargo (ej: "Desarrollador Frontend Senior")
   String? get department =>
-      throw _privateConstructorUsedError; // Departamento (ej: "Tecnología")
+      throw _privateConstructorUsedError; // Departamento (ej: "Tecnología", "Docente")
+// === Control horario (opcional, híbrido) ===
+  String? get scheduleId =>
+      throw _privateConstructorUsedError; // Referencia a plantilla de horario (ej: "template_40h_001")
+  DateTime? get fechaInicio =>
+      throw _privateConstructorUsedError; // Fecha de inicio en la APLICACIÓN (no en la empresa)
+  DateTime? get fechaFin =>
+      throw _privateConstructorUsedError; // Fecha de fin en la APLICACIÓN (baja/baja temporal)
+// DEPRECATED: Mantener por compatibilidad con código existente
+  @Deprecated('Usar scheduleId en su lugar')
   String? get schedule => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
@@ -59,9 +73,14 @@ abstract class $UserModelCopyWith<$Res> {
       double weeklyHours,
       bool isActive,
       DateTime createdAt,
+      String? dni,
+      String? telefono,
       String? position,
       String? department,
-      String? schedule});
+      String? scheduleId,
+      DateTime? fechaInicio,
+      DateTime? fechaFin,
+      @Deprecated('Usar scheduleId en su lugar') String? schedule});
 }
 
 /// @nodoc
@@ -87,8 +106,13 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? weeklyHours = null,
     Object? isActive = null,
     Object? createdAt = null,
+    Object? dni = freezed,
+    Object? telefono = freezed,
     Object? position = freezed,
     Object? department = freezed,
+    Object? scheduleId = freezed,
+    Object? fechaInicio = freezed,
+    Object? fechaFin = freezed,
     Object? schedule = freezed,
   }) {
     return _then(_value.copyWith(
@@ -124,6 +148,14 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      dni: freezed == dni
+          ? _value.dni
+          : dni // ignore: cast_nullable_to_non_nullable
+              as String?,
+      telefono: freezed == telefono
+          ? _value.telefono
+          : telefono // ignore: cast_nullable_to_non_nullable
+              as String?,
       position: freezed == position
           ? _value.position
           : position // ignore: cast_nullable_to_non_nullable
@@ -132,6 +164,18 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.department
           : department // ignore: cast_nullable_to_non_nullable
               as String?,
+      scheduleId: freezed == scheduleId
+          ? _value.scheduleId
+          : scheduleId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      fechaInicio: freezed == fechaInicio
+          ? _value.fechaInicio
+          : fechaInicio // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      fechaFin: freezed == fechaFin
+          ? _value.fechaFin
+          : fechaFin // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       schedule: freezed == schedule
           ? _value.schedule
           : schedule // ignore: cast_nullable_to_non_nullable
@@ -157,9 +201,14 @@ abstract class _$$UserModelImplCopyWith<$Res>
       double weeklyHours,
       bool isActive,
       DateTime createdAt,
+      String? dni,
+      String? telefono,
       String? position,
       String? department,
-      String? schedule});
+      String? scheduleId,
+      DateTime? fechaInicio,
+      DateTime? fechaFin,
+      @Deprecated('Usar scheduleId en su lugar') String? schedule});
 }
 
 /// @nodoc
@@ -183,8 +232,13 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? weeklyHours = null,
     Object? isActive = null,
     Object? createdAt = null,
+    Object? dni = freezed,
+    Object? telefono = freezed,
     Object? position = freezed,
     Object? department = freezed,
+    Object? scheduleId = freezed,
+    Object? fechaInicio = freezed,
+    Object? fechaFin = freezed,
     Object? schedule = freezed,
   }) {
     return _then(_$UserModelImpl(
@@ -220,6 +274,14 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      dni: freezed == dni
+          ? _value.dni
+          : dni // ignore: cast_nullable_to_non_nullable
+              as String?,
+      telefono: freezed == telefono
+          ? _value.telefono
+          : telefono // ignore: cast_nullable_to_non_nullable
+              as String?,
       position: freezed == position
           ? _value.position
           : position // ignore: cast_nullable_to_non_nullable
@@ -228,6 +290,18 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.department
           : department // ignore: cast_nullable_to_non_nullable
               as String?,
+      scheduleId: freezed == scheduleId
+          ? _value.scheduleId
+          : scheduleId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      fechaInicio: freezed == fechaInicio
+          ? _value.fechaInicio
+          : fechaInicio // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      fechaFin: freezed == fechaFin
+          ? _value.fechaFin
+          : fechaFin // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       schedule: freezed == schedule
           ? _value.schedule
           : schedule // ignore: cast_nullable_to_non_nullable
@@ -248,13 +322,19 @@ class _$UserModelImpl implements _UserModel {
       required this.weeklyHours,
       this.isActive = true,
       required this.createdAt,
+      this.dni,
+      this.telefono,
       this.position,
       this.department,
-      this.schedule});
+      this.scheduleId,
+      this.fechaInicio,
+      this.fechaFin,
+      @Deprecated('Usar scheduleId en su lugar') this.schedule});
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserModelImplFromJson(json);
 
+// === Campos básicos obligatorios ===
   @override
   final String userId;
   @override
@@ -272,19 +352,38 @@ class _$UserModelImpl implements _UserModel {
   final bool isActive;
   @override
   final DateTime createdAt;
-// Información adicional del empleado
+// === Información personal (opcional) ===
+  @override
+  final String? dni;
+// DNI/NIE del empleado
+  @override
+  final String? telefono;
+// Teléfono de contacto
+// === Información laboral (opcional, desnormalizado) ===
   @override
   final String? position;
-// Cargo (ej: "Desarrolladora Frontend Senior")
+// Cargo (ej: "Desarrollador Frontend Senior")
   @override
   final String? department;
-// Departamento (ej: "Tecnología")
+// Departamento (ej: "Tecnología", "Docente")
+// === Control horario (opcional, híbrido) ===
   @override
+  final String? scheduleId;
+// Referencia a plantilla de horario (ej: "template_40h_001")
+  @override
+  final DateTime? fechaInicio;
+// Fecha de inicio en la APLICACIÓN (no en la empresa)
+  @override
+  final DateTime? fechaFin;
+// Fecha de fin en la APLICACIÓN (baja/baja temporal)
+// DEPRECATED: Mantener por compatibilidad con código existente
+  @override
+  @Deprecated('Usar scheduleId en su lugar')
   final String? schedule;
 
   @override
   String toString() {
-    return 'UserModel(userId: $userId, employeeId: $employeeId, email: $email, displayName: $displayName, role: $role, weeklyHours: $weeklyHours, isActive: $isActive, createdAt: $createdAt, position: $position, department: $department, schedule: $schedule)';
+    return 'UserModel(userId: $userId, employeeId: $employeeId, email: $email, displayName: $displayName, role: $role, weeklyHours: $weeklyHours, isActive: $isActive, createdAt: $createdAt, dni: $dni, telefono: $telefono, position: $position, department: $department, scheduleId: $scheduleId, fechaInicio: $fechaInicio, fechaFin: $fechaFin, schedule: $schedule)';
   }
 
   @override
@@ -305,10 +404,19 @@ class _$UserModelImpl implements _UserModel {
                 other.isActive == isActive) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
+            (identical(other.dni, dni) || other.dni == dni) &&
+            (identical(other.telefono, telefono) ||
+                other.telefono == telefono) &&
             (identical(other.position, position) ||
                 other.position == position) &&
             (identical(other.department, department) ||
                 other.department == department) &&
+            (identical(other.scheduleId, scheduleId) ||
+                other.scheduleId == scheduleId) &&
+            (identical(other.fechaInicio, fechaInicio) ||
+                other.fechaInicio == fechaInicio) &&
+            (identical(other.fechaFin, fechaFin) ||
+                other.fechaFin == fechaFin) &&
             (identical(other.schedule, schedule) ||
                 other.schedule == schedule));
   }
@@ -325,8 +433,13 @@ class _$UserModelImpl implements _UserModel {
       weeklyHours,
       isActive,
       createdAt,
+      dni,
+      telefono,
       position,
       department,
+      scheduleId,
+      fechaInicio,
+      fechaFin,
       schedule);
 
   /// Create a copy of UserModel
@@ -347,21 +460,28 @@ class _$UserModelImpl implements _UserModel {
 
 abstract class _UserModel implements UserModel {
   const factory _UserModel(
-      {required final String userId,
-      required final String employeeId,
-      required final String email,
-      required final String displayName,
-      required final UserRole role,
-      required final double weeklyHours,
-      final bool isActive,
-      required final DateTime createdAt,
-      final String? position,
-      final String? department,
-      final String? schedule}) = _$UserModelImpl;
+          {required final String userId,
+          required final String employeeId,
+          required final String email,
+          required final String displayName,
+          required final UserRole role,
+          required final double weeklyHours,
+          final bool isActive,
+          required final DateTime createdAt,
+          final String? dni,
+          final String? telefono,
+          final String? position,
+          final String? department,
+          final String? scheduleId,
+          final DateTime? fechaInicio,
+          final DateTime? fechaFin,
+          @Deprecated('Usar scheduleId en su lugar') final String? schedule}) =
+      _$UserModelImpl;
 
   factory _UserModel.fromJson(Map<String, dynamic> json) =
       _$UserModelImpl.fromJson;
 
+// === Campos básicos obligatorios ===
   @override
   String get userId;
   @override
@@ -377,12 +497,28 @@ abstract class _UserModel implements UserModel {
   @override
   bool get isActive;
   @override
-  DateTime get createdAt; // Información adicional del empleado
+  DateTime get createdAt; // === Información personal (opcional) ===
   @override
-  String? get position; // Cargo (ej: "Desarrolladora Frontend Senior")
+  String? get dni; // DNI/NIE del empleado
   @override
-  String? get department; // Departamento (ej: "Tecnología")
+  String? get telefono; // Teléfono de contacto
+// === Información laboral (opcional, desnormalizado) ===
   @override
+  String? get position; // Cargo (ej: "Desarrollador Frontend Senior")
+  @override
+  String? get department; // Departamento (ej: "Tecnología", "Docente")
+// === Control horario (opcional, híbrido) ===
+  @override
+  String?
+      get scheduleId; // Referencia a plantilla de horario (ej: "template_40h_001")
+  @override
+  DateTime?
+      get fechaInicio; // Fecha de inicio en la APLICACIÓN (no en la empresa)
+  @override
+  DateTime? get fechaFin; // Fecha de fin en la APLICACIÓN (baja/baja temporal)
+// DEPRECATED: Mantener por compatibilidad con código existente
+  @override
+  @Deprecated('Usar scheduleId en su lugar')
   String? get schedule;
 
   /// Create a copy of UserModel

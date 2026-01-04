@@ -142,6 +142,9 @@ class EmployeeCreationService {
   /// - [telefono]: Teléfono del empleado (opcional)
   /// - [cargo]: Cargo/posición del empleado (opcional)
   /// - [departamento]: Departamento del empleado (opcional)
+  /// - [scheduleId]: ID de plantilla de horario (opcional)
+  /// - [fechaInicio]: Fecha de inicio en la APLICACIÓN, no en la empresa (opcional)
+  /// - [fechaFin]: Fecha de fin en la APLICACIÓN - baja/baja temporal (opcional)
   /// - [role]: Rol del usuario. Por defecto UserRole.employee
   ///
   /// Retorna:
@@ -162,6 +165,9 @@ class EmployeeCreationService {
     String? telefono,
     String? cargo,
     String? departamento,
+    String? scheduleId,
+    DateTime? fechaInicio,
+    DateTime? fechaFin,
     UserRole role = UserRole.employee,
   }) async {
     debugPrint('🚀 EmployeeCreationService.createEmployee() iniciado');
@@ -240,6 +246,10 @@ class EmployeeCreationService {
         if (cargo != null && cargo.trim().isNotEmpty) 'position': cargo.trim(),
         if (departamento != null && departamento.trim().isNotEmpty)
           'department': departamento.trim(),
+        if (scheduleId != null && scheduleId.trim().isNotEmpty)
+          'scheduleId': scheduleId.trim(),
+        if (fechaInicio != null) 'fechaInicio': Timestamp.fromDate(fechaInicio),
+        if (fechaFin != null) 'fechaFin': Timestamp.fromDate(fechaFin),
       });
       debugPrint('✅ Documento creado en Firestore');
 

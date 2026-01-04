@@ -58,6 +58,9 @@ class UserManagement extends _$UserManagement {
   /// - [telefono]: Teléfono
   /// - [cargo]: Cargo/posición
   /// - [departamento]: Departamento
+  /// - [scheduleId]: ID de plantilla de horario
+  /// - [fechaInicio]: Fecha de inicio en la APLICACIÓN
+  /// - [fechaFin]: Fecha de fin en la APLICACIÓN (baja/baja temporal)
   /// - [role]: Rol del usuario (default: employee)
   ///
   /// Retorna el resultado con userId y contraseña temporal, o null si hay error
@@ -72,6 +75,9 @@ class UserManagement extends _$UserManagement {
     String? telefono,
     String? cargo,
     String? departamento,
+    String? scheduleId,
+    DateTime? fechaInicio,
+    DateTime? fechaFin,
     UserRole role = UserRole.employee,
   }) async {
     // DEBUGGING
@@ -115,6 +121,9 @@ class UserManagement extends _$UserManagement {
         telefono: telefono,
         cargo: cargo,
         departamento: departamento,
+        scheduleId: scheduleId,
+        fechaInicio: fechaInicio,
+        fechaFin: fechaFin,
         role: role,
       );
 

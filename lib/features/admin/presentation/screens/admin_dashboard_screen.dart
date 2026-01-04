@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -10,25 +11,29 @@ import '../../../../shared/widgets/cards/metric_card.dart';
 import '../widgets/weekly_activity_chart.dart';
 import '../widgets/recent_requests_list.dart';
 import '../widgets/control_alerts_panel.dart';
+import '../../providers/admin_provider.dart';
 
 /// Panel de administración - Rediseñado
 ///
 /// Vista principal del admin con métricas, gráfico de actividad,
 /// solicitudes recientes y alertas de control.
 ///
-/// MOCK DATA: Usa MockData para todas las secciones
-class AdminDashboardScreen extends StatelessWidget {
+/// DÍA 4 - SPRINT 4.2: Conectado con Firestore via employeesCountProvider
+/// - Total Empleados: dato real desde Firestore
+/// - Otras métricas: aún con MockData (se implementarán después)
+class AdminDashboardScreen extends ConsumerWidget {
   const AdminDashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final stats = MockData.adminStats;
+  Widget build(BuildContext context, WidgetRef ref) {
+    // DÍA 4 - SPRINT 4.2: Obtener total de empleados desde Firestore
+    final employeesCountAsync = ref.watch(employeesCountProvider);
 
     return AdminLayout(
       currentRoute: AppRouter.admin,
       showSearch: true,
       onSearchChanged: (query) {
-        // TODO [FASE-2]: Implementar búsqueda
+        // TODO [DÍA-4]: Implementar búsqueda global
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,11 +44,25 @@ class AdminDashboardScreen extends StatelessWidget {
           AppSpacing.verticalSpaceXxl,
 
           // Grid de métricas (4 cards)
-          _buildMetricsGrid(context, stats),
+          employeesCountAsync.when(
+            data: (employeesCount) => _buildMetricsGrid(
+              context,
+              employeesCount: employeesCount,
+            ),
+            loading: () => _buildMetricsGrid(
+              context,
+              employeesCount: null, // Mostrar loading
+            ),
+            error: (err, stack) => _buildMetricsGrid(
+              context,
+              employeesCount: 0, // Mostrar 0 en caso de error
+            ),
+          ),
 
           AppSpacing.verticalSpaceXxl,
 
           // Gráfico de actividad semanal
+          // TODO [DÍA-5+]: Conectar con datos reales de fichajes
           WeeklyActivityChart(
             data: MockData.weeklyActivity,
           ),
@@ -51,6 +70,7 @@ class AdminDashboardScreen extends StatelessWidget {
           AppSpacing.verticalSpaceXxl,
 
           // Fila inferior: Solicitudes y Alertas
+          // TODO [DÍA-5+]: Conectar con datos reales
           _buildBottomRow(context),
         ],
       ),
@@ -76,11 +96,17 @@ class AdminDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMetricsGrid(BuildContext context, Map<String, dynamic> stats) {
+  Widget _buildMetricsGrid(
+    BuildContext context, {
+    required int? employeesCount, // null = loading
+  }) {
     final isMobile = context.isMobile;
     final isTablet = context.isTablet;
     final columns = isMobile ? 1 : (isTablet ? 2 : 4);
     final gap = context.gridGap;
+
+    // Datos mock para las otras métricas (se implementarán después)
+    final stats = MockData.adminStats;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -92,19 +118,21 @@ class AdminDashboardScreen extends StatelessWidget {
           spacing: gap,
           runSpacing: gap,
           children: [
-            // Total Empleados
+            // Total Empleados - DATO REAL desde Firestore
             SizedBox(
               width: cardWidth,
               child: MetricCard(
                 icon: Icons.people,
                 label: 'Total Empleados',
-                value: stats['totalEmployees'].toString(),
+                value: employeesCount == null
+                    ? '...' // Loading
+                    : employeesCount.toString(), // Dato real
                 color: AppColors.primary,
-                badgeText: '+12',
+                badgeText: employeesCount == null ? null : '+12',
                 badgeColor: AppColors.success,
               ),
             ),
-            // Fichados Hoy
+            // Fichados Hoy - TODO: Implementar en DÍA 5+
             SizedBox(
               width: cardWidth,
               child: MetricCard(
@@ -115,7 +143,7 @@ class AdminDashboardScreen extends StatelessWidget {
                 badgeText: '97%',
               ),
             ),
-            // Ausencias
+            // Ausencias - TODO: Implementar en DÍA 5+
             SizedBox(
               width: cardWidth,
               child: MetricCard(
@@ -127,7 +155,7 @@ class AdminDashboardScreen extends StatelessWidget {
                 badgeColor: AppColors.success,
               ),
             ),
-            // Solicitudes
+            // Solicitudes - TODO: Implementar en DÍA 5+
             SizedBox(
               width: cardWidth,
               child: MetricCard(
