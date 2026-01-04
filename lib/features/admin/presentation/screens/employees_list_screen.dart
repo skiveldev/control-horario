@@ -10,17 +10,22 @@ import '../../../../shared/widgets/layouts/admin_layout.dart';
 import '../../../../shared/widgets/inputs/custom_text_field.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
 import '../widgets/employee_list_item.dart';
+import '../widgets/employee_table_header.dart';
+import '../widgets/employee_table_row.dart';
 import '../widgets/new_employee_drawer.dart';
 import '../../providers/admin_provider.dart';
 
-/// Pantalla de lista de empleados
+/// Pantalla de lista de empleados (rediseñada con tabla)
 ///
-/// Muestra todos los empleados con búsqueda y filtros.
+/// Muestra todos los empleados con búsqueda y filtros en formato tabla.
 ///
 /// DÍA 4 - SPRINT 4.3: Conectado con Firestore via searchAndFilterEmployeesProvider
 /// - Lista actualizada en tiempo real
 /// - Búsqueda funcional
 /// - Filtros por departamento funcionales
+/// - Nueva UI: Tabla estructurada con columnas
+/// - Paginación local
+/// - Responsive: tabla en desktop, cards en mobile
 class EmployeesListScreen extends ConsumerStatefulWidget {
   const EmployeesListScreen({super.key});
 
@@ -33,6 +38,10 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
   final _searchController = TextEditingController();
   String _selectedDepartment = 'todos';
   bool _isDrawerOpen = false;
+
+  // Paginación
+  int _currentPage = 1;
+  final int _itemsPerPage = 10;
 
   @override
   void dispose() {
@@ -63,33 +72,19 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Título
-                Text('Gestión de Empleados', style: AppTextStyles.h3),
+                Text('Gestión de Trabajadores', style: AppTextStyles.h3),
+                AppSpacing.verticalSpaceXs,
+                Text(
+                  'Administra los empleados del sistema y sus turnos',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
 
                 AppSpacing.verticalSpaceLg,
 
-                // Búsqueda y botón nuevo
-                Row(
-                  children: [
-                    Expanded(
-                      child: CustomTextField(
-                        controller: _searchController,
-                        hintText: 'Buscar por nombre, email o ID...',
-                        prefixIcon: Icons.search,
-                        onChanged: (_) {
-                          // El provider se actualiza automáticamente
-                          setState(() {}); // Trigger rebuild para el provider
-                        },
-                      ),
-                    ),
-                    AppSpacing.horizontalSpaceMd,
-                    CustomButton(
-                      text: 'Nuevo',
-                      icon: Icons.add,
-                      variant: ButtonVariant.primary,
-                      onPressed: () => setState(() => _isDrawerOpen = true),
-                    ),
-                  ],
-                ),
+                // Búsqueda, Filtros, Exportar y botón nuevo
+                _buildActionBar(context),
 
                 AppSpacing.verticalSpaceMd,
 
@@ -113,7 +108,7 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
 
                 AppSpacing.verticalSpaceLg,
 
-                // Lista de empleados con estados de AsyncValue
+                // Lista de empleados con tabla o cards según pantalla
                 employeesAsync.when(
                   data: (filteredEmployees) {
                     if (filteredEmployees.isEmpty) {
@@ -123,48 +118,34 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
                       );
                     }
 
+                    // Calcular paginación
+                    final totalPages =
+                        (filteredEmployees.length / _itemsPerPage).ceil();
+                    final startIndex = (_currentPage - 1) * _itemsPerPage;
+                    final endIndex = (startIndex + _itemsPerPage)
+                        .clamp(0, filteredEmployees.length);
+                    final paginatedEmployees =
+                        filteredEmployees.sublist(startIndex, endIndex);
+
+                    // Responsive: tabla en desktop/tablet, cards en mobile
+                    final isMobile = context.isMobile;
+
                     return Column(
                       children: [
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: filteredEmployees.length,
-                          separatorBuilder: (context, index) =>
-                              AppSpacing.verticalSpaceMd,
-                          itemBuilder: (context, index) {
-                            final employee = filteredEmployees[index];
-                            return EmployeeListItem(
-                              employee:
-                                  employee, // Pasar UserModel directamente
-                              onTap: () {
-                                context.push(
-                                  AppRouter.adminEmployeeDetail.replaceFirst(
-                                    ':id',
-                                    employee.userId,
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
+                        // Tabla o Cards según dispositivo
+                        if (isMobile)
+                          _buildCardsList(paginatedEmployees)
+                        else
+                          _buildTable(paginatedEmployees),
 
-                        // Footer con contador
-                        AppSpacing.verticalSpaceMd,
-                        allEmployeesAsync.when(
-                          data: (allEmployees) => Text(
-                            'Mostrando ${filteredEmployees.length} de ${allEmployees.length} empleados',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          loading: () => Text(
-                            'Cargando...',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                          error: (_, __) => const SizedBox.shrink(),
+                        AppSpacing.verticalSpaceLg,
+
+                        // Footer con contador y paginación
+                        _buildFooter(
+                          context,
+                          allEmployeesAsync,
+                          filteredEmployees.length,
+                          totalPages,
                         ),
                       ],
                     );
@@ -263,6 +244,304 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // ============================================================================
+  // MÉTODOS DE BUILD
+  // ============================================================================
+
+  Widget _buildActionBar(BuildContext context) {
+    final isMobile = context.isMobile;
+
+    if (isMobile) {
+      // En mobile: diseño vertical
+      return Column(
+        children: [
+          // Búsqueda
+          CustomTextField(
+            controller: _searchController,
+            hintText: 'Buscar por nombre, email o ID...',
+            prefixIcon: Icons.search,
+            onChanged: (_) {
+              // Resetear página al buscar
+              setState(() {
+                _currentPage = 1;
+              });
+            },
+          ),
+          AppSpacing.verticalSpaceSm,
+          // Botones
+          Row(
+            children: [
+              Expanded(
+                child: CustomButton(
+                  text: 'Filtros',
+                  icon: Icons.filter_list,
+                  variant: ButtonVariant.outline,
+                  onPressed: _showFiltersPlaceholder,
+                ),
+              ),
+              AppSpacing.horizontalSpaceSm,
+              Expanded(
+                child: CustomButton(
+                  text: 'Exportar',
+                  icon: Icons.download,
+                  variant: ButtonVariant.outline,
+                  onPressed: _showExportPlaceholder,
+                ),
+              ),
+              AppSpacing.horizontalSpaceSm,
+              Expanded(
+                child: CustomButton(
+                  text: 'Nuevo',
+                  icon: Icons.add,
+                  variant: ButtonVariant.primary,
+                  onPressed: () => setState(() => _isDrawerOpen = true),
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    }
+
+    // En desktop/tablet: diseño horizontal
+    return Row(
+      children: [
+        // Búsqueda
+        Expanded(
+          flex: 3,
+          child: CustomTextField(
+            controller: _searchController,
+            hintText: 'Buscar por nombre, email o ID...',
+            prefixIcon: Icons.search,
+            onChanged: (_) {
+              // Resetear página al buscar
+              setState(() {
+                _currentPage = 1;
+              });
+            },
+          ),
+        ),
+        AppSpacing.horizontalSpaceMd,
+        // Filtros
+        CustomButton(
+          text: 'Filtros',
+          icon: Icons.filter_list,
+          variant: ButtonVariant.outline,
+          onPressed: _showFiltersPlaceholder,
+        ),
+        AppSpacing.horizontalSpaceSm,
+        // Exportar
+        CustomButton(
+          text: 'Exportar',
+          icon: Icons.download,
+          variant: ButtonVariant.outline,
+          onPressed: _showExportPlaceholder,
+        ),
+        AppSpacing.horizontalSpaceMd,
+        // Nuevo Trabajador
+        CustomButton(
+          text: 'Nuevo Trabajador',
+          icon: Icons.add,
+          variant: ButtonVariant.primary,
+          onPressed: () => setState(() => _isDrawerOpen = true),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTable(List<dynamic> employees) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: AppSpacing.borderRadiusMd,
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        children: [
+          // Header de tabla
+          const EmployeeTableHeader(),
+
+          // Filas de empleados
+          ...employees.map((employee) {
+            return EmployeeTableRow(
+              employee: employee,
+              onTap: () {
+                context.push(
+                  AppRouter.adminEmployeeDetail.replaceFirst(
+                    ':id',
+                    employee.userId,
+                  ),
+                );
+              },
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCardsList(List<dynamic> employees) {
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: employees.length,
+      separatorBuilder: (context, index) => AppSpacing.verticalSpaceMd,
+      itemBuilder: (context, index) {
+        final employee = employees[index];
+        return EmployeeListItem(
+          employee: employee,
+          onTap: () {
+            context.push(
+              AppRouter.adminEmployeeDetail.replaceFirst(
+                ':id',
+                employee.userId,
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildFooter(
+    BuildContext context,
+    AsyncValue<List<dynamic>> allEmployeesAsync,
+    int filteredCount,
+    int totalPages,
+  ) {
+    return Column(
+      children: [
+        // Contador
+        allEmployeesAsync.when(
+          data: (allEmployees) => Text(
+            'Mostrando $filteredCount de ${allEmployees.length} empleados',
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          loading: () => Text(
+            'Cargando...',
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+          error: (_, __) => const SizedBox.shrink(),
+        ),
+
+        AppSpacing.verticalSpaceMd,
+
+        // Paginación
+        if (totalPages > 1) _buildPagination(totalPages),
+      ],
+    );
+  }
+
+  Widget _buildPagination(int totalPages) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Botón Anterior
+        TextButton.icon(
+          onPressed:
+              _currentPage > 1 ? () => setState(() => _currentPage--) : null,
+          icon: const Icon(Icons.arrow_back_ios, size: 16),
+          label: const Text('Anterior'),
+          style: TextButton.styleFrom(
+            foregroundColor:
+                _currentPage > 1 ? AppColors.primary : AppColors.textTertiary,
+          ),
+        ),
+
+        AppSpacing.horizontalSpaceMd,
+
+        // Indicador de página actual
+        Container(
+          padding: AppSpacing.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.primary,
+            borderRadius: AppSpacing.borderRadiusXs,
+          ),
+          child: Text(
+            '$_currentPage',
+            style: AppTextStyles.labelMedium.copyWith(
+              color: AppColors.textOnPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+
+        AppSpacing.horizontalSpaceSm,
+
+        Text(
+          'de $totalPages',
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.textSecondary,
+          ),
+        ),
+
+        AppSpacing.horizontalSpaceMd,
+
+        // Botón Siguiente
+        TextButton(
+          onPressed: _currentPage < totalPages
+              ? () => setState(() => _currentPage++)
+              : null,
+          style: TextButton.styleFrom(
+            foregroundColor: _currentPage < totalPages
+                ? AppColors.primary
+                : AppColors.textTertiary,
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Siguiente'),
+              SizedBox(width: 4),
+              Icon(Icons.arrow_forward_ios, size: 16),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ============================================================================
+  // CALLBACKS
+  // ============================================================================
+
+  void _showFiltersPlaceholder() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Panel de filtros avanzados - Próximamente',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textOnPrimary,
+          ),
+        ),
+        backgroundColor: AppColors.info,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showExportPlaceholder() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Exportar a CSV/Excel - Próximamente',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textOnPrimary,
+          ),
+        ),
+        backgroundColor: AppColors.success,
+        duration: const Duration(seconds: 2),
       ),
     );
   }

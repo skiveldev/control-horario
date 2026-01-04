@@ -302,6 +302,47 @@ class MockData {
   ];
 
   // ============================================================================
+  // ÚLTIMO FICHAJE (Para tabla de empleados)
+  // ============================================================================
+
+  /// Mock data de último fichaje por userId
+  ///
+  /// Formato: userId -> último fichaje (Hoy HH:mm, Ayer HH:mm, DD MMM HH:mm)
+  /// TODO [FASE-2]: Obtener desde collection timeRecords de Firestore
+  static final Map<String, String> lastClockInByUserId = {
+    // Formato: userId -> último fichaje
+  };
+
+  /// Helper para obtener el último fichaje de un empleado
+  ///
+  /// Si no existe, genera uno aleatorio para simular datos
+  static String getLastClockIn(String userId) {
+    // Si ya existe en el mapa, retornarlo
+    if (lastClockInByUserId.containsKey(userId)) {
+      return lastClockInByUserId[userId]!;
+    }
+
+    // Generar mock data aleatorio basado en el hash del userId
+    final hash = userId.hashCode.abs();
+    final options = [
+      'Hoy, 08:45',
+      'Hoy, 09:00',
+      'Hoy, 08:30',
+      'Hoy, 14:02',
+      'Hoy, 09:15',
+      'Ayer, 18:30',
+      'Ayer, 17:45',
+      '05 Mar, 17:00',
+      '04 Mar, 16:30',
+      '03 Mar, 18:00',
+    ];
+
+    final selected = options[hash % options.length];
+    lastClockInByUserId[userId] = selected;
+    return selected;
+  }
+
+  // ============================================================================
   // MÉTODOS HELPER (FASE 1)
   // ============================================================================
 
