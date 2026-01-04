@@ -38,6 +38,8 @@ mixin _$UserModel {
       throw _privateConstructorUsedError; // Cargo (ej: "Desarrollador Frontend Senior")
   String? get department =>
       throw _privateConstructorUsedError; // Departamento (ej: "Tecnología", "Docente")
+  String? get empresa =>
+      throw _privateConstructorUsedError; // Empresa (ej: "Escuela Música")
 // === Control horario (opcional, híbrido) ===
   String? get scheduleId =>
       throw _privateConstructorUsedError; // Referencia a plantilla de horario (ej: "template_40h_001")
@@ -77,6 +79,7 @@ abstract class $UserModelCopyWith<$Res> {
       String? telefono,
       String? position,
       String? department,
+      String? empresa,
       String? scheduleId,
       DateTime? fechaInicio,
       DateTime? fechaFin,
@@ -110,6 +113,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? telefono = freezed,
     Object? position = freezed,
     Object? department = freezed,
+    Object? empresa = freezed,
     Object? scheduleId = freezed,
     Object? fechaInicio = freezed,
     Object? fechaFin = freezed,
@@ -164,6 +168,10 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.department
           : department // ignore: cast_nullable_to_non_nullable
               as String?,
+      empresa: freezed == empresa
+          ? _value.empresa
+          : empresa // ignore: cast_nullable_to_non_nullable
+              as String?,
       scheduleId: freezed == scheduleId
           ? _value.scheduleId
           : scheduleId // ignore: cast_nullable_to_non_nullable
@@ -205,6 +213,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
       String? telefono,
       String? position,
       String? department,
+      String? empresa,
       String? scheduleId,
       DateTime? fechaInicio,
       DateTime? fechaFin,
@@ -236,6 +245,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? telefono = freezed,
     Object? position = freezed,
     Object? department = freezed,
+    Object? empresa = freezed,
     Object? scheduleId = freezed,
     Object? fechaInicio = freezed,
     Object? fechaFin = freezed,
@@ -290,6 +300,10 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.department
           : department // ignore: cast_nullable_to_non_nullable
               as String?,
+      empresa: freezed == empresa
+          ? _value.empresa
+          : empresa // ignore: cast_nullable_to_non_nullable
+              as String?,
       scheduleId: freezed == scheduleId
           ? _value.scheduleId
           : scheduleId // ignore: cast_nullable_to_non_nullable
@@ -326,6 +340,7 @@ class _$UserModelImpl implements _UserModel {
       this.telefono,
       this.position,
       this.department,
+      this.empresa,
       this.scheduleId,
       this.fechaInicio,
       this.fechaFin,
@@ -366,6 +381,9 @@ class _$UserModelImpl implements _UserModel {
   @override
   final String? department;
 // Departamento (ej: "Tecnología", "Docente")
+  @override
+  final String? empresa;
+// Empresa (ej: "Escuela Música")
 // === Control horario (opcional, híbrido) ===
   @override
   final String? scheduleId;
@@ -383,7 +401,7 @@ class _$UserModelImpl implements _UserModel {
 
   @override
   String toString() {
-    return 'UserModel(userId: $userId, employeeId: $employeeId, email: $email, displayName: $displayName, role: $role, weeklyHours: $weeklyHours, isActive: $isActive, createdAt: $createdAt, dni: $dni, telefono: $telefono, position: $position, department: $department, scheduleId: $scheduleId, fechaInicio: $fechaInicio, fechaFin: $fechaFin, schedule: $schedule)';
+    return 'UserModel(userId: $userId, employeeId: $employeeId, email: $email, displayName: $displayName, role: $role, weeklyHours: $weeklyHours, isActive: $isActive, createdAt: $createdAt, dni: $dni, telefono: $telefono, position: $position, department: $department, empresa: $empresa, scheduleId: $scheduleId, fechaInicio: $fechaInicio, fechaFin: $fechaFin, schedule: $schedule)';
   }
 
   @override
@@ -411,6 +429,7 @@ class _$UserModelImpl implements _UserModel {
                 other.position == position) &&
             (identical(other.department, department) ||
                 other.department == department) &&
+            (identical(other.empresa, empresa) || other.empresa == empresa) &&
             (identical(other.scheduleId, scheduleId) ||
                 other.scheduleId == scheduleId) &&
             (identical(other.fechaInicio, fechaInicio) ||
@@ -437,6 +456,7 @@ class _$UserModelImpl implements _UserModel {
       telefono,
       position,
       department,
+      empresa,
       scheduleId,
       fechaInicio,
       fechaFin,
@@ -472,6 +492,7 @@ abstract class _UserModel implements UserModel {
           final String? telefono,
           final String? position,
           final String? department,
+          final String? empresa,
           final String? scheduleId,
           final DateTime? fechaInicio,
           final DateTime? fechaFin,
@@ -507,6 +528,8 @@ abstract class _UserModel implements UserModel {
   String? get position; // Cargo (ej: "Desarrollador Frontend Senior")
   @override
   String? get department; // Departamento (ej: "Tecnología", "Docente")
+  @override
+  String? get empresa; // Empresa (ej: "Escuela Música")
 // === Control horario (opcional, híbrido) ===
   @override
   String?

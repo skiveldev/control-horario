@@ -9,9 +9,31 @@
 ## 📋 Resumen
 
 Se actualizó el `UserModel` con una **estructura híbrida** que combina:
-- **Campos simples** para datos que no cambian frecuentemente (departamento, cargo)
+- **Campos simples** para datos que no cambian frecuentemente (departamento, cargo, empresa)
 - **Referencias** para datos complejos que se necesitan ocasionalmente (scheduleId)
 - **Campos adicionales** del drawer de FASE 1 que faltaban
+
+### 📊 Tabla Completa de Campos del UserModel
+
+| Campo           | Tipo         | Obligatorio | Descripción                                                    | Estrategia                      |
+|-----------------|--------------|-------------|----------------------------------------------------------------|---------------------------------|
+| `userId`        | `String`     | ✅          | ID único de Firebase Auth                                       | Básico                          |
+| `employeeId`    | `String`     | ✅          | ID del empleado (ej: "EMP-042")                                 | Básico (vacío hasta DÍA 6)      |
+| `email`         | `String`     | ✅          | Email de autenticación                                          | Básico                          |
+| `displayName`   | `String`     | ✅          | Nombre completo para mostrar                                    | Básico                          |
+| `role`          | `UserRole`   | ✅          | Rol del usuario (employee/rrhh/admin)                           | Básico (enum)                   |
+| `weeklyHours`   | `double`     | ✅          | Horas semanales (cache, ej: 40.0)                              | Básico                          |
+| `isActive`      | `bool`       | ✅          | Si el usuario está activo                                       | Básico                          |
+| `createdAt`     | `DateTime`   | ✅          | Fecha de creación del registro                                  | Básico                          |
+| `dni`           | `String?`    | ❌          | DNI/NIE del empleado                                            | Simple (opcional)               |
+| `telefono`      | `String?`    | ❌          | Teléfono de contacto                                            | Simple (opcional)               |
+| `position`      | `String?`    | ❌          | Cargo (ej: "Desarrollador Senior")                              | Desnormalizado (opcional)       |
+| `department`    | `String?`    | ❌          | Departamento (ej: "Tecnología")                                 | Desnormalizado (opcional)       |
+| `empresa`       | `String?`    | ❌          | Empresa (ej: "Escuela Música")                                  | Desnormalizado (opcional)       |
+| `scheduleId`    | `String?`    | ❌          | Referencia a plantilla de horario                               | Normalizado - Referencia (opcional) |
+| `fechaInicio`   | `DateTime?`  | ❌          | Fecha de inicio en la APLICACIÓN                                | Simple (opcional)               |
+| `fechaFin`      | `DateTime?`  | ❌          | Fecha de fin en la APLICACIÓN (baja)                            | Simple (opcional)               |
+| `schedule`      | `String?`    | ❌ (DEPRECATED) | Horario en texto (ej: "09:00 - 18:00")                      | DEPRECATED - Usar scheduleId    |
 
 ---
 
@@ -46,6 +68,7 @@ required DateTime createdAt,
 // Información laboral
 String? position,      // Cargo
 String? department,    // Departamento
+String? empresa,       // Empresa (ej: "Escuela Música")
 
 // DEPRECATED (mantener por compatibilidad)
 @Deprecated('Usar scheduleId en su lugar')
@@ -118,6 +141,16 @@ final result = await service.createEmployee(
 - Administración
 - Recursos Humanos
 
+### Empresa: String Simple + Pre-filled ✅
+**Justificación:**
+- Actualmente es una única empresa ("Escuela Música")
+- Se muestra pre-filled en el drawer (puede editarse si es necesario)
+- String simple permite fácil migración a multi-empresa en el futuro
+- No se requiere normalización para el MVP actual
+
+**Valor por defecto:**
+- "Escuela Música"
+
 ### Horario: Referencia (scheduleId) ✅
 **Justificación:**
 - Los horarios son complejos (turnos, días, pausas)
@@ -176,8 +209,10 @@ isActive: false
 Los empleados de test en Firestore (como "Paulo" y "Admin Sistema") **NO tienen** los campos nuevos:
 - `dni`: null
 - `telefono`: null
+- `empresa`: null
 - `scheduleId`: null
 - `fechaInicio`: null
+- `fechaFin`: null
 
 **Esto NO es problema** porque:
 - ✅ Todos los campos nuevos son **opcionales** (`String?`, `DateTime?`)

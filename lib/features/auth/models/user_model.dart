@@ -30,6 +30,7 @@ class UserModel with _$UserModel {
     // === Información laboral (opcional, desnormalizado) ===
     String? position, // Cargo (ej: "Desarrollador Frontend Senior")
     String? department, // Departamento (ej: "Tecnología", "Docente")
+    String? empresa, // Empresa (ej: "Escuela Música")
 
     // === Control horario (opcional, híbrido) ===
     String?
@@ -88,6 +89,7 @@ class UserModel with _$UserModel {
       // Información laboral
       position: data['position'] as String?,
       department: data['department'] as String?,
+      empresa: data['empresa'] as String?,
 
       // Control horario
       scheduleId: data['scheduleId'] as String?,

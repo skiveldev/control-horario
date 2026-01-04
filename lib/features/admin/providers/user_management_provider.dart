@@ -58,6 +58,7 @@ class UserManagement extends _$UserManagement {
   /// - [telefono]: Teléfono
   /// - [cargo]: Cargo/posición
   /// - [departamento]: Departamento
+  /// - [empresa]: Empresa (por defecto "Escuela Música")
   /// - [scheduleId]: ID de plantilla de horario
   /// - [fechaInicio]: Fecha de inicio en la APLICACIÓN
   /// - [fechaFin]: Fecha de fin en la APLICACIÓN (baja/baja temporal)
@@ -75,6 +76,7 @@ class UserManagement extends _$UserManagement {
     String? telefono,
     String? cargo,
     String? departamento,
+    String? empresa,
     String? scheduleId,
     DateTime? fechaInicio,
     DateTime? fechaFin,
@@ -121,6 +123,7 @@ class UserManagement extends _$UserManagement {
         telefono: telefono,
         cargo: cargo,
         departamento: departamento,
+        empresa: empresa,
         scheduleId: scheduleId,
         fechaInicio: fechaInicio,
         fechaFin: fechaFin,

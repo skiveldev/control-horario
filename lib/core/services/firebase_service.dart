@@ -142,6 +142,7 @@ class EmployeeCreationService {
   /// - [telefono]: Teléfono del empleado (opcional)
   /// - [cargo]: Cargo/posición del empleado (opcional)
   /// - [departamento]: Departamento del empleado (opcional)
+  /// - [empresa]: Empresa del empleado (opcional, por defecto "Escuela Música")
   /// - [scheduleId]: ID de plantilla de horario (opcional)
   /// - [fechaInicio]: Fecha de inicio en la APLICACIÓN, no en la empresa (opcional)
   /// - [fechaFin]: Fecha de fin en la APLICACIÓN - baja/baja temporal (opcional)
@@ -165,6 +166,7 @@ class EmployeeCreationService {
     String? telefono,
     String? cargo,
     String? departamento,
+    String? empresa,
     String? scheduleId,
     DateTime? fechaInicio,
     DateTime? fechaFin,
@@ -246,6 +248,8 @@ class EmployeeCreationService {
         if (cargo != null && cargo.trim().isNotEmpty) 'position': cargo.trim(),
         if (departamento != null && departamento.trim().isNotEmpty)
           'department': departamento.trim(),
+        if (empresa != null && empresa.trim().isNotEmpty)
+          'empresa': empresa.trim(),
         if (scheduleId != null && scheduleId.trim().isNotEmpty)
           'scheduleId': scheduleId.trim(),
         if (fechaInicio != null) 'fechaInicio': Timestamp.fromDate(fechaInicio),

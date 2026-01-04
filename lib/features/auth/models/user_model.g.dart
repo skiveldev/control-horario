@@ -20,6 +20,7 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       telefono: json['telefono'] as String?,
       position: json['position'] as String?,
       department: json['department'] as String?,
+      empresa: json['empresa'] as String?,
       scheduleId: json['scheduleId'] as String?,
       fechaInicio: json['fechaInicio'] == null
           ? null
@@ -44,6 +45,7 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'telefono': instance.telefono,
       'position': instance.position,
       'department': instance.department,
+      'empresa': instance.empresa,
       'scheduleId': instance.scheduleId,
       'fechaInicio': instance.fechaInicio?.toIso8601String(),
       'fechaFin': instance.fechaFin?.toIso8601String(),

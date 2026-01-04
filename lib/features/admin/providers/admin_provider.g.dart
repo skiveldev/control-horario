@@ -6,7 +6,7 @@ part of 'admin_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$allEmployeesHash() => r'986fd502188130bc9983c6bafe0be950d09667c6';
+String _$allEmployeesHash() => r'418572fbbd8ad2c245952e22f091cedbf12f7ddf';
 
 /// Provider que obtiene todos los empleados activos desde Firestore
 ///
