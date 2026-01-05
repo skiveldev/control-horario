@@ -144,8 +144,12 @@ class EmployeeCreationService {
   /// - [departamento]: Departamento del empleado (opcional)
   /// - [empresa]: Empresa del empleado (opcional, por defecto "Escuela Música")
   /// - [scheduleId]: ID de plantilla de horario (opcional)
-  /// - [fechaInicio]: Fecha de inicio en la APLICACIÓN, no en la empresa (opcional)
-  /// - [fechaFin]: Fecha de fin en la APLICACIÓN - baja/baja temporal (opcional)
+  /// - [fechaInicio]: Fecha de inicio en la APLICACIÓN (NO en la empresa).
+  ///   Desde esta fecha el empleado puede fichar en el sistema.
+  ///   Ejemplo: Empleado trabaja desde 2018, pero acceso app desde 10/01/2026
+  /// - [fechaFin]: Fecha de fin en la APLICACIÓN (baja/baja temporal del sistema).
+  ///   Hasta esta fecha el empleado puede fichar. Null = indefinido.
+  ///   Ejemplo: Baja de maternidad, despido, jubilación
   /// - [role]: Rol del usuario. Por defecto UserRole.employee
   ///
   /// Retorna:
@@ -242,6 +246,11 @@ class EmployeeCreationService {
         'isActive': true,
         'createdAt': FieldValue.serverTimestamp(),
         // Campos opcionales (solo si tienen valor)
+        // ✅ Campos nombre/apellidos SEPARADOS
+        if (nombre.trim().isNotEmpty) 'nombre': nombre.trim(),
+        if (apellido1.trim().isNotEmpty) 'apellido1': apellido1.trim(),
+        if (apellido2 != null && apellido2.trim().isNotEmpty)
+          'apellido2': apellido2.trim(),
         if (dni != null && dni.trim().isNotEmpty) 'dni': dni.trim(),
         if (telefono != null && telefono.trim().isNotEmpty)
           'telefono': telefono.trim(),
@@ -252,6 +261,9 @@ class EmployeeCreationService {
           'empresa': empresa.trim(),
         if (scheduleId != null && scheduleId.trim().isNotEmpty)
           'scheduleId': scheduleId.trim(),
+        // ⚠️ CRÍTICO: fechaInicio/fechaFin son ALTAS EN LA APLICACIÓN, NO en la empresa
+        // - fechaInicio: Desde cuándo puede fichar en la app
+        // - fechaFin: Hasta cuándo puede fichar (baja de la app)
         if (fechaInicio != null) 'fechaInicio': Timestamp.fromDate(fechaInicio),
         if (fechaFin != null) 'fechaFin': Timestamp.fromDate(fechaFin),
       });

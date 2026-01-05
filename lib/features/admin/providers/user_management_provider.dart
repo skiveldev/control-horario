@@ -60,8 +60,8 @@ class UserManagement extends _$UserManagement {
   /// - [departamento]: Departamento
   /// - [empresa]: Empresa (por defecto "Escuela Música")
   /// - [scheduleId]: ID de plantilla de horario
-  /// - [fechaInicio]: Fecha de inicio en la APLICACIÓN
-  /// - [fechaFin]: Fecha de fin en la APLICACIÓN (baja/baja temporal)
+  /// - [fechaInicio]: Fecha de inicio en la APLICACIÓN (acceso al sistema de fichaje)
+  /// - [fechaFin]: Fecha de fin en la APLICACIÓN (baja/baja temporal del sistema)
   /// - [role]: Rol del usuario (default: employee)
   ///
   /// Retorna el resultado con userId y contraseña temporal, o null si hay error

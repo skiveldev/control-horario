@@ -252,6 +252,13 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                     : _cargoController.text.trim(),
                 departamento: _selectedDepartamento,
                 role: role,
+                // ✅ Los 4 campos que faltaban
+                empresa: _empresaController.text.trim().isEmpty
+                    ? null
+                    : _empresaController.text.trim(),
+                scheduleId: _selectedScheduleId,
+                fechaInicio: _fechaInicio,
+                fechaFin: _fechaFin,
               );
 
       if (result == null) {

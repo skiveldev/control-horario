@@ -30,6 +30,12 @@ mixin _$UserModel {
   bool get isActive => throw _privateConstructorUsedError;
   DateTime get createdAt =>
       throw _privateConstructorUsedError; // === Información personal (opcional) ===
+  String? get nombre =>
+      throw _privateConstructorUsedError; // Nombre (ej: "María")
+  String? get apellido1 =>
+      throw _privateConstructorUsedError; // Primer apellido (ej: "García")
+  String? get apellido2 =>
+      throw _privateConstructorUsedError; // Segundo apellido (ej: "López")
   String? get dni => throw _privateConstructorUsedError; // DNI/NIE del empleado
   String? get telefono =>
       throw _privateConstructorUsedError; // Teléfono de contacto
@@ -43,10 +49,11 @@ mixin _$UserModel {
 // === Control horario (opcional, híbrido) ===
   String? get scheduleId =>
       throw _privateConstructorUsedError; // Referencia a plantilla de horario (ej: "template_40h_001")
+// ⚠️ FECHAS DE ALTA EN LA APLICACIÓN (NO en la empresa)
   DateTime? get fechaInicio =>
-      throw _privateConstructorUsedError; // Fecha de inicio en la APLICACIÓN (no en la empresa)
+      throw _privateConstructorUsedError; // Fecha desde la cual el empleado puede FICHAR en la app
   DateTime? get fechaFin =>
-      throw _privateConstructorUsedError; // Fecha de fin en la APLICACIÓN (baja/baja temporal)
+      throw _privateConstructorUsedError; // Fecha hasta la cual el empleado puede FICHAR (baja app)
 // DEPRECATED: Mantener por compatibilidad con código existente
   @Deprecated('Usar scheduleId en su lugar')
   String? get schedule => throw _privateConstructorUsedError;
@@ -75,6 +82,9 @@ abstract class $UserModelCopyWith<$Res> {
       double weeklyHours,
       bool isActive,
       DateTime createdAt,
+      String? nombre,
+      String? apellido1,
+      String? apellido2,
       String? dni,
       String? telefono,
       String? position,
@@ -109,6 +119,9 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? weeklyHours = null,
     Object? isActive = null,
     Object? createdAt = null,
+    Object? nombre = freezed,
+    Object? apellido1 = freezed,
+    Object? apellido2 = freezed,
     Object? dni = freezed,
     Object? telefono = freezed,
     Object? position = freezed,
@@ -152,6 +165,18 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      nombre: freezed == nombre
+          ? _value.nombre
+          : nombre // ignore: cast_nullable_to_non_nullable
+              as String?,
+      apellido1: freezed == apellido1
+          ? _value.apellido1
+          : apellido1 // ignore: cast_nullable_to_non_nullable
+              as String?,
+      apellido2: freezed == apellido2
+          ? _value.apellido2
+          : apellido2 // ignore: cast_nullable_to_non_nullable
+              as String?,
       dni: freezed == dni
           ? _value.dni
           : dni // ignore: cast_nullable_to_non_nullable
@@ -209,6 +234,9 @@ abstract class _$$UserModelImplCopyWith<$Res>
       double weeklyHours,
       bool isActive,
       DateTime createdAt,
+      String? nombre,
+      String? apellido1,
+      String? apellido2,
       String? dni,
       String? telefono,
       String? position,
@@ -241,6 +269,9 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? weeklyHours = null,
     Object? isActive = null,
     Object? createdAt = null,
+    Object? nombre = freezed,
+    Object? apellido1 = freezed,
+    Object? apellido2 = freezed,
     Object? dni = freezed,
     Object? telefono = freezed,
     Object? position = freezed,
@@ -284,6 +315,18 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      nombre: freezed == nombre
+          ? _value.nombre
+          : nombre // ignore: cast_nullable_to_non_nullable
+              as String?,
+      apellido1: freezed == apellido1
+          ? _value.apellido1
+          : apellido1 // ignore: cast_nullable_to_non_nullable
+              as String?,
+      apellido2: freezed == apellido2
+          ? _value.apellido2
+          : apellido2 // ignore: cast_nullable_to_non_nullable
+              as String?,
       dni: freezed == dni
           ? _value.dni
           : dni // ignore: cast_nullable_to_non_nullable
@@ -336,6 +379,9 @@ class _$UserModelImpl implements _UserModel {
       required this.weeklyHours,
       this.isActive = true,
       required this.createdAt,
+      this.nombre,
+      this.apellido1,
+      this.apellido2,
       this.dni,
       this.telefono,
       this.position,
@@ -369,6 +415,15 @@ class _$UserModelImpl implements _UserModel {
   final DateTime createdAt;
 // === Información personal (opcional) ===
   @override
+  final String? nombre;
+// Nombre (ej: "María")
+  @override
+  final String? apellido1;
+// Primer apellido (ej: "García")
+  @override
+  final String? apellido2;
+// Segundo apellido (ej: "López")
+  @override
   final String? dni;
 // DNI/NIE del empleado
   @override
@@ -388,12 +443,13 @@ class _$UserModelImpl implements _UserModel {
   @override
   final String? scheduleId;
 // Referencia a plantilla de horario (ej: "template_40h_001")
+// ⚠️ FECHAS DE ALTA EN LA APLICACIÓN (NO en la empresa)
   @override
   final DateTime? fechaInicio;
-// Fecha de inicio en la APLICACIÓN (no en la empresa)
+// Fecha desde la cual el empleado puede FICHAR en la app
   @override
   final DateTime? fechaFin;
-// Fecha de fin en la APLICACIÓN (baja/baja temporal)
+// Fecha hasta la cual el empleado puede FICHAR (baja app)
 // DEPRECATED: Mantener por compatibilidad con código existente
   @override
   @Deprecated('Usar scheduleId en su lugar')
@@ -401,7 +457,7 @@ class _$UserModelImpl implements _UserModel {
 
   @override
   String toString() {
-    return 'UserModel(userId: $userId, employeeId: $employeeId, email: $email, displayName: $displayName, role: $role, weeklyHours: $weeklyHours, isActive: $isActive, createdAt: $createdAt, dni: $dni, telefono: $telefono, position: $position, department: $department, empresa: $empresa, scheduleId: $scheduleId, fechaInicio: $fechaInicio, fechaFin: $fechaFin, schedule: $schedule)';
+    return 'UserModel(userId: $userId, employeeId: $employeeId, email: $email, displayName: $displayName, role: $role, weeklyHours: $weeklyHours, isActive: $isActive, createdAt: $createdAt, nombre: $nombre, apellido1: $apellido1, apellido2: $apellido2, dni: $dni, telefono: $telefono, position: $position, department: $department, empresa: $empresa, scheduleId: $scheduleId, fechaInicio: $fechaInicio, fechaFin: $fechaFin, schedule: $schedule)';
   }
 
   @override
@@ -422,6 +478,11 @@ class _$UserModelImpl implements _UserModel {
                 other.isActive == isActive) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
+            (identical(other.nombre, nombre) || other.nombre == nombre) &&
+            (identical(other.apellido1, apellido1) ||
+                other.apellido1 == apellido1) &&
+            (identical(other.apellido2, apellido2) ||
+                other.apellido2 == apellido2) &&
             (identical(other.dni, dni) || other.dni == dni) &&
             (identical(other.telefono, telefono) ||
                 other.telefono == telefono) &&
@@ -442,25 +503,29 @@ class _$UserModelImpl implements _UserModel {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      userId,
-      employeeId,
-      email,
-      displayName,
-      role,
-      weeklyHours,
-      isActive,
-      createdAt,
-      dni,
-      telefono,
-      position,
-      department,
-      empresa,
-      scheduleId,
-      fechaInicio,
-      fechaFin,
-      schedule);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        userId,
+        employeeId,
+        email,
+        displayName,
+        role,
+        weeklyHours,
+        isActive,
+        createdAt,
+        nombre,
+        apellido1,
+        apellido2,
+        dni,
+        telefono,
+        position,
+        department,
+        empresa,
+        scheduleId,
+        fechaInicio,
+        fechaFin,
+        schedule
+      ]);
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -488,6 +553,9 @@ abstract class _UserModel implements UserModel {
           required final double weeklyHours,
           final bool isActive,
           required final DateTime createdAt,
+          final String? nombre,
+          final String? apellido1,
+          final String? apellido2,
           final String? dni,
           final String? telefono,
           final String? position,
@@ -520,6 +588,12 @@ abstract class _UserModel implements UserModel {
   @override
   DateTime get createdAt; // === Información personal (opcional) ===
   @override
+  String? get nombre; // Nombre (ej: "María")
+  @override
+  String? get apellido1; // Primer apellido (ej: "García")
+  @override
+  String? get apellido2; // Segundo apellido (ej: "López")
+  @override
   String? get dni; // DNI/NIE del empleado
   @override
   String? get telefono; // Teléfono de contacto
@@ -534,11 +608,13 @@ abstract class _UserModel implements UserModel {
   @override
   String?
       get scheduleId; // Referencia a plantilla de horario (ej: "template_40h_001")
+// ⚠️ FECHAS DE ALTA EN LA APLICACIÓN (NO en la empresa)
   @override
   DateTime?
-      get fechaInicio; // Fecha de inicio en la APLICACIÓN (no en la empresa)
+      get fechaInicio; // Fecha desde la cual el empleado puede FICHAR en la app
   @override
-  DateTime? get fechaFin; // Fecha de fin en la APLICACIÓN (baja/baja temporal)
+  DateTime?
+      get fechaFin; // Fecha hasta la cual el empleado puede FICHAR (baja app)
 // DEPRECATED: Mantener por compatibilidad con código existente
   @override
   @Deprecated('Usar scheduleId en su lugar')

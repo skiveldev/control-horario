@@ -65,6 +65,7 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
   bool _isLoading = false;
   String? _startTimeError;
   String? _endTimeError;
+  late bool _isActiveRecord; // ✨ Detectar si es registro activo
 
   @override
   void initState() {
@@ -74,11 +75,18 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
       final record = widget.recordToEdit!;
       _selectedCategory = record.category;
       _startTime = _parseTime(record.startTime);
-      _endTime = _parseTime(record.endTime);
+      _isActiveRecord = record.isActive; // ✨ Determinar si está activo
+
+      // ✨ Solo cargar endTime si NO es activo
+      if (!_isActiveRecord) {
+        _endTime = _parseTime(record.endTime);
+      }
+
       _selectedLocation = record.location;
     } else {
       // Modo añadir
       _selectedCategory = RecordCategory.work;
+      _isActiveRecord = false; // ✨ Nuevos registros siempre son completados
       _selectedLocation = widget.availableLocations.isNotEmpty
           ? widget.availableLocations.first
           : null;
@@ -115,6 +123,12 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
                 AppSpacing.verticalSpaceLg,
               ],
 
+              // ✨ Aviso si es registro activo
+              if (_isActiveRecord) ...[
+                _buildActiveRecordWarning(),
+                AppSpacing.verticalSpaceLg,
+              ],
+
               // Tipo de registro
               _buildSectionLabel('TIPO DE REGISTRO'),
               AppSpacing.verticalSpaceSm,
@@ -132,54 +146,70 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
               // Horario
               _buildSectionLabel('HORARIO'),
               AppSpacing.verticalSpaceSm,
-              Row(
-                children: [
-                  Expanded(
-                    child: TimePickerField(
-                      label: 'Hora inicio',
-                      value: _startTime,
-                      errorText: _startTimeError,
-                      onChanged: (time) {
-                        setState(() {
-                          _startTime = time;
-                          _validateTimes();
-                        });
-                      },
-                    ),
-                  ),
-                  AppSpacing.horizontalSpaceLg,
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      top: AppSpacing.xl,
-                    ),
-                    child: Text(
-                      '—',
-                      style: AppTextStyles.h4.copyWith(
-                        color: AppColors.textTertiary,
+              // ✨ Mostrar layout diferente según si es activo o completado
+              if (_isActiveRecord)
+                // Registro activo: Solo hora inicio
+                TimePickerField(
+                  label: _getStartTimeLabel(), // ✨ Label contextual
+                  value: _startTime,
+                  errorText: _startTimeError,
+                  onChanged: (time) {
+                    setState(() {
+                      _startTime = time;
+                      _validateTimes();
+                    });
+                  },
+                )
+              else
+                // Registro completado: Hora inicio + fin
+                Row(
+                  children: [
+                    Expanded(
+                      child: TimePickerField(
+                        label: _getStartTimeLabel(), // ✨ Label contextual
+                        value: _startTime,
+                        errorText: _startTimeError,
+                        onChanged: (time) {
+                          setState(() {
+                            _startTime = time;
+                            _validateTimes();
+                          });
+                        },
                       ),
                     ),
-                  ),
-                  AppSpacing.horizontalSpaceLg,
-                  Expanded(
-                    child: TimePickerField(
-                      label: 'Hora fin',
-                      value: _endTime,
-                      errorText: _endTimeError,
-                      onChanged: (time) {
-                        setState(() {
-                          _endTime = time;
-                          _validateTimes();
-                        });
-                      },
+                    AppSpacing.horizontalSpaceLg,
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: AppSpacing.xl,
+                      ),
+                      child: Text(
+                        '—',
+                        style: AppTextStyles.h4.copyWith(
+                          color: AppColors.textTertiary,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                    AppSpacing.horizontalSpaceLg,
+                    Expanded(
+                      child: TimePickerField(
+                        label: _getEndTimeLabel(), // ✨ Label contextual
+                        value: _endTime,
+                        errorText: _endTimeError,
+                        onChanged: (time) {
+                          setState(() {
+                            _endTime = time;
+                            _validateTimes();
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
 
               AppSpacing.verticalSpaceMd,
 
-              // Duración estimada
-              _buildDurationDisplay(),
+              // ✨ Duración solo si NO es activo
+              if (!_isActiveRecord) _buildDurationDisplay(),
 
               AppSpacing.verticalSpaceXxl,
 
@@ -331,6 +361,59 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
     );
   }
 
+  /// ✨ Warning para registros activos
+  Widget _buildActiveRecordWarning() {
+    return Container(
+      padding: AppSpacing.allMd,
+      decoration: BoxDecoration(
+        color: AppColors.warning.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        border: Border.all(
+          color: AppColors.warning.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.access_time,
+            size: AppSpacing.iconMd,
+            color: AppColors.warning,
+          ),
+          AppSpacing.horizontalSpaceSm,
+          Expanded(
+            child: Text(
+              _selectedCategory == RecordCategory.work
+                  ? 'Registro en curso. Solo puedes editar la hora de entrada.'
+                  : 'Pausa en curso. Solo puedes editar la hora de inicio de pausa.',
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ✨ Obtener label contextual para hora de inicio
+  String _getStartTimeLabel() {
+    if (_selectedCategory == RecordCategory.work) {
+      return 'Hora de entrada';
+    } else {
+      return 'Hora inicio de pausa';
+    }
+  }
+
+  /// ✨ Obtener label contextual para hora de fin
+  String _getEndTimeLabel() {
+    if (_selectedCategory == RecordCategory.work) {
+      return 'Hora de salida';
+    } else {
+      return 'Hora fin de pausa';
+    }
+  }
+
   Widget _buildSectionLabel(String label) {
     return Text(
       label,
@@ -423,7 +506,8 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
       _endTimeError = null;
     });
 
-    if (_startTime != null && _endTime != null) {
+    // ✨ Solo validar endTime si NO es registro activo
+    if (!_isActiveRecord && _startTime != null && _endTime != null) {
       final startMinutes = _startTime!.hour * 60 + _startTime!.minute;
       final endMinutes = _endTime!.hour * 60 + _endTime!.minute;
 
@@ -451,6 +535,14 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
   }
 
   bool _canSave() {
+    // ✨ Si es activo: solo validar startTime
+    if (_isActiveRecord) {
+      return _startTime != null &&
+          _selectedLocation != null &&
+          _startTimeError == null;
+    }
+
+    // ✨ Si es completado: validar ambos campos
     return _startTime != null &&
         _endTime != null &&
         _selectedLocation != null &&
@@ -491,9 +583,14 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
         date: _formatDate(widget.date),
         category: _selectedCategory,
         startTime: _formatTimeOfDay(_startTime!),
-        endTime: _formatTimeOfDay(_endTime!),
+        // ✨ Si es activo, preservar endTime original; si completado, usar nuevo valor
+        endTime: _isActiveRecord
+            ? widget.recordToEdit!
+                .endTime // Preservar valor original (puede ser null o startTime)
+            : _formatTimeOfDay(_endTime!), // Usar nuevo valor
         location: _selectedLocation!,
-        durationMinutes: _calculateDuration(),
+        // ✨ Si es activo, duración = 0; si completado, calcular duración
+        durationMinutes: _isActiveRecord ? 0 : _calculateDuration(),
         recordStatus: recordStatus, // ✅ Preservar estado si es edición
         createdAt: widget.recordToEdit?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
@@ -531,6 +628,9 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
 
   /// Verificar si el nuevo registro se solapa con registros existentes
   String? _checkOverlap() {
+    // ✨ No validar solapamiento para registros activos (no tienen endTime completo)
+    if (_isActiveRecord) return null;
+
     if (_startTime == null || _endTime == null) return null;
 
     final newStart = _timeToMinutes(_startTime!);

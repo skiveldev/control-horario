@@ -90,6 +90,8 @@ class _DayRecordCardState extends State<DayRecordCard> {
     bool isMobile,
   ) {
     final dayNumber = widget.date.day;
+    // ✨ Obtener mes abreviado dinámicamente
+    final monthAbbr = DateFormat('MMM', 'es_ES').format(widget.date);
     final weekDay = DateFormat('EEEE', 'es_ES').format(widget.date);
     final weekDayCapitalized = weekDay[0].toUpperCase() + weekDay.substring(1);
 
@@ -144,8 +146,9 @@ class _DayRecordCardState extends State<DayRecordCard> {
                           ),
                         ),
                       if (widget.isToday) AppSpacing.horizontalSpaceSm,
+                      // ✨ Usar mes dinámico en lugar de hardcoded "dic."
                       Text(
-                        '$dayNumber dic.',
+                        '$dayNumber $monthAbbr.',
                         style: AppTextStyles.h5.copyWith(
                           fontWeight: FontWeight.w700,
                         ),
@@ -394,8 +397,11 @@ class _DayRecordCardState extends State<DayRecordCard> {
                   color: AppColors.textSecondary,
                 ),
                 AppSpacing.horizontalSpaceXs,
+                // ✨ Mostrar --:-- si es registro activo
                 Text(
-                  '${record.startTime} - ${record.endTime}',
+                  record.isActive
+                      ? '${record.startTime} - --:--'
+                      : '${record.startTime} - ${record.endTime}',
                   style: AppTextStyles.bodyMedium,
                 ),
               ],
@@ -416,8 +422,11 @@ class _DayRecordCardState extends State<DayRecordCard> {
                   ),
                 ),
                 AppSpacing.horizontalSpaceXs,
+                // ✨ Mostrar "En curso..." si es registro activo
                 Text(
-                  '${record.categoryName} (${(record.durationMinutes / 60).toStringAsFixed(1)}h)',
+                  record.isActive
+                      ? '${record.categoryName} (En curso...)'
+                      : '${record.categoryName} (${(record.durationMinutes / 60).toStringAsFixed(1)}h)',
                   style: AppTextStyles.bodyMedium,
                 ),
               ],
@@ -539,13 +548,19 @@ class _DayRecordCardState extends State<DayRecordCard> {
                 color: AppColors.textSecondary,
               ),
               AppSpacing.horizontalSpaceXs,
+              // ✨ Mostrar --:-- si es registro activo
               Text(
-                '${record.startTime} - ${record.endTime}',
+                record.isActive
+                    ? '${record.startTime} - --:--'
+                    : '${record.startTime} - ${record.endTime}',
                 style: AppTextStyles.bodyMedium,
               ),
               AppSpacing.horizontalSpaceMd,
+              // ✨ Mostrar "En curso..." si es registro activo
               Text(
-                '(${(record.durationMinutes / 60).toStringAsFixed(1)}h)',
+                record.isActive
+                    ? '(En curso...)'
+                    : '(${(record.durationMinutes / 60).toStringAsFixed(1)}h)',
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.textSecondary,
                 ),

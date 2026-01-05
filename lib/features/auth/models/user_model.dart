@@ -24,6 +24,9 @@ class UserModel with _$UserModel {
     required DateTime createdAt,
 
     // === Información personal (opcional) ===
+    String? nombre, // Nombre (ej: "María")
+    String? apellido1, // Primer apellido (ej: "García")
+    String? apellido2, // Segundo apellido (ej: "López")
     String? dni, // DNI/NIE del empleado
     String? telefono, // Teléfono de contacto
 
@@ -35,9 +38,11 @@ class UserModel with _$UserModel {
     // === Control horario (opcional, híbrido) ===
     String?
         scheduleId, // Referencia a plantilla de horario (ej: "template_40h_001")
+    // ⚠️ FECHAS DE ALTA EN LA APLICACIÓN (NO en la empresa)
     DateTime?
-        fechaInicio, // Fecha de inicio en la APLICACIÓN (no en la empresa)
-    DateTime? fechaFin, // Fecha de fin en la APLICACIÓN (baja/baja temporal)
+        fechaInicio, // Fecha desde la cual el empleado puede FICHAR en la app
+    DateTime?
+        fechaFin, // Fecha hasta la cual el empleado puede FICHAR (baja app)
 
     // DEPRECATED: Mantener por compatibilidad con código existente
     @Deprecated('Usar scheduleId en su lugar')
@@ -83,6 +88,9 @@ class UserModel with _$UserModel {
       createdAt: createdAtDate,
 
       // Información personal
+      nombre: data['nombre'] as String?,
+      apellido1: data['apellido1'] as String?,
+      apellido2: data['apellido2'] as String?,
       dni: data['dni'] as String?,
       telefono: data['telefono'] as String?,
 
