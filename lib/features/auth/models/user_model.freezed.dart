@@ -369,7 +369,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$UserModelImpl implements _UserModel {
+class _$UserModelImpl extends _UserModel {
   const _$UserModelImpl(
       {required this.userId,
       required this.employeeId,
@@ -390,7 +390,8 @@ class _$UserModelImpl implements _UserModel {
       this.scheduleId,
       this.fechaInicio,
       this.fechaFin,
-      @Deprecated('Usar scheduleId en su lugar') this.schedule});
+      @Deprecated('Usar scheduleId en su lugar') this.schedule})
+      : super._();
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserModelImplFromJson(json);
@@ -543,7 +544,7 @@ class _$UserModelImpl implements _UserModel {
   }
 }
 
-abstract class _UserModel implements UserModel {
+abstract class _UserModel extends UserModel {
   const factory _UserModel(
           {required final String userId,
           required final String employeeId,
@@ -566,6 +567,7 @@ abstract class _UserModel implements UserModel {
           final DateTime? fechaFin,
           @Deprecated('Usar scheduleId en su lugar') final String? schedule}) =
       _$UserModelImpl;
+  const _UserModel._() : super._();
 
   factory _UserModel.fromJson(Map<String, dynamic> json) =
       _$UserModelImpl.fromJson;

@@ -164,7 +164,7 @@ class DashboardScreen extends ConsumerWidget {
               // Contenido del EmployeeHeader (expandido)
               Expanded(
                 child: EmployeeHeader(
-                  employeeName: user.displayName,
+                  employeeName: user.fullName,
                   employeeId: user.employeeId,
                   position: user.position,
                   department: user.department,

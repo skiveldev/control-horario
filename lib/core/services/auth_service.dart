@@ -90,4 +90,29 @@ class AuthService {
         .snapshots()
         .map((doc) => doc.exists ? UserModel.fromFirestore(doc) : null);
   }
+
+  /// Actualizar datos del usuario en Firestore
+  ///
+  /// Actualiza los campos especificados en [data] del documento del usuario.
+  /// Solo actualiza los campos proporcionados, manteniendo el resto intactos.
+  ///
+  /// Ejemplo:
+  /// ```dart
+  /// await authService.updateUserData(
+  ///   userId,
+  ///   {
+  ///     'nombre': 'Juan',
+  ///     'apellido1': 'Pérez',
+  ///     'telefono': '+34 600 123 456',
+  ///   },
+  /// );
+  /// ```
+  ///
+  /// Lanza excepción si el usuario no existe o hay error de permisos.
+  Future<void> updateUserData(
+    String userId,
+    Map<String, dynamic> data,
+  ) async {
+    await _firestore.collection('users').doc(userId).update(data);
+  }
 }

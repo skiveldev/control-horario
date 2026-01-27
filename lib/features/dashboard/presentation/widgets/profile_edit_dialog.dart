@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
 import '../../../../shared/widgets/inputs/custom_text_field.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
+import '../../../auth/models/user_model.dart';
+import '../../../../core/services/auth_service.dart';
 
 /// Dialog para editar perfil del usuario
 ///
 /// Permite actualizar información personal editable como nombre,
-/// teléfono y preferencias de notificaciones.
-///
-/// MOCK UI: Solo muestra SnackBar de éxito, sin persistencia real.
-/// TODO [FASE-2]: Conectar con Riverpod provider para actualizar datos
-class ProfileEditDialog extends StatefulWidget {
+/// apellidos, teléfono y DNI. Conectado con Firebase.
+class ProfileEditDialog extends ConsumerStatefulWidget {
   /// Datos actuales del usuario
-  final Map<String, dynamic> user;
+  final UserModel user;
 
   /// Callback al guardar cambios
   final Function(Map<String, dynamic>)? onSave;
@@ -23,53 +23,115 @@ class ProfileEditDialog extends StatefulWidget {
   const ProfileEditDialog({super.key, required this.user, this.onSave});
 
   @override
-  State<ProfileEditDialog> createState() => _ProfileEditDialogState();
+  ConsumerState<ProfileEditDialog> createState() => _ProfileEditDialogState();
 }
 
-class _ProfileEditDialogState extends State<ProfileEditDialog> {
-  late TextEditingController _nameController;
+class _ProfileEditDialogState extends ConsumerState<ProfileEditDialog> {
+  late TextEditingController _nombreController;
+  late TextEditingController _apellido1Controller;
+  late TextEditingController _apellido2Controller;
   late TextEditingController _phoneController;
-  bool _emailNotifications = true;
+  late TextEditingController _dniController;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(
-      text: widget.user['name'] as String,
+    _nombreController = TextEditingController(
+      text: widget.user.nombre ?? '',
+    );
+    _apellido1Controller = TextEditingController(
+      text: widget.user.apellido1 ?? '',
+    );
+    _apellido2Controller = TextEditingController(
+      text: widget.user.apellido2 ?? '',
     );
     _phoneController = TextEditingController(
-      text: '+34 600 123 456',
-    ); // Mock phone
+      text: widget.user.telefono ?? '',
+    );
+    _dniController = TextEditingController(
+      text: widget.user.dni ?? '',
+    );
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _nombreController.dispose();
+    _apellido1Controller.dispose();
+    _apellido2Controller.dispose();
     _phoneController.dispose();
+    _dniController.dispose();
     super.dispose();
   }
 
-  void _handleSave() {
-    // TODO [FASE-2]: Validar y actualizar datos con Riverpod
-    final updatedData = {
-      ...widget.user,
-      'name': _nameController.text,
-      'phone': _phoneController.text,
-      'emailNotifications': _emailNotifications,
-    };
+  Future<void> _handleSave() async {
+    // Validar campos obligatorios
+    if (_nombreController.text.trim().isEmpty ||
+        _apellido1Controller.text.trim().isEmpty) {
+      final colors = AppColorsHelper.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Nombre y primer apellido son obligatorios'),
+          backgroundColor: colors.error,
+        ),
+      );
+      return;
+    }
 
-    widget.onSave?.call(updatedData);
+    setState(() => _isLoading = true);
 
-    Navigator.of(context).pop();
+    final authService = ref.read(authServiceProvider);
 
-    // Mock UI feedback
-    final colors = AppColorsHelper.of(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Perfil actualizado correctamente'),
-        backgroundColor: colors.success,
-      ),
-    );
+    // Construir displayName desde nombre + apellidos
+    final nombre = _nombreController.text.trim();
+    final apellido1 = _apellido1Controller.text.trim();
+    final apellido2 = _apellido2Controller.text.trim();
+
+    final displayName = apellido2.isNotEmpty
+        ? '$nombre $apellido1 $apellido2'
+        : '$nombre $apellido1';
+
+    try {
+      await authService.updateUserData(
+        widget.user.userId,
+        {
+          'nombre': nombre,
+          'apellido1': apellido1,
+          'apellido2': apellido2.isEmpty ? null : apellido2,
+          'displayName': displayName, // Auto-calculado
+          'telefono': _phoneController.text.trim().isEmpty
+              ? null
+              : _phoneController.text.trim(),
+          'dni': _dniController.text.trim().isEmpty
+              ? null
+              : _dniController.text.trim(),
+        },
+      );
+
+      if (mounted) {
+        Navigator.of(context).pop();
+
+        final colors = AppColorsHelper.of(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Perfil actualizado correctamente'),
+            backgroundColor: colors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+
+        final colors = AppColorsHelper.of(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al actualizar: $e'),
+            backgroundColor: colors.error,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -101,10 +163,35 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
 
                 // Campos editables
                 CustomTextField(
-                  label: 'Nombre completo',
-                  controller: _nameController,
+                  label: 'Nombre',
+                  controller: _nombreController,
                   prefixIcon: Icons.person,
                   required: true,
+                ),
+
+                AppSpacing.verticalSpaceLg,
+
+                CustomTextField(
+                  label: 'Primer apellido',
+                  controller: _apellido1Controller,
+                  prefixIcon: Icons.person_outline,
+                  required: true,
+                ),
+
+                AppSpacing.verticalSpaceLg,
+
+                CustomTextField(
+                  label: 'Segundo apellido',
+                  controller: _apellido2Controller,
+                  prefixIcon: Icons.person_outline,
+                ),
+
+                AppSpacing.verticalSpaceLg,
+
+                CustomTextField(
+                  label: 'DNI/NIE',
+                  controller: _dniController,
+                  prefixIcon: Icons.credit_card,
                 ),
 
                 AppSpacing.verticalSpaceLg,
@@ -116,11 +203,6 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                   keyboardType: TextInputType.phone,
                 ),
 
-                AppSpacing.verticalSpaceLg,
-
-                // Switch de notificaciones
-                _buildNotificationSwitch(),
-
                 AppSpacing.verticalSpaceXxl,
 
                 // Campos de solo lectura
@@ -129,7 +211,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                 AppSpacing.verticalSpaceXxl,
 
                 // Botones de acción
-                _buildActions(isMobile),
+                _buildActions(isMobile, _isLoading),
               ],
             ),
           ),
@@ -157,7 +239,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
     return Center(
       child: Stack(
         children: [
-          // Avatar
+          // Avatar (por ahora genérico, no hay avatarUrl en UserModel)
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -166,12 +248,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
             child: CircleAvatar(
               radius: 60,
               backgroundColor: colors.primary,
-              backgroundImage: widget.user['avatarUrl'] != null
-                  ? NetworkImage(widget.user['avatarUrl'] as String)
-                  : null,
-              child: widget.user['avatarUrl'] == null
-                  ? Icon(Icons.person, size: 60, color: colors.textOnPrimary)
-                  : null,
+              child: Icon(Icons.person, size: 60, color: colors.textOnPrimary),
             ),
           ),
 
@@ -199,10 +276,10 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                   size: 20,
                 ),
                 onPressed: () {
-                  // TODO [FASE-2]: Implementar subida de imagen
+                  // TODO: Implementar subida de imagen cuando se agregue avatarUrl a UserModel
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Subida de imagen disponible en Fase 2'),
+                      content: Text('Función de avatar en desarrollo'),
                     ),
                   );
                 },
@@ -211,41 +288,6 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildNotificationSwitch() {
-    final colors = AppColorsHelper.of(context);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: colors.surfaceVariant,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: colors.border, width: 1),
-      ),
-      child: SwitchListTile(
-        title: Text(
-          'Recibir notificaciones por email',
-          style: AppTextStyles.bodyMedium,
-        ),
-        subtitle: Text(
-          'Recibe alertas y resúmenes en tu correo',
-          style: AppTextStyles.bodySmall.copyWith(color: colors.textSecondary),
-        ),
-        value: _emailNotifications,
-        onChanged: (value) {
-          setState(() {
-            _emailNotifications = value;
-          });
-        },
-        activeTrackColor: colors.primary.withValues(alpha: 0.5),
-        thumbColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return colors.primary;
-          }
-          return null;
-        }),
       ),
     );
   }
@@ -263,19 +305,19 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
         AppSpacing.verticalSpaceMd,
         _buildReadOnlyField(
           label: 'Correo electrónico',
-          value: widget.user['email'] as String,
+          value: widget.user.email,
           icon: Icons.email,
         ),
         AppSpacing.verticalSpaceSm,
         _buildReadOnlyField(
           label: 'ID Empleado',
-          value: widget.user['id'] as String,
+          value: widget.user.employeeId,
           icon: Icons.tag,
         ),
         AppSpacing.verticalSpaceSm,
         _buildReadOnlyField(
           label: 'Departamento',
-          value: widget.user['department'] as String,
+          value: widget.user.department ?? 'Sin asignar',
           icon: Icons.business,
         ),
       ],
@@ -320,22 +362,22 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
     );
   }
 
-  Widget _buildActions(bool isMobile) {
+  Widget _buildActions(bool isMobile, bool isLoading) {
     if (isMobile) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           CustomButton(
-            text: 'Guardar Cambios',
+            text: isLoading ? 'Guardando...' : 'Guardar Cambios',
             variant: ButtonVariant.primary,
-            icon: Icons.save,
-            onPressed: _handleSave,
+            icon: isLoading ? null : Icons.save,
+            onPressed: isLoading ? null : _handleSave,
           ),
           AppSpacing.verticalSpaceMd,
           CustomButton(
             text: 'Cancelar',
             variant: ButtonVariant.outline,
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: isLoading ? null : () => Navigator.of(context).pop(),
           ),
         ],
       );
@@ -347,14 +389,14 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
         CustomButton(
           text: 'Cancelar',
           variant: ButtonVariant.outline,
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: isLoading ? null : () => Navigator.of(context).pop(),
         ),
         AppSpacing.horizontalSpaceMd,
         CustomButton(
-          text: 'Guardar Cambios',
+          text: isLoading ? 'Guardando...' : 'Guardar Cambios',
           variant: ButtonVariant.primary,
-          icon: Icons.save,
-          onPressed: _handleSave,
+          icon: isLoading ? null : Icons.save,
+          onPressed: isLoading ? null : _handleSave,
         ),
       ],
     );

@@ -234,3 +234,4 @@ El drawer de "Nuevo Trabajador" capturaba **7 campos** que NO se estaban guardan
 
 **Documentación:** Ver [TESTING_CAMPOS_DRAWER.md](TESTING_CAMPOS_DRAWER.md) para instrucciones de testing.
 
+

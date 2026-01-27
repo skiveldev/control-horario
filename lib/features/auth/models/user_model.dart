@@ -12,6 +12,8 @@ part 'user_model.g.dart';
 /// DÍA 4: Actualizado con estructura híbrida completa
 @freezed
 class UserModel with _$UserModel {
+  const UserModel._();
+
   const factory UserModel({
     // === Campos básicos obligatorios ===
     required String userId,
@@ -48,6 +50,29 @@ class UserModel with _$UserModel {
     @Deprecated('Usar scheduleId en su lugar')
     String? schedule, // Horario en formato texto (ej: "09:00 - 18:00")
   }) = _UserModel;
+
+  /// Obtiene el nombre completo del usuario
+  ///
+  /// Prioriza construir desde campos individuales (nombre + apellidos).
+  /// Si no existen, usa displayName como fallback.
+  ///
+  /// Útil para usuarios antiguos donde displayName puede estar incompleto.
+  String get fullName {
+    // Si existen campos individuales, construir nombre completo
+    if (nombre != null && apellido1 != null) {
+      final nombreCompleto = nombre!.trim();
+      final primerApellido = apellido1!.trim();
+      final segundoApellido = apellido2?.trim() ?? '';
+
+      if (segundoApellido.isNotEmpty) {
+        return '$nombreCompleto $primerApellido $segundoApellido';
+      }
+      return '$nombreCompleto $primerApellido';
+    }
+
+    // Fallback a displayName
+    return displayName;
+  }
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
       _$UserModelFromJson(json);
@@ -88,16 +113,26 @@ class UserModel with _$UserModel {
       createdAt: createdAtDate,
 
       // Información personal
-      nombre: data['nombre'] as String?,
-      apellido1: data['apellido1'] as String?,
-      apellido2: data['apellido2'] as String?,
-      dni: data['dni'] as String?,
-      telefono: data['telefono'] as String?,
+      // Compatibilidad con múltiples formatos de nombres de campos
+      nombre: data['nombre'] as String? ?? data['Nombre'] as String?,
+      apellido1: data['apellido1'] as String? ??
+          data['Apellido1'] as String? ??
+          data['Primer Apellido'] as String?,
+      apellido2: data['apellido2'] as String? ??
+          data['Apellido2'] as String? ??
+          data['Segundo Apellido'] as String?,
+      dni: data['dni'] as String? ?? data['DNI/NIE'] as String?,
+      telefono: data['telefono'] as String? ?? data['Telefono'] as String?,
 
       // Información laboral
-      position: data['position'] as String?,
-      department: data['department'] as String?,
-      empresa: data['empresa'] as String?,
+      // Compatibilidad con campos en español (usuarios antiguos) e inglés (usuarios nuevos)
+      position: data['position'] as String? ??
+          data['Cargo/Puesto'] as String? ??
+          data['cargo'] as String?,
+      department: data['department'] as String? ??
+          data['Departamento'] as String? ??
+          data['departamento'] as String?,
+      empresa: data['empresa'] as String? ?? data['Empresa'] as String?,
 
       // Control horario
       scheduleId: data['scheduleId'] as String?,
