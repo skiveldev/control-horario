@@ -1,44 +1,95 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
-import '../../../../core/constants/mock_schedules.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../shared/widgets/layouts/admin_layout.dart';
 import '../../../../shared/widgets/cards/schedule_card.dart';
+import '../../providers/schedule_management_provider.dart';
+import '../widgets/schedule_template_modal.dart';
 
 /// Pantalla de gestión de horarios (Admin/RRHH)
 ///
-/// Muestra lista de plantillas de horarios predefinidas.
-/// En el MVP solo visualización, sin modales de edición.
+/// Muestra lista de plantillas de horarios predefinidas desde Firebase.
+/// Admin puede crear, editar y ver plantillas en tiempo real.
 ///
-/// MOCK DATA: Usa MockSchedules.templates
-class ScheduleManagementScreen extends StatelessWidget {
+/// ✅ Conectado a Firebase via allScheduleTemplatesProvider
+class ScheduleManagementScreen extends ConsumerWidget {
   const ScheduleManagementScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // MOCK DATA: Obtener plantillas
-    final templates = MockSchedules.templates;
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Observar plantillas desde Firebase en tiempo real
+    final templatesAsync = ref.watch(allScheduleTemplatesProvider);
 
     return AdminLayout(
       currentRoute: AppRouter.adminSchedules,
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1200),
+      child: templatesAsync.when(
+        data: (templates) => Stack(
+          children: [
+            // Contenido principal
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1200),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header con título y descripción
+                    _buildHeader(templates.length),
+
+                    AppSpacing.verticalSpaceXl,
+
+                    // Lista de plantillas
+                    templates.isEmpty
+                        ? _buildEmptyState(context)
+                        : _buildTemplatesList(context, templates),
+                  ],
+                ),
+              ),
+            ),
+
+            // Floating Action Button - SOLO cuando hay plantillas
+            if (templates.isNotEmpty)
+              Positioned(
+                right: 24,
+                bottom: 24,
+                child: FloatingActionButton.extended(
+                  onPressed: () =>
+                      _showTemplateModal(context, existingTemplate: null),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Nueva Plantilla'),
+                  backgroundColor: AppColors.primary,
+                ),
+              ),
+          ],
+        ),
+        loading: () => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        error: (error, _) => Center(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Header con título y descripción
-              _buildHeader(templates.length),
-
-              AppSpacing.verticalSpaceXl,
-
-              // Lista de plantillas
-              templates.isEmpty
-                  ? _buildEmptyState()
-                  : _buildTemplatesList(context, templates),
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: AppColors.error,
+              ),
+              AppSpacing.verticalSpaceMd,
+              Text(
+                'Error al cargar plantillas',
+                style: AppTextStyles.h5,
+              ),
+              AppSpacing.verticalSpaceSm,
+              Text(
+                error.toString(),
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
         ),
@@ -64,7 +115,7 @@ class ScheduleManagementScreen extends StatelessWidget {
 
   Widget _buildTemplatesList(
     BuildContext context,
-    List<Map<String, dynamic>> templates,
+    List templates,
   ) {
     final columns = context.responsiveValue(
       mobile: 1,
@@ -86,21 +137,16 @@ class ScheduleManagementScreen extends StatelessWidget {
             return SizedBox(
               width: cardWidth,
               child: ScheduleCard(
-                name: template['name'] as String,
-                description: template['description'] as String,
-                weeklyHours: template['weeklyHours'] as int,
-                usedByCount: template['usedByCount'] as int?,
-                isTemplate: template['isTemplate'] as bool? ?? true,
-                onTap: () {
-                  // TODO [FASE-2]: Abrir modal de ver/editar plantilla
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Ver detalles de: ${template['name']}',
-                      ),
-                    ),
-                  );
-                },
+                name: template.name,
+                description: template.description,
+                weeklyHours: template.totalWeeklyHours,
+                usedByCount: template.usedByCount,
+                isTemplate: template.isTemplate,
+                createdBy: template.createdBy,
+                onTap: () => _showTemplateModal(
+                  context,
+                  existingTemplate: template,
+                ),
               ),
             );
           }).toList(),
@@ -109,7 +155,7 @@ class ScheduleManagementScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Padding(
         padding: AppSpacing.allHuge,
@@ -133,8 +179,29 @@ class ScheduleManagementScreen extends StatelessWidget {
                 color: AppColors.textSecondary,
               ),
             ),
+            AppSpacing.verticalSpaceLg,
+            ElevatedButton.icon(
+              onPressed: () =>
+                  _showTemplateModal(context, existingTemplate: null),
+              icon: const Icon(Icons.add),
+              label: const Text('Crear Plantilla'),
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Mostrar modal de crear/editar plantilla
+  void _showTemplateModal(
+    BuildContext context, {
+    required existingTemplate,
+  }) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => ScheduleTemplateModal(
+        existingTemplate: existingTemplate,
       ),
     );
   }

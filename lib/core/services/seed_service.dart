@@ -28,25 +28,110 @@ class SeedService {
   }
 
   /// Crea los horarios predefinidos
+  ///
+  /// Plantillas comunes para escuela de música:
+  /// - Jornadas completas 40h (diferentes horarios)
+  /// - Jornadas reducidas 35h, 25h
+  /// - Medias jornadas 20h
+  /// - Part-time 15h
   Future<void> _seedSchedules() async {
+    debugPrint('   📋 Creando plantillas de horario...');
+
     final schedules = [
+      // ========== JORNADAS COMPLETAS 40H ==========
       {
-        'scheduleId': 'schedule_standard',
-        'name': 'Jornada Completa (40h)',
-        'description': 'Lunes a Viernes de 9:00 a 18:00 con 1h de pausa',
+        'scheduleId': 'schedule_40h_9_17',
+        'name': 'Jornada 40h (9:00-17:00)',
+        'description': 'Lunes a Viernes, 9:00-17:00 con 1h pausa',
         'totalWeeklyHours': 40,
         'isActive': true,
+        'isTemplate': true,
+        'usedByCount': 0,
         'createdAt': FieldValue.serverTimestamp(),
-        'weeklySchedule': _generateStandardWeek(),
+        'createdBy': 'system',
+        'weeklySchedule': _generateWeek('09:00', '17:00', 60),
       },
       {
-        'scheduleId': 'schedule_part_time',
-        'name': 'Media Jornada (20h)',
-        'description': 'Lunes a Viernes de 9:00 a 13:00',
+        'scheduleId': 'schedule_40h_10_18',
+        'name': 'Jornada 40h (10:00-18:00)',
+        'description': 'Lunes a Viernes, 10:00-18:00 con 1h pausa',
+        'totalWeeklyHours': 40,
+        'isActive': true,
+        'isTemplate': true,
+        'usedByCount': 0,
+        'createdAt': FieldValue.serverTimestamp(),
+        'createdBy': 'system',
+        'weeklySchedule': _generateWeek('10:00', '18:00', 60),
+      },
+      {
+        'scheduleId': 'schedule_40h_8_30_16_30',
+        'name': 'Jornada 40h (8:30-16:30)',
+        'description': 'Lunes a Viernes, 8:30-16:30 con 1h pausa',
+        'totalWeeklyHours': 40,
+        'isActive': true,
+        'isTemplate': true,
+        'usedByCount': 0,
+        'createdAt': FieldValue.serverTimestamp(),
+        'createdBy': 'system',
+        'weeklySchedule': _generateWeek('08:30', '16:30', 60),
+      },
+
+      // ========== JORNADAS REDUCIDAS ==========
+      {
+        'scheduleId': 'schedule_35h_9_16',
+        'name': 'Jornada 35h (9:00-16:00)',
+        'description': 'Lunes a Viernes, 9:00-16:00 con 1h pausa',
+        'totalWeeklyHours': 35,
+        'isActive': true,
+        'isTemplate': true,
+        'usedByCount': 0,
+        'createdAt': FieldValue.serverTimestamp(),
+        'createdBy': 'system',
+        'weeklySchedule': _generateWeek('09:00', '16:00', 60),
+      },
+      {
+        'scheduleId': 'schedule_25h_afternoon',
+        'name': 'Jornada Tarde 25h (15:00-20:00)',
+        'description': 'Lunes a Viernes, turno tarde sin pausa',
+        'totalWeeklyHours': 25,
+        'isActive': true,
+        'isTemplate': true,
+        'usedByCount': 0,
+        'createdAt': FieldValue.serverTimestamp(),
+        'createdBy': 'system',
+        'weeklySchedule': _generateWeek('15:00', '20:00', 0),
+      },
+
+      // ========== MEDIAS JORNADAS ==========
+      {
+        'scheduleId': 'schedule_20h_morning',
+        'name': 'Media Jornada Mañana 20h (9:00-13:00)',
+        'description': 'Lunes a Viernes, turno mañana',
         'totalWeeklyHours': 20,
         'isActive': true,
+        'isTemplate': true,
+        'usedByCount': 0,
         'createdAt': FieldValue.serverTimestamp(),
-        'weeklySchedule': _generatePartTimeWeek(),
+        'createdBy': 'system',
+        'weeklySchedule': _generateWeek('09:00', '13:00', 0),
+      },
+
+      // ========== PART-TIME ==========
+      {
+        'scheduleId': 'schedule_15h_part_time',
+        'name': 'Part-Time 15h (Lun/Mié/Vie 15:00-20:00)',
+        'description': 'Lunes, Miércoles y Viernes tarde',
+        'totalWeeklyHours': 15,
+        'isActive': true,
+        'isTemplate': true,
+        'usedByCount': 0,
+        'createdAt': FieldValue.serverTimestamp(),
+        'createdBy': 'system',
+        'weeklySchedule': _generateAlternateDays(
+          ['monday', 'wednesday', 'friday'],
+          '15:00',
+          '20:00',
+        ),
       },
     ];
 
@@ -59,7 +144,7 @@ class SeedService {
     }
 
     await batch.commit();
-    debugPrint('   -> Horarios creados');
+    debugPrint('   ✅ ${schedules.length} plantillas de horario creadas');
   }
 
   /// Crea la configuración global
@@ -101,54 +186,107 @@ class SeedService {
     debugPrint('👑 Usuario ${user.email} promovido a ADMIN');
   }
 
-  // Helpers para generar horarios
-  Map<String, dynamic> _generateStandardWeek() {
-    final day = {
+  // ==========================================================================
+  // HELPERS PARA GENERAR HORARIOS
+  // ==========================================================================
+
+  /// Generar semana estándar (Lun-Vie con mismo horario)
+  ///
+  /// [start]: Hora inicio (formato "HH:mm")
+  /// [end]: Hora fin (formato "HH:mm")
+  /// [breakMinutes]: Minutos de pausa
+  Map<String, dynamic> _generateWeek(
+    String start,
+    String end,
+    int breakMinutes,
+  ) {
+    final dailyHours = _calculateDailyHours(start, end, breakMinutes);
+
+    final workDay = {
       'isWorkDay': true,
-      'startTime': '09:00',
-      'endTime': '18:00',
-      'breakMinutes': 60,
+      'shifts': [
+        {'startTime': start, 'endTime': end}
+      ],
+      'breakMinutes': breakMinutes,
+      'dailyHours': dailyHours,
     };
-    final weekend = {
+
+    final freeDay = {
       'isWorkDay': false,
-      'startTime': null,
-      'endTime': null,
+      'shifts': [],
       'breakMinutes': 0,
+      'dailyHours': 0.0,
     };
 
     return {
-      'monday': day,
-      'tuesday': day,
-      'wednesday': day,
-      'thursday': day,
-      'friday': day,
-      'saturday': weekend,
-      'sunday': weekend,
+      'monday': workDay,
+      'tuesday': workDay,
+      'wednesday': workDay,
+      'thursday': workDay,
+      'friday': workDay,
+      'saturday': freeDay,
+      'sunday': freeDay,
     };
   }
 
-  Map<String, dynamic> _generatePartTimeWeek() {
-    final day = {
+  /// Generar horario solo para días específicos
+  ///
+  /// Usado para part-time (ej: solo Lun/Mié/Vie)
+  ///
+  /// [workDays]: Lista de días laborables (ej: ['monday', 'wednesday', 'friday'])
+  /// [start]: Hora inicio
+  /// [end]: Hora fin
+  Map<String, dynamic> _generateAlternateDays(
+    List<String> workDays,
+    String start,
+    String end,
+  ) {
+    final allDays = [
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
+    ];
+
+    final dailyHours = _calculateDailyHours(start, end, 0);
+
+    final workDay = {
       'isWorkDay': true,
-      'startTime': '09:00',
-      'endTime': '13:00',
+      'shifts': [
+        {'startTime': start, 'endTime': end}
+      ],
       'breakMinutes': 0,
+      'dailyHours': dailyHours,
     };
-    final weekend = {
+
+    final freeDay = {
       'isWorkDay': false,
-      'startTime': null,
-      'endTime': null,
+      'shifts': [],
       'breakMinutes': 0,
+      'dailyHours': 0.0,
     };
 
     return {
-      'monday': day,
-      'tuesday': day,
-      'wednesday': day,
-      'thursday': day,
-      'friday': day,
-      'saturday': weekend,
-      'sunday': weekend,
+      for (var day in allDays) day: workDays.contains(day) ? workDay : freeDay,
     };
+  }
+
+  /// Calcular horas diarias netas (restando pausa)
+  double _calculateDailyHours(String start, String end, int breakMinutes) {
+    final startParts = start.split(':');
+    final endParts = end.split(':');
+
+    final startMinutes =
+        int.parse(startParts[0]) * 60 + int.parse(startParts[1]);
+    final endMinutes = int.parse(endParts[0]) * 60 + int.parse(endParts[1]);
+
+    final totalMinutes = endMinutes - startMinutes;
+    final netMinutes =
+        totalMinutes; // Pausa cuenta como trabajo según requisitos
+
+    return netMinutes / 60.0;
   }
 }

@@ -41,6 +41,18 @@ Stream<UserModel?> currentUser(CurrentUserRef ref) async* {
   yield* authService.userDataStream(authState.uid);
 }
 
+/// Provider para obtener usuario específico por ID
+///
+/// Stream de datos de cualquier usuario desde Firestore.
+/// Usado para ver horarios, perfiles, etc. de otros empleados (admin/RRHH).
+///
+/// [userId]: ID del usuario a observar
+@riverpod
+Stream<UserModel?> userById(UserByIdRef ref, String userId) {
+  final authService = ref.watch(authServiceProvider);
+  return authService.userDataStream(userId);
+}
+
 // ==============================================================================
 // NOTIFIER - Acciones de Autenticación
 // ==============================================================================

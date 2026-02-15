@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/constants/mock_schedules.dart';
+import '../../../dashboard/providers/employee_schedule_provider.dart';
+import '../../models/schedule_model.dart';
 
 /// Visualizador de horario semanal
 ///
@@ -10,7 +12,7 @@ import '../../../../core/constants/mock_schedules.dart';
 /// Si el empleado usa plantilla, muestra un resumen simple.
 /// Si tiene horario personalizado, muestra turnos detallados.
 ///
-/// MOCK DATA: Usa MockSchedules.getEmployeeSchedule()
+/// ✅ Conectado a Firebase via employeeFullScheduleProvider
 ///
 /// Ejemplo de uso:
 /// ```dart
@@ -19,7 +21,7 @@ import '../../../../core/constants/mock_schedules.dart';
 ///   isReadOnly: false,
 /// )
 /// ```
-class WeekScheduleViewer extends StatelessWidget {
+class WeekScheduleViewer extends ConsumerWidget {
   /// ID del empleado
   final String employeeId;
 
@@ -33,30 +35,58 @@ class WeekScheduleViewer extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    // MOCK DATA: Obtener horario del empleado
-    final scheduleData = MockSchedules.getEmployeeSchedule(employeeId);
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Observar horario desde Firebase en tiempo real
+    final scheduleAsync = ref.watch(employeeFullScheduleProvider(employeeId));
 
-    if (scheduleData == null) {
-      return _buildEmptyState();
-    }
+    return scheduleAsync.when(
+      data: (schedule) {
+        if (schedule == null) {
+          return _buildEmptyState();
+        }
 
-    final isTemplate = scheduleData['type'] == 'template';
-    final weekSchedule = scheduleData['schedule'] as Map<String, dynamic>;
-    final weeklyHours = scheduleData['weeklyHours'] as int;
-    final templateName = scheduleData['templateName'] as String;
+        final isTemplate = schedule.type == 'template';
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Header con información del tipo de horario
-        _buildHeader(isTemplate, templateName, weeklyHours),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header con información del tipo de horario
+            _buildHeader(
+              isTemplate,
+              schedule.templateName,
+              schedule.weeklyHours,
+            ),
 
-        AppSpacing.verticalSpaceMd,
+            AppSpacing.verticalSpaceMd,
 
-        // Tabla de horarios
-        _buildScheduleTable(weekSchedule, isTemplate),
-      ],
+            // Tabla de horarios
+            _buildScheduleTable(schedule.schedule),
+          ],
+        );
+      },
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.all(32),
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (error, _) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.error_outline, size: 48, color: AppColors.error),
+              AppSpacing.verticalSpaceMd,
+              Text(
+                'Error al cargar horario',
+                style:
+                    AppTextStyles.bodyMedium.copyWith(color: AppColors.error),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -129,8 +159,7 @@ class WeekScheduleViewer extends StatelessWidget {
   }
 
   Widget _buildScheduleTable(
-    Map<String, dynamic> weekSchedule,
-    bool isTemplate,
+    Map<String, DaySchedule> weekSchedule,
   ) {
     final days = [
       'monday',
@@ -151,7 +180,7 @@ class WeekScheduleViewer extends StatelessWidget {
         children: days.asMap().entries.map((entry) {
           final index = entry.key;
           final dayKey = entry.value;
-          final dayData = weekSchedule[dayKey] as Map<String, dynamic>?;
+          final dayData = weekSchedule[dayKey];
           final isLast = index == days.length - 1;
 
           return _buildDayRow(dayKey, dayData, isLast: isLast);
@@ -162,13 +191,13 @@ class WeekScheduleViewer extends StatelessWidget {
 
   Widget _buildDayRow(
     String dayKey,
-    Map<String, dynamic>? dayData, {
+    DaySchedule? dayData, {
     required bool isLast,
   }) {
-    final dayName = MockSchedules.formatDayName(dayKey);
-    final isWorkDay = dayData?['isWorkDay'] ?? false;
-    final shifts = (dayData?['shifts'] ?? []) as List<dynamic>;
-    final dailyHours = dayData?['dailyHours'] ?? 0;
+    final dayName = _getDayName(dayKey);
+    final isWorkDay = dayData?.isWorkDay ?? false;
+    final shifts = dayData?.shifts ?? [];
+    final dailyHours = dayData?.dailyHours ?? 0;
 
     return Container(
       decoration: BoxDecoration(
@@ -236,7 +265,7 @@ class WeekScheduleViewer extends StatelessWidget {
     );
   }
 
-  Widget _buildShiftsList(List<dynamic> shifts) {
+  Widget _buildShiftsList(List<TimeShift> shifts) {
     if (shifts.isEmpty) {
       return Text(
         'Sin horario',
@@ -246,9 +275,9 @@ class WeekScheduleViewer extends StatelessWidget {
 
     // Si es solo un turno, mostrar directo
     if (shifts.length == 1) {
-      final shift = shifts[0] as Map<String, dynamic>;
+      final shift = shifts[0];
       return Text(
-        '${shift['startTime']} - ${shift['endTime']}',
+        '${shift.startTime} - ${shift.endTime}',
         style: AppTextStyles.bodySmall.copyWith(color: AppColors.textPrimary),
       );
     }
@@ -259,13 +288,13 @@ class WeekScheduleViewer extends StatelessWidget {
       runSpacing: AppSpacing.xs,
       children: shifts.asMap().entries.map((entry) {
         final index = entry.key;
-        final shift = entry.value as Map<String, dynamic>;
+        final shift = entry.value;
 
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '${shift['startTime']}-${shift['endTime']}',
+              '${shift.startTime}-${shift.endTime}',
               style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.textPrimary,
               ),
@@ -284,6 +313,20 @@ class WeekScheduleViewer extends StatelessWidget {
         );
       }).toList(),
     );
+  }
+
+  /// Formatear nombre del día en español
+  String _getDayName(String dayKey) {
+    const names = {
+      'monday': 'Lunes',
+      'tuesday': 'Martes',
+      'wednesday': 'Miércoles',
+      'thursday': 'Jueves',
+      'friday': 'Viernes',
+      'saturday': 'Sábado',
+      'sunday': 'Domingo',
+    };
+    return names[dayKey] ?? dayKey;
   }
 
   Widget _buildEmptyState() {

@@ -51,6 +51,198 @@ final currentUserProvider = AutoDisposeStreamProvider<UserModel?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentUserRef = AutoDisposeStreamProviderRef<UserModel?>;
+String _$userByIdHash() => r'd69a0360859b9ad604eea0971d39d0abdb39d799';
+
+/// Copied from Dart SDK
+class _SystemHash {
+  _SystemHash._();
+
+  static int combine(int hash, int value) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + value);
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
+    return hash ^ (hash >> 6);
+  }
+
+  static int finish(int hash) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
+    // ignore: parameter_assignments
+    hash = hash ^ (hash >> 11);
+    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
+  }
+}
+
+/// Provider para obtener usuario específico por ID
+///
+/// Stream de datos de cualquier usuario desde Firestore.
+/// Usado para ver horarios, perfiles, etc. de otros empleados (admin/RRHH).
+///
+/// [userId]: ID del usuario a observar
+///
+/// Copied from [userById].
+@ProviderFor(userById)
+const userByIdProvider = UserByIdFamily();
+
+/// Provider para obtener usuario específico por ID
+///
+/// Stream de datos de cualquier usuario desde Firestore.
+/// Usado para ver horarios, perfiles, etc. de otros empleados (admin/RRHH).
+///
+/// [userId]: ID del usuario a observar
+///
+/// Copied from [userById].
+class UserByIdFamily extends Family<AsyncValue<UserModel?>> {
+  /// Provider para obtener usuario específico por ID
+  ///
+  /// Stream de datos de cualquier usuario desde Firestore.
+  /// Usado para ver horarios, perfiles, etc. de otros empleados (admin/RRHH).
+  ///
+  /// [userId]: ID del usuario a observar
+  ///
+  /// Copied from [userById].
+  const UserByIdFamily();
+
+  /// Provider para obtener usuario específico por ID
+  ///
+  /// Stream de datos de cualquier usuario desde Firestore.
+  /// Usado para ver horarios, perfiles, etc. de otros empleados (admin/RRHH).
+  ///
+  /// [userId]: ID del usuario a observar
+  ///
+  /// Copied from [userById].
+  UserByIdProvider call(
+    String userId,
+  ) {
+    return UserByIdProvider(
+      userId,
+    );
+  }
+
+  @override
+  UserByIdProvider getProviderOverride(
+    covariant UserByIdProvider provider,
+  ) {
+    return call(
+      provider.userId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'userByIdProvider';
+}
+
+/// Provider para obtener usuario específico por ID
+///
+/// Stream de datos de cualquier usuario desde Firestore.
+/// Usado para ver horarios, perfiles, etc. de otros empleados (admin/RRHH).
+///
+/// [userId]: ID del usuario a observar
+///
+/// Copied from [userById].
+class UserByIdProvider extends AutoDisposeStreamProvider<UserModel?> {
+  /// Provider para obtener usuario específico por ID
+  ///
+  /// Stream de datos de cualquier usuario desde Firestore.
+  /// Usado para ver horarios, perfiles, etc. de otros empleados (admin/RRHH).
+  ///
+  /// [userId]: ID del usuario a observar
+  ///
+  /// Copied from [userById].
+  UserByIdProvider(
+    String userId,
+  ) : this._internal(
+          (ref) => userById(
+            ref as UserByIdRef,
+            userId,
+          ),
+          from: userByIdProvider,
+          name: r'userByIdProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$userByIdHash,
+          dependencies: UserByIdFamily._dependencies,
+          allTransitiveDependencies: UserByIdFamily._allTransitiveDependencies,
+          userId: userId,
+        );
+
+  UserByIdProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.userId,
+  }) : super.internal();
+
+  final String userId;
+
+  @override
+  Override overrideWith(
+    Stream<UserModel?> Function(UserByIdRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: UserByIdProvider._internal(
+        (ref) => create(ref as UserByIdRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        userId: userId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<UserModel?> createElement() {
+    return _UserByIdProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is UserByIdProvider && other.userId == userId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, userId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin UserByIdRef on AutoDisposeStreamProviderRef<UserModel?> {
+  /// The parameter `userId` of this provider.
+  String get userId;
+}
+
+class _UserByIdProviderElement
+    extends AutoDisposeStreamProviderElement<UserModel?> with UserByIdRef {
+  _UserByIdProviderElement(super.provider);
+
+  @override
+  String get userId => (origin as UserByIdProvider).userId;
+}
+
 String _$authNotifierHash() => r'8ff24c3efcc38681855185baee32b06aaf7fc85e';
 
 /// Notifier para acciones de autenticación

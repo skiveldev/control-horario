@@ -70,5 +70,27 @@ final employeeCreationServiceProvider =
 // ignore: unused_element
 typedef EmployeeCreationServiceRef
     = AutoDisposeProviderRef<EmployeeCreationService>;
+String _$scheduleServiceHash() => r'1c8b2ed82808cd2ac5107a439a9a97381dfcb8d8';
+
+/// Provider para el servicio de gestión de plantillas de horario
+///
+/// Proporciona acceso a operaciones CRUD de plantillas en Firestore.
+/// Usado por ScheduleManagementProvider para lógica de negocio.
+///
+/// Copied from [scheduleService].
+@ProviderFor(scheduleService)
+final scheduleServiceProvider = AutoDisposeProvider<ScheduleService>.internal(
+  scheduleService,
+  name: r'scheduleServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$scheduleServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ScheduleServiceRef = AutoDisposeProviderRef<ScheduleService>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

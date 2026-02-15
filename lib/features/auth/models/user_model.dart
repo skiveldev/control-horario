@@ -39,7 +39,12 @@ class UserModel with _$UserModel {
 
     // === Control horario (opcional, híbrido) ===
     String?
-        scheduleId, // Referencia a plantilla de horario (ej: "template_40h_001")
+        scheduleId, // Referencia a plantilla de horario (ej: "schedule_40h_9_17")
+    @Default('template')
+    String
+        scheduleType, // Tipo de horario: "template" (usa scheduleId) | "custom" (usa customSchedule)
+    Map<String, dynamic>?
+        customSchedule, // Horario personalizado (solo si scheduleType = "custom")
     // ⚠️ FECHAS DE ALTA EN LA APLICACIÓN (NO en la empresa)
     DateTime?
         fechaInicio, // Fecha desde la cual el empleado puede FICHAR en la app
@@ -47,7 +52,7 @@ class UserModel with _$UserModel {
         fechaFin, // Fecha hasta la cual el empleado puede FICHAR (baja app)
 
     // DEPRECATED: Mantener por compatibilidad con código existente
-    @Deprecated('Usar scheduleId en su lugar')
+    @Deprecated('Usar scheduleId + scheduleType en su lugar')
     String? schedule, // Horario en formato texto (ej: "09:00 - 18:00")
   }) = _UserModel;
 
@@ -136,6 +141,8 @@ class UserModel with _$UserModel {
 
       // Control horario
       scheduleId: data['scheduleId'] as String?,
+      scheduleType: data['scheduleType'] as String? ?? 'template',
+      customSchedule: data['customSchedule'] as Map<String, dynamic>?,
       fechaInicio: fechaInicioDate,
       fechaFin: fechaFinDate,
 

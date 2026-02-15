@@ -4,11 +4,11 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
-import '../../../../core/constants/mock_schedules.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
 import '../../../../shared/widgets/inputs/custom_text_field.dart';
 import '../../../auth/models/user_model.dart';
 import '../../providers/user_management_provider.dart';
+import '../../providers/schedule_management_provider.dart';
 
 /// Drawer lateral para crear nuevo empleado
 ///
@@ -918,42 +918,85 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  DropdownButtonFormField<String>(
-                    isExpanded: true,
-                    hint: const Text('Sin asignar'),
-                    decoration: InputDecoration(
-                      hintText: _selectedScheduleId,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppColors.border),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppColors.border),
-                      ),
-                    ),
-                    items: [
-                      const DropdownMenuItem(
-                        value: null,
-                        child: Text('Sin asignar'),
-                      ),
-                      ...MockSchedules.templates.map((template) {
-                        return DropdownMenuItem(
-                          value: template['id'] as String,
-                          child: Text(
-                            '${template['name']} (${template['weeklyHours']}h/sem)',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
+                  // Observar plantillas desde Firebase
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final templatesAsync =
+                          ref.watch(allScheduleTemplatesProvider);
+
+                      return templatesAsync.when(
+                        data: (templates) {
+                          return DropdownButtonFormField<String>(
+                            isExpanded: true,
+                            initialValue: _selectedScheduleId,
+                            hint: const Text('Sin asignar'),
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: AppColors.border),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: AppColors.border),
+                              ),
+                            ),
+                            items: [
+                              const DropdownMenuItem(
+                                value: null,
+                                child: Text('Sin asignar'),
+                              ),
+                              ...templates.map((template) {
+                                return DropdownMenuItem(
+                                  value: template.scheduleId,
+                                  child: Text(
+                                    '${template.name} (${template.totalWeeklyHours}h/sem)',
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                );
+                              }),
+                            ],
+                            onChanged: (value) {
+                              setState(() => _selectedScheduleId = value);
+                            },
+                          );
+                        },
+                        loading: () => const Center(
+                          child: SizedBox(
+                            height: 48,
+                            child: Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
                           ),
-                        );
-                      }),
-                    ],
-                    onChanged: (value) {
-                      setState(() => _selectedScheduleId = value);
+                        ),
+                        error: (error, _) => Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.error.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: AppColors.error),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.error_outline,
+                                  color: AppColors.error, size: 16),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Error al cargar plantillas',
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    color: AppColors.error,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
                     },
                   ),
                 ],

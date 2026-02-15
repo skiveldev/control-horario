@@ -164,4 +164,52 @@ class UserManagement extends _$UserManagement {
   void clearError() {
     state = state.copyWith(error: null);
   }
+
+  /// Actualizar campos de un empleado existente
+  ///
+  /// Permite actualizar cualquier campo del empleado en Firestore.
+  /// Solo actualiza los campos proporcionados en [updates].
+  ///
+  /// [userId]: ID del usuario a actualizar
+  /// [updates]: Map con los campos a actualizar
+  ///
+  /// Ejemplo:
+  /// ```dart
+  /// await updateEmployee(
+  ///   userId: 'user123',
+  ///   updates: {
+  ///     'scheduleType': 'template',
+  ///     'scheduleId': 'schedule_40h_9_17',
+  ///   },
+  /// );
+  /// ```
+  Future<void> updateEmployee({
+    required String userId,
+    required Map<String, dynamic> updates,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      debugPrint('🔄 Actualizando empleado: $userId');
+      debugPrint('📝 Campos a actualizar: ${updates.keys.join(", ")}');
+
+      final firestore = ref.read(firestoreProvider);
+      await firestore.collection('users').doc(userId).update(updates);
+
+      debugPrint('✅ Empleado actualizado exitosamente');
+
+      state = state.copyWith(
+        isLoading: false,
+        error: null,
+      );
+    } catch (e) {
+      debugPrint('❌ ERROR al actualizar empleado: $e');
+
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString(),
+      );
+      rethrow;
+    }
+  }
 }

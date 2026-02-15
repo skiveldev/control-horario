@@ -1,0 +1,47 @@
+feat: Sistema de Horarios Flexible completo con plantillas y custom schedules
+
+Implementación completa del sistema de gestión de horarios flexible que permite
+manejar múltiples jornadas laborales (40h, 35h, 25h, 20h, 15h) con diferentes
+configuraciones horarias y turnos personalizables.
+
+CAPA 1 - Modelos:
+- Crear ScheduleModel con DaySchedule y TimeShift (freezed)
+- Actualizar UserModel con scheduleType, scheduleId, customSchedule
+- Soporte para plantillas reutilizables y horarios personalizados
+
+CAPA 2 - Services:
+- ScheduleService: CRUD completo de plantillas en Firestore
+- watchActiveTemplates(), createTemplate(), updateTemplate(), deleteTemplate()
+- Contadores automáticos de uso (usedByCount)
+
+CAPA 3 - Providers:
+- allScheduleTemplatesProvider: Stream de plantillas activas
+- scheduleByIdProvider: Stream de plantilla específica
+- employeeFullScheduleProvider: Obtener horario completo (template/custom)
+- ScheduleManagement Notifier: Lógica CRUD con validaciones
+- userByIdProvider: Stream de usuario específico
+- UserManagement.updateEmployee(): Actualizar campos de empleado
+
+CAPA 4 - UI/Presentation:
+- WeekScheduleEditor: Editor interactivo con switches, TimePickers, auto-cálculo
+- ScheduleTemplateModal: CRUD de plantillas con validaciones
+- EmployeeScheduleEditorModal: Asignar plantilla o custom schedule
+- EmployeeInfoEditorModal: Editar información general del empleado
+- ScheduleManagementScreen: Conectado Firebase, FAB condicional
+- EmployeeDetailScreen: Datos reales Firebase, 2 botones editar
+- NewEmployeeDrawer: Dropdown plantillas conectado Firebase
+- WeekScheduleViewer: Muestra horario en tiempo real
+
+CAPA 5 - Configuración:
+- seed_service: 7 plantillas iniciales (40h 9-17, 40h 10-18, 40h 8:30-16:30, 35h, 25h, 20h, 15h)
+- firestore.rules: Seguridad colección schedules (read: auth, write: admin/RRHH)
+- Rules desplegadas: firebase deploy --only firestore:rules
+
+Correcciones:
+- Fix: Usuario no autenticado - usar await .future en lugar de .valueOrNull
+- Fix: FAB duplicado - solo mostrar cuando templates.isNotEmpty
+- Fix: Dropdown crash scheduleId inválido - validación defensiva + warning
+- Fix: Deprecaciones de DropdownButtonFormField.value → initialValue
+
+Archivos: 8 nuevos, 10 modificados, ~2500 líneas
+Documentación: CHANGELOG_SISTEMA_HORARIOS_FLEXIBLE.md

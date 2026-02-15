@@ -89,6 +89,18 @@ service cloud.firestore {
       }
     }
     
+    // ========================================
+    // COLECCIÓN: schedules (Plantillas de Horario)
+    // ========================================
+    match /schedules/{scheduleId} {
+      // Todos los usuarios autenticados pueden leer plantillas
+      // (necesario para dropdowns de selección de horario)
+      allow read: if request.auth != null;
+      
+      // Solo admin y RRHH pueden crear, editar y eliminar plantillas
+      allow create, update, delete: if isAdmin();
+    }
+    
     // Denegar acceso a cualquier otra colección no especificada
     match /{document=**} {
       allow read, write: if false;

@@ -48,14 +48,18 @@ mixin _$UserModel {
       throw _privateConstructorUsedError; // Empresa (ej: "Escuela Música")
 // === Control horario (opcional, híbrido) ===
   String? get scheduleId =>
-      throw _privateConstructorUsedError; // Referencia a plantilla de horario (ej: "template_40h_001")
+      throw _privateConstructorUsedError; // Referencia a plantilla de horario (ej: "schedule_40h_9_17")
+  String get scheduleType =>
+      throw _privateConstructorUsedError; // Tipo de horario: "template" (usa scheduleId) | "custom" (usa customSchedule)
+  Map<String, dynamic>? get customSchedule =>
+      throw _privateConstructorUsedError; // Horario personalizado (solo si scheduleType = "custom")
 // ⚠️ FECHAS DE ALTA EN LA APLICACIÓN (NO en la empresa)
   DateTime? get fechaInicio =>
       throw _privateConstructorUsedError; // Fecha desde la cual el empleado puede FICHAR en la app
   DateTime? get fechaFin =>
       throw _privateConstructorUsedError; // Fecha hasta la cual el empleado puede FICHAR (baja app)
 // DEPRECATED: Mantener por compatibilidad con código existente
-  @Deprecated('Usar scheduleId en su lugar')
+  @Deprecated('Usar scheduleId + scheduleType en su lugar')
   String? get schedule => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
@@ -91,9 +95,12 @@ abstract class $UserModelCopyWith<$Res> {
       String? department,
       String? empresa,
       String? scheduleId,
+      String scheduleType,
+      Map<String, dynamic>? customSchedule,
       DateTime? fechaInicio,
       DateTime? fechaFin,
-      @Deprecated('Usar scheduleId en su lugar') String? schedule});
+      @Deprecated('Usar scheduleId + scheduleType en su lugar')
+      String? schedule});
 }
 
 /// @nodoc
@@ -128,6 +135,8 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? department = freezed,
     Object? empresa = freezed,
     Object? scheduleId = freezed,
+    Object? scheduleType = null,
+    Object? customSchedule = freezed,
     Object? fechaInicio = freezed,
     Object? fechaFin = freezed,
     Object? schedule = freezed,
@@ -201,6 +210,14 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.scheduleId
           : scheduleId // ignore: cast_nullable_to_non_nullable
               as String?,
+      scheduleType: null == scheduleType
+          ? _value.scheduleType
+          : scheduleType // ignore: cast_nullable_to_non_nullable
+              as String,
+      customSchedule: freezed == customSchedule
+          ? _value.customSchedule
+          : customSchedule // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
       fechaInicio: freezed == fechaInicio
           ? _value.fechaInicio
           : fechaInicio // ignore: cast_nullable_to_non_nullable
@@ -243,9 +260,12 @@ abstract class _$$UserModelImplCopyWith<$Res>
       String? department,
       String? empresa,
       String? scheduleId,
+      String scheduleType,
+      Map<String, dynamic>? customSchedule,
       DateTime? fechaInicio,
       DateTime? fechaFin,
-      @Deprecated('Usar scheduleId en su lugar') String? schedule});
+      @Deprecated('Usar scheduleId + scheduleType en su lugar')
+      String? schedule});
 }
 
 /// @nodoc
@@ -278,6 +298,8 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? department = freezed,
     Object? empresa = freezed,
     Object? scheduleId = freezed,
+    Object? scheduleType = null,
+    Object? customSchedule = freezed,
     Object? fechaInicio = freezed,
     Object? fechaFin = freezed,
     Object? schedule = freezed,
@@ -351,6 +373,14 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.scheduleId
           : scheduleId // ignore: cast_nullable_to_non_nullable
               as String?,
+      scheduleType: null == scheduleType
+          ? _value.scheduleType
+          : scheduleType // ignore: cast_nullable_to_non_nullable
+              as String,
+      customSchedule: freezed == customSchedule
+          ? _value._customSchedule
+          : customSchedule // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
       fechaInicio: freezed == fechaInicio
           ? _value.fechaInicio
           : fechaInicio // ignore: cast_nullable_to_non_nullable
@@ -388,10 +418,13 @@ class _$UserModelImpl extends _UserModel {
       this.department,
       this.empresa,
       this.scheduleId,
+      this.scheduleType = 'template',
+      final Map<String, dynamic>? customSchedule,
       this.fechaInicio,
       this.fechaFin,
-      @Deprecated('Usar scheduleId en su lugar') this.schedule})
-      : super._();
+      @Deprecated('Usar scheduleId + scheduleType en su lugar') this.schedule})
+      : _customSchedule = customSchedule,
+        super._();
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserModelImplFromJson(json);
@@ -443,7 +476,23 @@ class _$UserModelImpl extends _UserModel {
 // === Control horario (opcional, híbrido) ===
   @override
   final String? scheduleId;
-// Referencia a plantilla de horario (ej: "template_40h_001")
+// Referencia a plantilla de horario (ej: "schedule_40h_9_17")
+  @override
+  @JsonKey()
+  final String scheduleType;
+// Tipo de horario: "template" (usa scheduleId) | "custom" (usa customSchedule)
+  final Map<String, dynamic>? _customSchedule;
+// Tipo de horario: "template" (usa scheduleId) | "custom" (usa customSchedule)
+  @override
+  Map<String, dynamic>? get customSchedule {
+    final value = _customSchedule;
+    if (value == null) return null;
+    if (_customSchedule is EqualUnmodifiableMapView) return _customSchedule;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
+// Horario personalizado (solo si scheduleType = "custom")
 // ⚠️ FECHAS DE ALTA EN LA APLICACIÓN (NO en la empresa)
   @override
   final DateTime? fechaInicio;
@@ -453,12 +502,12 @@ class _$UserModelImpl extends _UserModel {
 // Fecha hasta la cual el empleado puede FICHAR (baja app)
 // DEPRECATED: Mantener por compatibilidad con código existente
   @override
-  @Deprecated('Usar scheduleId en su lugar')
+  @Deprecated('Usar scheduleId + scheduleType en su lugar')
   final String? schedule;
 
   @override
   String toString() {
-    return 'UserModel(userId: $userId, employeeId: $employeeId, email: $email, displayName: $displayName, role: $role, weeklyHours: $weeklyHours, isActive: $isActive, createdAt: $createdAt, nombre: $nombre, apellido1: $apellido1, apellido2: $apellido2, dni: $dni, telefono: $telefono, position: $position, department: $department, empresa: $empresa, scheduleId: $scheduleId, fechaInicio: $fechaInicio, fechaFin: $fechaFin, schedule: $schedule)';
+    return 'UserModel(userId: $userId, employeeId: $employeeId, email: $email, displayName: $displayName, role: $role, weeklyHours: $weeklyHours, isActive: $isActive, createdAt: $createdAt, nombre: $nombre, apellido1: $apellido1, apellido2: $apellido2, dni: $dni, telefono: $telefono, position: $position, department: $department, empresa: $empresa, scheduleId: $scheduleId, scheduleType: $scheduleType, customSchedule: $customSchedule, fechaInicio: $fechaInicio, fechaFin: $fechaFin, schedule: $schedule)';
   }
 
   @override
@@ -494,6 +543,10 @@ class _$UserModelImpl extends _UserModel {
             (identical(other.empresa, empresa) || other.empresa == empresa) &&
             (identical(other.scheduleId, scheduleId) ||
                 other.scheduleId == scheduleId) &&
+            (identical(other.scheduleType, scheduleType) ||
+                other.scheduleType == scheduleType) &&
+            const DeepCollectionEquality()
+                .equals(other._customSchedule, _customSchedule) &&
             (identical(other.fechaInicio, fechaInicio) ||
                 other.fechaInicio == fechaInicio) &&
             (identical(other.fechaFin, fechaFin) ||
@@ -523,6 +576,8 @@ class _$UserModelImpl extends _UserModel {
         department,
         empresa,
         scheduleId,
+        scheduleType,
+        const DeepCollectionEquality().hash(_customSchedule),
         fechaInicio,
         fechaFin,
         schedule
@@ -546,27 +601,29 @@ class _$UserModelImpl extends _UserModel {
 
 abstract class _UserModel extends UserModel {
   const factory _UserModel(
-          {required final String userId,
-          required final String employeeId,
-          required final String email,
-          required final String displayName,
-          required final UserRole role,
-          required final double weeklyHours,
-          final bool isActive,
-          required final DateTime createdAt,
-          final String? nombre,
-          final String? apellido1,
-          final String? apellido2,
-          final String? dni,
-          final String? telefono,
-          final String? position,
-          final String? department,
-          final String? empresa,
-          final String? scheduleId,
-          final DateTime? fechaInicio,
-          final DateTime? fechaFin,
-          @Deprecated('Usar scheduleId en su lugar') final String? schedule}) =
-      _$UserModelImpl;
+      {required final String userId,
+      required final String employeeId,
+      required final String email,
+      required final String displayName,
+      required final UserRole role,
+      required final double weeklyHours,
+      final bool isActive,
+      required final DateTime createdAt,
+      final String? nombre,
+      final String? apellido1,
+      final String? apellido2,
+      final String? dni,
+      final String? telefono,
+      final String? position,
+      final String? department,
+      final String? empresa,
+      final String? scheduleId,
+      final String scheduleType,
+      final Map<String, dynamic>? customSchedule,
+      final DateTime? fechaInicio,
+      final DateTime? fechaFin,
+      @Deprecated('Usar scheduleId + scheduleType en su lugar')
+      final String? schedule}) = _$UserModelImpl;
   const _UserModel._() : super._();
 
   factory _UserModel.fromJson(Map<String, dynamic> json) =
@@ -609,7 +666,13 @@ abstract class _UserModel extends UserModel {
 // === Control horario (opcional, híbrido) ===
   @override
   String?
-      get scheduleId; // Referencia a plantilla de horario (ej: "template_40h_001")
+      get scheduleId; // Referencia a plantilla de horario (ej: "schedule_40h_9_17")
+  @override
+  String
+      get scheduleType; // Tipo de horario: "template" (usa scheduleId) | "custom" (usa customSchedule)
+  @override
+  Map<String, dynamic>?
+      get customSchedule; // Horario personalizado (solo si scheduleType = "custom")
 // ⚠️ FECHAS DE ALTA EN LA APLICACIÓN (NO en la empresa)
   @override
   DateTime?
@@ -619,7 +682,7 @@ abstract class _UserModel extends UserModel {
       get fechaFin; // Fecha hasta la cual el empleado puede FICHAR (baja app)
 // DEPRECATED: Mantener por compatibilidad con código existente
   @override
-  @Deprecated('Usar scheduleId en su lugar')
+  @Deprecated('Usar scheduleId + scheduleType en su lugar')
   String? get schedule;
 
   /// Create a copy of UserModel

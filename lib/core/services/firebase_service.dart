@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/auth/models/user_model.dart';
+import 'schedule_service.dart';
 
 part 'firebase_service.g.dart';
 
@@ -297,4 +298,18 @@ class EmployeeCreationService {
       rethrow;
     }
   }
+}
+
+// ============================================================================
+// SCHEDULE SERVICE - Gestión de Plantillas de Horario
+// ============================================================================
+
+/// Provider para el servicio de gestión de plantillas de horario
+///
+/// Proporciona acceso a operaciones CRUD de plantillas en Firestore.
+/// Usado por ScheduleManagementProvider para lógica de negocio.
+@riverpod
+ScheduleService scheduleService(ScheduleServiceRef ref) {
+  final firestore = ref.watch(firestoreProvider);
+  return ScheduleService(firestore);
 }

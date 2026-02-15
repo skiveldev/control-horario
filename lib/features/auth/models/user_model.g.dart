@@ -25,6 +25,8 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       department: json['department'] as String?,
       empresa: json['empresa'] as String?,
       scheduleId: json['scheduleId'] as String?,
+      scheduleType: json['scheduleType'] as String? ?? 'template',
+      customSchedule: json['customSchedule'] as Map<String, dynamic>?,
       fechaInicio: json['fechaInicio'] == null
           ? null
           : DateTime.parse(json['fechaInicio'] as String),
@@ -53,6 +55,8 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'department': instance.department,
       'empresa': instance.empresa,
       'scheduleId': instance.scheduleId,
+      'scheduleType': instance.scheduleType,
+      'customSchedule': instance.customSchedule,
       'fechaInicio': instance.fechaInicio?.toIso8601String(),
       'fechaFin': instance.fechaFin?.toIso8601String(),
       'schedule': instance.schedule,
