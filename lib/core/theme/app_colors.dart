@@ -156,6 +156,22 @@ class AppColors {
   );
 
   // ============================================================================
+  // GLASSMORPHISM SUPPORT (Para efectos de vidrio)
+  // ============================================================================
+
+  /// Fondo para glassmorphism en login
+  /// Colores ultra claros para que el efecto glassmorphism sea visible
+  /// Azul ultra claro → Violeta ultra claro (tinte 5%)
+  static const LinearGradient loginGlassBackground = LinearGradient(
+    colors: [
+      Color(0xFFF0F4FF), // Azul ultra claro (tinte azul 5%)
+      Color(0xFFF8F4FF), // Violeta ultra claro (tinte violeta 5%)
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // ============================================================================
   // CLOCKING STATUS COLORS (Estados de fichaje - Semántica)
   // ============================================================================
 

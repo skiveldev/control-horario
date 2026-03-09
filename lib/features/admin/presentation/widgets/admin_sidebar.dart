@@ -71,6 +71,15 @@ class AdminSidebar extends StatelessWidget {
                 ),
                 AppSpacing.verticalSpaceSm,
                 _SidebarItem(
+                  icon: Icons.calendar_month_outlined,
+                  activeIcon: Icons.calendar_month,
+                  label: 'Gestionar Calendarios',
+                  route: AppRouter.adminCalendars,
+                  isActive: currentRoute == AppRouter.adminCalendars,
+                  onTap: () => _navigate(context, AppRouter.adminCalendars),
+                ),
+                AppSpacing.verticalSpaceSm,
+                _SidebarItem(
                   icon: Icons.assignment_outlined,
                   activeIcon: Icons.assignment,
                   label: 'Reportes Detallados',

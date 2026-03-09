@@ -5,6 +5,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
 import '../../../../core/router/app_router.dart';
+import '../../../../shared/widgets/buttons/custom_button.dart';
 import '../../../../shared/widgets/layouts/admin_layout.dart';
 import '../../../../shared/widgets/cards/schedule_card.dart';
 import '../../providers/schedule_management_provider.dart';
@@ -27,43 +28,24 @@ class ScheduleManagementScreen extends ConsumerWidget {
     return AdminLayout(
       currentRoute: AppRouter.adminSchedules,
       child: templatesAsync.when(
-        data: (templates) => Stack(
-          children: [
-            // Contenido principal
-            Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1200),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header con título y descripción
-                    _buildHeader(templates.length),
+        data: (templates) => Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1200),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header con título, descripción y botón
+                _buildHeader(context, templates.length),
 
-                    AppSpacing.verticalSpaceXl,
+                AppSpacing.verticalSpaceXl,
 
-                    // Lista de plantillas
-                    templates.isEmpty
-                        ? _buildEmptyState(context)
-                        : _buildTemplatesList(context, templates),
-                  ],
-                ),
-              ),
+                // Lista de plantillas
+                templates.isEmpty
+                    ? _buildEmptyState(context)
+                    : _buildTemplatesList(context, templates),
+              ],
             ),
-
-            // Floating Action Button - SOLO cuando hay plantillas
-            if (templates.isNotEmpty)
-              Positioned(
-                right: 24,
-                bottom: 24,
-                child: FloatingActionButton.extended(
-                  onPressed: () =>
-                      _showTemplateModal(context, existingTemplate: null),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Nueva Plantilla'),
-                  backgroundColor: AppColors.primary,
-                ),
-              ),
-          ],
+          ),
         ),
         loading: () => const Center(
           child: CircularProgressIndicator(),
@@ -97,17 +79,38 @@ class ScheduleManagementScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(int templateCount) {
-    return Column(
+  Widget _buildHeader(BuildContext context, int templateCount) {
+    final isMobile = MediaQuery.of(context).size.width < Breakpoints.tablet;
+
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Plantillas de Horario', style: AppTextStyles.h3),
-        AppSpacing.verticalSpaceSm,
-        Text(
-          'Plantillas predefinidas que puedes asignar a tus empleados. Tienes $templateCount ${templateCount == 1 ? 'plantilla disponible' : 'plantillas disponibles'}.',
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.textSecondary,
+        // Columna con título y descripción (Flexible para evitar overflow)
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Plantillas de Horario', style: AppTextStyles.h3),
+              AppSpacing.verticalSpaceSm,
+              Text(
+                'Plantillas predefinidas que puedes asignar a tus empleados. Tienes $templateCount ${templateCount == 1 ? 'plantilla disponible' : 'plantillas disponibles'}.',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
           ),
+        ),
+
+        AppSpacing.horizontalSpaceLg,
+
+        // Botón "Nueva Plantilla" (responsive: texto completo en desktop, solo icono en mobile)
+        CustomButton(
+          text: isMobile ? '' : 'Nueva Plantilla',
+          icon: Icons.add,
+          variant: ButtonVariant.brand,
+          size: ButtonSize.large,
+          onPressed: () => _showTemplateModal(context, existingTemplate: null),
         ),
       ],
     );

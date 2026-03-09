@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
 import 'app.dart';
 
@@ -15,6 +16,7 @@ import 'app.dart';
 /// - SharedPreferences (theme persistence)
 /// - Firebase
 /// - Firebase Emulator (solo en debug mode)
+/// - Google Fonts (pre-carga)
 /// - Orientación de pantalla
 /// - Status bar / System UI
 /// - Providers globales (Riverpod)
@@ -31,6 +33,20 @@ void main() async {
   // INICIALIZAR SHARED PREFERENCES (para persistencia de tema)
   // ============================================================================
   await SharedPreferences.getInstance(); // Pre-cache para mejor performance
+
+  // ============================================================================
+  // PRE-CARGAR GOOGLE FONTS
+  // ============================================================================
+  // Esto descarga la fuente Inter antes de mostrar la UI
+  // Evita el "salto" visual cuando la fuente se carga después
+  try {
+    await _preloadGoogleFonts();
+  } catch (e) {
+    // Si falla la carga de fuentes, continuar con fuente de respaldo
+    if (kDebugMode) {
+      print('⚠️ Error al pre-cargar Google Fonts: $e');
+    }
+  }
 
   // ============================================================================
   // INICIALIZAR FIREBASE
@@ -79,4 +95,36 @@ void main() async {
     // ProviderScope de Riverpod para state management global
     const ProviderScope(child: ControlHorarioApp()),
   );
+}
+
+/// Pre-carga las fuentes de Google Fonts utilizadas en la app
+///
+/// Esto descarga la fuente Inter en todos los pesos necesarios
+/// antes de mostrar cualquier contenido, evitando el cambio visual
+/// cuando la fuente se carga de forma asíncrona.
+Future<void> _preloadGoogleFonts() async {
+  // Lista de todos los pesos de Inter que usamos en la app
+  // según app_text_styles.dart
+  final fontsToLoad = [
+    GoogleFonts.inter(fontWeight: FontWeight.w400), // Regular - Body text
+    GoogleFonts.inter(fontWeight: FontWeight.w500), // Medium - Labels
+    GoogleFonts.inter(fontWeight: FontWeight.w600), // SemiBold - Headings
+    GoogleFonts.inter(
+        fontWeight: FontWeight.w700), // Bold - Títulos principales
+  ];
+
+  // Forzar la carga de todas las fuentes
+  final futures = fontsToLoad.map((font) {
+    return Future.value(font.fontFamily);
+  }).toList();
+
+  await Future.wait(futures);
+
+  // Esperar a que todas las fuentes pendientes se descarguen
+  await GoogleFonts.pendingFonts([
+    GoogleFonts.inter(fontWeight: FontWeight.w400),
+    GoogleFonts.inter(fontWeight: FontWeight.w500),
+    GoogleFonts.inter(fontWeight: FontWeight.w600),
+    GoogleFonts.inter(fontWeight: FontWeight.w700),
+  ]);
 }

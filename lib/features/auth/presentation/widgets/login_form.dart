@@ -75,7 +75,10 @@ class _LoginFormState extends State<LoginForm> {
     return Form(
       key: _formKey,
       child: Padding(
-        padding: AppSpacing.allXxl,
+        padding: AppSpacing.symmetric(
+          horizontal: AppSpacing.xxxl,
+          vertical: AppSpacing.xxl,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,

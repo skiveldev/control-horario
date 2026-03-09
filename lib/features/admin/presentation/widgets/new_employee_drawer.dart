@@ -390,7 +390,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
           CustomButton(
             text: 'CERRAR',
             onPressed: () => Navigator.of(context).pop(),
-            variant: ButtonVariant.primary,
+            variant: ButtonVariant.brand,
           ),
         ],
       ),
@@ -610,7 +610,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
           AppSpacing.horizontalSpaceSm,
           CustomButton(
             text: 'Guardar',
-            variant: ButtonVariant.primary,
+            variant: ButtonVariant.brand,
             onPressed: _save,
           ),
         ],

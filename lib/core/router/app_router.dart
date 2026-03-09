@@ -19,6 +19,7 @@ import '../../features/admin/presentation/screens/admin_profile_screen.dart';
 import '../../features/admin/presentation/screens/employees_list_screen.dart';
 import '../../features/admin/presentation/screens/employee_detail_screen.dart';
 import '../../features/admin/presentation/screens/schedule_management_screen.dart';
+import '../../features/admin/presentation/screens/calendar_management_screen.dart';
 
 /// Sistema de navegación de la aplicación
 ///
@@ -46,6 +47,7 @@ class AppRouter {
   static const String adminEmployees = '/admin/employees';
   static const String adminEmployeeDetail = '/admin/employees/:id';
   static const String adminSchedules = '/admin/schedules';
+  static const String adminCalendars = '/admin/calendars';
 
   // ============================================================================
   // ROUTER CONFIGURATION
@@ -208,6 +210,16 @@ class AppRouter {
               context: context,
               state: state,
               child: const ScheduleManagementScreen(),
+            ),
+          ),
+          // Gestión de calendarios laborales
+          GoRoute(
+            path: 'calendars',
+            name: 'admin-calendars',
+            pageBuilder: (context, state) => _buildPageWithTransition(
+              context: context,
+              state: state,
+              child: const CalendarManagementScreen(),
             ),
           ),
         ],

@@ -297,7 +297,7 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
                 child: CustomButton(
                   text: 'Nuevo',
                   icon: Icons.add,
-                  variant: ButtonVariant.primary,
+                  variant: ButtonVariant.brand,
                   onPressed: () => setState(() => _isDrawerOpen = true),
                 ),
               ),
@@ -346,7 +346,7 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
         CustomButton(
           text: 'Nuevo Trabajador',
           icon: Icons.add,
-          variant: ButtonVariant.primary,
+          variant: ButtonVariant.brand,
           onPressed: () => setState(() => _isDrawerOpen = true),
         ),
       ],

@@ -5,7 +5,8 @@ import '../../../../core/theme/app_spacing.dart';
 
 /// Footer del formulario de login
 ///
-/// Contiene el link de registro y nota legal.
+/// Contiene la nota legal y copyright.
+/// Solo administradores pueden registrar nuevos usuarios.
 class LoginFooter extends StatelessWidget {
   const LoginFooter({super.key});
 
@@ -16,36 +17,6 @@ class LoginFooter extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // ¿No tienes cuenta? Regístrate
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '¿No tienes cuenta?',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  // TODO [FASE-2+]: Implementar registro
-                  // Por ahora solo mostramos mensaje
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Contacta al administrador para crear tu cuenta',
-                      ),
-                      duration: Duration(seconds: 3),
-                    ),
-                  );
-                },
-                child: Text('Regístrate aquí', style: AppTextStyles.link),
-              ),
-            ],
-          ),
-
-          AppSpacing.verticalSpaceMd,
-
           // Divider
           const Divider(height: 1),
 
@@ -62,9 +33,9 @@ class LoginFooter extends StatelessWidget {
 
           AppSpacing.verticalSpaceSm,
 
-          // Versión de la app
+          // Copyright y seguridad
           Text(
-            'Sistema seguro de gestión de tiempo para empleados',
+            'Sistema seguro • © 2026 Time Rega',
             style: AppTextStyles.caption.copyWith(
               color: AppColors.textTertiary,
             ),
