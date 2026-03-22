@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'holiday_type.dart';
 
 /// Representa un día o conjunto de días marcados en un calendario laboral
@@ -13,6 +14,26 @@ class CalendarEventModel {
     required this.date,
     required this.type,
   });
+
+  /// Deserializar desde Map de Firestore (elemento del array events)
+  factory CalendarEventModel.fromMap(Map<String, dynamic> map) {
+    return CalendarEventModel(
+      id: map['id'] as String,
+      name: map['name'] as String,
+      date: (map['date'] as Timestamp).toDate(),
+      type: HolidayType.values.byName(map['type'] as String),
+    );
+  }
+
+  /// Serializar a Map para guardar en Firestore
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'date': Timestamp.fromDate(date),
+      'type': type.name,
+    };
+  }
 
   CalendarEventModel copyWith({
     String? id,

@@ -101,6 +101,18 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
     
+    // ========================================
+    // COLECCIÓN: calendars (Calendarios Laborales)
+    // ========================================
+    match /calendars/{calendarId} {
+      // Todos los usuarios autenticados pueden leer calendarios
+      // (necesario para dropdowns de asignación y visualización)
+      allow read: if request.auth != null;
+      
+      // Solo admin y RRHH pueden crear, editar y eliminar calendarios
+      allow create, update, delete: if isAdmin();
+    }
+    
     // Denegar acceso a cualquier otra colección no especificada
     match /{document=**} {
       allow read, write: if false;

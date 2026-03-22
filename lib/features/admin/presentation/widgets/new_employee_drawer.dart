@@ -9,6 +9,7 @@ import '../../../../shared/widgets/inputs/custom_text_field.dart';
 import '../../../auth/models/user_model.dart';
 import '../../providers/user_management_provider.dart';
 import '../../providers/schedule_management_provider.dart';
+import '../../providers/calendar_management_provider.dart';
 
 /// Drawer lateral para crear nuevo empleado
 ///
@@ -80,6 +81,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
   DateTime _fechaInicio = DateTime.now();
   DateTime? _fechaFin;
   String? _selectedScheduleId;
+  String? _selectedCalendarId;
   bool _isActive = true;
   final _weeklyHoursController = TextEditingController();
 
@@ -257,6 +259,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                     ? null
                     : _empresaController.text.trim(),
                 scheduleId: _selectedScheduleId,
+                calendarId: _selectedCalendarId,
                 fechaInicio: _fechaInicio,
                 fechaFin: _fechaFin,
               );
@@ -467,6 +470,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
       _fechaInicio = DateTime.now();
       _fechaFin = null;
       _selectedScheduleId = null;
+      _selectedCalendarId = null;
       _weeklyHoursController.clear();
       _isActive = true;
       _errors.clear();
@@ -1018,6 +1022,92 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
               ),
             ),
           ],
+        ),
+        AppSpacing.verticalSpaceMd,
+
+        // Calendario laboral
+        Text(
+          'Calendario laboral',
+          style: AppTextStyles.labelMedium.copyWith(
+            color: AppColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Consumer(
+          builder: (context, ref, _) {
+            final calendarsAsync = ref.watch(allCalendarsProvider);
+
+            return calendarsAsync.when(
+              data: (calendars) {
+                return DropdownButtonFormField<String>(
+                  isExpanded: true,
+                  initialValue: _selectedCalendarId,
+                  hint: const Text('Sin asignar'),
+                  decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: AppColors.border),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: AppColors.border),
+                    ),
+                  ),
+                  items: [
+                    const DropdownMenuItem(
+                      value: null,
+                      child: Text('Sin asignar'),
+                    ),
+                    ...calendars.map((calendar) {
+                      return DropdownMenuItem(
+                        value: calendar.id,
+                        child: Text(
+                          '${calendar.name} (${calendar.year})',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      );
+                    }),
+                  ],
+                  onChanged: (value) {
+                    setState(() => _selectedCalendarId = value);
+                  },
+                );
+              },
+              loading: () => const SizedBox(
+                height: 48,
+                child: Center(
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+              error: (error, _) => Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.error.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.error),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.error_outline, color: AppColors.error, size: 16),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Error al cargar calendarios',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.error,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
         AppSpacing.verticalSpaceMd,
 

@@ -14,6 +14,8 @@ import '../widgets/employee_schedule_editor_modal.dart';
 import '../widgets/employee_info_editor_modal.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../../../auth/models/user_model.dart';
+import '../../providers/calendar_management_provider.dart';
+import '../../providers/user_management_provider.dart';
 
 /// Pantalla de detalle de empleado (Admin)
 ///
@@ -41,7 +43,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
           if (employee == null) {
             return _buildNotFound(context);
           }
-          return _buildContent(context, employee);
+          return _buildContent(context, ref, employee);
         },
         loading: () => const Center(
           child: CircularProgressIndicator(),
@@ -51,7 +53,8 @@ class EmployeeDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, UserModel employee) {
+  Widget _buildContent(
+      BuildContext context, WidgetRef ref, UserModel employee) {
     return SingleChildScrollView(
       padding: EdgeInsets.all(
         context.responsiveValue(
@@ -172,6 +175,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
                         'Fecha Inicio',
                         DateFormat('dd/MM/yyyy').format(employee.fechaInicio!),
                       ),
+                    _buildCalendarRow(context, ref, employee),
                   ],
                 ),
               ),
@@ -385,6 +389,185 @@ class EmployeeDetailScreen extends ConsumerWidget {
       barrierDismissible: false,
       builder: (_) => EmployeeInfoEditorModal(
         employee: employee,
+      ),
+    );
+  }
+
+  /// Fila de calendario con nombre resuelto y botón "Cambiar"
+  Widget _buildCalendarRow(
+    BuildContext context,
+    WidgetRef ref,
+    UserModel employee,
+  ) {
+    return Padding(
+      padding: AppSpacing.verticalSm,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 140,
+            child: Text(
+              'Calendario',
+              style: AppTextStyles.labelMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+          Expanded(
+            child: employee.calendarId != null
+                ? Consumer(
+                    builder: (context, ref, _) {
+                      final calendarAsync = ref.watch(
+                        calendarByIdProvider(employee.calendarId!),
+                      );
+                      return calendarAsync.when(
+                        data: (calendar) => Text(
+                          calendar?.name ?? 'Calendario no encontrado',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        loading: () => const SizedBox(
+                          height: 16,
+                          width: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        error: (_, __) => Text(
+                          'Error al cargar',
+                          style: AppTextStyles.bodyMedium,
+                        ),
+                      );
+                    },
+                  )
+                : Text(
+                    'Sin asignar',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+          ),
+          TextButton.icon(
+            onPressed: () => _showCalendarChangeDialog(context, ref, employee),
+            icon: const Icon(Icons.edit_outlined, size: 14),
+            label: const Text('Cambiar'),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.primary,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Diálogo para cambiar el calendario asignado al empleado
+  Future<void> _showCalendarChangeDialog(
+    BuildContext context,
+    WidgetRef ref,
+    UserModel employee,
+  ) async {
+    // Obtener lista de calendarios una sola vez para el diálogo
+    List<dynamic> calendars = [];
+    try {
+      calendars = await ref.read(allCalendarsProvider.future);
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error al cargar calendarios')),
+        );
+      }
+      return;
+    }
+
+    if (!context.mounted) return;
+
+    String? selectedCalendarId = employee.calendarId;
+
+    await showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            title: const Text('Cambiar Calendario'),
+            content: SizedBox(
+              width: 320,
+              child: DropdownButtonFormField<String>(
+                key: ValueKey(selectedCalendarId),
+                isExpanded: true,
+                initialValue: selectedCalendarId,
+                hint: const Text('Sin asignar'),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                ),
+                items: [
+                  const DropdownMenuItem(
+                    value: null,
+                    child: Text('Sin asignar'),
+                  ),
+                  ...calendars.map((calendar) {
+                    return DropdownMenuItem(
+                      value: calendar.id as String,
+                      child: Text(
+                        '${calendar.name} (${calendar.year})',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    );
+                  }),
+                ],
+                onChanged: (value) {
+                  setDialogState(() => selectedCalendarId = value);
+                },
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  Navigator.of(ctx).pop();
+                  try {
+                    await ref
+                        .read(userManagementProvider.notifier)
+                        .updateEmployee(
+                      userId: employee.userId,
+                      updates: {
+                        'calendarId': selectedCalendarId,
+                      },
+                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Calendario actualizado'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error: $e'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
+                },
+                child: const Text('Guardar'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

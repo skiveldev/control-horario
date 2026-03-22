@@ -6,7 +6,7 @@ part of 'user_management_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$userManagementHash() => r'1b02ddfd67d3108d549853c47a2c46f5c83bc61a';
+String _$userManagementHash() => r'679d6be6e123975ee9bacb0e49a4fc68d902c537';
 
 /// Provider para gestión de usuarios (creación, edición, eliminación)
 ///

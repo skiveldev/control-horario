@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/auth/models/user_model.dart';
 import 'schedule_service.dart';
+import 'calendar_service.dart';
 
 part 'firebase_service.g.dart';
 
@@ -145,6 +146,7 @@ class EmployeeCreationService {
   /// - [departamento]: Departamento del empleado (opcional)
   /// - [empresa]: Empresa del empleado (opcional, por defecto "Escuela Música")
   /// - [scheduleId]: ID de plantilla de horario (opcional)
+  /// - [calendarId]: ID del calendario laboral asignado (opcional)
   /// - [fechaInicio]: Fecha de inicio en la APLICACIÓN (NO en la empresa).
   ///   Desde esta fecha el empleado puede fichar en el sistema.
   ///   Ejemplo: Empleado trabaja desde 2018, pero acceso app desde 10/01/2026
@@ -173,6 +175,7 @@ class EmployeeCreationService {
     String? departamento,
     String? empresa,
     String? scheduleId,
+    String? calendarId,
     DateTime? fechaInicio,
     DateTime? fechaFin,
     UserRole role = UserRole.employee,
@@ -262,6 +265,8 @@ class EmployeeCreationService {
           'empresa': empresa.trim(),
         if (scheduleId != null && scheduleId.trim().isNotEmpty)
           'scheduleId': scheduleId.trim(),
+        if (calendarId != null && calendarId.trim().isNotEmpty)
+          'calendarId': calendarId.trim(),
         // ⚠️ CRÍTICO: fechaInicio/fechaFin son ALTAS EN LA APLICACIÓN, NO en la empresa
         // - fechaInicio: Desde cuándo puede fichar en la app
         // - fechaFin: Hasta cuándo puede fichar (baja de la app)
@@ -312,4 +317,18 @@ class EmployeeCreationService {
 ScheduleService scheduleService(ScheduleServiceRef ref) {
   final firestore = ref.watch(firestoreProvider);
   return ScheduleService(firestore);
+}
+
+// ============================================================================
+// CALENDAR SERVICE - Gestión de Calendarios Laborales
+// ============================================================================
+
+/// Provider para el servicio de gestión de calendarios laborales
+///
+/// Proporciona acceso a operaciones CRUD de calendarios en Firestore.
+/// Usado por CalendarManagementProvider para lógica de negocio.
+@riverpod
+CalendarService calendarService(CalendarServiceRef ref) {
+  final firestore = ref.watch(firestoreProvider);
+  return CalendarService(firestore);
 }

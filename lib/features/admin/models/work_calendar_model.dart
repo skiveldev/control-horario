@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'calendar_event_model.dart';
 import 'holiday_type.dart';
 
@@ -24,6 +25,34 @@ class WorkCalendarModel {
   /// Total de días marcados como vacaciones
   int get totalVacationDays =>
       events.where((e) => e.type == HolidayType.vacation).length;
+
+  /// Deserializar desde documento de Firestore
+  factory WorkCalendarModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+
+    final rawEvents = data['events'] as List<dynamic>? ?? [];
+    final events = rawEvents
+        .map((e) => CalendarEventModel.fromMap(e as Map<String, dynamic>))
+        .toList();
+
+    return WorkCalendarModel(
+      id: doc.id,
+      name: data['name'] as String? ?? '',
+      year: data['year'] as int? ?? DateTime.now().year,
+      events: events,
+      isActive: data['isActive'] as bool? ?? true,
+    );
+  }
+
+  /// Serializar para guardar en Firestore
+  Map<String, dynamic> toFirestore() {
+    return {
+      'name': name,
+      'year': year,
+      'isActive': isActive,
+      'events': events.map((e) => e.toMap()).toList(),
+    };
+  }
 
   WorkCalendarModel copyWith({
     String? id,

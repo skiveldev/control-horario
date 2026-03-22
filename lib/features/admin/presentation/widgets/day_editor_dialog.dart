@@ -60,6 +60,7 @@ class _DayEditorDialogState extends State<DayEditorDialog> {
     _nameController = TextEditingController(
       text: widget.existingEvent?.name ?? '',
     );
+    _nameController.addListener(() => setState(() {}));
   }
 
   @override

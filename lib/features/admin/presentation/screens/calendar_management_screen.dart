@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -7,6 +9,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
 import '../../../../shared/widgets/layouts/admin_layout.dart';
 import '../../models/work_calendar_model.dart';
+import '../../providers/calendar_management_provider.dart';
 import '../widgets/calendar_card.dart';
 import 'calendar_editor_screen.dart';
 
@@ -14,28 +17,13 @@ import 'calendar_editor_screen.dart';
 ///
 /// Lista los calendarios creados (festivos nacionales, autonómicos y vacaciones)
 /// y permite al administrador crear, editar, duplicar o eliminar calendarios.
-///
-/// MOCK DATA: Reemplazar con Riverpod provider en Fase 2 (calendarManagementProvider)
-class CalendarManagementScreen extends StatefulWidget {
+class CalendarManagementScreen extends ConsumerWidget {
   const CalendarManagementScreen({super.key});
 
   @override
-  State<CalendarManagementScreen> createState() =>
-      _CalendarManagementScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final calendarsAsync = ref.watch(allCalendarsProvider);
 
-class _CalendarManagementScreenState extends State<CalendarManagementScreen> {
-  // MOCK DATA: Reemplazar con Riverpod provider en Fase 2
-  late List<WorkCalendarModel> _calendars;
-
-  @override
-  void initState() {
-    super.initState();
-    _calendars = List.from(mockWorkCalendars);
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return AdminLayout(
       currentRoute: AppRouter.adminCalendars,
       child: Center(
@@ -44,11 +32,30 @@ class _CalendarManagementScreenState extends State<CalendarManagementScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(context),
+              _buildHeader(
+                context,
+                ref,
+                count: calendarsAsync.maybeWhen(
+                  data: (c) => c.length,
+                  orElse: () => 0,
+                ),
+              ),
               AppSpacing.verticalSpaceXl,
-              _calendars.isEmpty
-                  ? _buildEmptyState(context)
-                  : _buildCalendarList(context),
+              calendarsAsync.when(
+                data: (calendars) => calendars.isEmpty
+                    ? _buildEmptyState(context, ref)
+                    : _buildCalendarList(context, ref, calendars),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(
+                  child: Text(
+                    'Error al cargar calendarios: $e',
+                    style: AppTextStyles.bodyMedium
+                        .copyWith(color: AppColors.error),
+                  ),
+                ),
+              ),
+              AppSpacing.verticalSpaceXl,
+              _buildTipBanner(),
             ],
           ),
         ),
@@ -56,48 +63,98 @@ class _CalendarManagementScreenState extends State<CalendarManagementScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(
+    BuildContext context,
+    WidgetRef ref, {
+    required int count,
+  }) {
     final isMobile = MediaQuery.of(context).size.width < Breakpoints.tablet;
-    final count = _calendars.length;
 
-    return Row(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Flexible(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Calendarios Laborales', style: AppTextStyles.h3),
-              AppSpacing.verticalSpaceSm,
-              Text(
-                'Gestiona festivos y vacaciones por región. '
-                'Tienes $count ${count == 1 ? 'calendario disponible' : 'calendarios disponibles'}.',
-                style: AppTextStyles.bodyMedium.copyWith(
+        // Breadcrumbs
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () => context.go(AppRouter.admin),
+              child: Text(
+                'Panel Admin',
+                style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.textSecondary,
                 ),
               ),
-            ],
-          ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+              child: Text(
+                '›',
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textTertiary,
+                ),
+              ),
+            ),
+            Flexible(
+              child: Text(
+                'Calendarios Laborales',
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
+          ],
         ),
-        AppSpacing.horizontalSpaceLg,
-        CustomButton(
-          text: isMobile ? '' : 'Nuevo Calendario',
-          icon: Icons.add,
-          variant: ButtonVariant.brand,
-          size: ButtonSize.large,
-          onPressed: () => _navigateToEditor(context),
+        AppSpacing.verticalSpaceSm,
+        // Título + botón condicional (solo visible cuando hay calendarios)
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Calendarios Laborales', style: AppTextStyles.h3),
+                  AppSpacing.verticalSpaceXs,
+                  Text(
+                    'Gestiona festivos y vacaciones por región. '
+                    'Tienes $count ${count == 1 ? 'calendario disponible' : 'calendarios disponibles'}.',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (count > 0) ...[
+              AppSpacing.horizontalSpaceLg,
+              CustomButton(
+                text: isMobile ? '' : 'Nuevo Calendario',
+                icon: Icons.add,
+                variant: ButtonVariant.brand,
+                size: ButtonSize.large,
+                onPressed: () => _navigateToEditor(context),
+              ),
+            ],
+          ],
         ),
       ],
     );
   }
 
-  Widget _buildCalendarList(BuildContext context) {
+  Widget _buildCalendarList(
+    BuildContext context,
+    WidgetRef ref,
+    List<WorkCalendarModel> calendars,
+  ) {
     final columns = MediaQuery.of(context).size.width >= Breakpoints.desktop
         ? 2
         : MediaQuery.of(context).size.width >= Breakpoints.tablet
             ? 2
             : 1;
-    final gap = AppSpacing.lg;
+    const gap = AppSpacing.lg;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -108,14 +165,14 @@ class _CalendarManagementScreenState extends State<CalendarManagementScreen> {
         return Wrap(
           spacing: gap,
           runSpacing: gap,
-          children: _calendars.map((calendar) {
+          children: calendars.map((calendar) {
             return SizedBox(
               width: cardWidth,
               child: CalendarCard(
                 calendar: calendar,
                 onEdit: () => _navigateToEditor(context, calendar: calendar),
-                onDuplicate: () => _duplicateCalendar(calendar),
-                onDelete: () => _confirmDelete(context, calendar),
+                onDuplicate: () => _duplicateCalendar(context, ref, calendar),
+                onDelete: () => _confirmDelete(context, ref, calendar),
               ),
             );
           }).toList(),
@@ -124,83 +181,161 @@ class _CalendarManagementScreenState extends State<CalendarManagementScreen> {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: AppSpacing.allHuge,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.calendar_month_outlined,
-              size: 64,
-              color: AppColors.textTertiary,
-            ),
-            AppSpacing.verticalSpaceLg,
-            Text(
-              'No hay calendarios disponibles',
-              style: AppTextStyles.h4,
-            ),
-            AppSpacing.verticalSpaceSm,
-            Text(
-              'Crea tu primer calendario laboral para gestionar festivos y vacaciones',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+  Widget _buildEmptyState(BuildContext context, WidgetRef ref) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSpacing.giant,
+        horizontal: AppSpacing.massive,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        border: Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: AppSpacing.avatarXxl,
+                height: AppSpacing.avatarXxl,
+                decoration: BoxDecoration(
+                  color: AppColors.secondary.withValues(alpha: 0.08),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.calendar_month_outlined,
+                  size: AppSpacing.iconXxl,
+                  color: AppColors.secondary,
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
-            AppSpacing.verticalSpaceLg,
-            CustomButton(
-              text: 'Crear Calendario',
-              icon: Icons.add,
-              variant: ButtonVariant.brand,
-              onPressed: () => _navigateToEditor(context),
-            ),
-          ],
+              AppSpacing.verticalSpaceXl,
+              Text(
+                'No hay calendarios disponibles',
+                style: AppTextStyles.h4,
+                textAlign: TextAlign.center,
+              ),
+              AppSpacing.verticalSpaceMd,
+              Text(
+                'Crea tu primer calendario laboral para empezar a gestionar '
+                'festivos, vacaciones y jornadas especiales por región o departamento.',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              AppSpacing.verticalSpaceXl,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomButton(
+                    text: 'Crear Primer Calendario',
+                    icon: Icons.add,
+                    variant: ButtonVariant.brand,
+                    size: ButtonSize.large,
+                    onPressed: () => _navigateToEditor(context),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  void _navigateToEditor(BuildContext context,
-      {WorkCalendarModel? calendar}) async {
-    final result = await Navigator.of(context).push<WorkCalendarModel>(
+  Widget _buildTipBanner() {
+    return Container(
+      padding: AppSpacing.allLg,
+      decoration: BoxDecoration(
+        color: AppColors.textPrimary,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(
+            Icons.info_outline,
+            color: AppColors.surface,
+            size: AppSpacing.iconLg,
+          ),
+          AppSpacing.horizontalSpaceMd,
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '¿Cómo funcionan los calendarios laborales?',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.surface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                AppSpacing.verticalSpaceXs,
+                Text(
+                  'Cada calendario define los días festivos y jornadas especiales '
+                  'de una región. Puedes asignarlo a tus empleados para calcular '
+                  'correctamente sus horas trabajadas.',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.surface.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _navigateToEditor(BuildContext context, {WorkCalendarModel? calendar}) {
+    Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => CalendarEditorScreen(existingCalendar: calendar),
       ),
     );
+  }
 
-    if (result != null) {
-      setState(() {
-        final index = _calendars.indexWhere((c) => c.id == result.id);
-        if (index >= 0) {
-          _calendars[index] = result;
-        } else {
-          _calendars.add(result);
-        }
-      });
+  Future<void> _duplicateCalendar(
+    BuildContext context,
+    WidgetRef ref,
+    WorkCalendarModel original,
+  ) async {
+    try {
+      await ref
+          .read(calendarManagementProvider.notifier)
+          .duplicateCalendar(original.id);
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Calendario "${original.name}" duplicado'),
+            backgroundColor: AppColors.success,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al duplicar: $e'),
+            backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
     }
   }
 
-  void _duplicateCalendar(WorkCalendarModel original) {
-    // MOCK: Reemplazar con provider en Fase 2
-    final duplicate = original.copyWith(
-      id: '${original.id}_copy_${DateTime.now().millisecondsSinceEpoch}',
-      name: '${original.name} (copia)',
-      isActive: false,
-    );
-    setState(() => _calendars.add(duplicate));
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Calendario "${original.name}" duplicado'),
-        backgroundColor: AppColors.success,
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
-  void _confirmDelete(BuildContext context, WorkCalendarModel calendar) {
+  void _confirmDelete(
+    BuildContext context,
+    WidgetRef ref,
+    WorkCalendarModel calendar,
+  ) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -215,17 +350,33 @@ class _CalendarManagementScreenState extends State<CalendarManagementScreen> {
             child: const Text('Cancelar'),
           ),
           FilledButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(ctx).pop();
-              setState(
-                  () => _calendars.removeWhere((c) => c.id == calendar.id));
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Calendario "${calendar.name}" eliminado'),
-                  backgroundColor: AppColors.error,
-                  duration: const Duration(seconds: 2),
-                ),
-              );
+              try {
+                await ref
+                    .read(calendarManagementProvider.notifier)
+                    .deleteCalendar(calendar.id);
+
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Calendario "${calendar.name}" eliminado'),
+                      backgroundColor: AppColors.error,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error al eliminar: $e'),
+                      backgroundColor: AppColors.error,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                }
+              }
             },
             style: FilledButton.styleFrom(backgroundColor: AppColors.error),
             child: const Text('Eliminar'),

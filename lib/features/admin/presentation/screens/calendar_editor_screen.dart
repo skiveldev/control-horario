@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
@@ -9,6 +11,7 @@ import '../../../../shared/widgets/buttons/custom_button.dart';
 import '../../models/calendar_event_model.dart';
 import '../../models/holiday_type.dart';
 import '../../models/work_calendar_model.dart';
+import '../../providers/calendar_management_provider.dart';
 import '../widgets/day_editor_dialog.dart';
 
 /// Pantalla de edición de un calendario laboral
@@ -18,19 +21,18 @@ import '../widgets/day_editor_dialog.dart';
 /// - Marcar festivos nacionales, autonómicos, locales y vacaciones
 /// - Usar rangos de fechas para periodos vacacionales
 /// - Ver el resumen lateral de todos los días marcados
-///
-/// MOCK DATA: Reemplazar con Riverpod provider en Fase 2 (calendarManagementProvider)
-class CalendarEditorScreen extends StatefulWidget {
+class CalendarEditorScreen extends ConsumerStatefulWidget {
   /// Calendario existente (null para crear nuevo)
   final WorkCalendarModel? existingCalendar;
 
   const CalendarEditorScreen({super.key, this.existingCalendar});
 
   @override
-  State<CalendarEditorScreen> createState() => _CalendarEditorScreenState();
+  ConsumerState<CalendarEditorScreen> createState() =>
+      _CalendarEditorScreenState();
 }
 
-class _CalendarEditorScreenState extends State<CalendarEditorScreen> {
+class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
   late TextEditingController _nameController;
   late int _selectedYear;
   late bool _isActive;
@@ -70,6 +72,15 @@ class _CalendarEditorScreenState extends State<CalendarEditorScreen> {
     return _events.where((e) => isSameDay(e.date, day)).toList();
   }
 
+  List<CalendarEventModel> get _eventsForFocusedMonth => _events
+      .where(
+        (e) =>
+            e.date.month == _focusedDay.month &&
+            e.date.year == _focusedDay.year,
+      )
+      .toList()
+    ..sort((a, b) => a.date.compareTo(b.date));
+
   Color _colorForType(HolidayType type) {
     switch (type) {
       case HolidayType.national:
@@ -81,6 +92,81 @@ class _CalendarEditorScreenState extends State<CalendarEditorScreen> {
       case HolidayType.vacation:
         return AppColors.success;
     }
+  }
+
+  Widget _buildEmptyDayCell(DateTime day) {
+    return _HoverableDayCell(
+      builder: (isHovered) => Container(
+        margin: const EdgeInsets.all(2),
+        decoration: BoxDecoration(
+          color: isHovered
+              ? AppColors.primary.withValues(alpha: 0.04)
+              : AppColors.surface,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+          border: Border.all(
+            color: isHovered
+                ? AppColors.primary.withValues(alpha: 0.25)
+                : Colors.transparent,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            '${day.day}',
+            style: TextStyle(
+              color: isHovered ? AppColors.primary : AppColors.textPrimary,
+              fontWeight: FontWeight.w500,
+              fontSize: 13,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEventDayCell(DateTime day, CalendarEventModel event) {
+    final color = _colorForType(event.type);
+    final shortName = event.name.toUpperCase();
+
+    return Container(
+      margin: const EdgeInsets.all(2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xs,
+        vertical: AppSpacing.xs,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+        border: Border.all(color: color.withValues(alpha: 0.35), width: 1),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            '${day.day}',
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            shortName,
+            style: TextStyle(
+              color: color,
+              fontSize: 9,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.3,
+              height: 1.1,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
   }
 
   // ===========================================================================
@@ -124,7 +210,7 @@ class _CalendarEditorScreenState extends State<CalendarEditorScreen> {
     );
   }
 
-  void _saveCalendar() {
+  Future<void> _saveCalendar() async {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -134,24 +220,35 @@ class _CalendarEditorScreenState extends State<CalendarEditorScreen> {
       return;
     }
 
-    // MOCK: En Fase 2 llamar a calendarManagementProvider.notifier.save(...)
-    final calendar = WorkCalendarModel(
-      id: widget.existingCalendar?.id ??
-          'cal_${DateTime.now().millisecondsSinceEpoch}',
-      name: name,
-      year: _selectedYear,
-      events: _events,
-      isActive: _isActive,
-    );
+    try {
+      await ref.read(calendarManagementProvider.notifier).saveCalendar(
+            calendarId: widget.existingCalendar?.id,
+            name: name,
+            year: _selectedYear,
+            events: _events,
+            isActive: _isActive,
+          );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Calendario "${calendar.name}" guardado'),
-        backgroundColor: AppColors.success,
-      ),
-    );
-
-    Navigator.of(context).pop(calendar);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Calendario "$name" guardado'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al guardar: $e'),
+            backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    }
   }
 
   // ===========================================================================
@@ -164,55 +261,104 @@ class _CalendarEditorScreenState extends State<CalendarEditorScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: _buildAppBar(),
-      body: isDesktop ? _buildDesktopLayout() : _buildMobileLayout(),
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              _buildPageHeader(),
+              Divider(height: 1, color: AppColors.border),
+              Expanded(
+                child: isDesktop ? _buildDesktopLayout() : _buildMobileLayout(),
+              ),
+            ],
+          ),
+          Positioned(
+            bottom: AppSpacing.xxl,
+            left: 0,
+            right: 0,
+            child: Center(child: _buildStatusBar()),
+          ),
+        ],
+      ),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: AppColors.surface,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => Navigator.of(context).pop(),
+  Widget _buildPageHeader() {
+    final title = widget.existingCalendar == null
+        ? 'Nuevo Calendario'
+        : 'Editar Calendario';
+
+    return Container(
+      color: AppColors.surface,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xxl,
+        vertical: AppSpacing.md,
       ),
-      title: Text(
-        widget.existingCalendar == null
-            ? 'Nuevo Calendario'
-            : 'Editar Calendario',
-        style: AppTextStyles.h5,
-      ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: AppSpacing.lg),
-          child: CustomButton(
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: AppColors.secondary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            ),
+            child: const Icon(
+              Icons.calendar_month_outlined,
+              color: AppColors.secondary,
+              size: AppSpacing.iconLg,
+            ),
+          ),
+          AppSpacing.horizontalSpaceMd,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(title, style: AppTextStyles.h5),
+                Text(
+                  'Configuración de festivos y jornada',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          CustomButton(
+            text: 'Cancelar',
+            variant: ButtonVariant.text,
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          AppSpacing.horizontalSpaceSm,
+          CustomButton(
             text: 'Guardar Calendario',
             icon: Icons.save_outlined,
             variant: ButtonVariant.brand,
             onPressed: _saveCalendar,
           ),
-        ),
-      ],
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(1),
-        child: Divider(height: 1, color: AppColors.border),
+          AppSpacing.horizontalSpaceMd,
+        ],
       ),
     );
   }
 
-  // Desktop: Calendario a la izquierda, resumen a la derecha
+  // Desktop: Calendario a la izquierda, sidebar card independiente a la derecha
   Widget _buildDesktopLayout() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Panel izquierdo: formulario + calendario
-        Expanded(
-          flex: 3,
-          child: SingleChildScrollView(
-            padding: AppSpacing.allXl,
+    return SingleChildScrollView(
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.xxl,
+        AppSpacing.xl,
+        AppSpacing.xxl,
+        AppSpacing.massive +
+            AppSpacing.xxl, // espacio para el statusbar flotante
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Columna izquierda: formulario + calendario
+          Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildFormFields(),
                 AppSpacing.verticalSpaceXl,
@@ -220,24 +366,26 @@ class _CalendarEditorScreenState extends State<CalendarEditorScreen> {
               ],
             ),
           ),
-        ),
-
-        // Divisor
-        VerticalDivider(width: 1, color: AppColors.border),
-
-        // Panel derecho: resumen de festivos
-        SizedBox(
-          width: 300,
-          child: _buildEventsSummary(),
-        ),
-      ],
+          AppSpacing.horizontalSpaceXxl,
+          // Sidebar: card independiente con su propio estilo
+          SizedBox(
+            width: 320,
+            child: _buildEventsSummary(),
+          ),
+        ],
+      ),
     );
   }
 
   // Mobile: Apilado verticalmente
   Widget _buildMobileLayout() {
     return SingleChildScrollView(
-      padding: AppSpacing.allLg,
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.massive + AppSpacing.xxl,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -255,90 +403,215 @@ class _CalendarEditorScreenState extends State<CalendarEditorScreen> {
   // SECCIÓN: FORMULARIO SUPERIOR
   // ===========================================================================
 
+  Widget _buildStatusBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xxl,
+        vertical: AppSpacing.md,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.textPrimary,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.textPrimary.withValues(alpha: 0.35),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.check_circle,
+            color: AppColors.success,
+            size: AppSpacing.iconLg,
+          ),
+          AppSpacing.horizontalSpaceMd,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'ESTADO ACTUAL',
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: AppColors.surface.withValues(alpha: 0.5),
+                  letterSpacing: 0.8,
+                  fontSize: 10,
+                ),
+              ),
+              Text(
+                'Configuración válida para $_selectedYear',
+                style: AppTextStyles.labelMedium.copyWith(
+                  color: AppColors.surface,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          AppSpacing.horizontalSpaceLg,
+          Icon(
+            Icons.edit_outlined,
+            size: AppSpacing.iconMd,
+            color: AppColors.surface.withValues(alpha: 0.6),
+          ),
+          AppSpacing.horizontalSpaceMd,
+          Icon(
+            Icons.more_vert,
+            size: AppSpacing.iconMd,
+            color: AppColors.surface.withValues(alpha: 0.6),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildFormFields() {
     return Container(
-      padding: AppSpacing.allLg,
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         border: Border.all(color: AppColors.border),
+        boxShadow: AppShadows.subtleShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Información del Calendario', style: AppTextStyles.h6),
-          AppSpacing.verticalSpaceMd,
-          Row(
-            children: [
-              // Nombre
-              Expanded(
-                flex: 3,
-                child: TextField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    labelText: 'Nombre del calendario *',
-                    hintText: 'Ej: Madrid 2025',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                    ),
-                    contentPadding: AppSpacing.symmetric(
-                      horizontal: AppSpacing.md,
-                      vertical: AppSpacing.md,
-                    ),
+          // Header del card
+          Padding(
+            padding: AppSpacing.allLg,
+            child: Row(
+              children: [
+                Icon(
+                  Icons.settings_outlined,
+                  size: AppSpacing.iconLg,
+                  color: AppColors.textSecondary,
+                ),
+                AppSpacing.horizontalSpaceSm,
+                Text('Información del Calendario', style: AppTextStyles.h6),
+              ],
+            ),
+          ),
+          Divider(height: 1, color: AppColors.border),
+          Padding(
+            padding: AppSpacing.allLg,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Nombre
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'NOMBRE DEL CALENDARIO *',
+                        style: AppTextStyles.labelSmall.copyWith(
+                          color: AppColors.textSecondary,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      AppSpacing.verticalSpaceXs,
+                      TextField(
+                        controller: _nameController,
+                        decoration: InputDecoration(
+                          hintText: 'Ej: Calendario Laboral 2026',
+                          border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(AppSpacing.radiusSm),
+                          ),
+                          contentPadding: AppSpacing.symmetric(
+                            horizontal: AppSpacing.md,
+                            vertical: AppSpacing.md,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              AppSpacing.horizontalSpaceMd,
+                AppSpacing.horizontalSpaceMd,
 
-              // Año
-              SizedBox(
-                width: 120,
-                child: DropdownButtonFormField<int>(
-                  key: ValueKey(_selectedYear),
-                  initialValue: _selectedYear,
-                  decoration: InputDecoration(
-                    labelText: 'Año',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                    ),
-                    contentPadding: AppSpacing.symmetric(
-                      horizontal: AppSpacing.md,
-                      vertical: AppSpacing.md,
-                    ),
+                // Año
+                SizedBox(
+                  width: 140,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'AÑO',
+                        style: AppTextStyles.labelSmall.copyWith(
+                          color: AppColors.textSecondary,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      AppSpacing.verticalSpaceXs,
+                      DropdownButtonFormField<int>(
+                        key: ValueKey(_selectedYear),
+                        initialValue: _selectedYear,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(AppSpacing.radiusSm),
+                          ),
+                          contentPadding: AppSpacing.symmetric(
+                            horizontal: AppSpacing.md,
+                            vertical: AppSpacing.md,
+                          ),
+                        ),
+                        items: _availableYears.map((year) {
+                          return DropdownMenuItem(
+                            value: year,
+                            child: Text('$year'),
+                          );
+                        }).toList(),
+                        onChanged: (year) {
+                          if (year != null) {
+                            setState(() {
+                              _selectedYear = year;
+                              _focusedDay = DateTime(year);
+                            });
+                          }
+                        },
+                      ),
+                    ],
                   ),
-                  items: _availableYears.map((year) {
-                    return DropdownMenuItem(
-                      value: year,
-                      child: Text('$year'),
-                    );
-                  }).toList(),
-                  onChanged: (year) {
-                    if (year != null) {
-                      setState(() {
-                        _selectedYear = year;
-                        _focusedDay = DateTime(year);
-                      });
-                    }
-                  },
                 ),
-              ),
-              AppSpacing.horizontalSpaceMd,
+                AppSpacing.horizontalSpaceMd,
 
-              // Estado (Activo / Borrador)
-              Row(
-                children: [
-                  Text(
-                    _isActive ? 'Activo' : 'Borrador',
-                    style: AppTextStyles.labelMedium,
-                  ),
-                  Switch(
-                    value: _isActive,
-                    onChanged: (v) => setState(() => _isActive = v),
-                    activeThumbColor: AppColors.success,
-                  ),
-                ],
-              ),
-            ],
+                // Estado
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'ESTADO',
+                      style: AppTextStyles.labelSmall.copyWith(
+                        color: AppColors.textSecondary,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    AppSpacing.verticalSpaceXs,
+                    Switch(
+                      value: _isActive,
+                      onChanged: (v) => setState(() => _isActive = v),
+                      activeThumbColor: AppColors.success,
+                      activeTrackColor:
+                          AppColors.success.withValues(alpha: 0.4),
+                    ),
+                    Text(
+                      _isActive ? 'ACTIVO' : 'BORRADOR',
+                      style: AppTextStyles.labelSmall.copyWith(
+                        color: _isActive
+                            ? AppColors.success
+                            : AppColors.textTertiary,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -355,6 +628,7 @@ class _CalendarEditorScreenState extends State<CalendarEditorScreen> {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         border: Border.all(color: AppColors.border),
+        boxShadow: AppShadows.subtleShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -385,113 +659,128 @@ class _CalendarEditorScreenState extends State<CalendarEditorScreen> {
 
           Divider(height: 1, color: AppColors.border),
 
-          // TableCalendar
-          TableCalendar<CalendarEventModel>(
-            firstDay: DateTime(_selectedYear, 1, 1),
-            lastDay: DateTime(_selectedYear, 12, 31),
-            focusedDay: _focusedDay,
-            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-            eventLoader: _eventsForDay,
-            onDaySelected: _onDaySelected,
-            onPageChanged: (focusedDay) {
-              setState(() => _focusedDay = focusedDay);
-            },
-            calendarFormat: CalendarFormat.month,
-            availableCalendarFormats: const {
-              CalendarFormat.month: 'Mes',
-            },
-            locale: 'es_ES',
-            startingDayOfWeek: StartingDayOfWeek.monday,
-            headerStyle: HeaderStyle(
-              titleCentered: true,
-              formatButtonVisible: false,
-              titleTextStyle: AppTextStyles.h6,
-              leftChevronIcon: const Icon(Icons.chevron_left),
-              rightChevronIcon: const Icon(Icons.chevron_right),
-              headerPadding: AppSpacing.symmetric(
-                horizontal: AppSpacing.lg,
-                vertical: AppSpacing.md,
-              ),
+          // TableCalendar — Theme neutraliza el hover circular nativo
+          Theme(
+            data: Theme.of(context).copyWith(
+              hoverColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              splashColor: Colors.transparent,
             ),
-            calendarStyle: CalendarStyle(
-              outsideDaysVisible: false,
-              todayDecoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.15),
-                shape: BoxShape.circle,
-              ),
-              todayTextStyle: TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
-              ),
-              selectedDecoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.3),
-                shape: BoxShape.circle,
-              ),
-              selectedTextStyle: TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w700,
-              ),
-              markerDecoration: const BoxDecoration(
-                color: Colors.transparent,
-              ),
-              markersMaxCount: 0,
-              cellMargin: const EdgeInsets.all(4),
-            ),
-            calendarBuilders: CalendarBuilders(
-              defaultBuilder: (context, day, focusedDay) {
-                final events = _eventsForDay(day);
-                if (events.isEmpty) return null;
-
-                final event = events.first;
-                final color = _colorForType(event.type);
-
-                return Container(
-                  margin: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: color, width: 1.5),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${day.day}',
-                      style: TextStyle(
-                        color: color,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                );
+            child: TableCalendar<CalendarEventModel>(
+              firstDay: DateTime(_selectedYear, 1, 1),
+              lastDay: DateTime(_selectedYear, 12, 31),
+              focusedDay: _focusedDay,
+              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+              eventLoader: _eventsForDay,
+              onDaySelected: _onDaySelected,
+              onPageChanged: (focusedDay) {
+                setState(() => _focusedDay = focusedDay);
               },
-              todayBuilder: (context, day, focusedDay) {
-                final events = _eventsForDay(day);
-                if (events.isNotEmpty) {
-                  final event = events.first;
-                  final color = _colorForType(event.type);
+              rowHeight: 72,
+              calendarFormat: CalendarFormat.month,
+              availableCalendarFormats: const {
+                CalendarFormat.month: 'Mes',
+              },
+              locale: 'es_ES',
+              startingDayOfWeek: StartingDayOfWeek.monday,
+              headerStyle: HeaderStyle(
+                titleCentered: true,
+                formatButtonVisible: false,
+                titleTextStyle: AppTextStyles.h6,
+                leftChevronIcon: const Icon(Icons.chevron_left),
+                rightChevronIcon: const Icon(Icons.chevron_right),
+                headerPadding: AppSpacing.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.md,
+                ),
+              ),
+              calendarStyle: CalendarStyle(
+                outsideDaysVisible: false,
+                todayDecoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                todayTextStyle: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+                selectedDecoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.3),
+                  shape: BoxShape.circle,
+                ),
+                selectedTextStyle: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w700,
+                ),
+                markerDecoration: const BoxDecoration(
+                  color: Colors.transparent,
+                ),
+                markersMaxCount: 0,
+                cellMargin: const EdgeInsets.all(2),
+              ),
+              calendarBuilders: CalendarBuilders(
+                defaultBuilder: (context, day, focusedDay) {
+                  final events = _eventsForDay(day);
+                  if (events.isNotEmpty) {
+                    return _buildEventDayCell(day, events.first);
+                  }
+                  return _buildEmptyDayCell(day);
+                },
+                todayBuilder: (context, day, focusedDay) {
+                  final events = _eventsForDay(day);
+                  if (events.isNotEmpty) {
+                    return _buildEventDayCell(day, events.first);
+                  }
                   return Container(
-                    margin: const EdgeInsets.all(4),
+                    margin: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.25),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: color, width: 2),
+                      color: AppColors.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.4),
+                      ),
                     ),
                     child: Center(
                       child: Text(
                         '${day.day}',
                         style: TextStyle(
-                          color: color,
+                          color: AppColors.primary,
                           fontWeight: FontWeight.w700,
                           fontSize: 13,
                         ),
                       ),
                     ),
                   );
-                }
-                return null;
-              },
+                },
+                selectedBuilder: (context, day, focusedDay) {
+                  final events = _eventsForDay(day);
+                  if (events.isNotEmpty) {
+                    return _buildEventDayCell(day, events.first);
+                  }
+                  return Container(
+                    margin: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: AppColors.secondary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                      border: Border.all(
+                        color: AppColors.secondary.withValues(alpha: 0.5),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${day.day}',
+                        style: TextStyle(
+                          color: AppColors.secondary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
+          ), // Theme
           AppSpacing.verticalSpaceMd,
         ],
       ),
@@ -533,30 +822,65 @@ class _CalendarEditorScreenState extends State<CalendarEditorScreen> {
   // ===========================================================================
 
   Widget _buildEventsSummary() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: AppSpacing.allLg,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Festivos configurados', style: AppTextStyles.h6),
-              AppSpacing.verticalSpaceSm,
-              Text(
-                '${_events.length} días marcados',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        border: Border.all(color: AppColors.border),
+        boxShadow: AppShadows.subtleShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: AppSpacing.allLg,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        'Festivos configurados',
+                        style: AppTextStyles.h6,
+                      ),
+                    ),
+                    AppSpacing.horizontalSpaceSm,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.success.withValues(alpha: 0.1),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.radiusCircular),
+                      ),
+                      child: Text(
+                        '${_eventsForFocusedMonth.length} Días',
+                        style: AppTextStyles.labelSmall.copyWith(
+                          color: AppColors.success,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+                AppSpacing.verticalSpaceXs,
+                Text(
+                  DateFormat('MMMM yyyy', 'es').format(_focusedDay),
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        Divider(height: 1, color: AppColors.border),
-        Expanded(
-          child: _buildEventsList(),
-        ),
-      ],
+          Divider(height: 1, color: AppColors.border),
+          _buildEventsList(_eventsForFocusedMonth),
+        ],
+      ),
     );
   }
 
@@ -566,6 +890,7 @@ class _CalendarEditorScreenState extends State<CalendarEditorScreen> {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         border: Border.all(color: AppColors.border),
+        boxShadow: AppShadows.subtleShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -574,112 +899,192 @@ class _CalendarEditorScreenState extends State<CalendarEditorScreen> {
             padding: AppSpacing.allLg,
             child: Row(
               children: [
-                Text('Festivos configurados', style: AppTextStyles.h6),
-                const Spacer(),
-                Text(
-                  '${_events.length} días',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                Flexible(
+                  child: Text(
+                    'Festivos configurados',
+                    style: AppTextStyles.h6,
+                  ),
+                ),
+                AppSpacing.horizontalSpaceSm,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withValues(alpha: 0.1),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.radiusCircular),
+                  ),
+                  child: Text(
+                    '${_eventsForFocusedMonth.length} Días',
+                    style: AppTextStyles.labelSmall.copyWith(
+                      color: AppColors.success,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
           Divider(height: 1, color: AppColors.border),
-          SizedBox(
-            height: 320,
-            child: _buildEventsList(),
-          ),
+          _buildEventsList(_eventsForFocusedMonth),
         ],
       ),
     );
   }
 
-  Widget _buildEventsList() {
-    if (_events.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: AppSpacing.allXl,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.calendar_today_outlined,
-                size: 40,
+  Widget _buildEventsList(List<CalendarEventModel> events) {
+    if (events.isEmpty) {
+      return Padding(
+        padding: AppSpacing.allXl,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.calendar_today_outlined,
+              size: 40,
+              color: AppColors.textTertiary,
+            ),
+            AppSpacing.verticalSpaceMd,
+            Text(
+              'Sin festivos',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+            AppSpacing.verticalSpaceSm,
+            Text(
+              'Toca un día en el calendario para añadir',
+              style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.textTertiary,
               ),
-              AppSpacing.verticalSpaceMd,
-              Text(
-                'Sin festivos',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              AppSpacing.verticalSpaceSm,
-              Text(
-                'Toca un día en el calendario para añadir',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textTertiary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       );
     }
 
-    // Agrupar por tipo y ordenar por fecha
-    final sortedEvents = List<CalendarEventModel>.from(_events)
+    final sortedEvents = List<CalendarEventModel>.from(events)
       ..sort((a, b) => a.date.compareTo(b.date));
 
     final formatter = DateFormat('d MMM', 'es');
 
     return ListView.separated(
       padding: AppSpacing.allMd,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: sortedEvents.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 2),
+      separatorBuilder: (_, __) => AppSpacing.verticalSpaceXs,
       itemBuilder: (context, index) {
         final event = sortedEvents[index];
         final color = _colorForType(event.type);
+        final typeLabel = event.type.shortLabel.toUpperCase();
+        final dateStr = formatter.format(event.date);
 
-        return ListTile(
-          dense: true,
-          contentPadding: AppSpacing.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: 0,
-          ),
-          leading: Container(
-            width: 8,
-            height: 8,
-            margin: const EdgeInsets.only(top: 4),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: color,
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            border: Border(
+              left: BorderSide(color: color, width: 3),
             ),
           ),
-          title: Text(
-            event.name,
-            style: AppTextStyles.labelMedium,
-            overflow: TextOverflow.ellipsis,
-          ),
-          subtitle: Text(
-            '${formatter.format(event.date)} · ${event.type.shortLabel}',
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textSecondary,
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: AppSpacing.md,
+              right: AppSpacing.xs,
+              top: AppSpacing.sm,
+              bottom: AppSpacing.sm,
             ),
-          ),
-          trailing: IconButton(
-            icon: const Icon(Icons.close, size: 14),
-            color: AppColors.textTertiary,
-            onPressed: () {
-              setState(() {
-                _events.removeWhere((e) => e.id == event.id);
-              });
-            },
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        typeLabel,
+                        style: AppTextStyles.labelSmall.copyWith(
+                          color: color,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        event.name,
+                        style: AppTextStyles.labelMedium,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.access_time_outlined,
+                            size: 11,
+                            color: AppColors.textTertiary,
+                          ),
+                          const SizedBox(width: 3),
+                          Flexible(
+                            child: Text(
+                              dateStr,
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.textTertiary,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, size: 14),
+                  color: AppColors.textTertiary,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    minWidth: 28,
+                    minHeight: 28,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _events.removeWhere((e) => e.id == event.id);
+                    });
+                  },
+                ),
+              ],
+            ),
           ),
         );
       },
+    );
+  }
+}
+
+class _HoverableDayCell extends StatefulWidget {
+  final Widget Function(bool isHovered) builder;
+
+  const _HoverableDayCell({required this.builder});
+
+  @override
+  State<_HoverableDayCell> createState() => _HoverableDayCellState();
+}
+
+class _HoverableDayCellState extends State<_HoverableDayCell> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: widget.builder(_isHovered),
     );
   }
 }

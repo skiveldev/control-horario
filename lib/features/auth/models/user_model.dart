@@ -45,6 +45,7 @@ class UserModel with _$UserModel {
         scheduleType, // Tipo de horario: "template" (usa scheduleId) | "custom" (usa customSchedule)
     Map<String, dynamic>?
         customSchedule, // Horario personalizado (solo si scheduleType = "custom")
+    String? calendarId, // Referencia al calendario laboral asignado
     // ⚠️ FECHAS DE ALTA EN LA APLICACIÓN (NO en la empresa)
     DateTime?
         fechaInicio, // Fecha desde la cual el empleado puede FICHAR en la app
@@ -143,6 +144,7 @@ class UserModel with _$UserModel {
       scheduleId: data['scheduleId'] as String?,
       scheduleType: data['scheduleType'] as String? ?? 'template',
       customSchedule: data['customSchedule'] as Map<String, dynamic>?,
+      calendarId: data['calendarId'] as String?,
       fechaInicio: fechaInicioDate,
       fechaFin: fechaFinDate,
 

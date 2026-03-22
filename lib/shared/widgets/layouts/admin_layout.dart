@@ -64,7 +64,7 @@ class AdminLayout extends StatelessWidget {
           // Sidebar fijo en desktop
           if (!isMobileOrTablet)
             SizedBox(
-              width: 250,
+              width: 270,
               height: double.infinity,
               child: AdminSidebar(currentRoute: currentRoute),
             ),

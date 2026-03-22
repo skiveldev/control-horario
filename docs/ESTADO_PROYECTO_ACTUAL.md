@@ -12,14 +12,14 @@ PROYECTO CONTROL HORARIO
 │
 ├─ FASE 1: UI/UX                                  ✅ 100% COMPLETADO
 │
-├─ FASE 2: Backend + Lógica + Firebase            🔶 ~65% COMPLETADO
+├─ FASE 2: Backend + Lógica + Firebase            🔶 ~75% COMPLETADO
 │   ├─ Bloque A: Auth + Firebase Setup            ✅ Completado
 │   ├─ Bloque B: Fichaje (Clocking)               ✅ Completado
 │   ├─ Bloque C: Mi Control Horario               ✅ Completado
 │   ├─ Bloque D: Panel Admin + Empleados          ✅ Completado
 │   ├─ Bloque E: Gestión de Horarios              ✅ Completado
 │   ├─ Bloque F: Gestión de Calendarios (UI)      ✅ Completado (UI Only)
-│   ├─ Bloque G: Gestión de Calendarios (Backend) ⏳ Pendiente
+│   ├─ Bloque G: Gestión de Calendarios (Backend) ✅ Completado
 │   ├─ Bloque H: Automatizaciones (Cloud Func.)   ⏳ Pendiente
 │   ├─ Bloque I: Horas Extras + Aprobaciones      ⏳ Pendiente
 │   └─ Bloque J: Reportes + Exportación PDF       ⏳ Pendiente
@@ -154,29 +154,23 @@ PROYECTO CONTROL HORARIO
 
 ## Lo que Falta — Fase 2
 
-### Bloque G: Gestión de Calendarios — Backend ⏳
+### Bloque G: Gestión de Calendarios — Backend ✅
 
-Prioridad: **Alta** (depende del Bloque F ya completado)
-
-| Tarea | Descripción |
+| Tarea | Estado |
 |---|---|
-| `CalendarService` | CRUD en colección `calendars` de Firestore |
-| `calendarManagementProvider` | Riverpod `NotifierProvider` para CRUD + `StreamProvider` para lista |
-| Actualizar `UserModel` | Añadir campo `calendarId: String?` + serialización Firestore |
-| Actualizar `NewEmployeeDrawer` | Dropdown de calendarios (igual que el de horarios) |
-| Reemplazar mock data | Conectar `CalendarManagementScreen` con el provider real |
-| Reglas Firestore | Solo admin puede crear/editar calendarios |
+| `CalendarService` | ✅ CRUD en colección `calendars` de Firestore |
+| `calendarManagementProvider` | ✅ `StreamProvider` + `NotifierProvider` (saveCalendar, deleteCalendar, duplicateCalendar) |
+| Actualizar `UserModel` | ✅ Campo `calendarId: String?` añadido con serialización Firestore |
+| Actualizar `NewEmployeeDrawer` | ✅ Dropdown de calendarios en sección Control Horario |
+| Reemplazar mock data | ✅ `CalendarManagementScreen` conectada con `allCalendarsProvider` |
+| `CalendarEditorScreen` | ✅ Guarda en Firebase via `calendarManagementProvider.notifier.saveCalendar()` |
+| `EmployeeDetailScreen` | ✅ Muestra calendario asignado + botón "Cambiar" con diálogo |
 
-**Estructura Firebase:**
-```
-firestore/
-└── calendars/{calendarId}
-    ├── name: "Madrid 2025"
-    ├── year: 2025
-    ├── isActive: true
-    ├── isTemplate: true
-    └── events: [{ id, name, date, type }]   // Array de eventos
-```
+**Archivos clave:**
+- `lib/core/services/calendar_service.dart`
+- `lib/features/admin/providers/calendar_management_provider.dart`
+- `lib/features/admin/models/work_calendar_model.dart` (fromFirestore/toFirestore)
+- `lib/features/admin/models/calendar_event_model.dart` (fromMap/toMap)
 
 ---
 
@@ -240,7 +234,6 @@ Prioridad: **Baja** (después de los bloques anteriores)
 | `TODO: Copiar portapapeles` | `new_employee_drawer.dart` | Botón "COPIAR CREDENCIALES" en modal |
 | Rol `supervisor` | `new_employee_drawer.dart` | Radio button existe pero no está en `UserRole` |
 | Editar empleado | `employee_detail_screen.dart` | Pantalla de detalle existe, falta formulario de edición |
-| Asignar/cambiar calendario | `employee_detail_screen.dart` | Campo `calendarId` pendiente de agregar |
 | `Reportes Detallados` | `admin_sidebar.dart` | Ítem muestra "en desarrollo", pantalla no implementada |
 
 ---
@@ -304,18 +297,12 @@ lib/
 ## Próximos Pasos Recomendados
 
 ```
-1. ─ Bloque G: CalendarService + calendarManagementProvider + UserModel.calendarId
-   └── Estimado: 1 sesión de trabajo
-
-2. ─ Bloque D (completar): Pantalla de edición de empleado (edit drawer)
-   └── Estimado: 1 sesión de trabajo
-
-3. ─ Bloque H: Cloud Functions (requiere plan Blaze)
+1. ─ Bloque H: Cloud Functions (requiere plan Blaze)
    └── Estimado: 2 sesiones de trabajo
 
-4. ─ Bloque I: Horas Extras + Panel RRHH
+2. ─ Bloque I: Horas Extras + Panel RRHH
    └── Estimado: 2 sesiones de trabajo
 
-5. ─ Bloque J: Reportes + PDF
+3. ─ Bloque J: Reportes + PDF
    └── Estimado: 2 sesiones de trabajo
 ```

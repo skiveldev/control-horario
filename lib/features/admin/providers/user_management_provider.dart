@@ -60,6 +60,7 @@ class UserManagement extends _$UserManagement {
   /// - [departamento]: Departamento
   /// - [empresa]: Empresa (por defecto "Escuela Música")
   /// - [scheduleId]: ID de plantilla de horario
+  /// - [calendarId]: ID del calendario laboral asignado
   /// - [fechaInicio]: Fecha de inicio en la APLICACIÓN (acceso al sistema de fichaje)
   /// - [fechaFin]: Fecha de fin en la APLICACIÓN (baja/baja temporal del sistema)
   /// - [role]: Rol del usuario (default: employee)
@@ -78,6 +79,7 @@ class UserManagement extends _$UserManagement {
     String? departamento,
     String? empresa,
     String? scheduleId,
+    String? calendarId,
     DateTime? fechaInicio,
     DateTime? fechaFin,
     UserRole role = UserRole.employee,
@@ -125,6 +127,7 @@ class UserManagement extends _$UserManagement {
         departamento: departamento,
         empresa: empresa,
         scheduleId: scheduleId,
+        calendarId: calendarId,
         fechaInicio: fechaInicio,
         fechaFin: fechaFin,
         role: role,

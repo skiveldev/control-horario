@@ -53,6 +53,8 @@ mixin _$UserModel {
       throw _privateConstructorUsedError; // Tipo de horario: "template" (usa scheduleId) | "custom" (usa customSchedule)
   Map<String, dynamic>? get customSchedule =>
       throw _privateConstructorUsedError; // Horario personalizado (solo si scheduleType = "custom")
+  String? get calendarId =>
+      throw _privateConstructorUsedError; // Referencia al calendario laboral asignado
 // ⚠️ FECHAS DE ALTA EN LA APLICACIÓN (NO en la empresa)
   DateTime? get fechaInicio =>
       throw _privateConstructorUsedError; // Fecha desde la cual el empleado puede FICHAR en la app
@@ -97,6 +99,7 @@ abstract class $UserModelCopyWith<$Res> {
       String? scheduleId,
       String scheduleType,
       Map<String, dynamic>? customSchedule,
+      String? calendarId,
       DateTime? fechaInicio,
       DateTime? fechaFin,
       @Deprecated('Usar scheduleId + scheduleType en su lugar')
@@ -137,6 +140,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? scheduleId = freezed,
     Object? scheduleType = null,
     Object? customSchedule = freezed,
+    Object? calendarId = freezed,
     Object? fechaInicio = freezed,
     Object? fechaFin = freezed,
     Object? schedule = freezed,
@@ -218,6 +222,10 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.customSchedule
           : customSchedule // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
+      calendarId: freezed == calendarId
+          ? _value.calendarId
+          : calendarId // ignore: cast_nullable_to_non_nullable
+              as String?,
       fechaInicio: freezed == fechaInicio
           ? _value.fechaInicio
           : fechaInicio // ignore: cast_nullable_to_non_nullable
@@ -262,6 +270,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
       String? scheduleId,
       String scheduleType,
       Map<String, dynamic>? customSchedule,
+      String? calendarId,
       DateTime? fechaInicio,
       DateTime? fechaFin,
       @Deprecated('Usar scheduleId + scheduleType en su lugar')
@@ -300,6 +309,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? scheduleId = freezed,
     Object? scheduleType = null,
     Object? customSchedule = freezed,
+    Object? calendarId = freezed,
     Object? fechaInicio = freezed,
     Object? fechaFin = freezed,
     Object? schedule = freezed,
@@ -381,6 +391,10 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value._customSchedule
           : customSchedule // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
+      calendarId: freezed == calendarId
+          ? _value.calendarId
+          : calendarId // ignore: cast_nullable_to_non_nullable
+              as String?,
       fechaInicio: freezed == fechaInicio
           ? _value.fechaInicio
           : fechaInicio // ignore: cast_nullable_to_non_nullable
@@ -420,6 +434,7 @@ class _$UserModelImpl extends _UserModel {
       this.scheduleId,
       this.scheduleType = 'template',
       final Map<String, dynamic>? customSchedule,
+      this.calendarId,
       this.fechaInicio,
       this.fechaFin,
       @Deprecated('Usar scheduleId + scheduleType en su lugar') this.schedule})
@@ -493,6 +508,9 @@ class _$UserModelImpl extends _UserModel {
   }
 
 // Horario personalizado (solo si scheduleType = "custom")
+  @override
+  final String? calendarId;
+// Referencia al calendario laboral asignado
 // ⚠️ FECHAS DE ALTA EN LA APLICACIÓN (NO en la empresa)
   @override
   final DateTime? fechaInicio;
@@ -507,7 +525,7 @@ class _$UserModelImpl extends _UserModel {
 
   @override
   String toString() {
-    return 'UserModel(userId: $userId, employeeId: $employeeId, email: $email, displayName: $displayName, role: $role, weeklyHours: $weeklyHours, isActive: $isActive, createdAt: $createdAt, nombre: $nombre, apellido1: $apellido1, apellido2: $apellido2, dni: $dni, telefono: $telefono, position: $position, department: $department, empresa: $empresa, scheduleId: $scheduleId, scheduleType: $scheduleType, customSchedule: $customSchedule, fechaInicio: $fechaInicio, fechaFin: $fechaFin, schedule: $schedule)';
+    return 'UserModel(userId: $userId, employeeId: $employeeId, email: $email, displayName: $displayName, role: $role, weeklyHours: $weeklyHours, isActive: $isActive, createdAt: $createdAt, nombre: $nombre, apellido1: $apellido1, apellido2: $apellido2, dni: $dni, telefono: $telefono, position: $position, department: $department, empresa: $empresa, scheduleId: $scheduleId, scheduleType: $scheduleType, customSchedule: $customSchedule, calendarId: $calendarId, fechaInicio: $fechaInicio, fechaFin: $fechaFin, schedule: $schedule)';
   }
 
   @override
@@ -547,6 +565,8 @@ class _$UserModelImpl extends _UserModel {
                 other.scheduleType == scheduleType) &&
             const DeepCollectionEquality()
                 .equals(other._customSchedule, _customSchedule) &&
+            (identical(other.calendarId, calendarId) ||
+                other.calendarId == calendarId) &&
             (identical(other.fechaInicio, fechaInicio) ||
                 other.fechaInicio == fechaInicio) &&
             (identical(other.fechaFin, fechaFin) ||
@@ -578,6 +598,7 @@ class _$UserModelImpl extends _UserModel {
         scheduleId,
         scheduleType,
         const DeepCollectionEquality().hash(_customSchedule),
+        calendarId,
         fechaInicio,
         fechaFin,
         schedule
@@ -620,6 +641,7 @@ abstract class _UserModel extends UserModel {
       final String? scheduleId,
       final String scheduleType,
       final Map<String, dynamic>? customSchedule,
+      final String? calendarId,
       final DateTime? fechaInicio,
       final DateTime? fechaFin,
       @Deprecated('Usar scheduleId + scheduleType en su lugar')
@@ -673,6 +695,8 @@ abstract class _UserModel extends UserModel {
   @override
   Map<String, dynamic>?
       get customSchedule; // Horario personalizado (solo si scheduleType = "custom")
+  @override
+  String? get calendarId; // Referencia al calendario laboral asignado
 // ⚠️ FECHAS DE ALTA EN LA APLICACIÓN (NO en la empresa)
   @override
   DateTime?
