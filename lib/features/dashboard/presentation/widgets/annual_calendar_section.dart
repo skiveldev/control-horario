@@ -128,6 +128,7 @@ class _AnnualCalendarSectionState extends ConsumerState<AnnualCalendarSection> {
         border: Border.all(color: AppColors.border),
       ),
       child: TableCalendar<CalendarEventModel>(
+        locale: 'es_ES',
         focusedDay: _focusedMonth,
         firstDay: DateTime(calendar.year, 1, 1),
         lastDay: DateTime(calendar.year, 12, 31),
