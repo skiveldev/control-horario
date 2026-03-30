@@ -49,7 +49,7 @@ class NavigationItems {
     NavigationItem(
       label: 'Calendario',
       icon: Icons.calendar_today_outlined,
-      route: '/calendar', // TODO [FASE-2]: Definir ruta de calendario
+      route: AppRouter.calendar,
     ),
     NavigationItem(
       label: 'Mi Control Horario',

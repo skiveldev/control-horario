@@ -9,6 +9,7 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 
 // Pantallas de dashboard
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
+import '../../features/dashboard/presentation/screens/calendar_screen.dart';
 import '../../features/dashboard/presentation/screens/my_time_control_screen.dart';
 import '../../features/dashboard/presentation/screens/profile_screen.dart';
 import '../../features/dashboard/presentation/screens/settings_screen.dart';
@@ -39,6 +40,7 @@ class AppRouter {
   static const String splash = '/';
   static const String login = '/login';
   static const String dashboard = '/dashboard';
+  static const String calendar = '/calendar';
   static const String myTimeControl = '/my-time-control';
   static const String profile = '/profile';
   static const String settings = '/settings';
@@ -113,6 +115,19 @@ class AppRouter {
           context: context,
           state: state,
           child: const DashboardScreen(),
+        ),
+      ),
+
+      // ========================================================================
+      // CALENDARIO LABORAL (Empleado)
+      // ========================================================================
+      GoRoute(
+        path: calendar,
+        name: 'calendar',
+        pageBuilder: (context, state) => _buildPageWithTransition(
+          context: context,
+          state: state,
+          child: const CalendarScreen(),
         ),
       ),
 
