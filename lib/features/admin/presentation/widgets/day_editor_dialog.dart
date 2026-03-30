@@ -146,31 +146,29 @@ class _DayEditorDialogState extends State<DayEditorDialog> {
 
             AppSpacing.verticalSpaceMd,
 
-            // Opción de rango (útil para vacaciones)
-            if (_selectedType == HolidayType.vacation) ...[
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  'Aplicar a un rango de fechas',
-                  style: AppTextStyles.bodyMedium,
-                ),
-                subtitle: Text(
-                  'Marca múltiples días de una vez',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                value: _isRange,
-                onChanged: (v) => setState(() {
-                  _isRange = v ?? false;
-                  if (!_isRange) _rangeEnd = null;
-                }),
-                activeColor: AppColors.primary,
+            // Opción de rango (útil para vacaciones y festivos)
+            CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                'Aplicar a un rango de fechas',
+                style: AppTextStyles.bodyMedium,
               ),
-              if (_isRange) ...[
-                AppSpacing.verticalSpaceSm,
-                _buildDateRangePicker(),
-              ],
+              subtitle: Text(
+                'Marca múltiples días de una vez',
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              value: _isRange,
+              onChanged: (v) => setState(() {
+                _isRange = v ?? false;
+                if (!_isRange) _rangeEnd = null;
+              }),
+              activeColor: AppColors.primary,
+            ),
+            if (_isRange) ...[
+              AppSpacing.verticalSpaceSm,
+              _buildDateRangePicker(),
             ],
           ],
         ),
@@ -311,9 +309,9 @@ class _DayEditorDialogState extends State<DayEditorDialog> {
   Future<void> _pickRangeEnd() async {
     final picked = await showDatePicker(
       context: context,
-      initialDate: widget.selectedDate.add(const Duration(days: 1)),
-      firstDate: widget.selectedDate.add(const Duration(days: 1)),
-      lastDate: DateTime(widget.selectedDate.year, 12, 31),
+      initialDate: _rangeEnd ?? widget.selectedDate,
+      firstDate: widget.selectedDate,
+      lastDate: DateTime(widget.selectedDate.year + 1, 12, 31),
     );
     if (picked != null) {
       setState(() => _rangeEnd = picked);
@@ -328,9 +326,10 @@ class _DayEditorDialogState extends State<DayEditorDialog> {
 
     if (_isRange && _rangeEnd != null) {
       // Generar un evento por cada día del rango
-      var current = widget.selectedDate;
+      var current = DateUtils.dateOnly(widget.selectedDate);
+      final end = DateUtils.dateOnly(_rangeEnd!);
       var idx = 0;
-      while (!current.isAfter(_rangeEnd!)) {
+      while (!current.isAfter(end)) {
         events.add(CalendarEventModel(
           id: 'event_${current.millisecondsSinceEpoch}_$idx',
           name: name,

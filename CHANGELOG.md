@@ -7,6 +7,36 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [1.3.0] - 2026-02-18
+
+### ✨ Modificado
+- Botón "Nueva Plantilla" movido al header superior (reemplaza FloatingActionButton) — responsive: texto+icono en desktop, solo icono en mobile
+
+---
+
+## [1.2.0] - 2026-02-16
+
+### ✨ Modificado
+- Rediseño pantalla de Login: mejoras de UX/UI y corrección de tipografía
+
+---
+
+## [1.1.1] - 2026-02-12
+
+### ✨ Añadido
+- Sistema de horarios flexible con plantillas asignables a empleados
+
+---
+
+## [1.1.0] - 2026-01-27
+
+### ✨ Añadido / Corregido
+- Perfil del empleado conectado con Firebase (eliminados datos mock)
+- Corrección 7 campos del drawer "Nuevo Trabajador" que no se guardaban en Firestore
+- Actualizado `UserModel` con campos `nombre`, `apellido1`, `apellido2`
+
+---
+
 ## [1.0.0] - 2025-12-14
 
 ### 🎉 Añadido - Funcionalidad "Mi Control Horario"

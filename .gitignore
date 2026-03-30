@@ -67,3 +67,5 @@ coverage/
 
 # Web build
 /web/build/
+# Archivos temporales
+commit_message.txt

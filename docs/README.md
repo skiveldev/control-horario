@@ -1,173 +1,36 @@
-# 📚 Documentación del Proyecto - Control Horario
+# Documentación — Control Horario
 
-Índice de documentación organizada por fase.
+## Documentos activos
 
----
+| Archivo | Descripción |
+|---------|-------------|
+| [PROJECT_STATUS.md](PROJECT_STATUS.md) | Estado actual del proyecto |
+| [ESTRUCTURA_PROYECTO.md](ESTRUCTURA_PROYECTO.md) | Arquitectura y estructura de carpetas |
 
-## 🎯 Estado Actual
+## Deployment
+- [DEPLOYMENT_QUICKSTART.md](deployment/DEPLOYMENT_QUICKSTART.md) — Guía rápida de deploy
+- [DEPLOYMENT_MI_CONTROL_HORARIO.md](deployment/DEPLOYMENT_MI_CONTROL_HORARIO.md) — Checklist de deployment
+- [DEPLOYMENT_SUCCESS.md](deployment/DEPLOYMENT_SUCCESS.md) — Registro de deploy exitoso
 
-**✅ FASE 1 Completada** | **🚧 FASE 2 Planificada**
+## Setup
+- [INSTALL_HOOKS.md](setup/INSTALL_HOOKS.md) — Configurar git hooks
+- [QUALITY_SETUP.md](setup/QUALITY_SETUP.md) — Configurar herramientas de calidad
+- [SETUP_COMPLETO.md](setup/SETUP_COMPLETO.md) — Setup completo del entorno
 
----
+## Features
+- [MI_CONTROL_HORARIO.md](features/MI_CONTROL_HORARIO.md) — Guía de "Mi Control Horario"
+- [IMPLEMENTACION_MI_CONTROL_HORARIO.md](features/IMPLEMENTACION_MI_CONTROL_HORARIO.md) — Resumen técnico
+- [LIMITACION_CIERRE_SESION.md](features/LIMITACION_CIERRE_SESION.md) — Limitación conocida de cierre de sesión
+- [MVP_GESTION_HORARIOS.md](features/MVP_GESTION_HORARIOS.md) — MVP gestión de horarios
+- [UI_UX_FALTANTE_FASE2.md](features/UI_UX_FALTANTE_FASE2.md) — UI/UX pendiente Fase 2
 
-## 📖 Documentación por Fase
-
-### Fase 1: UI/UX (Completada)
-
-#### 📄 [FASE1_COMPLETADO.md](../FASE1_COMPLETADO.md)
-Resumen completo de la Fase 1 con:
-- Estado de compilación y tests
-- Lista de componentes implementados
-- 8 pantallas completadas
-- Métricas finales (~50 archivos, 8,000 líneas)
-- Warnings conocidos (APIs deprecadas - no críticos)
-
-#### 📄 [FASE1_SUMMARY.md](FASE1_SUMMARY.md)
-Documentación técnica detallada de widgets y pantallas.
-
----
-
-### Fase 2: Backend + Lógica (Planificada)
-
-#### 📋 [fase-2-backend-logica.plan.md](../.cursor/plans/fase-2-backend-logica.plan.md) ⭐ **Documento Principal**
-**50+ páginas** con planificación completa:
-- Requisitos del cliente (458 empleados)
-- Estructura de base de datos Firebase
-- Especificaciones detalladas de 5 Sprints
-- Reglas de seguridad completas
-- Índices compuestos necesarios
-- Estrategia de optimización de costos
-- Cloud Functions (4 funciones)
-- Checklist completo de implementación
-- 35+ archivos a crear
-
-**Leer este documento primero para entender toda la arquitectura.**
+## Historial
+Todo el trabajo completado está en [archive/](archive/).
 
 ---
 
-#### 🎯 [FASE2_RESUMEN.md](FASE2_RESUMEN.md) ⭐ **Referencia Rápida**
-**Resumen ejecutivo** de 5 páginas:
-- Estructura Firebase simplificada
-- Plan de 5 Sprints (resumen)
-- Métricas de éxito por Sprint
-- Checklist rápido
-- Comandos útiles
+## Convención para nuevos docs
 
-**Usar este documento durante el desarrollo para consultas rápidas.**
-
----
-
-#### 🔄 [CONTEXTO_FASE2.md](CONTEXTO_FASE2.md)
-Contexto para retomar el trabajo:
-- Resumen de Fase 1
-- Estado técnico actual
-- Correcciones recientes
-- Limitaciones conocidas
-- Próximo paso (Sprint 1)
-
-**Útil al iniciar una nueva sesión de desarrollo.**
-
----
-
-## 🗺️ Guía de Lectura Recomendada
-
-### Para Entender el Proyecto Completo
-1. [../README.md](../README.md) - Visión general
-2. [FASE1_COMPLETADO.md](../FASE1_COMPLETADO.md) - Qué se ha construido
-3. [fase-2-backend-logica.plan.md](../.cursor/plans/fase-2-backend-logica.plan.md) - Qué se va a construir
-
-### Para Empezar a Desarrollar Fase 2
-1. [FASE2_RESUMEN.md](FASE2_RESUMEN.md) - Entender el plan
-2. [fase-2-backend-logica.plan.md](../.cursor/plans/fase-2-backend-logica.plan.md) - Sprint actual (detalles)
-3. [../.cursorrules](../.cursorrules) - Reglas de desarrollo
-
-### Durante el Desarrollo
-- [FASE2_RESUMEN.md](FASE2_RESUMEN.md) - Consultas rápidas
-- [fase-2-backend-logica.plan.md](../.cursor/plans/fase-2-backend-logica.plan.md) - Especificaciones detalladas
-- [../.cursorrules](../.cursorrules) - Recordar reglas
-
----
-
-## 🎓 Guías de Desarrollo
-
-### [../.cursorrules](../.cursorrules) ⭐ **Reglas del Proyecto**
-Documento fundamental que define:
-- Arquitectura del proyecto
-- Sistema de diseño
-- Convenciones de código
-- **Metodología de trabajo** (PLANIFICAR → DISCUTIR → CONSTRUIR)
-- Workflow de Git
-- Prevención de errores comunes
-
-**Leer antes de hacer cualquier cambio en el código.**
-
----
-
-### [../lib/shared/widgets/README.md](../lib/shared/widgets/README.md)
-Documentación de componentes reutilizables:
-- Uso de cada widget
-- Props disponibles
-- Ejemplos de código
-
----
-
-## 🔍 Cómo Buscar Información
-
-### ¿Necesitas saber...?
-
-**¿Qué se ha completado en Fase 1?**  
-→ [FASE1_COMPLETADO.md](../FASE1_COMPLETADO.md)
-
-**¿Cómo está estructurada la base de datos?**  
-→ [fase-2-backend-logica.plan.md](../.cursor/plans/fase-2-backend-logica.plan.md) - Sección "Diseño de Base de Datos"
-
-**¿Qué se implementa en Sprint X?**  
-→ [fase-2-backend-logica.plan.md](../.cursor/plans/fase-2-backend-logica.plan.md) - Sección "Especificaciones por Sprint"
-
-**¿Cuáles son las reglas de seguridad?**  
-→ [fase-2-backend-logica.plan.md](../.cursor/plans/fase-2-backend-logica.plan.md) - Sección "Reglas de Seguridad"
-
-**¿Cómo optimizar costos de Firebase?**  
-→ [fase-2-backend-logica.plan.md](../.cursor/plans/fase-2-backend-logica.plan.md) - Sección "Optimización de Costos"
-
-**¿Qué archivos debo crear en Sprint X?**  
-→ [fase-2-backend-logica.plan.md](../.cursor/plans/fase-2-backend-logica.plan.md) - Cada Sprint tiene su sección
-
-**¿Cuál es el checklist completo?**  
-→ [fase-2-backend-logica.plan.md](../.cursor/plans/fase-2-backend-logica.plan.md) - Sección "Checklist de Implementación"
-
-**¿Necesito un resumen rápido?**  
-→ [FASE2_RESUMEN.md](FASE2_RESUMEN.md)
-
----
-
-## 📊 Métricas del Proyecto
-
-### Fase 1 (Completada)
-- **Archivos creados**: 50
-- **Líneas de código**: ~8,000
-- **Pantallas**: 8
-- **Widgets reutilizables**: 15+
-- **Componentes especializados**: 25+
-
-### Fase 2 (Planificada)
-- **Archivos nuevos**: 35+
-- **Sprints**: 5 (6 semanas)
-- **Cloud Functions**: 4
-- **Colecciones Firestore**: 4
-- **Cobertura de tests**: >70%
-
----
-
-## 🚀 Próximos Pasos
-
-1. **Leer**: [fase-2-backend-logica.plan.md](../.cursor/plans/fase-2-backend-logica.plan.md) completo
-2. **Confirmar**: Que la planificación cubre todos los requisitos
-3. **Preparar**: Configurar proyecto Firebase
-4. **Iniciar**: Sprint 1 - MVP
-
----
-
-**Última actualización**: Noviembre 2025  
-**Estado**: Planificación Fase 2 Completada
-
+> Si lo necesitás solo vos para recordar algo → **Engram** (`mem_save`)
+> Si otro dev necesita leerlo → crear archivo en la carpeta correspondiente
+> Si es historial de qué cambió → una línea en `CHANGELOG.md` de raíz
