@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_colors_dark.dart';
 import '../../../core/theme/app_gradients.dart';
 import '../../../core/theme/app_shadows.dart';
@@ -163,7 +164,7 @@ class DesktopSidebar extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 18,
                   color: isDark
-                      ? Colors.white
+                      ? AppColorsDark.textPrimary
                       : Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w700,
                 ),
@@ -175,7 +176,8 @@ class DesktopSidebar extends ConsumerWidget {
               icon: Icon(
                 Icons.menu_open,
                 size: 20,
-                color: isDark ? Colors.white : Colors.black87,
+                color:
+                    isDark ? AppColorsDark.textPrimary : AppColors.textPrimary,
               ),
               onPressed: () =>
                   ref.read(sidebarNotifierProvider.notifier).toggle(),
@@ -187,7 +189,8 @@ class DesktopSidebar extends ConsumerWidget {
               icon: Icon(
                 Icons.menu,
                 size: 24,
-                color: isDark ? Colors.white : Colors.black87,
+                color:
+                    isDark ? AppColorsDark.textPrimary : AppColors.textPrimary,
               ),
               onPressed: () =>
                   ref.read(sidebarNotifierProvider.notifier).toggle(),
@@ -243,15 +246,11 @@ class DesktopSidebar extends ConsumerWidget {
                 size: 24,
                 color: isSelected
                     ? (isDark
-                        ? const Color(
-                            0xFF22D3EE,
-                          ) // Cyan brillante en dark mode
-                        : Theme.of(context)
-                            .colorScheme
-                            .primary) // Primary color en light mode
+                        ? AppColorsDark.navItemSelectedIcon
+                        : Theme.of(context).colorScheme.primary)
                     : (isDark
-                        ? Colors.white // Blanco puro en dark mode
-                        : Colors.black87), // Negro en light mode
+                        ? AppColorsDark.textPrimary
+                        : AppColors.textPrimary),
               ),
 
               // Texto (solo si está expandido)
@@ -264,15 +263,11 @@ class DesktopSidebar extends ConsumerWidget {
                       fontSize: 16,
                       color: isSelected
                           ? (isDark
-                              ? const Color(
-                                  0xFF22D3EE,
-                                ) // Cyan brillante en dark mode
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .primary) // Primary color en light mode
+                              ? AppColorsDark.navItemSelectedIcon
+                              : Theme.of(context).colorScheme.primary)
                           : (isDark
-                              ? Colors.white // Blanco puro en dark mode
-                              : Colors.black87), // Negro en light mode
+                              ? AppColorsDark.textPrimary
+                              : AppColors.textPrimary),
                       fontWeight:
                           isSelected ? FontWeight.w600 : FontWeight.normal,
                     ),

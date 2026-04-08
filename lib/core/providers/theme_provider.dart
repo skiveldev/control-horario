@@ -4,12 +4,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 part 'theme_provider.g.dart';
 
+/// Provider para la instancia de SharedPreferences
+///
+/// Debe ser sobreescrito (overrideWithValue) en el ProviderScope de main.dart
+/// con la instancia pre-inicializada, para que ThemeNotifier.build() pueda
+/// leer el tema guardado de forma síncrona y evitar el flash de tema incorrecto.
+@Riverpod(keepAlive: true)
+SharedPreferences sharedPreferences(SharedPreferencesRef ref) {
+  throw UnimplementedError(
+    'sharedPreferencesProvider debe ser overrideado en ProviderScope. '
+    'Ver main.dart: ProviderScope(overrides: [sharedPreferencesProvider.overrideWithValue(prefs)])',
+  );
+}
+
 /// Provider para gestionar el tema de la aplicación (claro/oscuro)
 ///
 /// Funcionalidades:
 /// - Toggle entre tema claro y oscuro
 /// - Persistencia de preferencia con SharedPreferences
-/// - Carga automática del tema guardado al iniciar
+/// - Carga síncrona del tema guardado al iniciar (sin flash)
 ///
 /// Uso:
 /// ```dart
@@ -28,41 +41,22 @@ class ThemeNotifier extends _$ThemeNotifier {
 
   @override
   ThemeMode build() {
-    // Cargar tema guardado de forma asíncrona
-    _loadThemePreference();
-
-    // Retornar tema claro por defecto mientras carga
-    return ThemeMode.light;
-  }
-
-  /// Carga la preferencia de tema desde SharedPreferences
-  Future<void> _loadThemePreference() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final isDark = prefs.getBool(_themeModeKey) ?? false;
-
-      // Actualizar estado solo si es diferente
-      final newMode = isDark ? ThemeMode.dark : ThemeMode.light;
-      if (state != newMode) {
-        state = newMode;
-      }
-    } catch (e) {
-      debugPrint('Error al cargar preferencia de tema: $e');
-    }
+    // Leer el tema guardado de forma síncrona usando la instancia pre-cargada.
+    // SharedPreferences.getBool() es síncrono una vez que la instancia está lista.
+    final prefs = ref.watch(sharedPreferencesProvider);
+    final isDark = prefs.getBool(_themeModeKey) ?? false;
+    return isDark ? ThemeMode.dark : ThemeMode.light;
   }
 
   /// Alterna entre tema claro y oscuro
   Future<void> toggleTheme() async {
     try {
-      // Determinar nuevo modo
       final newMode =
           state == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
 
-      // Actualizar estado inmediatamente
       state = newMode;
 
-      // Guardar en SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = ref.read(sharedPreferencesProvider);
       await prefs.setBool(_themeModeKey, newMode == ThemeMode.dark);
     } catch (e) {
       debugPrint('Error al cambiar tema: $e');
@@ -74,15 +68,15 @@ class ThemeNotifier extends _$ThemeNotifier {
 
   /// Establece un tema específico
   Future<void> setThemeMode(ThemeMode mode) async {
+    final previousState = state;
     try {
-      // Actualizar estado
       state = mode;
 
-      // Guardar en SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = ref.read(sharedPreferencesProvider);
       await prefs.setBool(_themeModeKey, mode == ThemeMode.dark);
     } catch (e) {
       debugPrint('Error al establecer tema: $e');
+      state = previousState;
     }
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors_dark.dart';
 import '../../../../core/theme/app_gradients.dart';
 import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -113,7 +114,7 @@ class TimeInfoBadge extends StatelessWidget {
             gradient: AppGradients.cardCyanSubtle,
             borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
             border: Border.all(
-              color: const Color(0xFF06B6D4).withValues(alpha: 0.4),
+              color: AppColorsDark.secondary.withValues(alpha: 0.4),
               width: 1,
             ),
             boxShadow: AppShadows.cardCyanGlow,
@@ -125,7 +126,7 @@ class TimeInfoBadge extends StatelessWidget {
             gradient: AppGradients.cardMagentaSubtle,
             borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
             border: Border.all(
-              color: const Color(0xFFD946EF).withValues(alpha: 0.4),
+              color: AppColorsDark.accent.withValues(alpha: 0.4),
               width: 1,
             ),
             boxShadow: AppShadows.cardMagentaGlow,

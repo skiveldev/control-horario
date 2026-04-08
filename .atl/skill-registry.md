@@ -65,7 +65,7 @@ Generated: 2026-03-30
 - **Stack**: Flutter Web + Firebase + Riverpod
 - **Phase**: Fase 2 (integración Firebase)
 - **SDD Persistence**: engram
-- **Strict TDD**: disabled
+- **Strict TDD**: enabled
 - **Engram keys**:
   - Project context: `sdd-init/control_horario`
   - Testing capabilities: `sdd/control_horario/testing-capabilities`

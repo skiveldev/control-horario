@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../models/work_calendar_model.dart';
 import '../models/calendar_event_model.dart';
 import '../../../core/services/firebase_service.dart';
+import '../../auth/models/user_model.dart';
 import '../../auth/providers/auth_provider.dart';
 
 part 'calendar_management_provider.g.dart';
@@ -89,6 +90,10 @@ class CalendarManagement extends _$CalendarManagement {
     if (currentUser == null) {
       throw Exception('Usuario no autenticado');
     }
+    if (currentUser.role != UserRole.admin) {
+      throw Exception(
+          'Sin permisos: solo administradores pueden modificar calendarios');
+    }
 
     if (name.trim().isEmpty) {
       throw Exception('El nombre del calendario es obligatorio');
@@ -125,6 +130,14 @@ class CalendarManagement extends _$CalendarManagement {
   ///
   /// Marca isActive = false en lugar de borrar el documento.
   Future<void> deleteCalendar(String calendarId) async {
+    final currentUser = await ref.read(currentUserProvider.future);
+    if (currentUser == null) {
+      throw Exception('Usuario no autenticado');
+    }
+    if (currentUser.role != UserRole.admin) {
+      throw Exception(
+          'Sin permisos: solo administradores pueden eliminar calendarios');
+    }
     final service = ref.read(calendarServiceProvider);
     await service.deleteCalendar(calendarId);
   }
@@ -137,6 +150,10 @@ class CalendarManagement extends _$CalendarManagement {
     final currentUser = await ref.read(currentUserProvider.future);
     if (currentUser == null) {
       throw Exception('Usuario no autenticado');
+    }
+    if (currentUser.role != UserRole.admin) {
+      throw Exception(
+          'Sin permisos: solo administradores pueden duplicar calendarios');
     }
 
     final service = ref.read(calendarServiceProvider);

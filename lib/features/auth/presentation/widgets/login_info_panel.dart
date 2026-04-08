@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 
@@ -17,9 +18,9 @@ class LoginInfoPanel extends StatelessWidget {
         // Gradiente moderno de 3 colores: Turquesa → Azul → Violeta
         gradient: LinearGradient(
           colors: [
-            Color(0xFF00BCD4), // Turquesa
-            Color(0xFF2196F3), // Azul
-            Color(0xFF7C3AED), // Violeta
+            AppColors.gradientStart, // Turquesa
+            AppColors.gradientMid, // Azul
+            AppColors.gradientEnd, // Violeta
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -41,13 +42,13 @@ class LoginInfoPanel extends StatelessWidget {
                 Container(
                   padding: AppSpacing.allMd,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: AppColors.textOnPrimary.withValues(alpha: 0.2),
                     borderRadius: AppSpacing.borderRadiusMd,
                   ),
                   child: const Icon(
                     Icons.access_time,
                     size: 36,
-                    color: Colors.white,
+                    color: AppColors.textOnPrimary,
                   ),
                 ),
                 AppSpacing.horizontalSpaceLg,
@@ -57,7 +58,7 @@ class LoginInfoPanel extends StatelessWidget {
                     Text(
                       'Time Rega',
                       style: AppTextStyles.h2.copyWith(
-                        color: Colors.white,
+                        color: AppColors.textOnPrimary,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -65,7 +66,7 @@ class LoginInfoPanel extends StatelessWidget {
                     Text(
                       'Sistema de Control Horario',
                       style: AppTextStyles.bodyMedium.copyWith(
-                        color: Colors.white.withValues(alpha: 0.95),
+                        color: AppColors.textOnPrimary.withValues(alpha: 0.95),
                       ),
                     ),
                   ],
@@ -76,18 +77,15 @@ class LoginInfoPanel extends StatelessWidget {
             AppSpacing.verticalSpaceHuge,
             AppSpacing.verticalSpaceMd,
 
-            // Título principal MUY GRANDE (multilinea) - letras más chatas
-            Transform.scale(
-              scaleY: 0.85, // Comprime verticalmente las letras (más chatas)
-              child: Text(
-                'Gestiona tu\ntiempo de forma\ninteligente',
-                style: AppTextStyles.displayLarge.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700, // Bold normal
-                  height: 1.15, // Ajustado para compensar el scale
-                  fontSize: 52,
-                  letterSpacing: 2.5,
-                ),
+            // Título principal MUY GRANDE (multilinea)
+            Text(
+              'Gestiona tu\ntiempo de forma\ninteligente',
+              style: AppTextStyles.displayLarge.copyWith(
+                color: AppColors.textOnPrimary,
+                fontWeight: FontWeight.w700,
+                height: 1.15,
+                fontSize: 52,
+                letterSpacing: 2.5,
               ),
             ),
 
@@ -97,7 +95,7 @@ class LoginInfoPanel extends StatelessWidget {
             Text(
               'Accede al sistema de control horario más avanzado para empresas modernas.',
               style: AppTextStyles.bodyLarge.copyWith(
-                color: Colors.white.withValues(alpha: 0.95),
+                color: AppColors.textOnPrimary.withValues(alpha: 0.95),
                 height: 1.6,
                 fontSize: 16, // Aumentado
               ),
@@ -153,13 +151,13 @@ class LoginInfoPanel extends StatelessWidget {
           Container(
             padding: AppSpacing.allLg,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
+              color: AppColors.textOnPrimary.withValues(alpha: 0.2),
               borderRadius: AppSpacing.borderRadiusMd,
             ),
             child: Icon(
               icon,
               size: 28, // Aumentado
-              color: Colors.white,
+              color: AppColors.textOnPrimary,
             ),
           ),
 
@@ -174,7 +172,7 @@ class LoginInfoPanel extends StatelessWidget {
                   title,
                   style: AppTextStyles.h4.copyWith(
                     // Aumentado de h5 a h4
-                    color: Colors.white,
+                    color: AppColors.textOnPrimary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -183,7 +181,7 @@ class LoginInfoPanel extends StatelessWidget {
                   description,
                   style: AppTextStyles.bodyMedium.copyWith(
                     // Aumentado de bodySmall a bodyMedium
-                    color: Colors.white.withValues(alpha: 0.9),
+                    color: AppColors.textOnPrimary.withValues(alpha: 0.9),
                     height: 1.6,
                   ),
                 ),

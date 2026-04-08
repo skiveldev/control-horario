@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../models/schedule_model.dart';
 import '../../../core/services/firebase_service.dart';
+import '../../auth/models/user_model.dart';
 import '../../auth/providers/auth_provider.dart';
 
 part 'schedule_management_provider.g.dart';
@@ -99,6 +100,10 @@ class ScheduleManagement extends _$ScheduleManagement {
       if (currentUser == null) {
         throw Exception('Usuario no autenticado');
       }
+      if (currentUser.role != UserRole.admin) {
+        throw Exception(
+            'Sin permisos: solo administradores pueden crear plantillas');
+      }
 
       // Validar nombre
       if (name.trim().isEmpty) {
@@ -154,6 +159,10 @@ class ScheduleManagement extends _$ScheduleManagement {
       if (currentUser == null) {
         throw Exception('Usuario no autenticado');
       }
+      if (currentUser.role != UserRole.admin) {
+        throw Exception(
+            'Sin permisos: solo administradores pueden actualizar plantillas');
+      }
 
       // Calcular horas si se proporciona weeklySchedule
       int? totalHours;
@@ -194,7 +203,18 @@ class ScheduleManagement extends _$ScheduleManagement {
     state = const AsyncLoading();
 
     try {
-      // Verificar que no esté en uso
+      final currentUser = await ref.read(currentUserProvider.future);
+      if (currentUser == null) {
+        throw Exception('Usuario no autenticado');
+      }
+      if (currentUser.role != UserRole.admin) {
+        throw Exception(
+            'Sin permisos: solo administradores pueden eliminar plantillas');
+      }
+
+      // TODO(CRITICAL): Envolver en transacción Firestore para evitar TOCTOU:
+      // entre la lectura de usedByCount y el deleteTemplate otro admin podría
+      // asignar empleados a la plantilla. Re-validar usedByCount dentro del servicio.
       final template = await ref.read(scheduleByIdProvider(scheduleId).future);
       if (template != null && template.usedByCount > 0) {
         throw Exception(

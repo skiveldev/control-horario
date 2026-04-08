@@ -13,6 +13,9 @@ part 'clocking_state_provider.g.dart';
 ///
 /// Representa en qué fase del día laboral se encuentra el empleado.
 enum ClockingState {
+  /// Cargando registros del día (no habilitar ningún botón)
+  loading,
+
   /// No ha fichado entrada aún
   notStarted,
 
@@ -107,7 +110,7 @@ ClockingState currentClockingState(CurrentClockingStateRef ref) {
       debugPrint('✅ [ClockingState] Estado: finished (jornada completada)');
       return ClockingState.finished;
     },
-    loading: () => ClockingState.notStarted,
+    loading: () => ClockingState.loading,
     error: (_, __) => ClockingState.notStarted,
   );
 }
@@ -139,9 +142,14 @@ TimeRecordModel _emptyRecord() {
 
 /// Extension para obtener información legible del estado
 extension ClockingStateExtension on ClockingState {
+  /// Indica si los registros están cargando (deshabilitar todos los botones)
+  bool get isLoading => this == ClockingState.loading;
+
   /// Texto descriptivo del estado
   String get displayText {
     switch (this) {
+      case ClockingState.loading:
+        return 'Cargando...';
       case ClockingState.notStarted:
         return 'Sin fichar';
       case ClockingState.working:

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../theme/app_colors.dart';
 import 'auth_notifier.dart';
 
 // Pantallas de autenticación
@@ -31,7 +34,10 @@ class AppRouter {
   AppRouter._();
 
   // Instancia del AuthNotifier para go_router
-  static final _authNotifier = AuthNotifier(FirebaseAuth.instance);
+  static final _authNotifier = AuthNotifier(
+    FirebaseAuth.instance,
+    FirebaseFirestore.instance,
+  );
 
   // ============================================================================
   // ROUTE NAMES (Nombres de rutas)
@@ -57,7 +63,7 @@ class AppRouter {
 
   static final GoRouter router = GoRouter(
     initialLocation: splash,
-    debugLogDiagnostics: true,
+    debugLogDiagnostics: kDebugMode,
     refreshListenable: _authNotifier,
 
     // Redirect para proteger rutas
@@ -69,6 +75,16 @@ class AppRouter {
       // Si no está autenticado y no va a login o splash, redirigir a login
       if (!isAuthenticated && !isGoingToLogin && !isGoingToSplash) {
         return login;
+      }
+
+      // Protección de rutas admin: solo usuarios con rol admin pueden acceder a /admin*
+      // Si el rol aún no ha cargado (_isAdmin = false por defecto), se deniega acceso
+      // hasta que Firestore confirme el rol, momento en que AuthNotifier notifica y
+      // go_router re-evalúa este redirect.
+      final isGoingToAdmin = state.matchedLocation.startsWith('/admin');
+      if (isAuthenticated && isGoingToAdmin && !_authNotifier.isAdmin) {
+        if (_authNotifier.isLoadingRole) return null;
+        return dashboard;
       }
 
       // NOTA: Ya NO redirigimos automáticamente desde login cuando está autenticado
@@ -288,7 +304,7 @@ class _ErrorScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const Icon(Icons.error_outline, size: 64, color: AppColors.error),
             const SizedBox(height: 16),
             const Text(
               'Ruta no encontrada',
@@ -299,7 +315,8 @@ class _ErrorScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: Text(
                 error,
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
+                style: const TextStyle(
+                    fontSize: 14, color: AppColors.textSecondary),
                 textAlign: TextAlign.center,
               ),
             ),

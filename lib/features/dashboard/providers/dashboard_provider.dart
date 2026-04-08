@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../models/time_record_model.dart';
 import '../services/time_records_service.dart';
 import 'clocking_provider.dart';
+import 'time_records_provider.dart';
 
 part 'dashboard_provider.g.dart';
 
@@ -26,7 +29,7 @@ Stream<List<TimeRecordModel>> monthlyRecords(MonthlyRecordsRef ref) async* {
   }
 
   final now = DateTime.now();
-  final timeRecordsService = TimeRecordsService();
+  final timeRecordsService = ref.watch(timeRecordsServiceProvider);
 
   yield* timeRecordsService.getMonthRecords(user.userId, now);
 }
@@ -41,13 +44,39 @@ Stream<List<TimeRecordModel>> monthlyRecords(MonthlyRecordsRef ref) async* {
 /// Retorna 0 si no hay registros.
 @riverpod
 int todayTotalMinutes(TodayTotalMinutesRef ref) {
+  // Refrescar cada minuto para mantener el contador del registro activo actualizado
+  final timer = Timer.periodic(
+    const Duration(minutes: 1),
+    (_) => ref.invalidateSelf(),
+  );
+  ref.onDispose(timer.cancel);
+
   final todayRecords = ref.watch(todayRecordsProvider).valueOrNull ?? [];
 
   // Sumar solo registros de trabajo (excluir pausas)
+  // Para registros activos, calcular el tiempo transcurrido dinámicamente
   int total = 0;
+  final now = DateTime.now();
   for (final record in todayRecords) {
     if (record.category == RecordCategory.work) {
-      total += record.durationMinutes;
+      if (record.recordStatus == RecordStatus.active) {
+        final startParts = record.startTime.split(':');
+        if (startParts.length == 2) {
+          final startHour = int.tryParse(startParts[0]) ?? 0;
+          final startMinute = int.tryParse(startParts[1]) ?? 0;
+          final startDateTime = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            startHour,
+            startMinute,
+          );
+          final elapsed = now.difference(startDateTime).inMinutes;
+          total += elapsed.clamp(0, 1440);
+        }
+      } else {
+        total += record.durationMinutes;
+      }
     }
   }
 
@@ -102,11 +131,10 @@ String? todayClockInTime(TodayClockInTimeRef ref) {
 
   if (todayRecords.isEmpty) return null;
 
-  // Buscar el primer registro work
-  final firstWorkRecord = todayRecords.firstWhere(
-    (r) => r.category == RecordCategory.work,
-    orElse: () => todayRecords.first,
-  );
+  // Buscar el primer registro work; retornar null si no existe ninguno
+  final workRecords =
+      todayRecords.where((r) => r.category == RecordCategory.work);
+  if (workRecords.isEmpty) return null;
 
-  return firstWorkRecord.startTime;
+  return workRecords.first.startTime;
 }

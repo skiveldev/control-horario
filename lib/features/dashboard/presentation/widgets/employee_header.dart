@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
@@ -167,7 +168,7 @@ class EmployeeHeader extends StatelessWidget {
                 width: isMobile ? 14 : 16,
                 height: isMobile ? 14 : 16,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF3B82F6), // Azul info
+                  color: AppColors.info,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: Theme.of(context).colorScheme.surface,

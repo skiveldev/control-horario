@@ -314,7 +314,7 @@ class RecentRecordsCard extends ConsumerWidget {
                     Icon(Icons.error_outline, size: 48, color: colors.error),
                     AppSpacing.verticalSpaceMd,
                     Text(
-                      'Error al cargar registros',
+                      errorMessage,
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: colors.error,
                       ),

@@ -10,6 +10,9 @@ part 'time_record_model.g.dart';
 /// Incluye sistema de validación/bloqueo para control por admin.
 @freezed
 class TimeRecordModel with _$TimeRecordModel {
+  // ignore: unused_element
+  const TimeRecordModel._();
+
   const factory TimeRecordModel({
     required String id,
     required String userId,
@@ -46,21 +49,17 @@ class TimeRecordModel with _$TimeRecordModel {
       id: doc.id,
       userId: data['userId'] ?? '',
       date: data['date'] ?? '',
-      category: data['category'] == 'breakTime'
-          ? RecordCategory.breakTime
-          : RecordCategory.work,
+      category: _recordCategoryFromString(data['category'] as String?),
       startTime: data['startTime'] ?? '',
       endTime: data['endTime'] ?? '',
       location: data['location'] ?? '',
       durationMinutes: data['durationMinutes'] ?? 0,
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       createdBy: data['createdBy'] ?? '',
       isManual: data['isManual'] ?? false,
       copiedFrom: data['copiedFrom'],
-      // recordStatus: Compatible con datos existentes (sin campo = active por durationMinutes)
-      recordStatus:
-          _parseRecordStatus(data['recordStatus'], data['durationMinutes']),
+      recordStatus: _parseRecordStatus(data['recordStatus']),
       validationStatus: _parseValidationStatus(data['validationStatus']),
       validatedBy: data['validatedBy'],
       validatedAt: (data['validatedAt'] as Timestamp?)?.toDate(),
@@ -70,62 +69,63 @@ class TimeRecordModel with _$TimeRecordModel {
     );
   }
 
-  /// Convertir a Map para Firestore
-  static Map<String, dynamic> toFirestore(TimeRecordModel record) {
+  /// Serializar a Map para guardar en Firestore
+  Map<String, dynamic> toFirestore() {
     return {
-      'userId': record.userId,
-      'date': record.date,
-      'category': record.category.name,
-      'startTime': record.startTime,
-      'endTime': record.endTime,
-      'location': record.location,
-      'durationMinutes': record.durationMinutes,
-      'recordStatus': record.recordStatus.name, // ✨ Nuevo campo explícito
-      'createdAt': Timestamp.fromDate(record.createdAt),
-      'updatedAt': Timestamp.fromDate(record.updatedAt),
-      'createdBy': record.createdBy,
-      'isManual': record.isManual,
-      if (record.copiedFrom != null) 'copiedFrom': record.copiedFrom,
-      'validationStatus': record.validationStatus.name,
-      if (record.validatedBy != null) 'validatedBy': record.validatedBy,
-      if (record.validatedAt != null)
-        'validatedAt': Timestamp.fromDate(record.validatedAt!),
-      if (record.blockedBy != null) 'blockedBy': record.blockedBy,
-      if (record.blockedAt != null)
-        'blockedAt': Timestamp.fromDate(record.blockedAt!),
-      if (record.blockReason != null) 'blockReason': record.blockReason,
+      'userId': userId,
+      'date': date,
+      'category': category.name,
+      'startTime': startTime,
+      'endTime': endTime,
+      'location': location,
+      'durationMinutes': durationMinutes,
+      'recordStatus': recordStatus.name,
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': Timestamp.fromDate(updatedAt),
+      'createdBy': createdBy,
+      'isManual': isManual,
+      if (copiedFrom != null) 'copiedFrom': copiedFrom,
+      'validationStatus': validationStatus.name,
+      if (validatedBy != null) 'validatedBy': validatedBy,
+      if (validatedAt != null) 'validatedAt': Timestamp.fromDate(validatedAt!),
+      if (blockedBy != null) 'blockedBy': blockedBy,
+      if (blockedAt != null) 'blockedAt': Timestamp.fromDate(blockedAt!),
+      if (blockReason != null) 'blockReason': blockReason,
     };
   }
 
   static ValidationStatus _parseValidationStatus(dynamic status) {
     if (status == null) return ValidationStatus.editable;
     try {
-      return ValidationStatus.values.byName(status);
-    } catch (e) {
+      return ValidationStatus.values.byName(status as String);
+    } catch (_) {
       return ValidationStatus.editable;
     }
   }
 
-  /// Parsear recordStatus con compatibilidad hacia atrás
+  /// Parsear recordStatus desde Firestore.
   ///
-  /// Para datos existentes sin el campo, infiere del durationMinutes:
-  /// - durationMinutes == 0 → active
-  /// - durationMinutes > 0 → completed
-  static RecordStatus _parseRecordStatus(
-      dynamic status, dynamic durationMinutes) {
-    // Si tiene el campo explícito, usarlo
+  /// Para datos legacy sin el campo, se devuelve `completed` como valor seguro.
+  /// Derivar el estado de `durationMinutes == 0` es un anti-patrón: un empleado
+  /// que ficha entrada y salida en el mismo minuto quedaría "activo" para siempre.
+  static RecordStatus _parseRecordStatus(dynamic status) {
     if (status != null) {
       try {
-        return RecordStatus.values.byName(status);
-      } catch (e) {
-        // Fallback si el valor es inválido
+        return RecordStatus.values.byName(status as String);
+      } catch (_) {
+        // Continúa al default
       }
     }
+    // Datos legacy sin campo: default seguro es completed
+    return RecordStatus.completed;
+  }
 
-    // Compatibilidad con datos existentes (sin campo recordStatus)
-    // Inferir del durationMinutes como antes
-    final duration = durationMinutes as int? ?? 0;
-    return duration == 0 ? RecordStatus.active : RecordStatus.completed;
+  static RecordCategory _recordCategoryFromString(String? value) {
+    try {
+      return RecordCategory.values.byName(value ?? 'work');
+    } catch (_) {
+      return RecordCategory.work;
+    }
   }
 }
 

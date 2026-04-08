@@ -106,7 +106,7 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
           border: Border.all(
             color: isHovered
                 ? AppColors.primary.withValues(alpha: 0.25)
-                : Colors.transparent,
+                : AppColors.transparent,
           ),
         ),
         child: Center(
@@ -643,10 +643,13 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
                   children: [
                     Text('Calendario $_selectedYear', style: AppTextStyles.h6),
                     const Spacer(),
-                    Text(
-                      'Toca un día para añadir o editar un festivo',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                    Flexible(
+                      child: Text(
+                        'Toca un día para añadir o editar un festivo',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
@@ -662,9 +665,9 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
           // TableCalendar — Theme neutraliza el hover circular nativo
           Theme(
             data: Theme.of(context).copyWith(
-              hoverColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              splashColor: Colors.transparent,
+              hoverColor: AppColors.transparent,
+              highlightColor: AppColors.transparent,
+              splashColor: AppColors.transparent,
             ),
             child: TableCalendar<CalendarEventModel>(
               firstDay: DateTime(_selectedYear, 1, 1),
@@ -713,7 +716,7 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
                   fontWeight: FontWeight.w700,
                 ),
                 markerDecoration: const BoxDecoration(
-                  color: Colors.transparent,
+                  color: AppColors.transparent,
                 ),
                 markersMaxCount: 0,
                 cellMargin: const EdgeInsets.all(2),

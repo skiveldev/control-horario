@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../utils/password_utils.dart';
 
 /// Campo de contraseña personalizado
 ///
@@ -253,7 +254,10 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
   // ==========================================================================
 
   Widget _buildStrengthIndicator() {
-    final strength = _calculatePasswordStrength(_currentValue);
+    final strength = calculatePasswordStrength(
+      _currentValue,
+      minLength: widget.minLength ?? 6,
+    );
     final strengthData = _getStrengthData(strength);
 
     return Column(
@@ -284,33 +288,6 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
         ),
       ],
     );
-  }
-
-  /// Calcula la fortaleza de la contraseña (0-4)
-  int _calculatePasswordStrength(String password) {
-    if (password.isEmpty) return 0;
-
-    int strength = 0;
-
-    // Longitud mínima
-    if (password.length >= (widget.minLength ?? 6)) strength++;
-
-    // Contiene mayúsculas
-    if (password.contains(RegExp(r'[A-Z]'))) strength++;
-
-    // Contiene minúsculas
-    if (password.contains(RegExp(r'[a-z]'))) strength++;
-
-    // Contiene números
-    if (password.contains(RegExp(r'[0-9]'))) strength++;
-
-    // Contiene caracteres especiales
-    if (password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
-      strength++;
-    }
-
-    // Limitar a 4
-    return strength > 4 ? 4 : strength;
   }
 
   /// Obtiene datos visuales según la fortaleza

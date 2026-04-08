@@ -1,5 +1,6 @@
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:intl/intl.dart';
 import '../../auth/providers/auth_provider.dart';
 
 part 'work_schedule_status_provider.g.dart';
@@ -41,6 +42,12 @@ class WorkScheduleStatus {
 class WorkScheduleStatusNotifier extends _$WorkScheduleStatusNotifier {
   @override
   WorkScheduleStatus build() {
+    // Recalcular cada minuto para actualizar isInWorkSchedule automáticamente
+    final timer = Timer.periodic(const Duration(minutes: 1), (_) {
+      ref.invalidateSelf();
+    });
+    ref.onDispose(timer.cancel);
+
     // Obtener usuario actual
     final userAsync = ref.watch(currentUserProvider);
 

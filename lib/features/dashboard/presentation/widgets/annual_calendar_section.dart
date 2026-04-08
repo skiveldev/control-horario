@@ -49,6 +49,7 @@ class _AnnualCalendarSectionState extends ConsumerState<AnnualCalendarSection> {
       ),
       error: (error, _) => _FirestoreErrorState(
         onRetry: () => ref.invalidate(employeeWorkCalendarProvider),
+        errorMessage: error.toString(),
       ),
     );
   }
@@ -273,7 +274,7 @@ Color _colorForType(HolidayType type) {
     case HolidayType.local:
       return AppColors.accent;
     case HolidayType.vacation:
-      return AppColors.secondary;
+      return AppColors.vacation;
   }
 }
 
@@ -495,8 +496,9 @@ class _NoCalendarEmptyState extends StatelessWidget {
 /// Estado de error de Firestore con botón de reintento
 class _FirestoreErrorState extends StatelessWidget {
   final VoidCallback onRetry;
+  final String? errorMessage;
 
-  const _FirestoreErrorState({required this.onRetry});
+  const _FirestoreErrorState({required this.onRetry, this.errorMessage});
 
   @override
   Widget build(BuildContext context) {
@@ -521,7 +523,7 @@ class _FirestoreErrorState extends StatelessWidget {
           ),
           AppSpacing.verticalSpaceSm,
           Text(
-            'Comprueba tu conexión e inténtalo de nuevo.',
+            errorMessage ?? 'Comprueba tu conexión e inténtalo de nuevo.',
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textTertiary,
             ),

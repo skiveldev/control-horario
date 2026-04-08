@@ -106,11 +106,14 @@ class MonthNavigationHeader extends StatelessWidget {
           AppSpacing.horizontalSpaceSm,
 
           // Nombre del mes
-          Text(
-            monthName,
-            style: AppTextStyles.labelLarge.copyWith(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w600,
+          Flexible(
+            child: Text(
+              monthName,
+              style: AppTextStyles.labelLarge.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
 
@@ -164,10 +167,13 @@ class MonthNavigationHeader extends StatelessWidget {
                 color: AppColors.textSecondary,
               ),
               AppSpacing.horizontalSpaceSm,
-              Text(
-                'Resumen del Mes',
-                style: AppTextStyles.labelLarge.copyWith(
-                  color: AppColors.textSecondary,
+              Flexible(
+                child: Text(
+                  'Resumen del Mes',
+                  style: AppTextStyles.labelLarge.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -302,11 +308,14 @@ class MonthNavigationHeader extends StatelessWidget {
         AppSpacing.verticalSpaceXs,
         Row(
           children: [
-            Text(
-              value,
-              style: AppTextStyles.h4.copyWith(
-                color: color,
-                fontWeight: FontWeight.w700,
+            Flexible(
+              child: Text(
+                value,
+                style: AppTextStyles.h4.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w700,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             if (icon != null) ...[

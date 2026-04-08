@@ -77,6 +77,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
   // ============================================================================
   // STATE - Sección 3: Control Horario
   // ============================================================================
+  // TODO: Replace String with UserRole enum for type safety (see FIX-11)
   String _selectedRole = 'employee';
   DateTime _fechaInicio = DateTime.now();
   DateTime? _fechaFin;
@@ -220,6 +221,10 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
         break;
       case 'rrhh':
         role = UserRole.rrhh;
+        break;
+      case 'supervisor':
+        // Supervisor maps to employee role (no dedicated UserRole.supervisor exists)
+        role = UserRole.employee;
         break;
       default:
         role = UserRole.employee;
@@ -507,7 +512,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
           child: GestureDetector(
             onTap: widget.onClose,
             child: Container(
-              color: Colors.black,
+              color: AppColors.textPrimary,
               width: double.infinity,
               height: double.infinity,
             ),
@@ -1294,7 +1299,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
           borderRadius: BorderRadius.circular(8),
           color: isSelected
               ? AppColors.primary.withValues(alpha: 0.05)
-              : Colors.transparent,
+              : AppColors.transparent,
         ),
         child: Row(
           children: [

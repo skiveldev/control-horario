@@ -53,9 +53,12 @@ class AdminDashboardScreen extends ConsumerWidget {
               context,
               employeesCount: null, // Mostrar loading
             ),
-            error: (err, stack) => _buildMetricsGrid(
-              context,
-              employeesCount: 0, // Mostrar 0 en caso de error
+            error: (err, stack) => Center(
+              child: Text(
+                'Error al cargar métricas',
+                style:
+                    AppTextStyles.bodyMedium.copyWith(color: AppColors.error),
+              ),
             ),
           ),
 

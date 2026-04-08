@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_colors_dark.dart';
 import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -83,6 +84,7 @@ class DaySummaryCard extends ConsumerWidget {
     required int breakTime,
   }) {
     final colors = AppColorsHelper.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return CustomCard(
       elevation: CardElevation.medium,
@@ -133,7 +135,8 @@ class DaySummaryCard extends ConsumerWidget {
                     TimeInfoBadge(
                       label: 'Salida estimada',
                       time: estimatedExit,
-                      color: AppColorsDark.purple, // Purple NO orange
+                      color:
+                          isDark ? AppColorsDark.purple : AppColors.secondary,
                       icon: Icons.logout,
                     ),
                     AppSpacing.verticalSpaceMd,
@@ -160,7 +163,9 @@ class DaySummaryCard extends ConsumerWidget {
                         child: TimeInfoBadge(
                           label: 'Salida estimada',
                           time: estimatedExit,
-                          color: AppColorsDark.purple, // Purple NO orange
+                          color: isDark
+                              ? AppColorsDark.purple
+                              : AppColors.secondary,
                           icon: Icons.logout,
                         ),
                       ),

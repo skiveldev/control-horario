@@ -254,7 +254,7 @@ class _ScheduleTemplateModalState extends ConsumerState<ScheduleTemplateModal> {
                             height: 16,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: AppColors.textOnPrimary,
                             ),
                           )
                         : Icon(_isEditMode ? Icons.save : Icons.add),

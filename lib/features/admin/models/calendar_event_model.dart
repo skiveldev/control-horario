@@ -18,10 +18,10 @@ class CalendarEventModel {
   /// Deserializar desde Map de Firestore (elemento del array events)
   factory CalendarEventModel.fromMap(Map<String, dynamic> map) {
     return CalendarEventModel(
-      id: map['id'] as String,
-      name: map['name'] as String,
-      date: (map['date'] as Timestamp).toDate(),
-      type: HolidayType.values.byName(map['type'] as String),
+      id: map['id'] as String? ?? '',
+      name: map['name'] as String? ?? '',
+      date: (map['date'] as Timestamp?)?.toDate() ?? DateTime(1970),
+      type: _holidayTypeFromString(map['type'] as String?),
     );
   }
 
@@ -58,4 +58,13 @@ class CalendarEventModel {
 
   @override
   int get hashCode => id.hashCode;
+}
+
+/// Convierte un string de Firestore al enum HolidayType con fallback seguro.
+HolidayType _holidayTypeFromString(String? value) {
+  try {
+    return HolidayType.values.byName(value ?? 'national');
+  } catch (_) {
+    return HolidayType.national;
+  }
 }

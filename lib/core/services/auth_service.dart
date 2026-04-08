@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/auth/models/user_model.dart';
 
@@ -88,7 +89,11 @@ class AuthService {
         .collection('users')
         .doc(userId)
         .snapshots()
-        .map((doc) => doc.exists ? UserModel.fromFirestore(doc) : null);
+        .map((doc) => doc.exists ? UserModel.fromFirestore(doc) : null)
+        .handleError((Object error, StackTrace stackTrace) {
+      debugPrint('AuthService.userDataStream error [$userId]: $error');
+      throw error;
+    });
   }
 
   /// Actualizar datos del usuario en Firestore

@@ -32,7 +32,8 @@ class LoginScreen extends ConsumerWidget {
           // Esperar un frame para asegurar que el contexto es válido
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (context.mounted) {
-              // Redirigir según el rol del usuario
+              // TODO: Move to router redirect — el router debería manejar la
+              // redirección por rol desde un redirect centralizado.
               final targetRoute =
                   (user.role == UserRole.admin || user.role == UserRole.rrhh)
                       ? AppRouter.admin
@@ -65,8 +66,7 @@ class LoginScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Container(
-        // Fondo blanco para armonizar con el panel lateral
-        color: Colors.white,
+        color: AppColors.surface,
         child: LayoutBuilder(
           builder: (context, constraints) {
             final isDesktop = constraints.maxWidth >= Breakpoints.desktop;
@@ -122,11 +122,11 @@ class LoginScreen extends ConsumerWidget {
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
+              color: AppColors.shadow,
               blurRadius: 24,
               offset: const Offset(0, 8),
             ),

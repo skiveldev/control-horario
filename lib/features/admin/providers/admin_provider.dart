@@ -65,7 +65,7 @@ Stream<int> employeesCount(EmployeesCountRef ref) {
   return employeesAsync.when(
     data: (employees) => Stream.value(employees.length),
     loading: () => Stream.value(0),
-    error: (err, stack) => Stream.value(0),
+    error: (err, stack) => Stream.error(err, stack),
   );
 }
 
@@ -110,7 +110,7 @@ Stream<List<UserModel>> filteredEmployees(
       return Stream.value(filtered);
     },
     loading: () => Stream.value([]),
-    error: (err, stack) => Stream.value([]),
+    error: (err, stack) => Stream.error(err, stack),
   );
 }
 
@@ -147,7 +147,7 @@ Stream<List<UserModel>> employeesByDepartment(
       return Stream.value(filtered);
     },
     loading: () => Stream.value([]),
-    error: (err, stack) => Stream.value([]),
+    error: (err, stack) => Stream.error(err, stack),
   );
 }
 
@@ -203,7 +203,7 @@ Stream<List<UserModel>> searchAndFilterEmployees(
       return Stream.value(filtered);
     },
     loading: () => Stream.value([]),
-    error: (err, stack) => Stream.value([]),
+    error: (err, stack) => Stream.error(err, stack),
   );
 }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 
@@ -39,20 +40,12 @@ class WorkScheduleStatusBadge extends StatelessWidget {
 
     // Colores según estado y tema
     final backgroundColor = isInWorkSchedule
-        ? (isDark
-            ? const Color(0xFF10B981).withValues(alpha: 0.15) // Verde oscuro
-            : const Color(0xFFD1FAE5)) // Verde claro
-        : (isDark
-            ? const Color(0xFFF59E0B).withValues(alpha: 0.15) // Amber oscuro
-            : const Color(0xFFFEF3C7)); // Amber claro
+        ? AppColors.success.withValues(alpha: 0.15)
+        : AppColors.warning.withValues(alpha: 0.15);
 
     final textColor = isInWorkSchedule
-        ? (isDark
-            ? const Color(0xFF34D399) // Verde brillante
-            : const Color(0xFF065F46)) // Verde oscuro
-        : (isDark
-            ? const Color(0xFFFBBF24) // Amber brillante
-            : const Color(0xFF92400E)); // Amber oscuro
+        ? (isDark ? AppColors.successLight : AppColors.successDark)
+        : (isDark ? AppColors.warningLight : AppColors.warningDark);
 
     final statusText = isInWorkSchedule ? 'En horario' : 'Fuera de horario';
 
@@ -86,13 +79,15 @@ class WorkScheduleStatusBadge extends StatelessWidget {
               SizedBox(width: isCompact ? 4 : AppSpacing.xs),
 
               // Texto de estado
-              Text(
-                statusText,
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: textColor,
-                  fontWeight: FontWeight.w600,
-                  fontSize:
-                      isCompact ? 11 : null, // Reducir tamaño si es compacto
+              Flexible(
+                child: Text(
+                  statusText,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: textColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize: isCompact ? 11 : null,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
 

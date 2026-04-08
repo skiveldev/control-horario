@@ -14,6 +14,7 @@ import '../widgets/employee_table_header.dart';
 import '../widgets/employee_table_row.dart';
 import '../widgets/new_employee_drawer.dart';
 import '../../providers/admin_provider.dart';
+import '../../../auth/models/user_model.dart';
 
 /// Pantalla de lista de empleados (rediseñada con tabla)
 ///
@@ -353,7 +354,7 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
     );
   }
 
-  Widget _buildTable(List<dynamic> employees) {
+  Widget _buildTable(List<UserModel> employees) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -384,7 +385,7 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
     );
   }
 
-  Widget _buildCardsList(List<dynamic> employees) {
+  Widget _buildCardsList(List<UserModel> employees) {
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -430,7 +431,10 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
               color: AppColors.textSecondary,
             ),
           ),
-          error: (_, __) => const SizedBox.shrink(),
+          error: (_, __) => Text(
+            'Error',
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.error),
+          ),
         ),
 
         AppSpacing.verticalSpaceMd,

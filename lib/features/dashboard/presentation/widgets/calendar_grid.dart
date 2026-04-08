@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -156,7 +157,7 @@ class CalendarGrid extends StatelessWidget {
       case 'festivo':
         return colors.error;
       case 'vacaciones':
-        return const Color(0xFFEC4899); // Rosa
+        return AppColors.vacation;
       case 'evento':
         return colors.secondary;
       case 'ausencia':

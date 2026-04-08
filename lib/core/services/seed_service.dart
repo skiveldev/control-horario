@@ -4,8 +4,14 @@ import 'package:flutter/foundation.dart';
 
 /// Servicio temporal para poblar la base de datos con datos iniciales
 class SeedService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _db;
+  final FirebaseAuth _auth;
+
+  SeedService({
+    FirebaseFirestore? firestore,
+    FirebaseAuth? auth,
+  })  : _db = firestore ?? FirebaseFirestore.instance,
+        _auth = auth ?? FirebaseAuth.instance;
 
   /// Crea los datos iniciales del sistema
   /// Retorna true si todo salió bien
@@ -176,7 +182,7 @@ class SeedService {
       'role': 'admin', // <--- ESTO ES LO IMPORTANTE
       'employeeId': 'ADMIN-001',
       'contractType': 'full_time',
-      'scheduleId': 'schedule_standard',
+      'scheduleId': 'schedule_40h_9_17',
       'weeklyHours': 40,
       'isActive': true,
       'createdAt': FieldValue.serverTimestamp(),

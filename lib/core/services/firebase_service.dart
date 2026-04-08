@@ -108,17 +108,40 @@ EmployeeCreationService employeeCreationService(
   );
 }
 
+/// Exception lanzada cuando la sesión del admin expira durante la creación de empleado.
+///
+/// Ocurre porque [FirebaseAuth.createUserWithEmailAndPassword] inicia sesión
+/// automáticamente con el usuario recién creado, destruyendo la sesión del admin.
+///
+/// Incluye [employeeData] con los datos del empleado creado, para que la UI
+/// pueda mostrar las credenciales antes de redirigir al login.
+class AdminSessionExpiredException implements Exception {
+  final String message;
+  final Map<String, String> employeeData;
+
+  const AdminSessionExpiredException({
+    required this.employeeData,
+    this.message =
+        'Sesión del administrador cerrada. Por favor, vuelva a iniciar sesión.',
+  });
+
+  @override
+  String toString() =>
+      'AdminSessionExpiredException: $message\nEmpleado creado: ${employeeData['userId']}';
+}
+
 /// Servicio para crear empleados en Firebase
 ///
 /// Gestiona la creación de usuarios en Authentication + Firestore
 class EmployeeCreationService {
-  final FirebaseFirestore firestore;
-  final FirebaseAuth auth;
+  final FirebaseFirestore _firestore;
+  final FirebaseAuth _auth;
 
   EmployeeCreationService({
-    required this.firestore,
-    required this.auth,
-  });
+    required FirebaseFirestore firestore,
+    required FirebaseAuth auth,
+  })  : _firestore = firestore,
+        _auth = auth;
 
   /// Crea un nuevo empleado en Firebase Auth + Firestore
   ///
@@ -196,7 +219,9 @@ class EmployeeCreationService {
 
     // 1. Generar contraseña temporal
     final temporaryPassword = _generateTemporaryPassword();
-    debugPrint('🔑 Contraseña temporal generada: $temporaryPassword');
+    if (kDebugMode) {
+      debugPrint('🔑 Contraseña temporal generada');
+    }
 
     // 2. EmployeeId: Dejarlo vacío por ahora (se asignará en lote más adelante)
     // TODO [DÍA-6]: Crear script para asignar employeeIds secuenciales a todos los usuarios
@@ -218,7 +243,7 @@ class EmployeeCreationService {
     UserCredential userCredential;
     try {
       debugPrint('🔐 Creando usuario en Firebase Auth...');
-      userCredential = await auth.createUserWithEmailAndPassword(
+      userCredential = await _auth.createUserWithEmailAndPassword(
         email: email.trim(),
         password: temporaryPassword,
       );
@@ -240,7 +265,7 @@ class EmployeeCreationService {
       // ⚠️ AHORA el usuario autenticado es el recién creado, NO el admin
       // Por eso necesitamos que las reglas permitan que el usuario cree su propio documento
       debugPrint('📝 Creando documento en Firestore...');
-      await firestore.collection('users').doc(userId).set({
+      await _firestore.collection('users').doc(userId).set({
         'userId': userId,
         'employeeId': finalEmployeeId,
         'email': email.trim(),
@@ -276,18 +301,27 @@ class EmployeeCreationService {
       debugPrint('✅ Documento creado en Firestore');
 
       // 6. Cerrar sesión del usuario recién creado
-      debugPrint('🚪 Cerrando sesión del usuario creado...');
-      await auth.signOut();
-      debugPrint('✅ Sesión cerrada');
+      // TODO(CRITICAL): Replace with Cloud Function using Admin SDK to avoid signing out
+      // the admin. createUserWithEmailAndPassword auto-signs in as the new user,
+      // destroying the admin session. Until this is fixed with a Cloud Function,
+      // AdminSessionExpiredException is thrown so the UI can handle the re-login flow.
+      debugPrint(
+          '🚪 Cerrando sesión del usuario creado (sesión del admin destruida)...');
+      await _auth.signOut();
+      debugPrint('⚠️ Sesión del admin cerrada');
 
-      // 7. Retornar credenciales
-      debugPrint('🎉 createEmployee completado exitosamente');
-      return {
-        'userId': userId,
-        'temporaryPassword': temporaryPassword,
-        'employeeId': finalEmployeeId,
-      };
+      // Throw to surface the session loss to the caller.
+      // The router will redirect to /login on the next frame via AuthNotifier.
+      // The employee data is included so the UI can show the credentials before redirecting.
+      throw AdminSessionExpiredException(
+        employeeData: {
+          'userId': userId,
+          'temporaryPassword': temporaryPassword,
+          'employeeId': finalEmployeeId,
+        },
+      );
     } catch (e) {
+      if (e is AdminSessionExpiredException) rethrow;
       debugPrint('❌ ERROR al crear documento Firestore: $e');
       // Si falla la creación en Firestore, intentar eliminar el usuario de Auth
       try {
@@ -298,7 +332,7 @@ class EmployeeCreationService {
       }
 
       // Cerrar sesión para limpiar estado
-      await auth.signOut();
+      await _auth.signOut();
 
       rethrow;
     }

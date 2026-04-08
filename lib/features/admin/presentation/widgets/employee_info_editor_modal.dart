@@ -355,7 +355,7 @@ class _EmployeeInfoEditorModalState
                             height: 16,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: AppColors.textOnPrimary,
                             ),
                           )
                         : const Icon(Icons.save),

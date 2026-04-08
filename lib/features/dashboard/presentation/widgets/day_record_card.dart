@@ -178,16 +178,22 @@ class _DayRecordCardState extends State<DayRecordCard> {
                     color: AppColors.textSecondary,
                   ),
                   AppSpacing.horizontalSpaceSm,
-                  Text(
-                    '${workedHours.toStringAsFixed(1)}h / ${plannedHours.toStringAsFixed(1)}h',
-                    style: AppTextStyles.labelLarge,
+                  Flexible(
+                    child: Text(
+                      '${workedHours.toStringAsFixed(1)}h / ${plannedHours.toStringAsFixed(1)}h',
+                      style: AppTextStyles.labelLarge,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                   AppSpacing.horizontalSpaceMd,
-                  Text(
-                    '${differenceMinutes >= 0 ? '+' : ''}${(differenceMinutes / 60).toStringAsFixed(1)}h',
-                    style: AppTextStyles.labelLarge.copyWith(
-                      color: differenceColor,
-                      fontWeight: FontWeight.w600,
+                  Flexible(
+                    child: Text(
+                      '${differenceMinutes >= 0 ? '+' : ''}${(differenceMinutes / 60).toStringAsFixed(1)}h',
+                      style: AppTextStyles.labelLarge.copyWith(
+                        color: differenceColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -398,11 +404,14 @@ class _DayRecordCardState extends State<DayRecordCard> {
                 ),
                 AppSpacing.horizontalSpaceXs,
                 // ✨ Mostrar --:-- si es registro activo
-                Text(
-                  record.isActive
-                      ? '${record.startTime} - --:--'
-                      : '${record.startTime} - ${record.endTime}',
-                  style: AppTextStyles.bodyMedium,
+                Flexible(
+                  child: Text(
+                    record.isActive
+                        ? '${record.startTime} - --:--'
+                        : '${record.startTime} - ${record.endTime}',
+                    style: AppTextStyles.bodyMedium,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),
@@ -423,11 +432,14 @@ class _DayRecordCardState extends State<DayRecordCard> {
                 ),
                 AppSpacing.horizontalSpaceXs,
                 // ✨ Mostrar "En curso..." si es registro activo
-                Text(
-                  record.isActive
-                      ? '${record.categoryName} (En curso...)'
-                      : '${record.categoryName} (${(record.durationMinutes / 60).toStringAsFixed(1)}h)',
-                  style: AppTextStyles.bodyMedium,
+                Flexible(
+                  child: Text(
+                    record.isActive
+                        ? '${record.categoryName} (En curso...)'
+                        : '${record.categoryName} (${(record.durationMinutes / 60).toStringAsFixed(1)}h)',
+                    style: AppTextStyles.bodyMedium,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),
@@ -531,9 +543,12 @@ class _DayRecordCardState extends State<DayRecordCard> {
                 ),
               ),
               AppSpacing.horizontalSpaceXs,
-              Text(
-                record.categoryName,
-                style: AppTextStyles.labelLarge,
+              Flexible(
+                child: Text(
+                  record.categoryName,
+                  style: AppTextStyles.labelLarge,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               const Spacer(),
               _buildStatusBadge(record),
@@ -549,20 +564,26 @@ class _DayRecordCardState extends State<DayRecordCard> {
               ),
               AppSpacing.horizontalSpaceXs,
               // ✨ Mostrar --:-- si es registro activo
-              Text(
-                record.isActive
-                    ? '${record.startTime} - --:--'
-                    : '${record.startTime} - ${record.endTime}',
-                style: AppTextStyles.bodyMedium,
+              Flexible(
+                child: Text(
+                  record.isActive
+                      ? '${record.startTime} - --:--'
+                      : '${record.startTime} - ${record.endTime}',
+                  style: AppTextStyles.bodyMedium,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               AppSpacing.horizontalSpaceMd,
               // ✨ Mostrar "En curso..." si es registro activo
-              Text(
-                record.isActive
-                    ? '(En curso...)'
-                    : '(${(record.durationMinutes / 60).toStringAsFixed(1)}h)',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
+              Flexible(
+                child: Text(
+                  record.isActive
+                      ? '(En curso...)'
+                      : '(${(record.durationMinutes / 60).toStringAsFixed(1)}h)',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],

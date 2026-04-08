@@ -14,6 +14,7 @@ import '../widgets/employee_schedule_editor_modal.dart';
 import '../widgets/employee_info_editor_modal.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../../../auth/models/user_model.dart';
+import '../../models/work_calendar_model.dart';
 import '../../providers/calendar_management_provider.dart';
 import '../../providers/user_management_provider.dart';
 
@@ -113,10 +114,13 @@ class EmployeeDetailScreen extends ConsumerWidget {
                                 color: AppColors.textSecondary,
                               ),
                               const SizedBox(width: 4),
-                              Text(
-                                employee.email,
-                                style: AppTextStyles.bodySmall.copyWith(
-                                  color: AppColors.textSecondary,
+                              Flexible(
+                                child: Text(
+                                  employee.email,
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    color: AppColors.textSecondary,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
@@ -468,7 +472,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
     UserModel employee,
   ) async {
     // Obtener lista de calendarios una sola vez para el diálogo
-    List<dynamic> calendars = [];
+    List<WorkCalendarModel> calendars = [];
     try {
       calendars = await ref.read(allCalendarsProvider.future);
     } catch (_) {
@@ -513,7 +517,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
                   ),
                   ...calendars.map((calendar) {
                     return DropdownMenuItem(
-                      value: calendar.id as String,
+                      value: calendar.id,
                       child: Text(
                         '${calendar.name} (${calendar.year})',
                         overflow: TextOverflow.ellipsis,
@@ -548,7 +552,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Calendario actualizado'),
-                          backgroundColor: Colors.green,
+                          backgroundColor: AppColors.success,
                         ),
                       );
                     }
@@ -557,7 +561,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Error: $e'),
-                          backgroundColor: Colors.red,
+                          backgroundColor: AppColors.error,
                         ),
                       );
                     }

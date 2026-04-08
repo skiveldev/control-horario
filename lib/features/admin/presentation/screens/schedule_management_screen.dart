@@ -8,6 +8,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
 import '../../../../shared/widgets/layouts/admin_layout.dart';
 import '../../../../shared/widgets/cards/schedule_card.dart';
+import '../../models/schedule_model.dart';
 import '../../providers/schedule_management_provider.dart';
 import '../widgets/schedule_template_modal.dart';
 
@@ -118,7 +119,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
 
   Widget _buildTemplatesList(
     BuildContext context,
-    List templates,
+    List<ScheduleModel> templates,
   ) {
     final columns = context.responsiveValue(
       mobile: 1,
@@ -198,7 +199,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
   /// Mostrar modal de crear/editar plantilla
   void _showTemplateModal(
     BuildContext context, {
-    required existingTemplate,
+    required ScheduleModel? existingTemplate,
   }) {
     showDialog(
       context: context,

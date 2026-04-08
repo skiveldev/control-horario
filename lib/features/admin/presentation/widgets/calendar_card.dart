@@ -261,7 +261,7 @@ class CalendarCard extends StatelessWidget {
             label: const Text('Editar'),
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.textOnPrimary,
               textStyle: AppTextStyles.labelMedium,
               padding: AppSpacing.symmetric(
                 horizontal: AppSpacing.lg,

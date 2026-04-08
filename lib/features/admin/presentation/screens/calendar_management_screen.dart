@@ -292,6 +292,7 @@ class CalendarManagementScreen extends ConsumerWidget {
   }
 
   void _navigateToEditor(BuildContext context, {WorkCalendarModel? calendar}) {
+    // TODO: Use GoRouter context.push() when CalendarEditorScreen route is added to app_router.dart
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => CalendarEditorScreen(existingCalendar: calendar),

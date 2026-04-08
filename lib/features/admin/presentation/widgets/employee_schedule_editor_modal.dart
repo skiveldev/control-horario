@@ -127,7 +127,6 @@ class _EmployeeScheduleEditorModalState
                     title: const Text('Usar plantilla'),
                     subtitle:
                         const Text('Selecciona una plantilla predefinida'),
-                    // ignore: deprecated_member_use
                     leading: Radio<String>(
                       value: 'template',
                       // ignore: deprecated_member_use
@@ -150,7 +149,6 @@ class _EmployeeScheduleEditorModalState
                   child: ListTile(
                     title: const Text('Horario personalizado'),
                     subtitle: const Text('Configura un horario único'),
-                    // ignore: deprecated_member_use
                     leading: Radio<String>(
                       value: 'custom',
                       // ignore: deprecated_member_use
@@ -202,7 +200,7 @@ class _EmployeeScheduleEditorModalState
                           height: 16,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: AppColors.textOnPrimary,
                           ),
                         )
                       : const Icon(Icons.save),
@@ -344,7 +342,7 @@ class _EmployeeScheduleEditorModalState
       error: (error, _) => Center(
         child: Text(
           'Error al cargar plantillas: $error',
-          style: TextStyle(color: AppColors.error),
+          style: AppTextStyles.bodySmall.copyWith(color: AppColors.error),
         ),
       ),
     );

@@ -80,7 +80,7 @@ class TimeRecordsService {
   Future<String> addRecord(TimeRecordModel record) async {
     try {
       final docRef = await _getRecordsCollection(record.userId).add(
-        TimeRecordModel.toFirestore(record),
+        record.toFirestore(),
       );
       return docRef.id;
     } catch (e) {
@@ -92,7 +92,7 @@ class TimeRecordsService {
   Future<void> updateRecord(TimeRecordModel record) async {
     try {
       await _getRecordsCollection(record.userId).doc(record.id).update(
-            TimeRecordModel.toFirestore(record),
+            record.toFirestore(),
           );
     } catch (e) {
       throw Exception('Error al actualizar registro: $e');
@@ -115,13 +115,13 @@ class TimeRecordsService {
             _getRecordsCollection(recordToUpdate.userId).doc(recordToUpdate.id);
         transaction.update(
           updateRef,
-          TimeRecordModel.toFirestore(recordToUpdate),
+          recordToUpdate.toFirestore(),
         );
 
         // 2. Crear nuevo registro
         transaction.set(
           newDocRef,
-          TimeRecordModel.toFirestore(recordToCreate),
+          recordToCreate.toFirestore(),
         );
       });
 
@@ -135,13 +135,12 @@ class TimeRecordsService {
   ///
   /// No permite eliminar registros bloqueados
   Future<void> deleteRecord(String userId, String recordId) async {
-    try {
-      // Verificar que no esté bloqueado
-      final record = await getRecord(userId, recordId);
-      if (record != null && record.isBlocked) {
-        throw Exception('No se puede eliminar un registro bloqueado');
-      }
+    final record = await getRecord(userId, recordId);
+    if (record != null && record.isBlocked) {
+      throw Exception('No se puede eliminar un registro bloqueado');
+    }
 
+    try {
       await _getRecordsCollection(userId).doc(recordId).delete();
     } catch (e) {
       throw Exception('Error al eliminar registro: $e');
@@ -154,17 +153,15 @@ class TimeRecordsService {
     String recordId,
     DateTime targetDate,
   ) async {
+    final originalRecord = await getRecord(userId, recordId);
+    if (originalRecord == null) {
+      throw Exception('Registro original no encontrado');
+    }
+    if (originalRecord.isBlocked) {
+      throw Exception('No se puede copiar un registro bloqueado');
+    }
+
     try {
-      final originalRecord = await getRecord(userId, recordId);
-      if (originalRecord == null) {
-        throw Exception('Registro original no encontrado');
-      }
-
-      // No permitir copiar registros bloqueados
-      if (originalRecord.isBlocked) {
-        throw Exception('No se puede copiar un registro bloqueado');
-      }
-
       // Crear nuevo registro con la nueva fecha
       final newRecord = TimeRecordModel(
         id: '', // Se generará al añadir
@@ -180,6 +177,7 @@ class TimeRecordsService {
         createdBy: originalRecord.userId,
         isManual: true,
         copiedFrom: recordId,
+        recordStatus: TimeRecordStatus.completed,
         validationStatus: ValidationStatus.editable,
       );
 

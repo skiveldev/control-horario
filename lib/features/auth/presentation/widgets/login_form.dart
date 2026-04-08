@@ -118,7 +118,9 @@ class _LoginFormState extends State<LoginForm> {
                           setState(() => _rememberMe = value ?? false);
                         },
                 ),
-                Text('Recordarme', style: AppTextStyles.bodyMedium),
+                Flexible(
+                  child: Text('Recordarme', style: AppTextStyles.bodyMedium),
+                ),
 
                 const Spacer(),
 

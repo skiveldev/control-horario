@@ -46,7 +46,7 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
     final isMobile = context.isMobile || context.isTablet;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       drawer: isMobile ? const MobileDrawer() : null,
       body: ResponsiveNavigation(
         child: Column(
@@ -98,11 +98,14 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
             tooltip: 'Abrir menú',
           ),
           AppSpacing.horizontalSpaceMd,
-          const Text(
-            'Mi Control Horario',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+          Flexible(
+            child: Text(
+              'Mi Control Horario',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -379,10 +382,11 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
     TimeRecordModel record,
     String userId,
   ) {
+    final outerContext = context;
     // Mostrar confirmación
     showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+      context: outerContext,
+      builder: (dialogContext) => AlertDialog(
         title: const Text('¿Eliminar registro?'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -401,33 +405,32 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.of(context).pop();
+              Navigator.of(dialogContext).pop();
 
               try {
-                // ✨ Usar mounted check antes de cada operación asíncrona
-                if (!context.mounted) return;
+                if (!outerContext.mounted) return;
 
                 await ref
                     .read(timeRecordsNotifierProvider.notifier)
                     .deleteRecord(userId, record.id);
 
-                if (!context.mounted) return;
+                if (!outerContext.mounted) return;
 
-                ScaffoldMessenger.of(context).showSnackBar(
+                ScaffoldMessenger.of(outerContext).showSnackBar(
                   const SnackBar(
                     content: Text('✓ Registro eliminado'),
                     backgroundColor: AppColors.success,
                   ),
                 );
               } catch (e) {
-                if (!context.mounted) return;
+                if (!outerContext.mounted) return;
 
-                ScaffoldMessenger.of(context).showSnackBar(
+                ScaffoldMessenger.of(outerContext).showSnackBar(
                   SnackBar(
                     content: Text('Error al eliminar: $e'),
                     backgroundColor: AppColors.error,

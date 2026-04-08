@@ -314,15 +314,23 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
       children: [
         Icon(icon, size: 14, color: color),
         AppSpacing.horizontalSpaceXs,
-        Text(
-          '$label: ',
-          style: AppTextStyles.bodySmall.copyWith(color: colors.textSecondary),
+        Flexible(
+          child: Text(
+            '$label: ',
+            style: AppTextStyles.bodySmall.copyWith(
+              color: colors.textSecondary,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
-        Text(
-          value,
-          style: AppTextStyles.bodySmall.copyWith(
-            fontWeight: FontWeight.w600,
-            color: color,
+        Flexible(
+          child: Text(
+            value,
+            style: AppTextStyles.bodySmall.copyWith(
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
@@ -348,6 +356,7 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
       },
     );
 
+    if (!mounted) return;
     if (picked != null) {
       setState(() {
         selectedTime = picked;
@@ -711,15 +720,23 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
       children: [
         Icon(icon, size: 14, color: color),
         AppSpacing.horizontalSpaceXs,
-        Text(
-          '$label: ',
-          style: AppTextStyles.bodySmall.copyWith(color: colors.textSecondary),
+        Flexible(
+          child: Text(
+            '$label: ',
+            style: AppTextStyles.bodySmall.copyWith(
+              color: colors.textSecondary,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
-        Text(
-          value,
-          style: AppTextStyles.bodySmall.copyWith(
-            fontWeight: FontWeight.w600,
-            color: color,
+        Flexible(
+          child: Text(
+            value,
+            style: AppTextStyles.bodySmall.copyWith(
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
@@ -745,6 +762,7 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
       },
     );
 
+    if (!mounted) return;
     if (picked != null) {
       setState(() {
         selectedTime = picked;

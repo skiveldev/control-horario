@@ -25,7 +25,7 @@ _$DailyRecordModelImpl _$$DailyRecordModelImplFromJson(
           ? null
           : DateTime.parse(json['breakEndTimestamp'] as String),
       totalMinutes: (json['totalMinutes'] as num?)?.toInt(),
-      status: $enumDecode(_$RecordStatusEnumMap, json['status']),
+      status: $enumDecode(_$DailyRecordStatusEnumMap, json['status']),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
@@ -41,14 +41,14 @@ Map<String, dynamic> _$$DailyRecordModelImplToJson(
       'breakStartTimestamp': instance.breakStartTimestamp?.toIso8601String(),
       'breakEndTimestamp': instance.breakEndTimestamp?.toIso8601String(),
       'totalMinutes': instance.totalMinutes,
-      'status': _$RecordStatusEnumMap[instance.status]!,
+      'status': _$DailyRecordStatusEnumMap[instance.status]!,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
     };
 
-const _$RecordStatusEnumMap = {
-  RecordStatus.incomplete: 'incomplete',
-  RecordStatus.complete: 'complete',
+const _$DailyRecordStatusEnumMap = {
+  DailyRecordStatus.incomplete: 'incomplete',
+  DailyRecordStatus.complete: 'complete',
 };
 
 _$ClockTimesImpl _$$ClockTimesImplFromJson(Map<String, dynamic> json) =>

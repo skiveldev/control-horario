@@ -92,6 +92,7 @@ class _ProfileEditDialogState extends ConsumerState<ProfileEditDialog> {
         : '$nombre $apellido1';
 
     try {
+      // TODO: Move to authNotifierProvider.notifier.updateProfile()
       await authService.updateUserData(
         widget.user.userId,
         {

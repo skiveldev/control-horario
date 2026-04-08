@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/services/firebase_service.dart';
 import '../../auth/models/user_model.dart';
+import '../../auth/providers/auth_provider.dart';
 
 part 'user_management_provider.g.dart';
 
@@ -84,6 +85,14 @@ class UserManagement extends _$UserManagement {
     DateTime? fechaFin,
     UserRole role = UserRole.employee,
   }) async {
+    // Verificar rol admin
+    final currentUser = ref.read(currentUserProvider).valueOrNull;
+    if (currentUser == null || currentUser.role != UserRole.admin) {
+      state = state.copyWith(
+          error: 'Sin permisos: solo administradores pueden crear empleados');
+      return null;
+    }
+
     // DEBUGGING
     debugPrint('🔄 UserManagementProvider.createEmployee() iniciado');
     debugPrint('📧 Email: $email');
@@ -135,7 +144,7 @@ class UserManagement extends _$UserManagement {
 
       debugPrint('✅ Usuario creado exitosamente');
       debugPrint('🆔 userId: ${result['userId']}');
-      debugPrint('🔑 password: ${result['temporaryPassword']}');
+      debugPrint('🔑 Contraseña temporal generada correctamente');
 
       state = state.copyWith(
         isLoading: false,
@@ -190,12 +199,19 @@ class UserManagement extends _$UserManagement {
     required String userId,
     required Map<String, dynamic> updates,
   }) async {
+    final currentUser = ref.read(currentUserProvider).valueOrNull;
+    if (currentUser == null || currentUser.role != UserRole.admin) {
+      throw Exception(
+          'Sin permisos: solo administradores pueden actualizar empleados');
+    }
+
     state = state.copyWith(isLoading: true, error: null);
 
     try {
       debugPrint('🔄 Actualizando empleado: $userId');
       debugPrint('📝 Campos a actualizar: ${updates.keys.join(", ")}');
 
+      // TODO: Move to UserService
       final firestore = ref.read(firestoreProvider);
       await firestore.collection('users').doc(userId).update(updates);
 

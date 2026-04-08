@@ -8,6 +8,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
 import 'app.dart';
+import 'core/providers/theme_provider.dart';
 
 /// Punto de entrada de la aplicación Control Horario
 ///
@@ -32,7 +33,7 @@ void main() async {
   // ============================================================================
   // INICIALIZAR SHARED PREFERENCES (para persistencia de tema)
   // ============================================================================
-  await SharedPreferences.getInstance(); // Pre-cache para mejor performance
+  final prefs = await SharedPreferences.getInstance();
 
   // ============================================================================
   // PRE-CARGAR GOOGLE FONTS
@@ -92,8 +93,15 @@ void main() async {
   // INICIALIZAR APP CON RIVERPOD
   // ============================================================================
   runApp(
-    // ProviderScope de Riverpod para state management global
-    const ProviderScope(child: ControlHorarioApp()),
+    // ProviderScope de Riverpod para state management global.
+    // Se inyecta la instancia pre-inicializada de SharedPreferences para que
+    // ThemeNotifier pueda leer el tema guardado de forma síncrona (sin flash).
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+      child: const ControlHorarioApp(),
+    ),
   );
 }
 

@@ -270,6 +270,10 @@ class AppColorsDark {
   // SIDEBAR COLORS (Navegación lateral)
   // ============================================================================
 
+  /// Color del ícono/texto del item de navegación seleccionado en dark mode
+  /// Cyan brillante (#22D3EE) = secondary400
+  static const Color navItemSelectedIcon = secondary400;
+
   /// Fondo del sidebar - Navy casi negro
   static const Color sidebarBackground = Color(
     0xFF000414,

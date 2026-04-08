@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../../features/admin/models/schedule_model.dart';
 
 /// Servicio para operaciones CRUD de plantillas de horario en Firestore
@@ -43,6 +44,9 @@ class ScheduleService {
       templates.sort((a, b) => a.name.compareTo(b.name));
 
       return templates;
+    }).handleError((Object error, StackTrace stackTrace) {
+      debugPrint('ScheduleService.watchActiveTemplates error: $error');
+      throw error;
     });
   }
 
@@ -55,7 +59,12 @@ class ScheduleService {
         .collection('schedules')
         .doc(scheduleId)
         .snapshots()
-        .map((doc) => doc.exists ? ScheduleModel.fromFirestore(doc) : null);
+        .map((doc) => doc.exists ? ScheduleModel.fromFirestore(doc) : null)
+        .handleError((Object error, StackTrace stackTrace) {
+      debugPrint(
+          'ScheduleService.watchScheduleById error [$scheduleId]: $error');
+      throw error;
+    });
   }
 
   /// Obtener plantilla (una sola vez, sin stream)
@@ -162,9 +171,25 @@ class ScheduleService {
   ///
   /// Se llama cuando un empleado deja de usar la plantilla
   /// (cambia a otra plantilla o a horario custom).
+  ///
+  /// Usa una transacción Firestore para evitar que el contador baje de 0.
+  /// Lanza [Exception] si el contador ya es 0.
   Future<void> decrementUsageCount(String scheduleId) async {
-    await _db.collection('schedules').doc(scheduleId).update({
-      'usedByCount': FieldValue.increment(-1),
+    final docRef = _db.collection('schedules').doc(scheduleId);
+
+    await _db.runTransaction((transaction) async {
+      final doc = await transaction.get(docRef);
+
+      if (!doc.exists) {
+        throw Exception('Plantilla no encontrada: $scheduleId');
+      }
+
+      final currentCount = (doc.data()?['usedByCount'] as int?) ?? 0;
+      if (currentCount <= 0) {
+        throw Exception('usedByCount is already 0 for schedule $scheduleId');
+      }
+
+      transaction.update(docRef, {'usedByCount': FieldValue.increment(-1)});
     });
   }
 

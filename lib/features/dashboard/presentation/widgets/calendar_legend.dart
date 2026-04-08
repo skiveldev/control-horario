@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -25,7 +26,7 @@ class CalendarLegend extends StatelessWidget {
         ),
         _buildLegendItem(
           context: context,
-          color: const Color(0xFFEC4899), // Rosa
+          color: AppColors.vacation,
           label: 'Vacaciones',
           icon: Icons.beach_access,
         ),

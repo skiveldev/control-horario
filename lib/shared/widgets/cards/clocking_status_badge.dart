@@ -122,15 +122,10 @@ class ClockingStatusBadge extends StatelessWidget {
 
       case ClockingStatus.incomplete:
         return {
-          'backgroundColor': isDark
-              ? AppColors.clockingIncomplete.withValues(alpha: 0.1)
-              : AppColors.clockingIncomplete.withValues(alpha: 0.1),
-          'textColor': isDark
-              ? AppColors.clockingIncomplete
-              : AppColors.clockingIncomplete,
-          'borderColor': isDark
-              ? AppColors.clockingIncomplete.withValues(alpha: 0.2)
-              : AppColors.clockingIncomplete.withValues(alpha: 0.2),
+          'backgroundColor':
+              AppColors.clockingIncomplete.withValues(alpha: 0.1),
+          'textColor': AppColors.clockingIncomplete,
+          'borderColor': AppColors.clockingIncomplete.withValues(alpha: 0.2),
           'icon': Icons.warning_rounded,
           'text': 'Incompleto',
           'tooltip': 'Fichaje sin cierre registrado',
@@ -138,15 +133,10 @@ class ClockingStatusBadge extends StatelessWidget {
 
       case ClockingStatus.autoClosed:
         return {
-          'backgroundColor': isDark
-              ? AppColors.clockingAutoClosed.withValues(alpha: 0.1)
-              : AppColors.clockingAutoClosed.withValues(alpha: 0.1),
-          'textColor': isDark
-              ? AppColors.clockingAutoClosed
-              : AppColors.clockingAutoClosed,
-          'borderColor': isDark
-              ? AppColors.clockingAutoClosed.withValues(alpha: 0.2)
-              : AppColors.clockingAutoClosed.withValues(alpha: 0.2),
+          'backgroundColor':
+              AppColors.clockingAutoClosed.withValues(alpha: 0.1),
+          'textColor': AppColors.clockingAutoClosed,
+          'borderColor': AppColors.clockingAutoClosed.withValues(alpha: 0.2),
           'icon': Icons.settings_rounded,
           'text': 'Auto-cerrado',
           'tooltip': 'Cierre automático por sistema',
@@ -154,14 +144,9 @@ class ClockingStatusBadge extends StatelessWidget {
 
       case ClockingStatus.edited:
         return {
-          'backgroundColor': isDark
-              ? AppColors.clockingEdited.withValues(alpha: 0.1)
-              : AppColors.clockingEdited.withValues(alpha: 0.1),
-          'textColor':
-              isDark ? AppColors.clockingEdited : AppColors.clockingEdited,
-          'borderColor': isDark
-              ? AppColors.clockingEdited.withValues(alpha: 0.2)
-              : AppColors.clockingEdited.withValues(alpha: 0.2),
+          'backgroundColor': AppColors.clockingEdited.withValues(alpha: 0.1),
+          'textColor': AppColors.clockingEdited,
+          'borderColor': AppColors.clockingEdited.withValues(alpha: 0.2),
           'icon': Icons.edit_rounded,
           'text': 'Editado',
           'tooltip': 'Registro modificado manualmente',
@@ -169,14 +154,9 @@ class ClockingStatusBadge extends StatelessWidget {
 
       case ClockingStatus.ongoing:
         return {
-          'backgroundColor': isDark
-              ? AppColors.clockingOnBreak.withValues(alpha: 0.1)
-              : AppColors.clockingOnBreak.withValues(alpha: 0.1),
-          'textColor':
-              isDark ? AppColors.clockingOnBreak : AppColors.clockingOnBreak,
-          'borderColor': isDark
-              ? AppColors.clockingOnBreak.withValues(alpha: 0.2)
-              : AppColors.clockingOnBreak.withValues(alpha: 0.2),
+          'backgroundColor': AppColors.clockingOnBreak.withValues(alpha: 0.1),
+          'textColor': AppColors.clockingOnBreak,
+          'borderColor': AppColors.clockingOnBreak.withValues(alpha: 0.2),
           'icon': Icons.access_time_rounded,
           'text': 'En curso',
           'tooltip': null,

@@ -204,7 +204,7 @@ class CustomButton extends StatelessWidget {
       isDisabled,
       gradient: AppGradients.buttonBrand,
       glowShadow: AppShadows.buttonBrandGlow,
-      textColor: Colors.white,
+      textColor: AppColors.textOnPrimary,
     );
   }
 
@@ -213,7 +213,7 @@ class CustomButton extends StatelessWidget {
     bool isDisabled, {
     required LinearGradient gradient,
     required List<BoxShadow> glowShadow,
-    Color textColor = Colors.white,
+    Color textColor = AppColors.textOnPrimary,
   }) {
     return Material(
       color: Colors.transparent,
@@ -346,7 +346,7 @@ class CustomButton extends StatelessWidget {
       isDisabled,
       gradient: AppGradients.buttonInfo,
       glowShadow: AppShadows.buttonInfoGlow,
-      textColor: Colors.white,
+      textColor: AppColors.textOnPrimary,
     );
   }
 
@@ -356,7 +356,7 @@ class CustomButton extends StatelessWidget {
       isDisabled,
       gradient: AppGradients.buttonDanger,
       glowShadow: AppShadows.buttonDangerGlow,
-      textColor: Colors.white,
+      textColor: AppColors.textOnPrimary,
     );
   }
 
@@ -366,7 +366,7 @@ class CustomButton extends StatelessWidget {
       isDisabled,
       gradient: AppGradients.buttonWarning,
       glowShadow: AppShadows.buttonWarningGlow,
-      textColor: Colors.white,
+      textColor: AppColors.textOnPrimary,
     );
   }
 
@@ -486,7 +486,7 @@ class CustomButton extends StatelessWidget {
       case ButtonVariant.success:
       case ButtonVariant.danger:
       case ButtonVariant.warning:
-        return Colors.white;
+        return AppColors.textOnPrimary;
       case ButtonVariant.secondary:
         return AppColors.textPrimary;
       case ButtonVariant.text:

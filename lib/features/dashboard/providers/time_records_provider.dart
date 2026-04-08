@@ -1,4 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../auth/models/user_model.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../models/time_record_model.dart';
 import '../services/time_records_service.dart';
 
@@ -113,6 +115,11 @@ class TimeRecordsNotifier extends _$TimeRecordsNotifier {
     String recordId,
     String validatedBy,
   ) async {
+    final user = ref.read(currentUserProvider).valueOrNull;
+    if (user == null || user.role != UserRole.admin) {
+      throw Exception(
+          'Sin permisos: solo administradores pueden realizar esta acción');
+    }
     final service = ref.read(timeRecordsServiceProvider);
     await service.validateRecord(userId, recordId, validatedBy);
   }
@@ -124,12 +131,22 @@ class TimeRecordsNotifier extends _$TimeRecordsNotifier {
     String blockedBy, {
     String? reason,
   }) async {
+    final user = ref.read(currentUserProvider).valueOrNull;
+    if (user == null || user.role != UserRole.admin) {
+      throw Exception(
+          'Sin permisos: solo administradores pueden realizar esta acción');
+    }
     final service = ref.read(timeRecordsServiceProvider);
     await service.blockRecord(userId, recordId, blockedBy, reason: reason);
   }
 
   /// Desbloquear un registro (solo admin)
   Future<void> unblockRecord(String userId, String recordId) async {
+    final user = ref.read(currentUserProvider).valueOrNull;
+    if (user == null || user.role != UserRole.admin) {
+      throw Exception(
+          'Sin permisos: solo administradores pueden realizar esta acción');
+    }
     final service = ref.read(timeRecordsServiceProvider);
     await service.unblockRecord(userId, recordId);
   }

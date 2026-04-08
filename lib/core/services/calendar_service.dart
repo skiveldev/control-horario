@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../../features/admin/models/work_calendar_model.dart';
 import '../../features/admin/models/calendar_event_model.dart';
 
@@ -41,6 +42,9 @@ class CalendarService {
       calendars.sort((a, b) => a.name.compareTo(b.name));
 
       return calendars;
+    }).handleError((Object error, StackTrace stackTrace) {
+      debugPrint('CalendarService.watchActiveCalendars error: $error');
+      throw error;
     });
   }
 
@@ -52,7 +56,12 @@ class CalendarService {
         .collection('calendars')
         .doc(calendarId)
         .snapshots()
-        .map((doc) => doc.exists ? WorkCalendarModel.fromFirestore(doc) : null);
+        .map((doc) => doc.exists ? WorkCalendarModel.fromFirestore(doc) : null)
+        .handleError((Object error, StackTrace stackTrace) {
+      debugPrint(
+          'CalendarService.watchCalendarById error [$calendarId]: $error');
+      throw error;
+    });
   }
 
   /// Obtener calendario (una sola vez, sin stream)

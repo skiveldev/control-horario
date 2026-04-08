@@ -39,6 +39,9 @@ class MetricCard extends StatelessWidget {
   /// Color del badge (verde para positivo, rojo para negativo)
   final Color? badgeColor;
 
+  /// Progreso de la barra (0.0 – 1.0). Si es null, la barra no se muestra.
+  final double? progress;
+
   /// Callback al hacer tap
   final VoidCallback? onTap;
 
@@ -50,6 +53,7 @@ class MetricCard extends StatelessWidget {
     required this.color,
     this.badgeText,
     this.badgeColor,
+    this.progress,
     this.onTap,
   });
 
@@ -123,25 +127,27 @@ class MetricCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
 
-              // Barra de progreso sutil (opcional)
-              AppSpacing.verticalSpaceSm,
-              Container(
-                height: 3,
-                decoration: BoxDecoration(
-                  color: AppColors.border,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-                child: FractionallySizedBox(
-                  alignment: Alignment.centerLeft,
-                  widthFactor: 0.7, // TODO: Hacer dinámico en Fase 2
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(2),
+              // Barra de progreso sutil (solo si se proporciona progress)
+              if (progress != null) ...[
+                AppSpacing.verticalSpaceSm,
+                Container(
+                  height: 3,
+                  decoration: BoxDecoration(
+                    color: AppColors.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                  child: FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: progress!.clamp(0.0, 1.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ],
           ),
         ),

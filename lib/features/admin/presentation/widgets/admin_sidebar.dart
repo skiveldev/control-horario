@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/router/app_router.dart';
+import '../../../auth/providers/auth_provider.dart';
 
 /// Sidebar de navegación del panel administrador
 ///
@@ -18,7 +19,7 @@ import '../../../../core/router/app_router.dart';
 ///   currentRoute: AppRouter.admin,
 /// )
 /// ```
-class AdminSidebar extends StatelessWidget {
+class AdminSidebar extends ConsumerWidget {
   /// Ruta actual para marcar el item activo
   final String? currentRoute;
 
@@ -28,7 +29,7 @@ class AdminSidebar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       color: AppColors.surface,
       child: Column(
@@ -108,7 +109,7 @@ class AdminSidebar extends StatelessWidget {
           ),
 
           // Botón de cerrar sesión
-          _buildLogoutButton(context),
+          _buildLogoutButton(context, ref),
         ],
       ),
     );
@@ -151,7 +152,7 @@ class AdminSidebar extends StatelessWidget {
     );
   }
 
-  Widget _buildLogoutButton(BuildContext context) {
+  Widget _buildLogoutButton(BuildContext context, WidgetRef ref) {
     return Container(
       padding: AppSpacing.allLg,
       decoration: BoxDecoration(
@@ -166,8 +167,7 @@ class AdminSidebar extends StatelessWidget {
         width: double.infinity,
         child: OutlinedButton.icon(
           onPressed: () async {
-            // Cerrar sesión de Firebase
-            await FirebaseAuth.instance.signOut();
+            await ref.read(authNotifierProvider.notifier).signOut();
             if (context.mounted) {
               context.go(AppRouter.login);
             }
@@ -228,7 +228,7 @@ class _SidebarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: AppColors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: AppSpacing.borderRadiusSm,
@@ -240,7 +240,7 @@ class _SidebarItem extends StatelessWidget {
           decoration: BoxDecoration(
             color: isActive
                 ? AppColors.primary.withValues(alpha: 0.1)
-                : Colors.transparent,
+                : AppColors.transparent,
             borderRadius: AppSpacing.borderRadiusSm,
             border: isActive
                 ? Border(

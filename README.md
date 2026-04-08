@@ -8,7 +8,7 @@ Sistema de control horario para escuela de música con ~500 empleados.
 - **Usuarios**: 458 empleados (docentes y no docentes)
 - **Plataforma**: Web (Flutter) + Móvil (futuro)
 - **Backend**: Firebase (Auth + Firestore + Functions + Storage)
-- **Estado**: ✅ FASE 1 Completada | 🚧 FASE 2 Planificada
+- **Estado**: ✅ FASE 1 Completada | ✅ FASE 2 Completada | 🚧 FASE 3 Planificada
 
 ## 🎯 Objetivos del MVP
 
@@ -19,11 +19,13 @@ Sistema de control horario para escuela de música con ~500 empleados.
 - ✅ Calendario mensual de fichajes
 - ✅ Ver perfil personal
 
-### Rol Admin (Básico):
+### Rol Admin:
 - ✅ Crear/editar usuarios
 - ✅ Ver fichajes de empleados
 - ✅ Corregir fichajes manualmente
 - ✅ Lista de incidencias del día
+- ✅ Gestión de calendarios laborales
+- ✅ Gestión de plantillas de horarios
 
 ## 🏗️ Stack Tecnológico
 ```
@@ -43,7 +45,6 @@ Backend:
 
 Desarrollo:
 ├── Cursor IDE
-├── Claude AI (Asistente de desarrollo)
 ├── Firebase Emulator Suite (Testing local)
 └── Git + GitHub
 ```
@@ -56,7 +57,7 @@ Desarrollo:
 
 ## 🛡️ Sistema de Calidad de Código
 
-Este proyecto cuenta con **3 capas de protección** para garantizar código de alta calidad:
+Este proyecto cuenta con **4 capas de protección** para garantizar código de alta calidad:
 
 ### 1. Linter Estricto (`analysis_options.yaml`)
 - ✅ Detecta errores mientras escribes en tu IDE
@@ -80,6 +81,11 @@ git config core.hooksPath .githooks
 
 **Ver estado:** [github.com/TU_REPO/actions](https://github.com)
 
+### 4. Revisión Adversarial (Judgment Day)
+- ✅ Revisión de código por dos jueces independientes en paralelo
+- ✅ Detecta bugs, vulnerabilidades y violaciones de arquitectura
+- ✅ Ejecutado sobre todos los módulos del proyecto (4 targets, múltiples rondas)
+
 📖 **Documentación completa:**
 - [📋 Guía Rápida](SETUP_COMPLETO.md) - Resumen ejecutivo
 - [📚 Documentación Detallada](docs/QUALITY_SETUP.md) - Sistema completo
@@ -94,20 +100,21 @@ control_horario/
 │   ├── app.dart
 │   │
 │   ├── core/                    # Configuración global
-│   │   ├── theme/              # Sistema de diseño
+│   │   ├── theme/              # Sistema de diseño (AppColors, AppTextStyles)
 │   │   ├── constants/          # Constantes
-│   │   └── router/             # Navegación
+│   │   ├── providers/          # Providers globales (theme, SharedPreferences)
+│   │   └── router/             # Navegación (GoRouter + AuthNotifier)
 │   │
 │   ├── features/               # Features por módulo
-│   │   ├── auth/
-│   │   ├── dashboard/
-│   │   └── admin/
+│   │   ├── auth/               # Login, modelos de usuario, providers
+│   │   ├── dashboard/          # Fichaje, historial, calendario empleado
+│   │   └── admin/              # Panel admin, empleados, calendarios, horarios
 │   │
 │   ├── shared/                 # Componentes compartidos
-│   │   ├── widgets/
-│   │   └── utils/
+│   │   ├── widgets/            # 15+ widgets reutilizables
+│   │   └── utils/              # Utilidades (password_utils, etc.)
 │   │
-│   └── services/               # Servicios externos (Fase 2)
+│   └── services/               # Servicios externos (Fase 3)
 │
 ├── assets/                     # Imágenes, fuentes, etc
 ├── test/                       # Tests unitarios
@@ -120,6 +127,8 @@ control_horario/
 - **Primario**: Azul profundo (#1E3A8A) - Confianza
 - **Secundario**: Violeta (#7C3AED) - Creatividad
 - **Acento**: Coral (#FB923C) - Calidez
+- **Vacaciones**: Rosa (#EC4899)
+- **Gradiente login**: Cyan → Azul → Violeta
 
 ### Tipografía:
 - **Fuente**: Inter
@@ -151,7 +160,7 @@ cd control_horario
 flutter pub get
 ```
 
-3. **Configurar Firebase** (Fase 2)
+3. **Configurar Firebase**
 ```bash
 # Seguir instrucciones en docs/firebase-setup.md
 ```
@@ -164,7 +173,7 @@ flutter run -d chrome
 ## 📅 Roadmap de Desarrollo
 
 ### ✅ Fase 1: UI/UX (COMPLETADO)
-- [x] Sistema de Theme completo
+- [x] Sistema de Theme completo (light + dark)
 - [x] 15+ Widgets reutilizables
 - [x] 8 Pantallas implementadas
 - [x] Navegación con go_router
@@ -176,33 +185,33 @@ flutter run -d chrome
 
 ---
 
-### 🚧 Fase 2: Backend + Lógica (PLANIFICADO - 6 semanas)
+### ✅ Fase 2: Backend + Lógica (COMPLETADO)
 **Objetivo**: Reemplazar datos mock con Firebase funcional
 
-**Sprint 1: MVP - Core Básico** (Semana 1)
-- [ ] Configurar Firebase (Auth + Firestore)
-- [ ] Login funcional con Firebase Auth
-- [ ] Sistema de fichaje básico (Entrada/Salida)
-- [ ] Dashboard con datos reales
+**Sprint 1: MVP - Core Básico** ✅
+- [x] Configurar Firebase (Auth + Firestore)
+- [x] Login funcional con Firebase Auth
+- [x] Sistema de fichaje básico (Entrada/Salida)
+- [x] Dashboard con datos reales
 
-**Sprint 2: Pausas + Validaciones** (Semana 2)
-- [ ] Sistema de 1 pausa por día
-- [ ] Máquina de estados (deshabilitar botones)
-- [ ] Cálculo de horas trabajadas
-- [ ] Validación de salida anticipada
+**Sprint 2: Pausas + Validaciones** ✅
+- [x] Sistema de 1 pausa por día
+- [x] Máquina de estados (deshabilitar botones según estado)
+- [x] Cálculo de horas trabajadas en tiempo real
+- [x] Validación de salida anticipada
 
-**Sprint 3: Panel Admin** (Semana 3)
-- [ ] Lista de 458 empleados
-- [ ] Admin puede corregir fichajes
-- [ ] Historial de ediciones
-- [ ] Panel de anomalías
+**Sprint 3: Panel Admin** ✅
+- [x] Lista de 458 empleados con búsqueda y filtros
+- [x] Admin puede corregir fichajes manualmente
+- [x] Gestión de calendarios laborales y festivos
+- [x] Gestión de plantillas de horarios
 
-**Sprint 4: Automatización** (Semana 4)
-- [ ] Cierre automático de fichajes (Cloud Function)
+**Sprint 4: Automatización** 🚧
+- [ ] Cierre automático de fichajes (Cloud Function — requiere plan Blaze)
 - [ ] Detección de horas extras (Cloud Function)
 - [ ] Sistema de aprobación (RRHH/Admin)
 
-**Sprint 5: Reportes** (Semana 5)
+**Sprint 5: Reportes** 🚧
 - [ ] Generación de reportes mensuales
 - [ ] Exportación a PDF
 - [ ] Archivado automático (>3 meses → Cloud Storage)
@@ -212,9 +221,28 @@ flutter run -d chrome
 
 ---
 
-### 🚀 Fase 3: Deploy & Testing (FUTURO)
+### 🔍 Revisión de Calidad: Judgment Day (COMPLETADO)
+
+Revisión adversarial completa sobre todos los módulos del proyecto:
+
+| Target | Issues resueltos | Highlights |
+|--------|-----------------|------------|
+| Core Services + Router | 8 fixes | AdminSessionException, race condition auth guard, streams |
+| Models + Serialización | 13 fixes | Null-safe casts, Timestamp serialization, enum helpers |
+| Providers / Estado | 12 fixes | Role checks en admin, DI correcto, ClockingState.loading |
+| Shared + Auth UI | 30 fixes | mounted checks, Flexible, AppColors, password_utils.dart |
+| Dashboard UI | 32 fixes | Text overflow, hex colors, business logic, context shadows |
+| Admin UI | 28 fixes | FirebaseAuth directo, tipos dinámicos, AppColors.transparent |
+
+**Nuevas constantes**: `AppColors.vacation`, `AppColors.gradientStart/Mid/End`, `AppColors.transparent`, `AppColorsDark.navItemSelectedIcon`  
+**Nuevo archivo**: `lib/shared/utils/password_utils.dart`
+
+---
+
+### 🚀 Fase 3: Deploy & Testing (PLANIFICADO)
 - Testing completo (>70% cobertura)
 - Deploy a Firebase Hosting
+- Cloud Functions en plan Blaze (cierre automático, horas extras)
 - Monitoreo y alertas
 - Capacitación usuarios
 
@@ -245,6 +273,8 @@ Ver archivo `.cursorrules` para reglas detalladas.
 - Widgets < 300 líneas
 - Separar UI de lógica
 - Comentar TODOs para fases futuras
+- Todo `Text` en `Row`/`Column` debe estar en `Flexible` o `Expanded`
+- Colores siempre con `AppColors.*` — nunca `Colors.X` ni hex literales
 
 ## 🧪 Testing
 ```bash
@@ -287,9 +317,6 @@ Privado - Todos los derechos reservados
 
 ---
 
-**Versión**: 1.0.0
----
-
 ## 📚 Documentación del Proyecto
 
 ### Estado Actual
@@ -304,5 +331,6 @@ Privado - Todos los derechos reservados
 
 ---
 
-**Última actualización**: Noviembre 2025
-**Estado**: En desarrollo - Fase 1
+**Versión**: 2.0.0  
+**Última actualización**: Abril 2026  
+**Estado**: Fase 2 completada — Revisión de calidad ejecutada

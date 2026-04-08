@@ -100,10 +100,10 @@ class MobileDrawer extends ConsumerWidget {
           // Avatar
           CircleAvatar(
             radius: 32,
-            backgroundColor: Colors.white.withValues(alpha: 0.2),
+            backgroundColor: AppColors.textOnPrimary.withValues(alpha: 0.2),
             child: Text(
               'MG',
-              style: AppTextStyles.h4.copyWith(color: Colors.white),
+              style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
             ),
           ),
 
@@ -113,7 +113,7 @@ class MobileDrawer extends ConsumerWidget {
           Text(
             'María García López', // TODO [FASE-2]: Conectar con user provider
             style: AppTextStyles.h5.copyWith(
-              color: Colors.white,
+              color: AppColors.textOnPrimary,
               fontWeight: FontWeight.w600,
             ),
             maxLines: 2, // Permitir 2 líneas para nombres largos
@@ -147,12 +147,12 @@ class MobileDrawer extends ConsumerWidget {
         child: ListTile(
           leading: Icon(
             item.icon,
-            color: const Color(0xFF22D3EE), // Cyan brillante
+            color: AppColorsDark.navItemSelectedIcon,
           ),
           title: Text(
             item.label,
             style: AppTextStyles.bodyMedium.copyWith(
-              color: const Color(0xFF22D3EE), // Cyan brillante
+              color: AppColorsDark.navItemSelectedIcon,
               fontWeight: FontWeight.w600,
             ),
           ),

@@ -118,6 +118,9 @@ class AppColors {
   // SPECIAL STATES (Interacciones)
   // ============================================================================
 
+  /// Completamente transparente
+  static const Color transparent = Color(0x00000000);
+
   /// Overlay para hover states
   static const Color hover = Color(0x0F000000); // 6% opacity black
 
@@ -156,6 +159,19 @@ class AppColors {
   );
 
   // ============================================================================
+  // LOGIN GRADIENT COLORS (Panel informativo del login)
+  // ============================================================================
+
+  /// Inicio del gradiente del panel login - Turquesa #00BCD4
+  static const Color gradientStart = Color(0xFF00BCD4);
+
+  /// Punto medio del gradiente del panel login - Azul #2196F3
+  static const Color gradientMid = Color(0xFF2196F3);
+
+  /// Fin del gradiente del panel login - Violeta (alias de secondary)
+  static const Color gradientEnd = secondary;
+
+  // ============================================================================
   // GLASSMORPHISM SUPPORT (Para efectos de vidrio)
   // ============================================================================
 
@@ -170,6 +186,13 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
+
+  // ============================================================================
+  // CALENDAR SPECIAL COLORS
+  // ============================================================================
+
+  /// Rosa para días de vacaciones #EC4899
+  static const Color vacation = Color(0xFFEC4899);
 
   // ============================================================================
   // CLOCKING STATUS COLORS (Estados de fichaje - Semántica)

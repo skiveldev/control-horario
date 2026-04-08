@@ -5,6 +5,7 @@ import '../../../core/services/firebase_service.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../models/time_record_model.dart';
 import '../services/time_records_service.dart';
+import 'time_records_provider.dart';
 
 part 'clocking_provider.g.dart';
 
@@ -56,7 +57,7 @@ Stream<List<TimeRecordModel>> todayRecords(TodayRecordsRef ref) async* {
   }
 
   final today = DateTime.now();
-  final timeRecordsService = TimeRecordsService();
+  final timeRecordsService = ref.watch(timeRecordsServiceProvider);
 
   yield* timeRecordsService.getDayRecords(user.userId, today);
 }
@@ -128,7 +129,7 @@ class ClockingNotifier extends _$ClockingNotifier {
       if (user == null) throw Exception('Usuario no autenticado');
 
       final now = DateTime.now();
-      final timeRecordsService = TimeRecordsService();
+      final timeRecordsService = ref.read(timeRecordsServiceProvider);
 
       // ✨ VALIDACIÓN: Verificar que NO haya registros activos
       debugPrint('🔍 [clockIn] Verificando registros existentes...');
@@ -169,8 +170,26 @@ class ClockingNotifier extends _$ClockingNotifier {
         validationStatus: ValidationStatus.editable,
       );
 
+      // TODO(CRITICAL): Envolver en transacción Firestore para evitar fichajes
+      // duplicados en multi-tab. La verificación + creación no son atómicas.
       final recordId = await timeRecordsService.addRecord(workRecord);
       debugPrint('✅ [clockIn] Registro creado con ID: $recordId');
+
+      // Guardia compensatoria: verificar si se crearon duplicados por race condition
+      final postCreateRecords =
+          await timeRecordsService.getDayRecords(user.userId, now).first;
+      final postActiveRecords =
+          postCreateRecords.where((r) => r.isActive).toList();
+      if (postActiveRecords.length > 1) {
+        // Conservar el registro que acabamos de crear, eliminar los otros activos
+        for (final duplicate in postActiveRecords) {
+          if (duplicate.id != recordId) {
+            debugPrint(
+                '⚠️ [clockIn] Eliminando registro duplicado: ${duplicate.id}');
+            await timeRecordsService.deleteRecord(user.userId, duplicate.id);
+          }
+        }
+      }
 
       // Guardar ID del registro activo
       ref
@@ -200,7 +219,7 @@ class ClockingNotifier extends _$ClockingNotifier {
       if (user == null) throw Exception('Usuario no autenticado');
 
       final now = DateTime.now();
-      final timeRecordsService = TimeRecordsService();
+      final timeRecordsService = ref.read(timeRecordsServiceProvider);
 
       // Buscar registro activo usando recordStatus
       final todayRecords =
@@ -282,7 +301,7 @@ class ClockingNotifier extends _$ClockingNotifier {
       if (user == null) throw Exception('Usuario no autenticado');
 
       final now = DateTime.now();
-      final timeRecordsService = TimeRecordsService();
+      final timeRecordsService = ref.read(timeRecordsServiceProvider);
 
       // Buscar registro de pausa activo usando recordStatus
       final todayRecords =
@@ -358,7 +377,7 @@ class ClockingNotifier extends _$ClockingNotifier {
       if (user == null) throw Exception('Usuario no autenticado');
 
       final now = DateTime.now();
-      final timeRecordsService = TimeRecordsService();
+      final timeRecordsService = ref.read(timeRecordsServiceProvider);
 
       // Buscar registro activo usando recordStatus
       final todayRecords =

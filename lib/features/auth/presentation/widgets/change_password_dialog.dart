@@ -3,6 +3,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
+import '../../../../shared/utils/password_utils.dart';
 import '../../../../shared/widgets/inputs/custom_password_field.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
 
@@ -46,33 +47,6 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
     super.dispose();
   }
 
-  /// Calcula la fortaleza de la contraseña (0-4)
-  int _calculatePasswordStrength(String password) {
-    if (password.isEmpty) return 0;
-
-    int strength = 0;
-
-    // Longitud mínima
-    if (password.length >= 8) strength++;
-
-    // Contiene mayúsculas
-    if (password.contains(RegExp(r'[A-Z]'))) strength++;
-
-    // Contiene minúsculas
-    if (password.contains(RegExp(r'[a-z]'))) strength++;
-
-    // Contiene números
-    if (password.contains(RegExp(r'[0-9]'))) strength++;
-
-    // Contiene caracteres especiales
-    if (password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
-      strength++;
-    }
-
-    // Limitar a 4
-    return strength > 4 ? 4 : strength;
-  }
-
   /// Verifica si el formulario es válido para enviar
   bool get _isFormValid {
     // Campos no vacíos
@@ -83,7 +57,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
     }
 
     // Fortaleza mínima (al menos media = 2)
-    if (_calculatePasswordStrength(_newPassword) < 2) {
+    if (calculatePasswordStrength(_newPassword, minLength: 8) < 2) {
       return false;
     }
 

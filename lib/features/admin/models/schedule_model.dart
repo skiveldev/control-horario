@@ -60,10 +60,10 @@ class ScheduleModel with _$ScheduleModel {
       scheduleId: doc.id,
       name: data['name'] as String? ?? '',
       description: data['description'] as String? ?? '',
-      totalWeeklyHours: data['totalWeeklyHours'] as int? ?? 0,
+      totalWeeklyHours: (data['totalWeeklyHours'] as num?)?.toInt() ?? 0,
       isActive: data['isActive'] as bool? ?? true,
       isTemplate: data['isTemplate'] as bool? ?? true,
-      usedByCount: data['usedByCount'] as int? ?? 0,
+      usedByCount: (data['usedByCount'] as num?)?.toInt() ?? 0,
       weeklySchedule: weeklySchedule,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
       createdBy: data['createdBy'] as String?,
@@ -75,7 +75,6 @@ class ScheduleModel with _$ScheduleModel {
   /// Convertir a formato Firestore
   Map<String, dynamic> toFirestore() {
     return {
-      'scheduleId': scheduleId,
       'name': name,
       'description': description,
       'totalWeeklyHours': totalWeeklyHours,

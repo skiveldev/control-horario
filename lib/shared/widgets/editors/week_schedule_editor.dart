@@ -83,10 +83,12 @@ class _WeekScheduleEditorState extends State<WeekScheduleEditor> {
             children: [
               Icon(Icons.access_time, color: AppColors.primary, size: 20),
               AppSpacing.horizontalSpaceSm,
-              Text(
-                'Total: $_totalWeeklyHours horas semanales',
-                style:
-                    AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
+              Flexible(
+                child: Text(
+                  'Total: $_totalWeeklyHours horas semanales',
+                  style: AppTextStyles.labelLarge
+                      .copyWith(color: AppColors.primary),
+                ),
               ),
             ],
           ),
@@ -98,11 +100,12 @@ class _WeekScheduleEditorState extends State<WeekScheduleEditor> {
         Expanded(
           child: ListView.separated(
             itemCount: days.length,
-            separatorBuilder: (_, __) => Divider(height: 1),
+            separatorBuilder: (_, __) => const Divider(height: 1),
             itemBuilder: (context, index) {
               final dayKey = days[index];
               final dayName = _getDayName(dayKey);
-              final daySchedule = _schedule[dayKey]!;
+              final daySchedule = _schedule[dayKey];
+              if (daySchedule == null) return const SizedBox.shrink();
               final isWeekend = dayKey == 'saturday' || dayKey == 'sunday';
 
               return ExpansionTile(
@@ -345,14 +348,17 @@ class _WeekScheduleEditorState extends State<WeekScheduleEditor> {
       },
     );
 
-    if (picked != null) {
+    if (picked != null && mounted) {
+      final currentShifts = _schedule[dayKey]?.shifts;
+      if (currentShifts == null || shiftIndex >= currentShifts.length) return;
       final timeString =
           '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
-      final shifts = List<TimeShift>.from(_schedule[dayKey]!.shifts);
-      shifts[shiftIndex] = isStart
-          ? TimeShift(startTime: timeString, endTime: shift.endTime)
-          : TimeShift(startTime: shift.startTime, endTime: timeString);
-      _updateDay(dayKey, shifts);
+      final currentShift = currentShifts[shiftIndex];
+      final updatedShifts = List<TimeShift>.from(currentShifts);
+      updatedShifts[shiftIndex] = isStart
+          ? TimeShift(startTime: timeString, endTime: currentShift.endTime)
+          : TimeShift(startTime: currentShift.startTime, endTime: timeString);
+      _updateDay(dayKey, updatedShifts);
     }
   }
 

@@ -260,8 +260,9 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
                               width: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor:
-                                    AlwaysStoppedAnimation(Colors.white),
+                                valueColor: AlwaysStoppedAnimation(
+                                  AppColors.textOnPrimary,
+                                ),
                               ),
                             )
                           : Text(isEdit
@@ -435,17 +436,23 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
           color: hasValidTimes ? AppColors.primary : AppColors.textTertiary,
         ),
         AppSpacing.horizontalSpaceSm,
-        Text(
-          'Duración estimada: ',
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.textSecondary,
+        Flexible(
+          child: Text(
+            'Duración estimada: ',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textSecondary,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
-        Text(
-          hasValidTimes ? _formatDuration(duration) : '--h --m',
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: hasValidTimes ? AppColors.primary : AppColors.textTertiary,
-            fontWeight: FontWeight.w600,
+        Flexible(
+          child: Text(
+            hasValidTimes ? _formatDuration(duration) : '--h --m',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: hasValidTimes ? AppColors.primary : AppColors.textTertiary,
+              fontWeight: FontWeight.w600,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
@@ -476,7 +483,9 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
                 color: AppColors.textSecondary,
               ),
               AppSpacing.horizontalSpaceSm,
-              Text(location),
+              Flexible(
+                child: Text(location, overflow: TextOverflow.ellipsis),
+              ),
             ],
           ),
         );
@@ -579,7 +588,8 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
       final record = TimeRecordModel(
         id: widget.recordToEdit?.id ??
             DateTime.now().millisecondsSinceEpoch.toString(),
-        userId: widget.recordToEdit?.userId ?? 'user123', // TODO: Get from auth
+        // TODO: This should never be null if auth is required
+        userId: widget.recordToEdit?.userId ?? '',
         date: _formatDate(widget.date),
         category: _selectedCategory,
         startTime: _formatTimeOfDay(_startTime!),
@@ -594,8 +604,8 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
         recordStatus: recordStatus, // ✅ Preservar estado si es edición
         createdAt: widget.recordToEdit?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
-        createdBy:
-            widget.recordToEdit?.createdBy ?? 'user123', // TODO: Get from auth
+        // TODO: This should never be null if auth is required
+        createdBy: widget.recordToEdit?.createdBy ?? '',
         isManual:
             widget.recordToEdit?.isManual ?? true, // Preservar si era manual
         validationStatus: widget.recordToEdit?.isValidated ?? false

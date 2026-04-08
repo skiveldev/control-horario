@@ -87,38 +87,21 @@ class UserModel with _$UserModel {
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
 
-    // Manejar createdAt que puede ser null o Timestamp
-    DateTime createdAtDate;
-    if (data['createdAt'] != null) {
-      createdAtDate = (data['createdAt'] as Timestamp).toDate();
-    } else {
-      // Si no existe, usar la fecha actual
-      createdAtDate = DateTime.now();
-    }
-
-    // Manejar fechaInicio que puede ser null o Timestamp
-    DateTime? fechaInicioDate;
-    if (data['fechaInicio'] != null) {
-      fechaInicioDate = (data['fechaInicio'] as Timestamp).toDate();
-    }
-
-    // Manejar fechaFin que puede ser null o Timestamp
-    DateTime? fechaFinDate;
-    if (data['fechaFin'] != null) {
-      fechaFinDate = (data['fechaFin'] as Timestamp).toDate();
-    }
+    final createdAtDate =
+        (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now();
+    final fechaInicioDate = (data['fechaInicio'] as Timestamp?)?.toDate();
+    final fechaFinDate = (data['fechaFin'] as Timestamp?)?.toDate();
 
     return UserModel(
       userId: doc.id,
       employeeId: data['employeeId'] ?? '',
       email: data['email'] ?? '',
       displayName: data['displayName'] ?? '',
-      role: UserRole.values.byName(data['role'] ?? 'employee'),
+      role: _roleFromString(data['role'] as String?),
       weeklyHours: (data['weeklyHours'] ?? 40).toDouble(),
       isActive: data['isActive'] ?? true,
       createdAt: createdAtDate,
 
-      // Información personal
       // Compatibilidad con múltiples formatos de nombres de campos
       nombre: data['nombre'] as String? ?? data['Nombre'] as String?,
       apellido1: data['apellido1'] as String? ??
@@ -130,7 +113,6 @@ class UserModel with _$UserModel {
       dni: data['dni'] as String? ?? data['DNI/NIE'] as String?,
       telefono: data['telefono'] as String? ?? data['Telefono'] as String?,
 
-      // Información laboral
       // Compatibilidad con campos en español (usuarios antiguos) e inglés (usuarios nuevos)
       position: data['position'] as String? ??
           data['Cargo/Puesto'] as String? ??
@@ -140,7 +122,6 @@ class UserModel with _$UserModel {
           data['departamento'] as String?,
       empresa: data['empresa'] as String? ?? data['Empresa'] as String?,
 
-      // Control horario
       scheduleId: data['scheduleId'] as String?,
       scheduleType: data['scheduleType'] as String? ?? 'template',
       customSchedule: data['customSchedule'] as Map<String, dynamic>?,
@@ -151,6 +132,46 @@ class UserModel with _$UserModel {
       // DEPRECATED: Mantener por compatibilidad
       schedule: data['schedule'] as String?,
     );
+  }
+
+  /// Serializar a Map para guardar en Firestore.
+  ///
+  /// Convierte DateTime → Timestamp para todos los campos de fecha,
+  /// usando las mismas claves literales que fromFirestore.
+  Map<String, dynamic> toFirestore() {
+    return {
+      'employeeId': employeeId,
+      'email': email,
+      'displayName': displayName,
+      'role': role.name,
+      'weeklyHours': weeklyHours,
+      'isActive': isActive,
+      'createdAt': Timestamp.fromDate(createdAt),
+      if (nombre != null) 'nombre': nombre,
+      if (apellido1 != null) 'apellido1': apellido1,
+      if (apellido2 != null) 'apellido2': apellido2,
+      if (dni != null) 'dni': dni,
+      if (telefono != null) 'telefono': telefono,
+      if (position != null) 'position': position,
+      if (department != null) 'department': department,
+      if (empresa != null) 'empresa': empresa,
+      if (scheduleId != null) 'scheduleId': scheduleId,
+      'scheduleType': scheduleType,
+      if (customSchedule != null) 'customSchedule': customSchedule,
+      if (calendarId != null) 'calendarId': calendarId,
+      if (fechaInicio != null) 'fechaInicio': Timestamp.fromDate(fechaInicio!),
+      if (fechaFin != null) 'fechaFin': Timestamp.fromDate(fechaFin!),
+      if (schedule != null) 'schedule': schedule,
+    };
+  }
+}
+
+/// Convierte un string de Firestore al enum UserRole con fallback seguro.
+UserRole _roleFromString(String? value) {
+  try {
+    return UserRole.values.byName(value ?? 'employee');
+  } catch (_) {
+    return UserRole.employee;
   }
 }
 
