@@ -1,0 +1,30 @@
+{
+  "name": "control_horario",
+  "version": "1.0.0",
+  "description": "Sistema de control horario para escuela de música con ~500 empleados.",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test:firestore-rules": "firebase emulators:exec --only firestore \"node --test test/firestore/firestore_rules.test.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skiveldev/control-horario.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/skiveldev/control-horario/issues"
+  },
+  "homepage": "https://github.com/skiveldev/control-horario#readme",
+  "private": true,
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.0",
+    "firebase": "^12.12.0"
+  }
+}

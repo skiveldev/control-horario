@@ -7,6 +7,8 @@ import '../../../../core/constants/breakpoints.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
 import '../../../../shared/widgets/inputs/custom_text_field.dart';
 import '../../../auth/models/user_model.dart';
+import 'supervisor_assignment_field.dart';
+import '../../providers/supervisors_provider.dart';
 import '../../providers/user_management_provider.dart';
 import '../../providers/schedule_management_provider.dart';
 import '../../providers/calendar_management_provider.dart';
@@ -83,6 +85,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
   DateTime? _fechaFin;
   String? _selectedScheduleId;
   String? _selectedCalendarId;
+  String? _selectedSupervisorId;
   bool _isActive = true;
   final _weeklyHoursController = TextEditingController();
 
@@ -215,6 +218,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
   Future<Map<String, String>?> _createEmployeeInFirebase() async {
     // Convertir role de String a UserRole
     UserRole role = UserRole.employee;
+    var isSupervisor = false;
     switch (_selectedRole) {
       case 'admin':
         role = UserRole.admin;
@@ -223,8 +227,9 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
         role = UserRole.rrhh;
         break;
       case 'supervisor':
-        // Supervisor maps to employee role (no dedicated UserRole.supervisor exists)
+        // Supervisor mantiene rol base empleado y habilita permiso adicional
         role = UserRole.employee;
+        isSupervisor = true;
         break;
       default:
         role = UserRole.employee;
@@ -259,6 +264,10 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                     : _cargoController.text.trim(),
                 departamento: _selectedDepartamento,
                 role: role,
+                isSupervisor: isSupervisor,
+                supervisorId:
+                    _selectedRole == 'admin' ? null : _selectedSupervisorId,
+                isActive: _isActive,
                 // ✅ Los 4 campos que faltaban
                 empresa: _empresaController.text.trim().isEmpty
                     ? null
@@ -476,6 +485,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
       _fechaFin = null;
       _selectedScheduleId = null;
       _selectedCalendarId = null;
+      _selectedSupervisorId = null;
       _weeklyHoursController.clear();
       _isActive = true;
       _errors.clear();
@@ -828,6 +838,8 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
             ),
           ],
         ),
+        AppSpacing.verticalSpaceMd,
+        _buildSupervisorSelector(),
       ],
     );
   }
@@ -1284,10 +1296,42 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
     );
   }
 
+  Widget _buildSupervisorSelector() {
+    final isAdminRole = _selectedRole == 'admin';
+
+    return Consumer(
+      builder: (context, ref, _) {
+        final supervisorsAsync = ref.watch(supervisorsProvider);
+
+        return SupervisorAssignmentField(
+          supervisorsAsync: supervisorsAsync,
+          selectedSupervisorId: _selectedSupervisorId,
+          enabled: !isAdminRole,
+          onChanged: isAdminRole
+              ? null
+              : (value) {
+                  setState(() => _selectedSupervisorId = value);
+                },
+          hintText:
+              isAdminRole ? 'No aplica para administradores' : 'Sin asignar',
+          helperText: isAdminRole
+              ? 'Los administradores no se asignan a un supervisor.'
+              : 'Opcional. Define quién supervisará los fichajes de este empleado.',
+          emptyText: 'No hay supervisores activos disponibles todavía.',
+        );
+      },
+    );
+  }
+
   Widget _buildRoleRadio(String value, String title, String description) {
     final isSelected = _selectedRole == value;
     return InkWell(
-      onTap: () => setState(() => _selectedRole = value),
+      onTap: () => setState(() {
+        _selectedRole = value;
+        if (value == 'admin') {
+          _selectedSupervisorId = null;
+        }
+      }),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(12),

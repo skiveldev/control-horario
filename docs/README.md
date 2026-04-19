@@ -23,6 +23,10 @@
 - [LIMITACION_CIERRE_SESION.md](features/LIMITACION_CIERRE_SESION.md) — Limitación conocida de cierre de sesión
 - [MVP_GESTION_HORARIOS.md](features/MVP_GESTION_HORARIOS.md) — MVP gestión de horarios
 - [UI_UX_FALTANTE_FASE2.md](features/UI_UX_FALTANTE_FASE2.md) — UI/UX pendiente Fase 2
+- [FIRESTORE_SUPERVISOR_SECURITY_2026-04.md](features/FIRESTORE_SUPERVISOR_SECURITY_2026-04.md) — Reglas Firestore, supervisor de equipo, tests y deuda conocida (abr 2026)
+- [SDD_SUPERVISOR_EQUIPO_SPEC.md](features/SDD_SUPERVISOR_EQUIPO_SPEC.md) — Especificación supervisor / equipo
+- [SDD_SUPERVISOR_EQUIPO_TASKS.md](features/SDD_SUPERVISOR_EQUIPO_TASKS.md) — Tareas del cambio
+- [SDD_SUPERVISOR_EQUIPO_VERIFY_REPORT.md](features/SDD_SUPERVISOR_EQUIPO_VERIFY_REPORT.md) — Informe de verificación
 
 ## Historial
 Todo el trabajo completado está en [archive/](archive/).

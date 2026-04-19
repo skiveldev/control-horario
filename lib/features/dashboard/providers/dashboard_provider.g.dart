@@ -6,7 +6,7 @@ part of 'dashboard_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$monthlyRecordsHash() => r'b4ad3ed97d38fdb31d0ccb72aeaa9050e7bcd053';
+String _$monthlyRecordsHash() => r'787fad227452957143bfe00053f2b354c130ec91';
 
 /// Provider para obtener registros del mes actual
 ///
@@ -31,7 +31,7 @@ final monthlyRecordsProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef MonthlyRecordsRef = AutoDisposeStreamProviderRef<List<TimeRecordModel>>;
-String _$todayTotalMinutesHash() => r'38fde3e66828f56d9a0924f8ff80bc91bdd34178';
+String _$todayTotalMinutesHash() => r'2ec4969403914c9212316eb6445935e652cf8ff9';
 
 /// Provider computado: Total de minutos trabajados hoy
 ///
@@ -97,7 +97,7 @@ final todayBreakMinutesProvider = AutoDisposeProvider<int>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TodayBreakMinutesRef = AutoDisposeProviderRef<int>;
-String _$todayClockInTimeHash() => r'b2d12cd54b867b513087ced689f3c312c5b2c4ed';
+String _$todayClockInTimeHash() => r'942f377eacda72b64898b5413549e39ddf025674';
 
 /// Provider computado: Hora de entrada de hoy
 ///

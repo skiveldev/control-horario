@@ -5,46 +5,99 @@ service cloud.firestore {
     // REGLAS DE PRODUCCIÓN - MVP Sprint 1.4
     // ========================================
     
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Helper global: Verificar si el usuario autenticado existe en /users
+    function requesterExists() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    // Helper global: Verificar si el usuario autenticado sigue activo
+    function requesterIsActive() {
+      return requesterExists() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isActive == true;
+    }
+
+    // Helper global: Verificar si el usuario autenticado es el propietario activo del path
+    function isActiveOwner(userId) {
+      return requesterIsActive() &&
+        request.auth.uid == userId;
+    }
+
     // Helper global: Verificar si el usuario tiene rol admin o rrhh
-    function isAdmin() {
-      return request.auth != null &&
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+    function isAdminOrRrhh() {
+      return requesterIsActive() &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'rrhh'];
+    }
+
+    // Helper global: Verificar si el usuario tiene rol admin estricto
+    function isAdminUser() {
+      return requesterIsActive() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Helper global: Verificar capacidad de supervisor
+    function isSupervisorUser() {
+      return requesterIsActive() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isSupervisor == true;
+    }
+
+    // Helper global: Verificar si el empleado pertenece al equipo del supervisor autenticado
+    // Solo concede acceso si el empleado target está activo (isActive == true).
+    function isSupervisorOfEmployee(employeeId) {
+      return isSupervisorUser() &&
+        exists(/databases/$(database)/documents/users/$(employeeId)) &&
+        get(/databases/$(database)/documents/users/$(employeeId)).data.supervisorId == request.auth.uid &&
+        get(/databases/$(database)/documents/users/$(employeeId)).data.isActive == true;
+    }
+
+    function isSafeSelfUserCreate(userId) {
+      return isSignedIn() &&
+        request.auth.uid == userId &&
+        request.resource.data.userId == userId &&
+        request.resource.data.role == 'employee' &&
+        request.resource.data.isSupervisor == false;
     }
     
     // Colección de usuarios
     match /users/{userId} {
       // Los usuarios pueden leer su propio documento
       // Admin y RRHH pueden leer todos los documentos
-      allow read: if request.auth != null && 
-                  (request.auth.uid == userId || isAdmin());
+      // Los supervisores pueden leer únicamente empleados activos de su propio equipo
+      allow read: if isSignedIn() &&
+                  (request.auth.uid == userId ||
+                   isAdminOrRrhh() ||
+                   (isSupervisorUser() &&
+                    resource.data.supervisorId == request.auth.uid &&
+                    resource.data.isActive == true));
       
-      // Solo admin y RRHH pueden crear usuarios (Sprint 1.4)
-      // WORKAROUND: Permitir que usuario cree su propio documento (para creación desde cliente)
-      // TODO [POST-MVP]: Mover a Cloud Function para mayor seguridad
-      allow create: if isAdmin() || 
-                    (request.auth != null && request.auth.uid == userId);
+      // Solo admin y RRHH pueden crear usuarios.
+      // Si el alta ocurre desde la propia sesión recién creada, limitarla a un
+      // perfil base sin privilegios para evitar escalado de rol/capacidad.
+      allow create: if isAdminOrRrhh() || isSafeSelfUserCreate(userId);
       
       // Solo admin y RRHH pueden actualizar usuarios (Sprint 1.4)
-      allow update: if isAdmin();
+      allow update: if isAdminOrRrhh();
       
       // No permitir eliminar usuarios (seguridad)
       allow delete: if false;
       
       // Subcolección de registros diarios
       match /daily_records/{recordId} {
-        // Los usuarios solo pueden leer sus propios registros
-        allow read: if request.auth != null && request.auth.uid == userId;
+        // Usar el userId del path permite que las consultas de lista
+        // sobre la subcolección funcionen sin exigir filtros redundantes.
+        allow read: if isActiveOwner(userId);
         
         // Los usuarios pueden crear nuevos registros
-        allow create: if request.auth != null 
-                      && request.auth.uid == userId
+        allow create: if isActiveOwner(userId)
                       && request.resource.data.userId == userId;
         
         // Los usuarios pueden actualizar sus propios registros
         // (solo para agregar hora de salida)
-        allow update: if request.auth != null 
-                      && request.auth.uid == userId
+        allow update: if isActiveOwner(userId)
                       && resource.data.userId == userId;
         
         // No permitir eliminar registros
@@ -53,40 +106,162 @@ service cloud.firestore {
       
       // Subcolección de registros de tiempo (Mi Control Horario)
       match /time_records/{recordId} {
-        // Helper: Verificar si el usuario tiene rol admin
-        function isAdmin() {
-          return exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-                 get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-        }
-        
         // Helper: Verificar si el registro está bloqueado
         function isBlocked() {
           return resource.data.validationStatus == 'blocked';
         }
+
+        // Helper: Verificar si el empleado mantiene su propio flujo de edición
+        function ownerKeepsAllowedValidationState() {
+          return request.resource.data.validationStatus != 'blocked' &&
+            (
+              request.resource.data.validationStatus == resource.data.validationStatus ||
+              (
+                resource.data.validationStatus == 'validated' &&
+                request.resource.data.validationStatus == 'modifiedAfterValidation'
+              )
+            );
+        }
+
+        // Helper: Verificar si el empleado no altera campos de auditoría de validación/bloqueo
+        function ownerKeepsAuditFields() {
+          return !request.resource.data.diff(resource.data).changedKeys()
+                   .hasAny(['validatedBy', 'validatedAt', 'blockedBy', 'blockedAt', 'blockReason']);
+        }
+
+        // Helper: Verificar que el empleado no altera campos de identidad/propiedad
+        function ownerKeepsIdentityFields() {
+          return request.resource.data.userId == resource.data.userId &&
+            request.resource.data.createdBy == resource.data.createdBy &&
+            request.resource.data.createdAt == resource.data.createdAt &&
+            !request.resource.data.diff(resource.data).changedKeys()
+              .hasAny(['userId', 'createdBy', 'createdAt']);
+        }
+
+        // Helper: Verificar que el cambio corresponde a una validación explícita
+        function isValidationOnlyUpdate() {
+          return request.resource.data.diff(resource.data).changedKeys()
+                   .hasOnly(['validationStatus', 'validatedBy', 'validatedAt', 'updatedAt']) &&
+            request.resource.data.validationStatus == 'validated' &&
+            request.resource.data.validatedBy == request.auth.uid &&
+            request.resource.data.validatedAt is timestamp;
+        }
+
+        // Helper: Verificar operación de bloqueo por admin
+        // Solo permite cambiar los campos de bloqueo y updatedAt.
+        function isBlockUpdate() {
+          return isAdminUser() &&
+            request.resource.data.validationStatus == 'blocked' &&
+            request.resource.data.blockedBy == request.auth.uid &&
+            request.resource.data.blockedAt is timestamp &&
+            request.resource.data.diff(resource.data).changedKeys()
+              .hasOnly(['validationStatus', 'blockedBy', 'blockedAt', 'blockReason', 'updatedAt']);
+        }
+
+        // Helper: Verificar operación de desbloqueo por admin
+        // Requiere que el registro esté bloqueado y que los campos de bloqueo sean eliminados.
+        function isUnblockUpdate() {
+          return isAdminUser() &&
+            resource.data.validationStatus == 'blocked' &&
+            request.resource.data.validationStatus == 'editable' &&
+            !request.resource.data.keys().hasAny(['blockedBy', 'blockedAt', 'blockReason']) &&
+            request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['validationStatus', 'blockedBy', 'blockedAt', 'blockReason', 'updatedAt']);
+        }
         
-        // Los usuarios pueden leer sus propios registros
-        allow read: if request.auth != null && request.auth.uid == userId;
+        // Basar la lectura en el userId del path evita permission-denied
+        // en queries sobre users/{userId}/time_records.
+        allow read: if requesterIsActive() &&
+                    (request.auth.uid == userId ||
+                     isAdminUser() ||
+                     isSupervisorOfEmployee(userId));
         
-        // Los usuarios pueden crear nuevos registros
-        allow create: if request.auth != null 
-                      && request.auth.uid == userId
+        // Los usuarios pueden crear nuevos registros.
+        // createdBy debe coincidir con el uid del creador.
+        // Los campos de auditoría de validación/bloqueo no pueden estar presentes al crear.
+        allow create: if isActiveOwner(userId)
                       && request.resource.data.userId == userId
-                      && request.resource.data.validationStatus == 'editable';
+                      && request.resource.data.createdBy == request.auth.uid
+                      && request.resource.data.validationStatus == 'editable'
+                      && !request.resource.data.keys().hasAny([
+                           'validatedBy', 'validatedAt',
+                           'blockedBy', 'blockedAt', 'blockReason'
+                         ]);
         
-        // Los usuarios pueden actualizar sus registros si no están bloqueados
-        allow update: if request.auth != null 
-                      && request.auth.uid == userId
-                      && resource.data.userId == userId
-                      && !isBlocked()
-                      // Solo admin puede cambiar validationStatus a blocked
-                      && (request.resource.data.validationStatus != 'blocked' || isAdmin());
+        // Los usuarios pueden actualizar sus registros si no están bloqueados.
+        // Admin puede bloquear/desbloquear independientemente del estado actual.
+        allow update: if requesterIsActive()
+                      && (
+                        // Edición normal y validación: no permitida si el registro está bloqueado
+                        (
+                          !isBlocked()
+                          && (
+                            (
+                              isActiveOwner(userId)
+                              && resource.data.userId == userId
+                              && ownerKeepsIdentityFields()
+                              && ownerKeepsAllowedValidationState()
+                              && ownerKeepsAuditFields()
+                            ) ||
+                            (
+                              (isAdminUser() || isSupervisorOfEmployee(userId))
+                              && isValidationOnlyUpdate()
+                            )
+                          )
+                        ) ||
+                        // Admin: bloquear (puede aplicarse a registros no bloqueados)
+                        isBlockUpdate() ||
+                        // Admin: desbloquear (solo aplica a registros bloqueados)
+                        isUnblockUpdate()
+                      );
         
         // Los usuarios pueden eliminar sus registros si no están bloqueados
-        allow delete: if request.auth != null 
-                      && request.auth.uid == userId
+        allow delete: if isActiveOwner(userId)
                       && resource.data.userId == userId
                       && !isBlocked();
       }
+    }
+
+    // ========================================
+    // COLECCIÓN: team_month_closures
+    // ========================================
+    match /team_month_closures/{closureId} {
+      function isOwnTeamClosure() {
+        return isSupervisorUser() &&
+          resource.data.supervisorId == request.auth.uid;
+      }
+
+      function isOwnTeamClosureWrite(closureId) {
+        return isSupervisorUser() &&
+          request.resource.data.supervisorId == request.auth.uid &&
+          request.resource.data.closedBy == request.auth.uid &&
+          request.resource.data.month is string &&
+          closureId == request.auth.uid + '_' + request.resource.data.month &&
+          request.resource.data.status == 'closed';
+      }
+
+      function keepsExistingClosureIdentity() {
+        return request.resource.data.supervisorId == resource.data.supervisorId &&
+          request.resource.data.closedBy == resource.data.closedBy &&
+          request.resource.data.month == resource.data.month &&
+          resource.data.status == 'closed';
+      }
+
+      allow read: if isAdminUser() || isOwnTeamClosure();
+      // Un cierre de mes es inmutable una vez creado: no se permite update.
+      allow create: if isOwnTeamClosureWrite(closureId);
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ========================================
+    // COLLECTION GROUP: time_records
+    // ========================================
+    match /{document=**}/time_records/{recordId} {
+      allow read: if requesterIsActive() &&
+                  (request.auth.uid == resource.data.userId ||
+                   isAdminUser() ||
+                   isSupervisorOfEmployee(resource.data.userId));
     }
     
     // ========================================
@@ -95,10 +270,10 @@ service cloud.firestore {
     match /schedules/{scheduleId} {
       // Todos los usuarios autenticados pueden leer plantillas
       // (necesario para dropdowns de selección de horario)
-      allow read: if request.auth != null;
+      allow read: if requesterIsActive();
       
       // Solo admin y RRHH pueden crear, editar y eliminar plantillas
-      allow create, update, delete: if isAdmin();
+      allow create, update, delete: if isAdminOrRrhh();
     }
     
     // ========================================
@@ -107,10 +282,10 @@ service cloud.firestore {
     match /calendars/{calendarId} {
       // Todos los usuarios autenticados pueden leer calendarios
       // (necesario para dropdowns de asignación y visualización)
-      allow read: if request.auth != null;
+      allow read: if requesterIsActive();
       
       // Solo admin y RRHH pueden crear, editar y eliminar calendarios
-      allow create, update, delete: if isAdmin();
+      allow create, update, delete: if isAdminOrRrhh();
     }
     
     // Denegar acceso a cualquier otra colección no especificada

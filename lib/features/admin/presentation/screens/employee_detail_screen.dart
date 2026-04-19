@@ -170,6 +170,11 @@ class EmployeeDetailScreen extends ConsumerWidget {
                     _buildInfoRow(
                         'Empresa', employee.empresa ?? 'No especificado'),
                     _buildInfoRow('Rol', _formatRole(employee.role)),
+                    _buildInfoRow(
+                      'Puede supervisar',
+                      employee.canSuperviseTeam ? 'Sí' : 'No',
+                    ),
+                    _buildAssignedSupervisorRow(ref, employee),
                     _buildInfoRow('Horas Semanales',
                         '${employee.weeklyHours.toStringAsFixed(0)}h'),
                     _buildInfoRow(
@@ -572,6 +577,58 @@ class EmployeeDetailScreen extends ConsumerWidget {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildAssignedSupervisorRow(WidgetRef ref, UserModel employee) {
+    if (employee.role == UserRole.admin) {
+      return _buildInfoRow('Supervisor asignado', 'No aplica');
+    }
+
+    if (employee.supervisorId == null ||
+        employee.supervisorId!.trim().isEmpty) {
+      return _buildInfoRow('Supervisor asignado', 'Sin asignar');
+    }
+
+    final supervisorAsync = ref.watch(userByIdProvider(employee.supervisorId!));
+
+    return Padding(
+      padding: AppSpacing.verticalSm,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 140,
+            child: Text(
+              'Supervisor asignado',
+              style: AppTextStyles.labelMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+          Expanded(
+            child: supervisorAsync.when(
+              data: (supervisor) => Text(
+                supervisor?.fullName ?? 'Supervisor no encontrado',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              loading: () => const SizedBox(
+                height: 16,
+                width: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              error: (_, __) => Text(
+                employee.supervisorId!,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

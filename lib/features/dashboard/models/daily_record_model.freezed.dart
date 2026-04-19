@@ -25,13 +25,10 @@ mixin _$DailyRecordModel {
   ClockTimes get clocks => throw _privateConstructorUsedError;
   DateTime? get clockInTimestamp => throw _privateConstructorUsedError;
   DateTime? get clockOutTimestamp => throw _privateConstructorUsedError;
-  DateTime? get breakStartTimestamp =>
-      throw _privateConstructorUsedError; // ✨ NUEVO: Timestamp inicio pausa
-  DateTime? get breakEndTimestamp =>
-      throw _privateConstructorUsedError; // ✨ NUEVO: Timestamp fin pausa
-  int? get totalMinutes =>
-      throw _privateConstructorUsedError; // ✨ NUEVO: Total minutos trabajados (pausa incluida)
-  RecordStatus get status => throw _privateConstructorUsedError;
+  DateTime? get breakStartTimestamp => throw _privateConstructorUsedError;
+  DateTime? get breakEndTimestamp => throw _privateConstructorUsedError;
+  int? get totalMinutes => throw _privateConstructorUsedError;
+  DailyRecordStatus get status => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
@@ -60,7 +57,7 @@ abstract class $DailyRecordModelCopyWith<$Res> {
       DateTime? breakStartTimestamp,
       DateTime? breakEndTimestamp,
       int? totalMinutes,
-      RecordStatus status,
+      DailyRecordStatus status,
       DateTime createdAt,
       DateTime updatedAt});
 
@@ -130,7 +127,7 @@ class _$DailyRecordModelCopyWithImpl<$Res, $Val extends DailyRecordModel>
       status: null == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
-              as RecordStatus,
+              as DailyRecordStatus,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -170,7 +167,7 @@ abstract class _$$DailyRecordModelImplCopyWith<$Res>
       DateTime? breakStartTimestamp,
       DateTime? breakEndTimestamp,
       int? totalMinutes,
-      RecordStatus status,
+      DailyRecordStatus status,
       DateTime createdAt,
       DateTime updatedAt});
 
@@ -239,7 +236,7 @@ class __$$DailyRecordModelImplCopyWithImpl<$Res>
       status: null == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
-              as RecordStatus,
+              as DailyRecordStatus,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -254,7 +251,7 @@ class __$$DailyRecordModelImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$DailyRecordModelImpl implements _DailyRecordModel {
+class _$DailyRecordModelImpl extends _DailyRecordModel {
   const _$DailyRecordModelImpl(
       {required this.date,
       required this.userId,
@@ -266,7 +263,8 @@ class _$DailyRecordModelImpl implements _DailyRecordModel {
       this.totalMinutes,
       required this.status,
       required this.createdAt,
-      required this.updatedAt});
+      required this.updatedAt})
+      : super._();
 
   factory _$DailyRecordModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$DailyRecordModelImplFromJson(json);
@@ -283,15 +281,12 @@ class _$DailyRecordModelImpl implements _DailyRecordModel {
   final DateTime? clockOutTimestamp;
   @override
   final DateTime? breakStartTimestamp;
-// ✨ NUEVO: Timestamp inicio pausa
   @override
   final DateTime? breakEndTimestamp;
-// ✨ NUEVO: Timestamp fin pausa
   @override
   final int? totalMinutes;
-// ✨ NUEVO: Total minutos trabajados (pausa incluida)
   @override
-  final RecordStatus status;
+  final DailyRecordStatus status;
   @override
   final DateTime createdAt;
   @override
@@ -360,7 +355,7 @@ class _$DailyRecordModelImpl implements _DailyRecordModel {
   }
 }
 
-abstract class _DailyRecordModel implements DailyRecordModel {
+abstract class _DailyRecordModel extends DailyRecordModel {
   const factory _DailyRecordModel(
       {required final String date,
       required final String userId,
@@ -370,9 +365,10 @@ abstract class _DailyRecordModel implements DailyRecordModel {
       final DateTime? breakStartTimestamp,
       final DateTime? breakEndTimestamp,
       final int? totalMinutes,
-      required final RecordStatus status,
+      required final DailyRecordStatus status,
       required final DateTime createdAt,
       required final DateTime updatedAt}) = _$DailyRecordModelImpl;
+  const _DailyRecordModel._() : super._();
 
   factory _DailyRecordModel.fromJson(Map<String, dynamic> json) =
       _$DailyRecordModelImpl.fromJson;
@@ -388,13 +384,13 @@ abstract class _DailyRecordModel implements DailyRecordModel {
   @override
   DateTime? get clockOutTimestamp;
   @override
-  DateTime? get breakStartTimestamp; // ✨ NUEVO: Timestamp inicio pausa
+  DateTime? get breakStartTimestamp;
   @override
-  DateTime? get breakEndTimestamp; // ✨ NUEVO: Timestamp fin pausa
+  DateTime? get breakEndTimestamp;
   @override
-  int? get totalMinutes; // ✨ NUEVO: Total minutos trabajados (pausa incluida)
+  int? get totalMinutes;
   @override
-  RecordStatus get status;
+  DailyRecordStatus get status;
   @override
   DateTime get createdAt;
   @override

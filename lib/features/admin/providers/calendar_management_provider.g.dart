@@ -228,7 +228,7 @@ class _CalendarByIdProviderElement
 }
 
 String _$calendarManagementHash() =>
-    r'4ce0e6cfa24e107dce5716689c1965692bd534a5';
+    r'3a6502abb8acc0a693af32648e4df8dc65d439ed';
 
 /// Notifier para crear, editar, duplicar y eliminar calendarios laborales
 ///

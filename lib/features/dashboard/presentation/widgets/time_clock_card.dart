@@ -134,6 +134,8 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
   buttons.ClockingState _mapToButtonsState(
       state_provider.ClockingState providerState) {
     switch (providerState) {
+      case state_provider.ClockingState.loading:
+        return buttons.ClockingState.notStarted;
       case state_provider.ClockingState.notStarted:
         return buttons.ClockingState.notStarted;
       case state_provider.ClockingState.working:
@@ -209,6 +211,8 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
 
   String _getStatusMessage(state_provider.ClockingState state) {
     switch (state) {
+      case state_provider.ClockingState.loading:
+        return 'Cargando estado de fichaje...';
       case state_provider.ClockingState.notStarted:
         return 'Sin registro activo';
       case state_provider.ClockingState.working:
@@ -226,6 +230,8 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
       BuildContext context, state_provider.ClockingState state) {
     final colors = AppColorsHelper.of(context);
     switch (state) {
+      case state_provider.ClockingState.loading:
+        return colors.textSecondary;
       case state_provider.ClockingState.notStarted:
         return colors.textSecondary;
       case state_provider.ClockingState.working:
@@ -241,6 +247,8 @@ class _TimeClockCardState extends ConsumerState<TimeClockCard> {
 
   IconData _getStatusIcon(state_provider.ClockingState state) {
     switch (state) {
+      case state_provider.ClockingState.loading:
+        return Icons.hourglass_top;
       case state_provider.ClockingState.notStarted:
         return Icons.schedule;
       case state_provider.ClockingState.working:

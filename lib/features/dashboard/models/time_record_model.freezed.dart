@@ -355,7 +355,7 @@ class __$$TimeRecordModelImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$TimeRecordModelImpl implements _TimeRecordModel {
+class _$TimeRecordModelImpl extends _TimeRecordModel {
   const _$TimeRecordModelImpl(
       {required this.id,
       required this.userId,
@@ -376,7 +376,8 @@ class _$TimeRecordModelImpl implements _TimeRecordModel {
       this.validatedAt,
       this.blockedBy,
       this.blockedAt,
-      this.blockReason});
+      this.blockReason})
+      : super._();
 
   factory _$TimeRecordModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$TimeRecordModelImplFromJson(json);
@@ -520,7 +521,7 @@ class _$TimeRecordModelImpl implements _TimeRecordModel {
   }
 }
 
-abstract class _TimeRecordModel implements TimeRecordModel {
+abstract class _TimeRecordModel extends TimeRecordModel {
   const factory _TimeRecordModel(
       {required final String id,
       required final String userId,
@@ -542,6 +543,7 @@ abstract class _TimeRecordModel implements TimeRecordModel {
       final String? blockedBy,
       final DateTime? blockedAt,
       final String? blockReason}) = _$TimeRecordModelImpl;
+  const _TimeRecordModel._() : super._();
 
   factory _TimeRecordModel.fromJson(Map<String, dynamic> json) =
       _$TimeRecordModelImpl.fromJson;

@@ -6,16 +6,28 @@ import '../models/time_record_model.dart';
 /// Maneja operaciones CRUD sobre la colección:
 /// users/{userId}/time_records/{recordId}
 class TimeRecordsService {
-  final FirebaseFirestore _firestore;
+  final FirebaseFirestore? _firestore;
 
   TimeRecordsService({FirebaseFirestore? firestore})
       : _firestore = firestore ?? FirebaseFirestore.instance;
+
+  TimeRecordsService.test() : _firestore = null;
+
+  FirebaseFirestore get _requireFirestore {
+    final firestore = _firestore;
+    if (firestore == null) {
+      throw StateError(
+        'TimeRecordsService test double must override Firestore access methods',
+      );
+    }
+    return firestore;
+  }
 
   /// Obtener referencia a la colección de registros de un usuario
   CollectionReference<Map<String, dynamic>> _getRecordsCollection(
     String userId,
   ) {
-    return _firestore
+    return _requireFirestore
         .collection('users')
         .doc(userId)
         .collection('time_records');
@@ -109,7 +121,7 @@ class TimeRecordsService {
     try {
       final newDocRef = _getRecordsCollection(recordToCreate.userId).doc();
 
-      await _firestore.runTransaction((transaction) async {
+      await _requireFirestore.runTransaction((transaction) async {
         // 1. Actualizar registro existente
         final updateRef =
             _getRecordsCollection(recordToUpdate.userId).doc(recordToUpdate.id);
@@ -177,7 +189,7 @@ class TimeRecordsService {
         createdBy: originalRecord.userId,
         isManual: true,
         copiedFrom: recordId,
-        recordStatus: TimeRecordStatus.completed,
+        recordStatus: RecordStatus.completed,
         validationStatus: ValidationStatus.editable,
       );
 
@@ -204,12 +216,9 @@ class TimeRecordsService {
     String validatedBy,
   ) async {
     try {
-      await _getRecordsCollection(userId).doc(recordId).update({
-        'validationStatus': ValidationStatus.validated.name,
-        'validatedBy': validatedBy,
-        'validatedAt': Timestamp.now(),
-        'updatedAt': Timestamp.now(),
-      });
+      await _getRecordsCollection(userId)
+          .doc(recordId)
+          .update(buildValidationAuditUpdate(validatedBy: validatedBy));
     } catch (e) {
       throw Exception('Error al validar registro: $e');
     }
@@ -254,4 +263,17 @@ class TimeRecordsService {
   String _formatDate(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
+}
+
+Map<String, dynamic> buildValidationAuditUpdate({
+  required String validatedBy,
+  Object? validatedAt,
+  Object? updatedAt,
+}) {
+  return {
+    'validationStatus': ValidationStatus.validated.name,
+    'validatedBy': validatedBy,
+    'validatedAt': validatedAt ?? Timestamp.now(),
+    'updatedAt': updatedAt ?? Timestamp.now(),
+  };
 }

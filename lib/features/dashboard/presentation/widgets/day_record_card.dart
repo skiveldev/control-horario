@@ -171,6 +171,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
             // Resumen de horas
             if (!isMobile) ...[
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     Icons.access_time,
@@ -178,22 +179,16 @@ class _DayRecordCardState extends State<DayRecordCard> {
                     color: AppColors.textSecondary,
                   ),
                   AppSpacing.horizontalSpaceSm,
-                  Flexible(
-                    child: Text(
-                      '${workedHours.toStringAsFixed(1)}h / ${plannedHours.toStringAsFixed(1)}h',
-                      style: AppTextStyles.labelLarge,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                  Text(
+                    '${workedHours.toStringAsFixed(1)}h / ${plannedHours.toStringAsFixed(1)}h',
+                    style: AppTextStyles.labelLarge,
                   ),
                   AppSpacing.horizontalSpaceMd,
-                  Flexible(
-                    child: Text(
-                      '${differenceMinutes >= 0 ? '+' : ''}${(differenceMinutes / 60).toStringAsFixed(1)}h',
-                      style: AppTextStyles.labelLarge.copyWith(
-                        color: differenceColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+                  Text(
+                    '${differenceMinutes >= 0 ? '+' : ''}${(differenceMinutes / 60).toStringAsFixed(1)}h',
+                    style: AppTextStyles.labelLarge.copyWith(
+                      color: differenceColor,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],

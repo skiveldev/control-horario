@@ -7,7 +7,7 @@ part of 'clocking_state_provider.dart';
 // **************************************************************************
 
 String _$currentClockingStateHash() =>
-    r'b3411f83eacb45515fd7c6b89ae9fe808c472dee';
+    r'47648c4235a9dc063b67db456fa511d44c66bbea';
 
 /// Provider que calcula el estado actual del fichaje
 ///

@@ -65,6 +65,9 @@ class UserManagement extends _$UserManagement {
   /// - [fechaInicio]: Fecha de inicio en la APLICACIÓN (acceso al sistema de fichaje)
   /// - [fechaFin]: Fecha de fin en la APLICACIÓN (baja/baja temporal del sistema)
   /// - [role]: Rol del usuario (default: employee)
+  /// - [isSupervisor]: Habilita permisos de supervision sobre equipo
+  /// - [supervisorId]: Supervisor asignado para este empleado
+  /// - [isActive]: Estado inicial del empleado en el sistema
   ///
   /// Retorna el resultado con userId y contraseña temporal, o null si hay error
   Future<Map<String, String>?> createEmployee({
@@ -84,9 +87,12 @@ class UserManagement extends _$UserManagement {
     DateTime? fechaInicio,
     DateTime? fechaFin,
     UserRole role = UserRole.employee,
+    bool isSupervisor = false,
+    String? supervisorId,
+    bool isActive = true,
   }) async {
     // Verificar rol admin
-    final currentUser = ref.read(currentUserProvider).valueOrNull;
+    final currentUser = await ref.read(currentUserProvider.future);
     if (currentUser == null || currentUser.role != UserRole.admin) {
       state = state.copyWith(
           error: 'Sin permisos: solo administradores pueden crear empleados');
@@ -140,6 +146,9 @@ class UserManagement extends _$UserManagement {
         fechaInicio: fechaInicio,
         fechaFin: fechaFin,
         role: role,
+        isSupervisor: isSupervisor,
+        supervisorId: supervisorId,
+        isActive: isActive,
       );
 
       debugPrint('✅ Usuario creado exitosamente');
@@ -153,6 +162,15 @@ class UserManagement extends _$UserManagement {
       );
 
       return result;
+    } on AdminSessionExpiredException catch (e) {
+      debugPrint('⚠️ Alta completada con sesión admin expirada: $e');
+
+      state = state.copyWith(
+        isLoading: false,
+        result: e.employeeData,
+        error: null,
+      );
+      return e.employeeData;
     } catch (e) {
       debugPrint('❌ ERROR en createEmployee: $e');
       debugPrint('❌ Tipo de error: ${e.runtimeType}');
@@ -199,7 +217,7 @@ class UserManagement extends _$UserManagement {
     required String userId,
     required Map<String, dynamic> updates,
   }) async {
-    final currentUser = ref.read(currentUserProvider).valueOrNull;
+    final currentUser = await ref.read(currentUserProvider.future);
     if (currentUser == null || currentUser.role != UserRole.admin) {
       throw Exception(
           'Sin permisos: solo administradores pueden actualizar empleados');

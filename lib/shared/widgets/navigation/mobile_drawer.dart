@@ -7,6 +7,7 @@ import '../../../core/theme/app_gradients.dart';
 import '../../../core/theme/app_shadows.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../features/auth/providers/auth_provider.dart';
 import 'navigation_items.dart';
 
 /// Drawer de navegación para mobile y tablet
@@ -37,6 +38,10 @@ class MobileDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentRoute = GoRouterState.of(context).matchedLocation;
+    final currentUser = ref.watch(currentUserProvider).valueOrNull;
+    final navItems = NavigationItems.items(
+      canSuperviseTeam: currentUser?.canSuperviseTeam ?? false,
+    );
 
     return Drawer(
       width: 280,
@@ -49,7 +54,7 @@ class MobileDrawer extends ConsumerWidget {
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
-              children: NavigationItems.items.map((item) {
+              children: navItems.map((item) {
                 return _buildNavItem(
                   context,
                   item,

@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors_dark.dart';
 import '../../../core/theme/app_gradients.dart';
 import '../../../core/theme/app_shadows.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../features/auth/providers/auth_provider.dart';
 import 'navigation_items.dart';
 
 part 'desktop_sidebar.g.dart';
@@ -93,6 +94,10 @@ class DesktopSidebar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isExpanded = ref.watch(sidebarNotifierProvider);
     final currentRoute = GoRouterState.of(context).matchedLocation;
+    final currentUser = ref.watch(currentUserProvider).valueOrNull;
+    final navItems = NavigationItems.items(
+      canSuperviseTeam: currentUser?.canSuperviseTeam ?? false,
+    );
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -117,7 +122,7 @@ class DesktopSidebar extends ConsumerWidget {
           Expanded(
             child: ListView(
               padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
-              children: NavigationItems.items.map((item) {
+              children: navItems.map((item) {
                 return _buildNavItem(
                   context,
                   item,
@@ -228,6 +233,7 @@ class DesktopSidebar extends ConsumerWidget {
         boxShadow: isSelected && isDark ? AppShadows.cardCyanGlow : null,
       ),
       child: InkWell(
+        key: ValueKey('desktop-nav-${item.route}'),
         onTap: () => context.go(item.route),
         borderRadius: BorderRadius.circular(8),
         child: Padding(

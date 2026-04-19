@@ -21,6 +21,8 @@ class UserModel with _$UserModel {
     required String email,
     required String displayName,
     required UserRole role,
+    @Default(false) bool isSupervisor,
+    String? supervisorId,
     required double weeklyHours,
     @Default(true) bool isActive,
     required DateTime createdAt,
@@ -80,6 +82,10 @@ class UserModel with _$UserModel {
     return displayName;
   }
 
+  /// Indica si el usuario puede acceder a funciones de supervision de equipo.
+  bool get canSuperviseTeam =>
+      isActive && (role == UserRole.admin || isSupervisor);
+
   factory UserModel.fromJson(Map<String, dynamic> json) =>
       _$UserModelFromJson(json);
 
@@ -98,6 +104,8 @@ class UserModel with _$UserModel {
       email: data['email'] ?? '',
       displayName: data['displayName'] ?? '',
       role: _roleFromString(data['role'] as String?),
+      isSupervisor: data['isSupervisor'] as bool? ?? false,
+      supervisorId: data['supervisorId'] as String?,
       weeklyHours: (data['weeklyHours'] ?? 40).toDouble(),
       isActive: data['isActive'] ?? true,
       createdAt: createdAtDate,
@@ -144,6 +152,8 @@ class UserModel with _$UserModel {
       'email': email,
       'displayName': displayName,
       'role': role.name,
+      'isSupervisor': isSupervisor,
+      if (supervisorId != null) 'supervisorId': supervisorId,
       'weeklyHours': weeklyHours,
       'isActive': isActive,
       'createdAt': Timestamp.fromDate(createdAt),

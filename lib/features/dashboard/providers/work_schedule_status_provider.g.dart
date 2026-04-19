@@ -7,7 +7,7 @@ part of 'work_schedule_status_provider.dart';
 // **************************************************************************
 
 String _$workScheduleStatusNotifierHash() =>
-    r'f1434eaa95c8d2f9c452b221016eece2c1c6cf45';
+    r'332def2d3f2414d15cf9114e990b958e9f3be966';
 
 /// Provider que calcula si el usuario está en horario laboral o fuera de horario
 ///

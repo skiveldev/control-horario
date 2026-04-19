@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../auth/models/user_model.dart';
+import 'supervisor_assignment_field.dart';
+import '../../providers/supervisors_provider.dart';
 import '../../providers/user_management_provider.dart';
 
 /// Modal para editar la información general de un empleado
@@ -54,7 +57,14 @@ class _EmployeeInfoEditorModalState
 
   // Estado
   late bool _isActive;
+  late bool _isSupervisor;
+  String? _selectedSupervisorId;
   bool _isLoading = false;
+
+  Object _textValueOrDelete(TextEditingController controller) {
+    final value = controller.text.trim();
+    return value.isEmpty ? FieldValue.delete() : value;
+  }
 
   @override
   void initState() {
@@ -77,6 +87,8 @@ class _EmployeeInfoEditorModalState
       text: widget.employee.weeklyHours.toStringAsFixed(0),
     );
     _isActive = widget.employee.isActive;
+    _isSupervisor = widget.employee.isSupervisor;
+    _selectedSupervisorId = widget.employee.supervisorId;
   }
 
   @override
@@ -306,14 +318,67 @@ class _EmployeeInfoEditorModalState
                         enabled: !_isLoading,
                       ),
 
+                      AppSpacing.verticalSpaceMd,
+
+                      Consumer(
+                        builder: (context, ref, _) => SupervisorAssignmentField(
+                          supervisorsAsync: ref.watch(supervisorsProvider),
+                          selectedSupervisorId: _selectedSupervisorId,
+                          excludedUserId: widget.employee.userId,
+                          enabled: widget.employee.role != UserRole.admin &&
+                              !_isLoading,
+                          onChanged: widget.employee.role == UserRole.admin ||
+                                  _isLoading
+                              ? null
+                              : (value) {
+                                  setState(() {
+                                    _selectedSupervisorId = value;
+                                  });
+                                },
+                          helperText: widget.employee.role == UserRole.admin
+                              ? 'Los administradores no se asignan a un supervisor.'
+                              : 'Puedes asignar o quitar el supervisor responsable de este empleado.',
+                          emptyText:
+                              'No hay supervisores activos disponibles todavía.',
+                        ),
+                      ),
+
+                      AppSpacing.verticalSpaceXs,
+                      Text(
+                        widget.employee.role == UserRole.admin
+                            ? 'Los administradores no se asignan a un supervisor.'
+                            : 'Puedes asignar o quitar el supervisor responsable de este empleado.',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+
                       AppSpacing.verticalSpaceXl,
 
                       // SECCIÓN 3: Estado
                       Text(
-                        'Estado',
+                        'Estado y permisos',
                         style: AppTextStyles.h6,
                       ),
                       AppSpacing.verticalSpaceMd,
+
+                      SwitchListTile(
+                        title: const Text('Puede supervisar equipo'),
+                        subtitle: Text(
+                          widget.employee.role == UserRole.admin
+                              ? 'Los administradores ya tienen permisos superiores.'
+                              : _isSupervisor
+                                  ? 'Este empleado aparecerá disponible para asignar equipos.'
+                                  : 'Activa esta opción para convertirlo en supervisor.',
+                        ),
+                        value: _isSupervisor,
+                        onChanged:
+                            widget.employee.role == UserRole.admin || _isLoading
+                                ? null
+                                : (value) {
+                                    setState(() => _isSupervisor = value);
+                                  },
+                      ),
 
                       SwitchListTile(
                         title: const Text('Empleado Activo'),
@@ -391,28 +456,17 @@ class _EmployeeInfoEditorModalState
         'apellido1': _apellido1Controller.text.trim(),
         'email': _emailController.text.trim(),
         'isActive': _isActive,
+        'isSupervisor': _isSupervisor,
         'weeklyHours': double.parse(_weeklyHoursController.text.trim()),
+        'apellido2': _textValueOrDelete(_apellido2Controller),
+        'dni': _textValueOrDelete(_dniController),
+        'telefono': _textValueOrDelete(_telefonoController),
+        'position': _textValueOrDelete(_cargoController),
+        'department': _textValueOrDelete(_departamentoController),
+        'empresa': _textValueOrDelete(_empresaController),
       };
 
-      // Campos opcionales
-      if (_apellido2Controller.text.trim().isNotEmpty) {
-        updates['apellido2'] = _apellido2Controller.text.trim();
-      }
-      if (_dniController.text.trim().isNotEmpty) {
-        updates['dni'] = _dniController.text.trim();
-      }
-      if (_telefonoController.text.trim().isNotEmpty) {
-        updates['telefono'] = _telefonoController.text.trim();
-      }
-      if (_cargoController.text.trim().isNotEmpty) {
-        updates['position'] = _cargoController.text.trim();
-      }
-      if (_departamentoController.text.trim().isNotEmpty) {
-        updates['department'] = _departamentoController.text.trim();
-      }
-      if (_empresaController.text.trim().isNotEmpty) {
-        updates['empresa'] = _empresaController.text.trim();
-      }
+      updates['supervisorId'] = _selectedSupervisorId ?? FieldValue.delete();
 
       // Actualizar displayName automáticamente
       final nombre = _nombreController.text.trim();

@@ -6,7 +6,7 @@ part of 'theme_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sharedPreferencesHash() => r'a3c9e1b2f4d5e6a7b8c9d0e1f2a3b4c5d6e7f8a9';
+String _$sharedPreferencesHash() => r'b5050ac0c185d8b7551a841d3d0640c64f7c799b';
 
 /// Provider para la instancia de SharedPreferences
 ///
@@ -26,9 +26,10 @@ final sharedPreferencesProvider = Provider<SharedPreferences>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef SharedPreferencesRef = ProviderRef<SharedPreferences>;
-
-String _$themeNotifierHash() => r'6751f6bd6c89d01c0525dfeaabf2c2bca657d3c2';
+String _$themeNotifierHash() => r'480e39adc591df3d4d7b48fb30367f786f23d417';
 
 /// Provider para gestionar el tema de la aplicación (claro/oscuro)
 ///

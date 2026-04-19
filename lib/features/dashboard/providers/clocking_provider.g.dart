@@ -6,7 +6,7 @@ part of 'clocking_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$todayRecordsHash() => r'1ee77253541c051a2d39382412e4bcc1ce2e4005';
+String _$todayRecordsHash() => r'210e1a7f4bb9a50c7ad66d2fc7bd0c02f3008898';
 
 /// Provider para obtener los registros de fichaje de hoy
 ///
@@ -49,7 +49,7 @@ final clockingSessionNotifierProvider = AutoDisposeNotifierProvider<
 );
 
 typedef _$ClockingSessionNotifier = AutoDisposeNotifier<ClockingSession>;
-String _$clockingNotifierHash() => r'3048ebf6bd89742ef5f074a9eb544f1ba96ef48b';
+String _$clockingNotifierHash() => r'850877bcfbf0f8568fe11e8a880082f64dabe0a3';
 
 /// Notifier para acciones de fichaje
 ///

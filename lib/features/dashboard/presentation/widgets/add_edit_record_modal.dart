@@ -462,6 +462,7 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
   Widget _buildLocationDropdown() {
     return DropdownButtonFormField<String>(
       initialValue: _selectedLocation,
+      isExpanded: true,
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.place, size: AppSpacing.iconMd),
         border: OutlineInputBorder(
@@ -475,18 +476,9 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
       items: widget.availableLocations.map((location) {
         return DropdownMenuItem(
           value: location,
-          child: Row(
-            children: [
-              Icon(
-                _getLocationIcon(location),
-                size: AppSpacing.iconMd,
-                color: AppColors.textSecondary,
-              ),
-              AppSpacing.horizontalSpaceSm,
-              Flexible(
-                child: Text(location, overflow: TextOverflow.ellipsis),
-              ),
-            ],
+          child: Text(
+            location,
+            overflow: TextOverflow.ellipsis,
           ),
         );
       }).toList(),
@@ -496,17 +488,6 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
         });
       },
     );
-  }
-
-  IconData _getLocationIcon(String location) {
-    if (location.toLowerCase().contains('oficina')) {
-      return Icons.business;
-    } else if (location.toLowerCase().contains('delegación')) {
-      return Icons.location_city;
-    } else if (location.toLowerCase().contains('remoto')) {
-      return Icons.home;
-    }
-    return Icons.place;
   }
 
   void _validateTimes() {

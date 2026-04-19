@@ -37,7 +37,17 @@ class AuthNotifier extends ChangeNotifier {
     try {
       final doc = await _firestore.collection('users').doc(uid).get();
       if (doc.exists) {
-        final role = (doc.data()?['role'] as String?) ?? 'employee';
+        final data = doc.data() ?? const <String, dynamic>{};
+        final isActive = data['isActive'] as bool? ?? true;
+        if (!isActive) {
+          _isAdmin = false;
+          if (_firebaseAuth.currentUser?.uid == uid) {
+            await _firebaseAuth.signOut();
+          }
+          return;
+        }
+
+        final role = (data['role'] as String?) ?? 'employee';
         _isAdmin = role == 'admin';
       }
     } catch (e) {

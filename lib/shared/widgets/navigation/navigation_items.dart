@@ -39,41 +39,57 @@ class NavigationItems {
   // Prevenir instanciación
   NavigationItems._();
 
-  /// Lista de todos los items de navegación
-  static const List<NavigationItem> items = [
-    NavigationItem(
-      label: 'Inicio',
-      icon: Icons.home_outlined,
-      route: AppRouter.dashboard,
-    ),
-    NavigationItem(
-      label: 'Calendario',
-      icon: Icons.calendar_today_outlined,
-      route: AppRouter.calendar,
-    ),
-    NavigationItem(
-      label: 'Mi Control Horario',
-      icon: Icons.access_time_outlined,
-      route: AppRouter.myTimeControl,
-    ),
-    NavigationItem(
-      label: 'Configuración',
-      icon: Icons.settings_outlined,
-      route: AppRouter.settings,
-    ),
-  ];
+  /// Lista de todos los items de navegación para empleado/supervisor.
+  static List<NavigationItem> items({required bool canSuperviseTeam}) {
+    return [
+      const NavigationItem(
+        label: 'Inicio',
+        icon: Icons.home_outlined,
+        route: AppRouter.dashboard,
+      ),
+      const NavigationItem(
+        label: 'Calendario',
+        icon: Icons.calendar_today_outlined,
+        route: AppRouter.calendar,
+      ),
+      const NavigationItem(
+        label: 'Mi Control Horario',
+        icon: Icons.access_time_outlined,
+        route: AppRouter.myTimeControl,
+      ),
+      if (canSuperviseTeam)
+        const NavigationItem(
+          label: 'Equipo',
+          icon: Icons.groups_outlined,
+          route: AppRouter.team,
+        ),
+      const NavigationItem(
+        label: 'Configuración',
+        icon: Icons.settings_outlined,
+        route: AppRouter.settings,
+      ),
+    ];
+  }
 
   /// Obtiene un item por su ruta
-  static NavigationItem? getItemByRoute(String route) {
+  static NavigationItem? getItemByRoute(
+    String route, {
+    bool canSuperviseTeam = false,
+  }) {
     try {
-      return items.firstWhere((item) => item.route == route);
+      return items(canSuperviseTeam: canSuperviseTeam)
+          .firstWhere((item) => item.route == route);
     } catch (e) {
       return null;
     }
   }
 
   /// Verifica si una ruta es un item de navegación
-  static bool isNavigationRoute(String route) {
-    return items.any((item) => item.route == route);
+  static bool isNavigationRoute(
+    String route, {
+    bool canSuperviseTeam = false,
+  }) {
+    return items(canSuperviseTeam: canSuperviseTeam)
+        .any((item) => item.route == route);
   }
 }

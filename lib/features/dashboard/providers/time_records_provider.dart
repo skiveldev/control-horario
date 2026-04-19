@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../../core/services/firebase_service.dart';
 import '../../auth/models/user_model.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../models/time_record_model.dart';
@@ -55,6 +56,22 @@ Future<bool> canEditRecord(
   final service = ref.watch(timeRecordsServiceProvider);
   return service.canEditRecord(userId, recordId);
 }
+
+typedef TimeRecordValidationTargetLookup = Future<UserModel?> Function(
+  String userId,
+);
+
+final timeRecordValidationTargetLookupProvider =
+    Provider<TimeRecordValidationTargetLookup>((ref) {
+  final firestore = ref.watch(firestoreProvider);
+  return (String userId) async {
+    final targetDoc = await firestore.collection('users').doc(userId).get();
+    if (!targetDoc.exists) {
+      return null;
+    }
+    return UserModel.fromFirestore(targetDoc);
+  };
+});
 
 /// Notifier para operaciones CRUD sobre registros
 @riverpod
@@ -116,10 +133,29 @@ class TimeRecordsNotifier extends _$TimeRecordsNotifier {
     String validatedBy,
   ) async {
     final user = ref.read(currentUserProvider).valueOrNull;
-    if (user == null || user.role != UserRole.admin) {
+    if (user == null || !user.isActive) {
       throw Exception(
-          'Sin permisos: solo administradores pueden realizar esta acción');
+          'Sin permisos: necesitas iniciar sesión para validar registros');
     }
+
+    if (user.role != UserRole.admin) {
+      if (!user.canSuperviseTeam) {
+        throw Exception(
+            'Sin permisos: solo administradores o supervisores pueden validar');
+      }
+
+      final lookupTargetUser =
+          ref.read(timeRecordValidationTargetLookupProvider);
+      final targetUser = await lookupTargetUser(userId);
+      if (targetUser == null) {
+        throw Exception('No se encontró el empleado a validar');
+      }
+      if (targetUser.supervisorId != user.userId) {
+        throw Exception(
+            'Sin permisos: solo puedes validar fichajes de tu propio equipo');
+      }
+    }
+
     final service = ref.read(timeRecordsServiceProvider);
     await service.validateRecord(userId, recordId, validatedBy);
   }
@@ -132,9 +168,9 @@ class TimeRecordsNotifier extends _$TimeRecordsNotifier {
     String? reason,
   }) async {
     final user = ref.read(currentUserProvider).valueOrNull;
-    if (user == null || user.role != UserRole.admin) {
+    if (user == null || !user.isActive || user.role != UserRole.admin) {
       throw Exception(
-          'Sin permisos: solo administradores pueden realizar esta acción');
+          'Sin permisos: solo administradores activos pueden realizar esta acción');
     }
     final service = ref.read(timeRecordsServiceProvider);
     await service.blockRecord(userId, recordId, blockedBy, reason: reason);
@@ -143,9 +179,9 @@ class TimeRecordsNotifier extends _$TimeRecordsNotifier {
   /// Desbloquear un registro (solo admin)
   Future<void> unblockRecord(String userId, String recordId) async {
     final user = ref.read(currentUserProvider).valueOrNull;
-    if (user == null || user.role != UserRole.admin) {
+    if (user == null || !user.isActive || user.role != UserRole.admin) {
       throw Exception(
-          'Sin permisos: solo administradores pueden realizar esta acción');
+          'Sin permisos: solo administradores activos pueden realizar esta acción');
     }
     final service = ref.read(timeRecordsServiceProvider);
     await service.unblockRecord(userId, recordId);

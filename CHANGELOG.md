@@ -7,6 +7,23 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [1.4.0] - 2026-04-19
+
+### Añadido
+- Módulo **Equipo** para supervisores: pantalla `/team`, resumen mensual, validación de fichajes del equipo, cierre mensual (`team_month_closures`) y navegación condicionada.
+- Suite **Node** para reglas Firestore (`npm run test:firestore-rules`) con emulador; dependencias en `package.json` / `package-lock.json`.
+- Documentación en `docs/features/FIRESTORE_SUPERVISOR_SECURITY_2026-04.md` y enlaces en `docs/README.md`.
+
+### Corregido / Seguridad
+- Reglas Firestore: lecturas por subcolección alineadas con el `userId` del path; endurecimiento de `time_records` (create/update), cierres mensuales inmutables tras creación, bloqueo/desbloqueo solo admin donde corresponde, y coherencia con usuarios inactivos y supervisor de equipo.
+- Alta de empleados desde admin sin cerrar sesión del administrador; persistencia de `isActive` y borrado de campos opcionales en edición.
+
+### Cambiado
+- `team_provider`: consultas de equipo y agregados mensuales más eficientes; miembros del equipo filtrados por `isActive`.
+- Proveedores de fichajes y cierre mensual alineados con reglas (p. ej. cierre solo supervisor, comprobaciones de admin activo).
+
+---
+
 ## [1.3.0] - 2026-02-18
 
 ### ✨ Modificado

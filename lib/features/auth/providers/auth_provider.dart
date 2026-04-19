@@ -38,7 +38,20 @@ Stream<UserModel?> currentUser(CurrentUserRef ref) async* {
 
   // Obtener datos completos del usuario desde Firestore
   final authService = ref.watch(authServiceProvider);
-  yield* authService.userDataStream(authState.uid);
+  await for (final user in authService.userDataStream(authState.uid)) {
+    if (user == null) {
+      yield null;
+      continue;
+    }
+
+    if (!user.isActive) {
+      await authService.signOut();
+      yield null;
+      continue;
+    }
+
+    yield user;
+  }
 }
 
 /// Provider para obtener usuario específico por ID

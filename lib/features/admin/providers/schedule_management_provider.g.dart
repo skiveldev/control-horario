@@ -236,7 +236,7 @@ class _ScheduleByIdProviderElement
 }
 
 String _$scheduleManagementHash() =>
-    r'987829443cbb4150977628d41640896097b1f651';
+    r'dacf4d03b6830ea724e4a0fe7540090b8e9338c4';
 
 /// Notifier para crear, editar y eliminar plantillas de horario
 ///

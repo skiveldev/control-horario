@@ -14,6 +14,7 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/dashboard/presentation/screens/calendar_screen.dart';
 import '../../features/dashboard/presentation/screens/my_time_control_screen.dart';
+import '../../features/dashboard/presentation/screens/team_screen.dart';
 import '../../features/dashboard/presentation/screens/profile_screen.dart';
 import '../../features/dashboard/presentation/screens/settings_screen.dart';
 
@@ -48,6 +49,7 @@ class AppRouter {
   static const String dashboard = '/dashboard';
   static const String calendar = '/calendar';
   static const String myTimeControl = '/my-time-control';
+  static const String team = '/team';
   static const String profile = '/profile';
   static const String settings = '/settings';
   static const String admin = '/admin';
@@ -157,6 +159,19 @@ class AppRouter {
           context: context,
           state: state,
           child: const MyTimeControlScreen(),
+        ),
+      ),
+
+      // ========================================================================
+      // EQUIPO (Supervisor)
+      // ========================================================================
+      GoRoute(
+        path: team,
+        name: 'team',
+        pageBuilder: (context, state) => _buildPageWithTransition(
+          context: context,
+          state: state,
+          child: const TeamScreen(),
         ),
       ),
 

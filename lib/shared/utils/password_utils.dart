@@ -1,4 +1,4 @@
-/// Utilidades compartidas para validación de contraseñas
+// Utilidades compartidas para validación de contraseñas.
 
 /// Calcula la fortaleza de una contraseña en una escala de 0 a 4.
 ///

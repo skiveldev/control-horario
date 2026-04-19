@@ -26,6 +26,8 @@ mixin _$UserModel {
   String get email => throw _privateConstructorUsedError;
   String get displayName => throw _privateConstructorUsedError;
   UserRole get role => throw _privateConstructorUsedError;
+  bool get isSupervisor => throw _privateConstructorUsedError;
+  String? get supervisorId => throw _privateConstructorUsedError;
   double get weeklyHours => throw _privateConstructorUsedError;
   bool get isActive => throw _privateConstructorUsedError;
   DateTime get createdAt =>
@@ -85,6 +87,8 @@ abstract class $UserModelCopyWith<$Res> {
       String email,
       String displayName,
       UserRole role,
+      bool isSupervisor,
+      String? supervisorId,
       double weeklyHours,
       bool isActive,
       DateTime createdAt,
@@ -126,6 +130,8 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? email = null,
     Object? displayName = null,
     Object? role = null,
+    Object? isSupervisor = null,
+    Object? supervisorId = freezed,
     Object? weeklyHours = null,
     Object? isActive = null,
     Object? createdAt = null,
@@ -166,6 +172,14 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.role
           : role // ignore: cast_nullable_to_non_nullable
               as UserRole,
+      isSupervisor: null == isSupervisor
+          ? _value.isSupervisor
+          : isSupervisor // ignore: cast_nullable_to_non_nullable
+              as bool,
+      supervisorId: freezed == supervisorId
+          ? _value.supervisorId
+          : supervisorId // ignore: cast_nullable_to_non_nullable
+              as String?,
       weeklyHours: null == weeklyHours
           ? _value.weeklyHours
           : weeklyHours // ignore: cast_nullable_to_non_nullable
@@ -256,6 +270,8 @@ abstract class _$$UserModelImplCopyWith<$Res>
       String email,
       String displayName,
       UserRole role,
+      bool isSupervisor,
+      String? supervisorId,
       double weeklyHours,
       bool isActive,
       DateTime createdAt,
@@ -295,6 +311,8 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? email = null,
     Object? displayName = null,
     Object? role = null,
+    Object? isSupervisor = null,
+    Object? supervisorId = freezed,
     Object? weeklyHours = null,
     Object? isActive = null,
     Object? createdAt = null,
@@ -335,6 +353,14 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.role
           : role // ignore: cast_nullable_to_non_nullable
               as UserRole,
+      isSupervisor: null == isSupervisor
+          ? _value.isSupervisor
+          : isSupervisor // ignore: cast_nullable_to_non_nullable
+              as bool,
+      supervisorId: freezed == supervisorId
+          ? _value.supervisorId
+          : supervisorId // ignore: cast_nullable_to_non_nullable
+              as String?,
       weeklyHours: null == weeklyHours
           ? _value.weeklyHours
           : weeklyHours // ignore: cast_nullable_to_non_nullable
@@ -420,6 +446,8 @@ class _$UserModelImpl extends _UserModel {
       required this.email,
       required this.displayName,
       required this.role,
+      this.isSupervisor = false,
+      this.supervisorId,
       required this.weeklyHours,
       this.isActive = true,
       required this.createdAt,
@@ -455,6 +483,11 @@ class _$UserModelImpl extends _UserModel {
   final String displayName;
   @override
   final UserRole role;
+  @override
+  @JsonKey()
+  final bool isSupervisor;
+  @override
+  final String? supervisorId;
   @override
   final double weeklyHours;
   @override
@@ -525,7 +558,7 @@ class _$UserModelImpl extends _UserModel {
 
   @override
   String toString() {
-    return 'UserModel(userId: $userId, employeeId: $employeeId, email: $email, displayName: $displayName, role: $role, weeklyHours: $weeklyHours, isActive: $isActive, createdAt: $createdAt, nombre: $nombre, apellido1: $apellido1, apellido2: $apellido2, dni: $dni, telefono: $telefono, position: $position, department: $department, empresa: $empresa, scheduleId: $scheduleId, scheduleType: $scheduleType, customSchedule: $customSchedule, calendarId: $calendarId, fechaInicio: $fechaInicio, fechaFin: $fechaFin, schedule: $schedule)';
+    return 'UserModel(userId: $userId, employeeId: $employeeId, email: $email, displayName: $displayName, role: $role, isSupervisor: $isSupervisor, supervisorId: $supervisorId, weeklyHours: $weeklyHours, isActive: $isActive, createdAt: $createdAt, nombre: $nombre, apellido1: $apellido1, apellido2: $apellido2, dni: $dni, telefono: $telefono, position: $position, department: $department, empresa: $empresa, scheduleId: $scheduleId, scheduleType: $scheduleType, customSchedule: $customSchedule, calendarId: $calendarId, fechaInicio: $fechaInicio, fechaFin: $fechaFin, schedule: $schedule)';
   }
 
   @override
@@ -540,6 +573,10 @@ class _$UserModelImpl extends _UserModel {
             (identical(other.displayName, displayName) ||
                 other.displayName == displayName) &&
             (identical(other.role, role) || other.role == role) &&
+            (identical(other.isSupervisor, isSupervisor) ||
+                other.isSupervisor == isSupervisor) &&
+            (identical(other.supervisorId, supervisorId) ||
+                other.supervisorId == supervisorId) &&
             (identical(other.weeklyHours, weeklyHours) ||
                 other.weeklyHours == weeklyHours) &&
             (identical(other.isActive, isActive) ||
@@ -584,6 +621,8 @@ class _$UserModelImpl extends _UserModel {
         email,
         displayName,
         role,
+        isSupervisor,
+        supervisorId,
         weeklyHours,
         isActive,
         createdAt,
@@ -627,6 +666,8 @@ abstract class _UserModel extends UserModel {
       required final String email,
       required final String displayName,
       required final UserRole role,
+      final bool isSupervisor,
+      final String? supervisorId,
       required final double weeklyHours,
       final bool isActive,
       required final DateTime createdAt,
@@ -662,6 +703,10 @@ abstract class _UserModel extends UserModel {
   String get displayName;
   @override
   UserRole get role;
+  @override
+  bool get isSupervisor;
+  @override
+  String? get supervisorId;
   @override
   double get weeklyHours;
   @override

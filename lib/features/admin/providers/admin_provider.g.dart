@@ -38,7 +38,7 @@ final allEmployeesProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AllEmployeesRef = AutoDisposeStreamProviderRef<List<UserModel>>;
-String _$employeesCountHash() => r'cf39a93a00b0a8eed1174e2057d3261ef160c04b';
+String _$employeesCountHash() => r'6bf901e905006046295ba7392a1cf48fc4f5a219';
 
 /// Provider que cuenta el total de empleados activos
 ///
@@ -70,7 +70,7 @@ final employeesCountProvider = AutoDisposeStreamProvider<int>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef EmployeesCountRef = AutoDisposeStreamProviderRef<int>;
-String _$filteredEmployeesHash() => r'e316c1ca447b79e21aab0bfb13d845315b518ebc';
+String _$filteredEmployeesHash() => r'7b81b2e3e8c62b01adff8afdefbba58323b59e2b';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -302,7 +302,7 @@ class _FilteredEmployeesProviderElement
 }
 
 String _$employeesByDepartmentHash() =>
-    r'6da9fda40cc344c102ac87bbbc8e824d65e5cfb1';
+    r'8fb7b52892f16ae183df70ce4c4eb1e84dd73484';
 
 /// Provider para filtrar empleados por departamento
 ///
@@ -515,7 +515,7 @@ class _EmployeesByDepartmentProviderElement
 }
 
 String _$searchAndFilterEmployeesHash() =>
-    r'e8f4e1283a5e9a4bd41780662cdbb105ec17e1f5';
+    r'c345cb97de5b40cd4bdba30ae8b8ac39da3d0a2b';
 
 /// Provider para filtrar empleados por query de búsqueda Y departamento
 ///
