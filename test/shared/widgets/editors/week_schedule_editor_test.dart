@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('WeekScheduleEditor', () {
-    Map<String, DaySchedule> _defaultSchedule() {
+    Map<String, DaySchedule> defaultSchedule() {
       return {
         'monday': DaySchedule(
           isWorkDay: true,
@@ -48,7 +48,7 @@ void main() {
     testWidgets('muestra el total de horas semanales', (tester) async {
       await tester.pumpWidget(_wrap(
         child: WeekScheduleEditor(
-          initialSchedule: _defaultSchedule(),
+          initialSchedule: defaultSchedule(),
           onChanged: (_) {},
         ),
       ));
@@ -62,7 +62,7 @@ void main() {
     testWidgets('muestra los días de la semana', (tester) async {
       await tester.pumpWidget(_wrap(
         child: WeekScheduleEditor(
-          initialSchedule: _defaultSchedule(),
+          initialSchedule: defaultSchedule(),
           onChanged: (_) {},
         ),
       ));
@@ -82,7 +82,7 @@ void main() {
         (tester) async {
       await tester.pumpWidget(_wrap(
         child: WeekScheduleEditor(
-          initialSchedule: _defaultSchedule(),
+          initialSchedule: defaultSchedule(),
           onChanged: (_) {},
         ),
       ));
@@ -104,7 +104,7 @@ void main() {
     testWidgets('el día no laborable no muestra turnos', (tester) async {
       await tester.pumpWidget(_wrap(
         child: WeekScheduleEditor(
-          initialSchedule: _defaultSchedule(),
+          initialSchedule: defaultSchedule(),
           onChanged: (_) {},
         ),
       ));
