@@ -29,16 +29,6 @@
       ]
     },
     {
-      "collectionGroup": "overtime_requests",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "status",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
       "collectionGroup": "anomalies",
       "queryScope": "COLLECTION",
       "fields": [
