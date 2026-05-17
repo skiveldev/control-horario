@@ -13,6 +13,8 @@ import '../widgets/future_month_empty_state.dart';
 import '../widgets/add_edit_record_modal.dart';
 import '../widgets/blocked_record_modal.dart';
 import '../../models/time_record_model.dart';
+import '../../services/compliance_service.dart';
+import '../../../admin/presentation/widgets/compliance_badge.dart';
 
 /// Pantalla Mi Control Horario
 ///
@@ -251,6 +253,7 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
                 records: dayRecords,
                 plannedMinutes: 8 * 60, // 8h planificadas
                 isToday: isToday,
+                complianceStatus: _computeDayCompliance(day, dayRecords),
                 onAddRecord: () =>
                     _handleAddRecord(context, day, userId, dayRecords),
                 onEditRecord: (record) =>
@@ -496,5 +499,28 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
 
   String _formatDate(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+
+  /// Calcula el cumplimiento simple para un día basado en los registros.
+  ///
+  /// - Si no hay registros de trabajo en día laborable → noRecord
+  /// - Si hay registros → compliant
+  /// - Fin de semana → noRecord
+  ComplianceStatus _computeDayCompliance(
+    DateTime day,
+    List<TimeRecordModel> records,
+  ) {
+    // Fin de semana: no se esperan registros
+    if (day.weekday == DateTime.saturday || day.weekday == DateTime.sunday) {
+      return ComplianceStatus.noRecord;
+    }
+
+    final hasWorkRecords =
+        records.any((r) => r.category == RecordCategory.work);
+    if (!hasWorkRecords) {
+      return ComplianceStatus.noRecord;
+    }
+
+    return ComplianceStatus.compliant;
   }
 }

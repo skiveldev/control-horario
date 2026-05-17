@@ -335,15 +335,19 @@ class _WeekScheduleEditorState extends State<WeekScheduleEditor> {
     final picked = await showTimePicker(
       context: context,
       initialTime: initialTime,
+      initialEntryMode: TimePickerEntryMode.input,
       builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            timePickerTheme: TimePickerThemeData(
-              backgroundColor: AppColors.surface,
-              dialBackgroundColor: AppColors.surfaceVariant,
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              timePickerTheme: TimePickerThemeData(
+                backgroundColor: AppColors.surface,
+                dialBackgroundColor: AppColors.surfaceVariant,
+              ),
             ),
+            child: child!,
           ),
-          child: child!,
         );
       },
     );

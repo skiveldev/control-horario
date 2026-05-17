@@ -341,17 +341,21 @@ class _EditEntranceDialogState extends State<_EditEntranceDialog> {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: selectedTime,
+      initialEntryMode: TimePickerEntryMode.input,
       builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: colors.primary,
-              onPrimary: colors.textOnPrimary,
-              surface: colors.surface,
-              onSurface: colors.textPrimary,
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: ColorScheme.light(
+                primary: colors.primary,
+                onPrimary: colors.textOnPrimary,
+                surface: colors.surface,
+                onSurface: colors.textPrimary,
+              ),
             ),
+            child: child!,
           ),
-          child: child!,
         );
       },
     );
@@ -747,17 +751,21 @@ class _EditEntranceBottomSheetState extends State<_EditEntranceBottomSheet> {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: selectedTime,
+      initialEntryMode: TimePickerEntryMode.input,
       builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: colors.primary,
-              onPrimary: colors.textOnPrimary,
-              surface: colors.surface,
-              onSurface: colors.textPrimary,
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: ColorScheme.light(
+                primary: colors.primary,
+                onPrimary: colors.textOnPrimary,
+                surface: colors.surface,
+                onSurface: colors.textPrimary,
+              ),
             ),
+            child: child!,
           ),
-          child: child!,
         );
       },
     );
