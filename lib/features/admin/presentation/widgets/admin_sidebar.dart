@@ -81,19 +81,30 @@ class AdminSidebar extends ConsumerWidget {
                 ),
                 AppSpacing.verticalSpaceSm,
                 _SidebarItem(
+                  icon: Icons.warning_amber_outlined,
+                  activeIcon: Icons.warning_amber,
+                  label: 'Anomalías',
+                  route: AppRouter.adminAnomalies,
+                  isActive: currentRoute == AppRouter.adminAnomalies,
+                  onTap: () => _navigate(context, AppRouter.adminAnomalies),
+                ),
+                AppSpacing.verticalSpaceSm,
+                _SidebarItem(
+                  icon: Icons.more_time_outlined,
+                  activeIcon: Icons.more_time,
+                  label: 'Horas Extra',
+                  route: AppRouter.adminOvertime,
+                  isActive: currentRoute == AppRouter.adminOvertime,
+                  onTap: () => _navigate(context, AppRouter.adminOvertime),
+                ),
+                AppSpacing.verticalSpaceSm,
+                _SidebarItem(
                   icon: Icons.assignment_outlined,
                   activeIcon: Icons.assignment,
-                  label: 'Reportes Detallados',
-                  route: null, // TODO [FASE-2]: Implementar ruta
-                  isActive: false,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Función en desarrollo'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  },
+                  label: 'Reportes',
+                  route: AppRouter.adminReports,
+                  isActive: currentRoute == AppRouter.adminReports,
+                  onTap: () => _navigate(context, AppRouter.adminReports),
                 ),
                 AppSpacing.verticalSpaceSm,
                 _SidebarItem(
