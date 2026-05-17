@@ -34,6 +34,9 @@ on:
       - master
       - main
       - develop
+      - 'feature/**'
+      - 'feat/**'
+      - 'fix/**'
   
   # Permite ejecutarlo manualmente desde GitHub
   workflow_dispatch:
