@@ -21,13 +21,17 @@ on:
   # Se ejecuta en cada PUSH a estas ramas
   push:
     branches: 
+      - master
       - main
       - develop
       - 'feature/**'  # Cualquier rama que empiece con feature/
+      - 'feat/**'
+      - 'fix/**'
   
   # Se ejecuta cuando creas o actualizas un Pull Request
   pull_request:
     branches: 
+      - master
       - main
       - develop
   
@@ -88,34 +92,29 @@ jobs:
         continue-on-error: false
 
   # --------------------------------------------------------------------------
-  # JOB 2: EJECUTAR TESTS (Opcional - Descomentar cuando tengas tests)
+  # JOB 2: EJECUTAR TESTS
   # --------------------------------------------------------------------------
-  # test:
-  #   name: 🧪 Run Tests
-  #   runs-on: ubuntu-latest
-  #   needs: analyze  # Solo ejecutar si 'analyze' pasó
-  #   
-  #   steps:
-  #     - name: 📥 Checkout repository
-  #       uses: actions/checkout@v4
-  #     
-  #     - name: 🐦 Setup Flutter
-  #       uses: subosito/flutter-action@v2
-  #       with:
-  #         flutter-version: '3.19.0'
-  #         channel: 'stable'
-  #         cache: true
-  #     
-  #     - name: 📦 Get dependencies
-  #       run: flutter pub get
-  #     
-  #     - name: 🧪 Run unit tests
-  #       run: flutter test --coverage
-  #     
-  #     - name: 📊 Upload coverage to Codecov
-  #       uses: codecov/codecov-action@v3
-  #       with:
-  #         file: ./coverage/lcov.info
+  test:
+    name: 🧪 Run Tests
+    runs-on: ubuntu-latest
+    needs: analyze  # Solo ejecutar si 'analyze' pasó
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.1'
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Get dependencies
+        run: flutter pub get
+
+      - name: 🧪 Run unit tests
+        run: flutter test --coverage
 
   # --------------------------------------------------------------------------
   # JOB 3: BUILD APK (Android)
@@ -189,7 +188,7 @@ jobs:
   notify-success:
     name: ✅ Notify Success
     runs-on: ubuntu-latest
-    needs: [analyze, build-android, build-web]
+    needs: [analyze, test, build-android, build-web]
     if: success()  # Solo ejecutar si todo pasó
     
     steps:
@@ -200,4 +199,3 @@ jobs:
           echo "============================================"
           echo "El código está listo para merge o deploy"
           echo "============================================"
-
