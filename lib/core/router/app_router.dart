@@ -25,6 +25,9 @@ import '../../features/admin/presentation/screens/employees_list_screen.dart';
 import '../../features/admin/presentation/screens/employee_detail_screen.dart';
 import '../../features/admin/presentation/screens/schedule_management_screen.dart';
 import '../../features/admin/presentation/screens/calendar_management_screen.dart';
+import '../../features/admin/presentation/screens/anomalies_screen.dart';
+import '../../features/admin/presentation/screens/overtime_review_screen.dart';
+import '../../features/admin/presentation/screens/reports_screen.dart';
 
 /// Sistema de navegación de la aplicación
 ///
@@ -58,6 +61,9 @@ class AppRouter {
   static const String adminEmployeeDetail = '/admin/employees/:id';
   static const String adminSchedules = '/admin/schedules';
   static const String adminCalendars = '/admin/calendars';
+  static const String adminAnomalies = '/admin/anomalies';
+  static const String adminOvertime = '/admin/overtime';
+  static const String adminReports = '/admin/reports';
 
   // ============================================================================
   // ROUTER CONFIGURATION
@@ -266,6 +272,36 @@ class AppRouter {
               context: context,
               state: state,
               child: const CalendarManagementScreen(),
+            ),
+          ),
+          // Detección de anomalías
+          GoRoute(
+            path: 'anomalies',
+            name: 'admin-anomalies',
+            pageBuilder: (context, state) => _buildPageWithTransition(
+              context: context,
+              state: state,
+              child: const AnomaliesScreen(),
+            ),
+          ),
+          // Revisión de horas extra
+          GoRoute(
+            path: 'overtime',
+            name: 'admin-overtime',
+            pageBuilder: (context, state) => _buildPageWithTransition(
+              context: context,
+              state: state,
+              child: const OvertimeReviewScreen(),
+            ),
+          ),
+          // Generación de reportes
+          GoRoute(
+            path: 'reports',
+            name: 'admin-reports',
+            pageBuilder: (context, state) => _buildPageWithTransition(
+              context: context,
+              state: state,
+              child: const ReportsScreen(),
             ),
           ),
         ],

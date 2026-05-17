@@ -5,6 +5,8 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
 import '../../models/time_record_model.dart';
+import '../../services/compliance_service.dart';
+import '../../../admin/presentation/widgets/compliance_badge.dart';
 
 /// Card de un día con registros colapsable/expandible
 ///
@@ -15,6 +17,7 @@ class DayRecordCard extends StatefulWidget {
   final List<TimeRecordModel> records;
   final int plannedMinutes;
   final bool isToday;
+  final ComplianceStatus? complianceStatus;
   final VoidCallback? onAddRecord;
   final Function(TimeRecordModel)? onEditRecord;
   final Function(TimeRecordModel)? onCopyRecord;
@@ -26,6 +29,7 @@ class DayRecordCard extends StatefulWidget {
     required this.records,
     this.plannedMinutes = 0,
     this.isToday = false,
+    this.complianceStatus,
     this.onAddRecord,
     this.onEditRecord,
     this.onCopyRecord,
@@ -156,11 +160,19 @@ class _DayRecordCardState extends State<DayRecordCard> {
                     ],
                   ),
                   AppSpacing.verticalSpaceXs,
-                  Text(
-                    weekDayCapitalized,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        weekDayCapitalized,
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      if (widget.complianceStatus != null) ...[
+                        AppSpacing.horizontalSpaceSm,
+                        ComplianceBadge(status: widget.complianceStatus!),
+                      ],
+                    ],
                   ),
                 ],
               ),
