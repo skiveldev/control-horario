@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -12,6 +13,13 @@ import '../../providers/supervisors_provider.dart';
 import '../../providers/user_management_provider.dart';
 import '../../providers/schedule_management_provider.dart';
 import '../../providers/calendar_management_provider.dart';
+
+String formatTemporaryCredentialsForClipboard({
+  required String email,
+  required String temporaryPassword,
+}) {
+  return 'Email: $email\nContraseña temporal: $temporaryPassword';
+}
 
 /// Drawer lateral para crear nuevo empleado
 ///
@@ -191,19 +199,22 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
 
     if (result != null) {
       if (mounted) {
+        final temporaryPassword = result['temporaryPassword'] ?? '';
+
         // Mostrar credenciales temporales (más breve)
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                'Usuario creado: ${_emailController.text}\nContraseña: ${result['temporaryPassword']}'),
+                'Usuario creado: ${_emailController.text}\nContraseña: $temporaryPassword'),
             backgroundColor: AppColors.success,
             duration: const Duration(seconds: 5),
             action: SnackBarAction(
               label: 'COPIAR',
               textColor: AppColors.surface,
-              onPressed: () {
-                // TODO: Copiar al portapapeles
-              },
+              onPressed: () => _copyToClipboard(
+                temporaryPassword,
+                successMessage: 'Contraseña copiada al portapapeles',
+              ),
             ),
           ),
         );
@@ -313,12 +324,46 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
     }
   }
 
+  Future<void> _copyToClipboard(
+    String text, {
+    required String successMessage,
+  }) async {
+    final copied = await _tryCopyToClipboard(text);
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            copied ? successMessage : 'No se pudo copiar',
+          ),
+          backgroundColor: copied ? AppColors.success : AppColors.error,
+        ),
+      );
+  }
+
+  Future<bool> _tryCopyToClipboard(String text) async {
+    if (text.isEmpty) return false;
+
+    try {
+      await Clipboard.setData(ClipboardData(text: text));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// Muestra un diálogo con las credenciales temporales
   void _showSuccessDialog(Map<String, String> credentials) {
+    final email = _emailController.text.trim();
+    final temporaryPassword = credentials['temporaryPassword'] ?? '';
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Row(
           children: [
             const Icon(Icons.check_circle, color: AppColors.success, size: 32),
@@ -357,7 +402,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                       const SizedBox(width: AppSpacing.sm),
                       Flexible(
                         child: Text(
-                          _emailController.text.trim(),
+                          email,
                           style: AppTextStyles.bodyLarge.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
@@ -373,7 +418,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                       const SizedBox(width: AppSpacing.sm),
                       Flexible(
                         child: Text(
-                          credentials['temporaryPassword'] ?? '',
+                          temporaryPassword,
                           style: AppTextStyles.bodyLarge.copyWith(
                             fontWeight: FontWeight.w600,
                             fontFamily: 'monospace',
@@ -398,15 +443,39 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              // TODO: Copiar credenciales al portapapeles
-              Navigator.of(context).pop();
+            onPressed: () async {
+              final copied = await _tryCopyToClipboard(
+                formatTemporaryCredentialsForClipboard(
+                  email: email,
+                  temporaryPassword: temporaryPassword,
+                ),
+              );
+
+              if (!dialogContext.mounted) return;
+
+              ScaffoldMessenger.of(dialogContext)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      copied
+                          ? 'Credenciales copiadas al portapapeles'
+                          : 'No se pudo copiar',
+                    ),
+                    backgroundColor:
+                        copied ? AppColors.success : AppColors.error,
+                  ),
+                );
+
+              if (copied) {
+                Navigator.of(dialogContext).pop();
+              }
             },
             child: const Text('COPIAR CREDENCIALES'),
           ),
           CustomButton(
             text: 'CERRAR',
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             variant: ButtonVariant.brand,
           ),
         ],
