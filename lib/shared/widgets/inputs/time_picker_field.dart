@@ -130,26 +130,30 @@ class TimePickerField extends StatelessWidget {
   }
 
   Future<void> _showTimePicker(BuildContext context) async {
-    final initialTime = value ?? TimeOfDay.now();
+    final initialTime = value ?? const TimeOfDay(hour: 9, minute: 0);
 
     final pickedTime = await showTimePicker(
       context: context,
       initialTime: initialTime,
+      initialEntryMode: TimePickerEntryMode.input,
       builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            timePickerTheme: TimePickerThemeData(
-              backgroundColor: AppColors.surface,
-              hourMinuteTextColor: AppColors.textPrimary,
-              dialHandColor: AppColors.primary,
-              dialBackgroundColor: AppColors.surfaceVariant,
-              entryModeIconColor: AppColors.primary,
-              helpTextStyle: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              timePickerTheme: TimePickerThemeData(
+                backgroundColor: AppColors.surface,
+                hourMinuteTextColor: AppColors.textPrimary,
+                dialHandColor: AppColors.primary,
+                dialBackgroundColor: AppColors.surfaceVariant,
+                entryModeIconColor: AppColors.primary,
+                helpTextStyle: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
               ),
             ),
+            child: child!,
           ),
-          child: child!,
         );
       },
     );
