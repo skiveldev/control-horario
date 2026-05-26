@@ -67,9 +67,11 @@ class MetricCard extends StatelessWidget {
         child: Container(
           padding: AppSpacing.allLg,
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: AppSpacing.borderRadiusMd,
-            border: Border.all(color: AppColors.border),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline,
+            ),
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadow.withValues(alpha: 0.05),
@@ -100,7 +102,7 @@ class MetricCard extends StatelessWidget {
                   ),
                   const Spacer(),
                   // Badge de cambio
-                  if (badgeText != null) _buildBadge(),
+                  if (badgeText != null) _buildBadge(context),
                 ],
               ),
 
@@ -111,7 +113,7 @@ class MetricCard extends StatelessWidget {
                 value,
                 style: AppTextStyles.h2.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
 
@@ -121,7 +123,7 @@ class MetricCard extends StatelessWidget {
               Text(
                 label,
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -133,7 +135,7 @@ class MetricCard extends StatelessWidget {
                 Container(
                   height: 3,
                   decoration: BoxDecoration(
-                    color: AppColors.border,
+                    color: Theme.of(context).colorScheme.outline,
                     borderRadius: BorderRadius.circular(2),
                   ),
                   child: FractionallySizedBox(
@@ -155,7 +157,7 @@ class MetricCard extends StatelessWidget {
     );
   }
 
-  Widget _buildBadge() {
+  Widget _buildBadge(BuildContext context) {
     final isPositive = badgeText!.startsWith('+');
     final isPercentage = badgeText!.contains('%');
     final effectiveColor = badgeColor ??
@@ -163,7 +165,7 @@ class MetricCard extends StatelessWidget {
             ? AppColors.success
             : badgeText!.startsWith('-')
                 ? AppColors.error
-                : AppColors.textSecondary);
+                : Theme.of(context).colorScheme.onSurfaceVariant);
 
     return Container(
       padding: AppSpacing.symmetric(

@@ -25,65 +25,65 @@ class AppTextStyles {
   /// H1 - Título principal de pantalla
   /// Peso: 700 (Bold), Tamaño: 32px
   /// Uso: Títulos de páginas principales
+  /// Color: provided by ThemeData.textTheme per brightness.
   static final TextStyle h1 = GoogleFonts.inter(
     fontSize: 32,
     fontWeight: FontWeight.w700,
     height: 1.2,
     letterSpacing: -0.5,
-    color: AppColors.textPrimary,
   );
 
   /// H2 - Título de sección
   /// Peso: 700 (Bold), Tamaño: 24px
   /// Uso: Títulos de secciones dentro de una página
+  /// Color: provided by ThemeData.textTheme per brightness.
   static final TextStyle h2 = GoogleFonts.inter(
     fontSize: 24,
     fontWeight: FontWeight.w700,
     height: 1.3,
     letterSpacing: -0.3,
-    color: AppColors.textPrimary,
   );
 
   /// H3 - Subtítulo importante
   /// Peso: 600 (SemiBold), Tamaño: 20px
   /// Uso: Subtítulos, títulos de cards
+  /// Color: provided by ThemeData.textTheme per brightness.
   static final TextStyle h3 = GoogleFonts.inter(
     fontSize: 20,
     fontWeight: FontWeight.w600,
     height: 1.4,
     letterSpacing: -0.2,
-    color: AppColors.textPrimary,
   );
 
   /// H4 - Subtítulo secundario
   /// Peso: 600 (SemiBold), Tamaño: 18px
   /// Uso: Subtítulos menores, headers de listas
+  /// Color: provided by ThemeData.textTheme per brightness.
   static final TextStyle h4 = GoogleFonts.inter(
     fontSize: 18,
     fontWeight: FontWeight.w600,
     height: 1.4,
     letterSpacing: -0.1,
-    color: AppColors.textPrimary,
   );
 
   /// H5 - Título pequeño
   /// Peso: 600 (SemiBold), Tamaño: 16px
   /// Uso: Títulos de widgets pequeños
+  /// Color: provided by ThemeData.textTheme per brightness.
   static final TextStyle h5 = GoogleFonts.inter(
     fontSize: 16,
     fontWeight: FontWeight.w600,
     height: 1.5,
-    color: AppColors.textPrimary,
   );
 
   /// H6 - Título mínimo
   /// Peso: 600 (SemiBold), Tamaño: 14px
   /// Uso: Etiquetas destacadas, mini-headers
+  /// Color: provided by ThemeData.textTheme per brightness.
   static final TextStyle h6 = GoogleFonts.inter(
     fontSize: 14,
     fontWeight: FontWeight.w600,
     height: 1.5,
-    color: AppColors.textPrimary,
   );
 
   // ============================================================================
@@ -93,31 +93,31 @@ class AppTextStyles {
   /// Body Large - Texto principal grande
   /// Peso: 400 (Regular), Tamaño: 16px
   /// Uso: Párrafos, contenido principal
+  /// Color: provided by ThemeData.textTheme per brightness.
   static final TextStyle bodyLarge = GoogleFonts.inter(
     fontSize: 16,
     fontWeight: FontWeight.w400,
     height: 1.5,
-    color: AppColors.textPrimary,
   );
 
   /// Body Medium - Texto principal mediano (defecto)
   /// Peso: 400 (Regular), Tamaño: 14px
   /// Uso: Texto estándar, descripción, contenido general
+  /// Color: provided by ThemeData.textTheme per brightness.
   static final TextStyle bodyMedium = GoogleFonts.inter(
     fontSize: 14,
     fontWeight: FontWeight.w400,
     height: 1.5,
-    color: AppColors.textPrimary,
   );
 
   /// Body Small - Texto principal pequeño
   /// Peso: 400 (Regular), Tamaño: 12px
   /// Uso: Textos secundarios, notas al pie
+  /// Color: provided by ThemeData.textTheme per brightness.
   static final TextStyle bodySmall = GoogleFonts.inter(
     fontSize: 12,
     fontWeight: FontWeight.w400,
     height: 1.5,
-    color: AppColors.textSecondary,
   );
 
   // ============================================================================
@@ -127,34 +127,34 @@ class AppTextStyles {
   /// Label Large - Etiqueta grande
   /// Peso: 500 (Medium), Tamaño: 14px
   /// Uso: Labels de inputs, etiquetas importantes
+  /// Color: provided by ThemeData.textTheme per brightness.
   static final TextStyle labelLarge = GoogleFonts.inter(
     fontSize: 14,
     fontWeight: FontWeight.w500,
     height: 1.4,
     letterSpacing: 0.1,
-    color: AppColors.textPrimary,
   );
 
   /// Label Medium - Etiqueta mediana
   /// Peso: 500 (Medium), Tamaño: 12px
   /// Uso: Labels estándar, botones
+  /// Color: provided by ThemeData.textTheme per brightness.
   static final TextStyle labelMedium = GoogleFonts.inter(
     fontSize: 12,
     fontWeight: FontWeight.w500,
     height: 1.4,
     letterSpacing: 0.5,
-    color: AppColors.textPrimary,
   );
 
   /// Label Small - Etiqueta pequeña
   /// Peso: 500 (Medium), Tamaño: 11px
   /// Uso: Labels pequeños, badges, tags
+  /// Color: provided by ThemeData.textTheme per brightness.
   static final TextStyle labelSmall = GoogleFonts.inter(
     fontSize: 11,
     fontWeight: FontWeight.w500,
     height: 1.4,
     letterSpacing: 0.5,
-    color: AppColors.textSecondary,
   );
 
   // ============================================================================
@@ -164,66 +164,66 @@ class AppTextStyles {
   /// Button Text - Texto de botón
   /// Peso: 600 (SemiBold), Tamaño: 14px
   /// Uso: Texto dentro de botones
+  /// Color: provided by ThemeData (e.g., ButtonStyle foregroundColor).
   static final TextStyle button = GoogleFonts.inter(
     fontSize: 14,
     fontWeight: FontWeight.w600,
     height: 1.2,
     letterSpacing: 0.5,
-    color: AppColors.textOnPrimary,
   );
 
   /// Caption - Texto descriptivo
   /// Peso: 400 (Regular), Tamaño: 12px
   /// Uso: Pies de foto, timestamps, información auxiliar
+  /// Color: provided by ThemeData.textTheme per brightness.
   static final TextStyle caption = GoogleFonts.inter(
     fontSize: 12,
     fontWeight: FontWeight.w400,
     height: 1.4,
-    color: AppColors.textTertiary,
   );
 
   /// Overline - Texto sobre línea
   /// Peso: 600 (SemiBold), Tamaño: 10px
   /// Uso: Categorías, secciones superiores
+  /// Color: provided by ThemeData.textTheme per brightness.
   static final TextStyle overline = GoogleFonts.inter(
     fontSize: 10,
     fontWeight: FontWeight.w600,
     height: 1.6,
     letterSpacing: 1.5,
-    color: AppColors.textSecondary,
   ).copyWith(textBaseline: TextBaseline.alphabetic);
 
   /// Display Large - Números grandes
   /// Peso: 700 (Bold), Tamaño: 48px
   /// Uso: Reloj digital, números destacados
+  /// Color: provided by ThemeData.textTheme per brightness.
   static final TextStyle displayLarge = GoogleFonts.inter(
     fontSize: 48,
     fontWeight: FontWeight.w700,
     height: 1.1,
     letterSpacing: -1,
-    color: AppColors.textPrimary,
   );
 
   /// Display Medium - Números medianos
   /// Peso: 600 (SemiBold), Tamaño: 36px
   /// Uso: Métricas importantes
+  /// Color: provided by ThemeData.textTheme per brightness.
   static final TextStyle displayMedium = GoogleFonts.inter(
     fontSize: 36,
     fontWeight: FontWeight.w600,
     height: 1.2,
     letterSpacing: -0.5,
-    color: AppColors.textPrimary,
   );
 
   /// Display Small - Números pequeños destacados
   /// Peso: 600 (SemiBold), Tamaño: 28px
   /// Uso: Contadores, estadísticas
+  /// Color: provided by ThemeData.textTheme per brightness.
   static final TextStyle displaySmall = GoogleFonts.inter(
     fontSize: 28,
     fontWeight: FontWeight.w600,
     height: 1.2,
     letterSpacing: -0.3,
-    color: AppColors.textPrimary,
   );
 
   // ============================================================================
@@ -233,22 +233,22 @@ class AppTextStyles {
   /// Link - Texto de enlace
   /// Peso: 500 (Medium), Tamaño: 14px
   /// Uso: Links clickeables
+  /// Color: provided by theme (primary link color).
   static final TextStyle link = GoogleFonts.inter(
     fontSize: 14,
     fontWeight: FontWeight.w500,
     height: 1.5,
-    color: AppColors.primary,
     decoration: TextDecoration.underline,
   );
 
   /// Link Small - Texto de enlace pequeño
   /// Peso: 500 (Medium), Tamaño: 12px
   /// Uso: Links secundarios
+  /// Color: provided by theme (primary link color).
   static final TextStyle linkSmall = GoogleFonts.inter(
     fontSize: 12,
     fontWeight: FontWeight.w500,
     height: 1.5,
-    color: AppColors.primary,
     decoration: TextDecoration.underline,
   );
 
@@ -299,10 +299,30 @@ extension AppTextStylesExtension on TextStyle {
   TextStyle get primary => copyWith(color: AppColors.primary);
 
   /// Aplicar color secundario
+  ///
+  /// **DEPRECATED**: This extension hardcodes [AppColors.textSecondary] which
+  /// does NOT adapt to dark mode. Use [onSurfaceVariant] or
+  /// `Theme.of(context).colorScheme.onSurfaceVariant` directly instead.
+  @Deprecated(
+      'Use onSurfaceVariant or Theme.of(context).colorScheme.onSurfaceVariant')
   TextStyle get secondary => copyWith(color: AppColors.textSecondary);
 
   /// Aplicar color terciario
+  ///
+  /// **DEPRECATED**: This extension hardcodes [AppColors.textTertiary] which
+  /// does NOT adapt to dark mode. Use [outline] or
+  /// `Theme.of(context).colorScheme.outline` directly instead.
+  @Deprecated('Use outline or Theme.of(context).colorScheme.outline')
   TextStyle get tertiary => copyWith(color: AppColors.textTertiary);
+
+  /// Aplicar color onSurfaceVariant (context-aware).
+  /// Use this instead of the deprecated [secondary] extension.
+  TextStyle onSurfaceVariant(ColorScheme cs) =>
+      copyWith(color: cs.onSurfaceVariant);
+
+  /// Aplicar color outline (context-aware).
+  /// Use this instead of the deprecated [tertiary] extension.
+  TextStyle outline(ColorScheme cs) => copyWith(color: cs.outline);
 
   /// Aplicar color de éxito
   TextStyle get success => copyWith(color: AppColors.success);

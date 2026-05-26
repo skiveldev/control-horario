@@ -126,11 +126,11 @@ class ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final content = _buildContent();
+    final content = _buildContent(context);
 
     if (fullScreen) {
       return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(child: content),
       );
     }
@@ -138,7 +138,7 @@ class ErrorState extends StatelessWidget {
     return Center(child: content);
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(BuildContext context) {
     return Padding(
       padding: AppSpacing.allXxl,
       child: Column(
@@ -160,7 +160,9 @@ class ErrorState extends StatelessWidget {
           // Título
           Text(
             title,
-            style: AppTextStyles.h3.copyWith(color: AppColors.textPrimary),
+            style: AppTextStyles.h3.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
             textAlign: TextAlign.center,
           ),
 
@@ -172,7 +174,7 @@ class ErrorState extends StatelessWidget {
             child: Text(
               message,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),

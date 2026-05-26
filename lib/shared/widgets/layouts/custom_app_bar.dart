@@ -106,14 +106,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: transparent
           ? Colors.transparent
-          : backgroundColor ?? AppColors.surface,
+          : backgroundColor ?? Theme.of(context).colorScheme.surface,
       elevation: transparent ? 0 : (elevation ?? 1),
       automaticallyImplyLeading: automaticallyImplyLeading,
       leading: leading,
       title: titleWidget ??
           (title != null ? Text(title!, style: AppTextStyles.h4) : null),
       actions: _buildActions(),
-      flexibleSpace: showSearch ? _buildSearchBar() : null,
+      flexibleSpace: showSearch ? _buildSearchBar(context) : null,
     );
   }
 
@@ -153,7 +153,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return actionWidgets.isNotEmpty ? actionWidgets : null;
   }
 
-  Widget? _buildSearchBar() {
+  Widget? _buildSearchBar(BuildContext context) {
     if (!showSearch) return null;
 
     return Container(
@@ -167,7 +167,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           hintText: searchHint ?? 'Buscar...',
           prefixIcon: const Icon(Icons.search),
           filled: true,
-          fillColor: AppColors.surfaceVariant,
+          fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
             borderSide: BorderSide.none,

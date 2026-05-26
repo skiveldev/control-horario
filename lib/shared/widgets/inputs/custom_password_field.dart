@@ -170,7 +170,7 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
                       ? AppColors.error
                       : _isFocused
                           ? AppColors.primary
-                          : AppColors.textSecondary,
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 children: const [
                   TextSpan(
@@ -208,7 +208,7 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
                   ? AppColors.error
                   : _isFocused
                       ? AppColors.primary
-                      : AppColors.textSecondary,
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
             ),
 
             // Toggle de visibilidad
@@ -223,7 +223,7 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
                   ? AppColors.error
                   : _isFocused
                       ? AppColors.primary
-                      : AppColors.textSecondary,
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
               onPressed: _toggleVisibility,
               tooltip:
                   _obscureText ? 'Mostrar contraseña' : 'Ocultar contraseña',
@@ -258,7 +258,7 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
       _currentValue,
       minLength: widget.minLength ?? 6,
     );
-    final strengthData = _getStrengthData(strength);
+    final strengthData = _getStrengthData(strength, context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,7 +270,7 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
           child: LinearProgressIndicator(
             value: strength / 4,
             minHeight: 4,
-            backgroundColor: AppColors.borderLight,
+            backgroundColor: Theme.of(context).colorScheme.outlineVariant,
             valueColor: AlwaysStoppedAnimation<Color>(
               strengthData['color'] as Color,
             ),
@@ -291,7 +291,7 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
   }
 
   /// Obtiene datos visuales según la fortaleza
-  Map<String, dynamic> _getStrengthData(int strength) {
+  Map<String, dynamic> _getStrengthData(int strength, BuildContext context) {
     switch (strength) {
       case 0:
       case 1:
@@ -303,7 +303,10 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
       case 4:
         return {'text': 'Contraseña muy fuerte', 'color': AppColors.success};
       default:
-        return {'text': '', 'color': AppColors.textSecondary};
+        return {
+          'text': '',
+          'color': Theme.of(context).colorScheme.onSurfaceVariant,
+        };
     }
   }
 }

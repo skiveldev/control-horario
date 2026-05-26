@@ -105,7 +105,7 @@ class IconButtonCustom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final button = _buildButton();
+    final button = _buildButton(context);
 
     if (tooltip != null) {
       return Tooltip(message: tooltip!, child: button);
@@ -114,11 +114,11 @@ class IconButtonCustom extends StatelessWidget {
     return button;
   }
 
-  Widget _buildButton() {
+  Widget _buildButton(BuildContext context) {
     final iconWidget = Icon(
       icon,
       size: _getIconSize(),
-      color: iconColor ?? _getDefaultIconColor(),
+      color: iconColor ?? _getDefaultIconColor(context),
     );
 
     switch (variant) {
@@ -135,8 +135,10 @@ class IconButtonCustom extends StatelessWidget {
             maxHeight: _getButtonSize(),
           ),
           style: IconButton.styleFrom(
-            foregroundColor: iconColor ?? AppColors.textPrimary,
-            disabledForegroundColor: AppColors.textTertiary,
+            foregroundColor:
+                iconColor ?? Theme.of(context).colorScheme.onSurface,
+            disabledForegroundColor:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
             shape: circular
                 ? const CircleBorder()
                 : RoundedRectangleBorder(
@@ -158,10 +160,14 @@ class IconButtonCustom extends StatelessWidget {
             maxHeight: _getButtonSize(),
           ),
           style: IconButton.styleFrom(
-            backgroundColor: backgroundColor ?? AppColors.primary,
-            foregroundColor: iconColor ?? AppColors.textOnPrimary,
-            disabledBackgroundColor: AppColors.borderLight,
-            disabledForegroundColor: AppColors.textTertiary,
+            backgroundColor:
+                backgroundColor ?? Theme.of(context).colorScheme.primary,
+            foregroundColor:
+                iconColor ?? Theme.of(context).colorScheme.onPrimary,
+            disabledBackgroundColor:
+                Theme.of(context).colorScheme.outlineVariant,
+            disabledForegroundColor:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
             shape: circular
                 ? const CircleBorder()
                 : RoundedRectangleBorder(
@@ -183,10 +189,14 @@ class IconButtonCustom extends StatelessWidget {
             maxHeight: _getButtonSize(),
           ),
           style: IconButton.styleFrom(
-            backgroundColor: backgroundColor ?? AppColors.surfaceVariant,
-            foregroundColor: iconColor ?? AppColors.textPrimary,
-            disabledBackgroundColor: AppColors.borderLight,
-            disabledForegroundColor: AppColors.textTertiary,
+            backgroundColor: backgroundColor ??
+                Theme.of(context).colorScheme.surfaceContainerHighest,
+            foregroundColor:
+                iconColor ?? Theme.of(context).colorScheme.onSurface,
+            disabledBackgroundColor:
+                Theme.of(context).colorScheme.outlineVariant,
+            disabledForegroundColor:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
             shape: circular
                 ? const CircleBorder()
                 : RoundedRectangleBorder(
@@ -208,11 +218,12 @@ class IconButtonCustom extends StatelessWidget {
             maxHeight: _getButtonSize(),
           ),
           style: IconButton.styleFrom(
-            foregroundColor: iconColor ?? AppColors.textPrimary,
-            disabledForegroundColor: AppColors.textTertiary,
+            foregroundColor:
+                iconColor ?? Theme.of(context).colorScheme.onSurface,
+            disabledForegroundColor:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
             side: BorderSide(
-              color:
-                  onPressed == null ? AppColors.borderLight : AppColors.border,
+              color: Theme.of(context).colorScheme.outline,
               width: 1,
             ),
             shape: circular
@@ -251,14 +262,15 @@ class IconButtonCustom extends StatelessWidget {
     }
   }
 
-  Color _getDefaultIconColor() {
+  Color _getDefaultIconColor(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     switch (variant) {
       case IconButtonVariant.standard:
       case IconButtonVariant.tonal:
       case IconButtonVariant.outlined:
-        return AppColors.textPrimary;
+        return cs.onSurface;
       case IconButtonVariant.filled:
-        return AppColors.textOnPrimary;
+        return cs.onPrimary;
     }
   }
 }

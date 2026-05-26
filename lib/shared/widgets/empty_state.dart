@@ -85,11 +85,11 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final content = _buildContent();
+    final content = _buildContent(context);
 
     if (fullScreen) {
       return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(child: content),
       );
     }
@@ -97,7 +97,7 @@ class EmptyState extends StatelessWidget {
     return Center(child: content);
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(BuildContext context) {
     return Padding(
       padding: AppSpacing.allXxl,
       child: Column(
@@ -108,15 +108,14 @@ class EmptyState extends StatelessWidget {
           Container(
             padding: AppSpacing.allXl,
             decoration: BoxDecoration(
-              color: (iconColor ?? AppColors.textTertiary).withValues(
-                alpha: 0.1,
-              ),
+              color: (iconColor ?? Theme.of(context).colorScheme.outline)
+                  .withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
               icon,
               size: iconSize ?? 64.0,
-              color: iconColor ?? AppColors.textTertiary,
+              color: iconColor ?? Theme.of(context).colorScheme.outline,
             ),
           ),
 
@@ -125,7 +124,9 @@ class EmptyState extends StatelessWidget {
           // Título
           Text(
             title,
-            style: AppTextStyles.h3.copyWith(color: AppColors.textPrimary),
+            style: AppTextStyles.h3.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
             textAlign: TextAlign.center,
           ),
 
@@ -137,7 +138,7 @@ class EmptyState extends StatelessWidget {
               child: Text(
                 message!,
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
               ),

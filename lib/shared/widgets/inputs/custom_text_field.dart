@@ -206,7 +206,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                       ? AppColors.error
                       : _isFocused
                           ? AppColors.primary
-                          : AppColors.textSecondary,
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 children: const [
                   TextSpan(
@@ -250,7 +250,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                         ? AppColors.error
                         : _isFocused
                             ? AppColors.primary
-                            : AppColors.textSecondary,
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
                   )
                 : null,
             prefix: widget.prefix,
@@ -265,7 +265,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                         ? AppColors.error
                         : _isFocused
                             ? AppColors.primary
-                            : AppColors.textSecondary,
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
                   )
                 : null,
             suffix: widget.suffix,

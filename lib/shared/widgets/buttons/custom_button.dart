@@ -135,28 +135,28 @@ class CustomButton extends StatelessWidget {
     return SizedBox(
       width: fullWidth ? double.infinity : null,
       height: _getHeight(),
-      child: _buildButton(isDisabled),
+      child: _buildButton(context, isDisabled),
     );
   }
 
-  Widget _buildButton(bool isDisabled) {
+  Widget _buildButton(BuildContext context, bool isDisabled) {
     switch (variant) {
       case ButtonVariant.primary:
-        return _buildPrimaryButton(isDisabled);
+        return _buildPrimaryButton(context, isDisabled);
       case ButtonVariant.brand:
-        return _buildBrandButton(isDisabled);
+        return _buildBrandButton(context, isDisabled);
       case ButtonVariant.secondary:
-        return _buildSecondaryButton(isDisabled);
+        return _buildSecondaryButton(context, isDisabled);
       case ButtonVariant.text:
-        return _buildTextButton(isDisabled);
+        return _buildTextButton(context, isDisabled);
       case ButtonVariant.outline:
-        return _buildOutlineButton(isDisabled);
+        return _buildOutlineButton(context, isDisabled);
       case ButtonVariant.success:
-        return _buildSuccessButton(isDisabled);
+        return _buildSuccessButton(context, isDisabled);
       case ButtonVariant.danger:
-        return _buildDangerButton(isDisabled);
+        return _buildDangerButton(context, isDisabled);
       case ButtonVariant.warning:
-        return _buildWarningButton(isDisabled);
+        return _buildWarningButton(context, isDisabled);
     }
   }
 
@@ -164,10 +164,11 @@ class CustomButton extends StatelessWidget {
   // VARIANTES DE BOTÓN
   // ==========================================================================
 
-  Widget _buildPrimaryButton(bool isDisabled) {
+  Widget _buildPrimaryButton(BuildContext context, bool isDisabled) {
     // Si no hay backgroundColor personalizado, usar GRADIENTE VERDE
     if (backgroundColor == null) {
       return _buildGradientButton(
+        context,
         isDisabled,
         gradient: AppGradients.buttonPrimary,
         glowShadow: AppShadows.buttonPrimaryGlow,
@@ -194,13 +195,14 @@ class CustomButton extends StatelessWidget {
         ),
         textStyle: _getTextStyle(),
       ),
-      child: _buildContent(),
+      child: _buildContent(context),
     );
   }
 
-  Widget _buildBrandButton(bool isDisabled) {
+  Widget _buildBrandButton(BuildContext context, bool isDisabled) {
     // Usar GRADIENTE AZUL-VIOLETA (coherente con header de login)
     return _buildGradientButton(
+      context,
       isDisabled,
       gradient: AppGradients.buttonBrand,
       glowShadow: AppShadows.buttonBrandGlow,
@@ -210,6 +212,7 @@ class CustomButton extends StatelessWidget {
 
   /// Botón con gradiente + glow genérico (TODOS los botones principales)
   Widget _buildGradientButton(
+    BuildContext context,
     bool isDisabled, {
     required LinearGradient gradient,
     required List<BoxShadow> glowShadow,
@@ -239,7 +242,7 @@ class CustomButton extends StatelessWidget {
                   color: textColor,
                   fontWeight: FontWeight.w600,
                 ),
-                child: _buildContent(),
+                child: _buildContent(context),
               ),
             ),
           ),
@@ -248,20 +251,19 @@ class CustomButton extends StatelessWidget {
     );
   }
 
-  Widget _buildSecondaryButton(bool isDisabled) {
+  Widget _buildSecondaryButton(BuildContext context, bool isDisabled) {
+    final cs = Theme.of(context).colorScheme;
     // Si outline es true, usar OutlinedButton en lugar de ElevatedButton
     if (outline) {
       return OutlinedButton(
         onPressed: isDisabled ? null : onPressed,
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.textPrimary,
-          disabledForegroundColor: AppColors.textTertiary.withValues(
+          foregroundColor: cs.onSurface,
+          disabledForegroundColor: cs.outline.withValues(
             alpha: 0.5,
           ),
           side: BorderSide(
-            color: isDisabled
-                ? AppColors.border.withValues(alpha: 0.4)
-                : AppColors.border,
+            color: isDisabled ? cs.outline.withValues(alpha: 0.4) : cs.outline,
             width: 2,
           ),
           padding: _getPadding(),
@@ -272,19 +274,19 @@ class CustomButton extends StatelessWidget {
           ),
           textStyle: _getTextStyle(),
         ),
-        child: _buildContent(),
+        child: _buildContent(context),
       );
     }
 
     return ElevatedButton(
       onPressed: isDisabled ? null : onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.surfaceVariant,
-        foregroundColor: AppColors.textPrimary,
-        disabledBackgroundColor: AppColors.surfaceVariant.withValues(
+        backgroundColor: cs.surfaceContainerHighest,
+        foregroundColor: cs.onSurface,
+        disabledBackgroundColor: cs.surfaceContainerHighest.withValues(
           alpha: 0.4,
         ),
-        disabledForegroundColor: AppColors.textPrimary.withValues(alpha: 0.5),
+        disabledForegroundColor: cs.onSurface.withValues(alpha: 0.5),
         elevation: 0,
         padding: _getPadding(),
         shape: RoundedRectangleBorder(
@@ -294,16 +296,16 @@ class CustomButton extends StatelessWidget {
         ),
         textStyle: _getTextStyle(),
       ),
-      child: _buildContent(),
+      child: _buildContent(context),
     );
   }
 
-  Widget _buildTextButton(bool isDisabled) {
+  Widget _buildTextButton(BuildContext context, bool isDisabled) {
     return TextButton(
       onPressed: isDisabled ? null : onPressed,
       style: TextButton.styleFrom(
         foregroundColor: AppColors.primary,
-        disabledForegroundColor: AppColors.textTertiary,
+        disabledForegroundColor: Theme.of(context).colorScheme.outline,
         padding: _getPadding(),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(
@@ -312,11 +314,11 @@ class CustomButton extends StatelessWidget {
         ),
         textStyle: _getTextStyle(),
       ),
-      child: _buildContent(),
+      child: _buildContent(context),
     );
   }
 
-  Widget _buildOutlineButton(bool isDisabled) {
+  Widget _buildOutlineButton(BuildContext context, bool isDisabled) {
     return OutlinedButton(
       onPressed: isDisabled ? null : onPressed,
       style: OutlinedButton.styleFrom(
@@ -336,13 +338,14 @@ class CustomButton extends StatelessWidget {
         ),
         textStyle: _getTextStyle(),
       ),
-      child: _buildContent(),
+      child: _buildContent(context),
     );
   }
 
-  Widget _buildSuccessButton(bool isDisabled) {
+  Widget _buildSuccessButton(BuildContext context, bool isDisabled) {
     // Usar gradiente azul/cyan para success (botón Retorno)
     return _buildGradientButton(
+      context,
       isDisabled,
       gradient: AppGradients.buttonInfo,
       glowShadow: AppShadows.buttonInfoGlow,
@@ -350,9 +353,10 @@ class CustomButton extends StatelessWidget {
     );
   }
 
-  Widget _buildDangerButton(bool isDisabled) {
+  Widget _buildDangerButton(BuildContext context, bool isDisabled) {
     // Usar GRADIENTE ROJO para danger (botón Salida)
     return _buildGradientButton(
+      context,
       isDisabled,
       gradient: AppGradients.buttonDanger,
       glowShadow: AppShadows.buttonDangerGlow,
@@ -360,9 +364,10 @@ class CustomButton extends StatelessWidget {
     );
   }
 
-  Widget _buildWarningButton(bool isDisabled) {
+  Widget _buildWarningButton(BuildContext context, bool isDisabled) {
     // Usar GRADIENTE NARANJA para warning (botón Pausa)
     return _buildGradientButton(
+      context,
       isDisabled,
       gradient: AppGradients.buttonWarning,
       glowShadow: AppShadows.buttonWarningGlow,
@@ -374,14 +379,16 @@ class CustomButton extends StatelessWidget {
   // CONTENT BUILDER
   // ==========================================================================
 
-  Widget _buildContent() {
+  Widget _buildContent(BuildContext context) {
     if (isLoading) {
       return SizedBox(
         height: _getIconSize(),
         width: _getIconSize(),
         child: CircularProgressIndicator(
           strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(_getLoadingColor()),
+          valueColor: AlwaysStoppedAnimation<Color>(
+            _getLoadingColor(context),
+          ),
         ),
       );
     }
@@ -479,7 +486,7 @@ class CustomButton extends StatelessWidget {
     }
   }
 
-  Color _getLoadingColor() {
+  Color _getLoadingColor(BuildContext context) {
     switch (variant) {
       case ButtonVariant.primary:
       case ButtonVariant.brand:
@@ -488,7 +495,7 @@ class CustomButton extends StatelessWidget {
       case ButtonVariant.warning:
         return AppColors.textOnPrimary;
       case ButtonVariant.secondary:
-        return AppColors.textPrimary;
+        return Theme.of(context).colorScheme.onSurface;
       case ButtonVariant.text:
       case ButtonVariant.outline:
         return AppColors.primary;

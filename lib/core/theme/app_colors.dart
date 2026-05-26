@@ -6,6 +6,34 @@ import 'package:flutter/material.dart';
 /// - Azul profundo: Confianza y profesionalismo
 /// - Violeta: Creatividad y expresión artística
 /// - Coral: Calidez y accesibilidad
+///
+/// ## Theme Safety (Dark Mode Awareness)
+///
+/// **Preferred path**: Use `Theme.of(context).colorScheme` tokens instead of
+/// direct `AppColors` static references for surfaces, text, and backgrounds.
+/// The `ColorScheme` is wired to light/dark theme variants in [AppTheme].
+///
+/// **Tokens by category**:
+/// | Category | Prefer `Theme.of(context).colorScheme` | Static `AppColors` OK? |
+/// |----------|--------------------------------------|----------------------|
+/// | Surface/background colors | `colorScheme.surface` | ❌ Breaks dark mode |
+/// | Primary action color | `colorScheme.primary` | ⚠️ Branded elements only |
+/// | Text on surfaces | `colorScheme.onSurface` | ❌ Hardcoded = invisible in dark |
+/// | Text on primary | `colorScheme.onPrimary` | ❌ Must match primary context |
+/// | Borders/outlines | `colorScheme.outline` | ❌ |
+/// | Gradients (primaryGradient, etc.) | N/A (branded) | ✅ Documented branded |
+/// | Semantic (error, success, warning) | `colorScheme.error` | ⚠️ Prefer colorScheme |
+/// | Special states (hover, pressed) | N/A | ✅ Intentionally static |
+///
+/// **Branded constants** (safe to use directly):
+/// - `primaryGradient`, `accentGradient`, `backgroundGradient` — visual brand identity
+/// - `hover`, `pressed`, `focus`, `shadow` — overlay states
+/// - `transparent` — semantic constant
+/// - `vacation` — calendar-specific, rarely changes by theme
+///
+/// **License**: This is the DESIGN TOKEN SOURCE OF TRUTH. All other files
+/// should reference tokens through either `AppColors` (for branded elements)
+/// or `Theme.of(context).colorScheme` (for theme-aware surfaces/text).
 class AppColors {
   // Prevenir instanciacion
   AppColors._();

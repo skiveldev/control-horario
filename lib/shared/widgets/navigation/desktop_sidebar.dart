@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_colors_dark.dart';
 import '../../../core/theme/app_gradients.dart';
 import '../../../core/theme/app_shadows.dart';
@@ -181,8 +180,9 @@ class DesktopSidebar extends ConsumerWidget {
               icon: Icon(
                 Icons.menu_open,
                 size: 20,
-                color:
-                    isDark ? AppColorsDark.textPrimary : AppColors.textPrimary,
+                color: isDark
+                    ? AppColorsDark.textPrimary
+                    : Theme.of(context).colorScheme.onSurface,
               ),
               onPressed: () =>
                   ref.read(sidebarNotifierProvider.notifier).toggle(),
@@ -194,8 +194,9 @@ class DesktopSidebar extends ConsumerWidget {
               icon: Icon(
                 Icons.menu,
                 size: 24,
-                color:
-                    isDark ? AppColorsDark.textPrimary : AppColors.textPrimary,
+                color: isDark
+                    ? AppColorsDark.textPrimary
+                    : Theme.of(context).colorScheme.onSurface,
               ),
               onPressed: () =>
                   ref.read(sidebarNotifierProvider.notifier).toggle(),
@@ -256,7 +257,7 @@ class DesktopSidebar extends ConsumerWidget {
                         : Theme.of(context).colorScheme.primary)
                     : (isDark
                         ? AppColorsDark.textPrimary
-                        : AppColors.textPrimary),
+                        : Theme.of(context).colorScheme.onSurface),
               ),
 
               // Texto (solo si está expandido)
@@ -273,7 +274,7 @@ class DesktopSidebar extends ConsumerWidget {
                               : Theme.of(context).colorScheme.primary)
                           : (isDark
                               ? AppColorsDark.textPrimary
-                              : AppColors.textPrimary),
+                              : Theme.of(context).colorScheme.onSurface),
                       fontWeight:
                           isSelected ? FontWeight.w600 : FontWeight.normal,
                     ),

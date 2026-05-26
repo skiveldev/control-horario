@@ -396,29 +396,47 @@ class AppTheme {
       // ========================================================================
       textTheme: TextTheme(
         // Display
-        displayLarge: AppTextStyles.displayLarge,
-        displayMedium: AppTextStyles.displayMedium,
-        displaySmall: AppTextStyles.displaySmall,
+        displayLarge: AppTextStyles.displayLarge.copyWith(
+          color: AppColors.textPrimary,
+        ),
+        displayMedium: AppTextStyles.displayMedium.copyWith(
+          color: AppColors.textPrimary,
+        ),
+        displaySmall: AppTextStyles.displaySmall.copyWith(
+          color: AppColors.textPrimary,
+        ),
 
         // Headline
-        headlineLarge: AppTextStyles.h1,
-        headlineMedium: AppTextStyles.h2,
-        headlineSmall: AppTextStyles.h3,
+        headlineLarge: AppTextStyles.h1.copyWith(color: AppColors.textPrimary),
+        headlineMedium: AppTextStyles.h2.copyWith(color: AppColors.textPrimary),
+        headlineSmall: AppTextStyles.h3.copyWith(color: AppColors.textPrimary),
 
         // Title
-        titleLarge: AppTextStyles.h4,
-        titleMedium: AppTextStyles.h5,
-        titleSmall: AppTextStyles.h6,
+        titleLarge: AppTextStyles.h4.copyWith(color: AppColors.textPrimary),
+        titleMedium: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
+        titleSmall: AppTextStyles.h6.copyWith(color: AppColors.textPrimary),
 
         // Body
-        bodyLarge: AppTextStyles.bodyLarge,
-        bodyMedium: AppTextStyles.bodyMedium,
-        bodySmall: AppTextStyles.bodySmall,
+        bodyLarge: AppTextStyles.bodyLarge.copyWith(
+          color: AppColors.textPrimary,
+        ),
+        bodyMedium: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.textPrimary,
+        ),
+        bodySmall: AppTextStyles.bodySmall.copyWith(
+          color: AppColors.textSecondary,
+        ),
 
         // Label
-        labelLarge: AppTextStyles.labelLarge,
-        labelMedium: AppTextStyles.labelMedium,
-        labelSmall: AppTextStyles.labelSmall,
+        labelLarge: AppTextStyles.labelLarge.copyWith(
+          color: AppColors.textPrimary,
+        ),
+        labelMedium: AppTextStyles.labelMedium.copyWith(
+          color: AppColors.textSecondary,
+        ),
+        labelSmall: AppTextStyles.labelSmall.copyWith(
+          color: AppColors.textSecondary,
+        ),
       ),
 
       // ========================================================================

@@ -61,9 +61,11 @@ class ScheduleCard extends StatelessWidget {
       child: Container(
         padding: AppSpacing.allLg,
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline,
+          ),
           boxShadow: [
             BoxShadow(
               color: AppColors.shadow.withValues(alpha: 0.05),
@@ -133,7 +135,7 @@ class ScheduleCard extends StatelessWidget {
             Text(
               description,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -146,13 +148,17 @@ class ScheduleCard extends StatelessWidget {
               children: [
                 // Contador de empleados (solo para templates)
                 if (isTemplate && usedByCount != null) ...[
-                  Icon(Icons.people, size: 16, color: AppColors.textSecondary),
+                  Icon(
+                    Icons.people,
+                    size: 16,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                   const SizedBox(width: 4),
                   Flexible(
                     child: Text(
                       'Usada por $usedByCount empleados',
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -165,7 +171,7 @@ class ScheduleCard extends StatelessWidget {
                   Text(
                     '•',
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textTertiary,
+                      color: Theme.of(context).colorScheme.outline,
                     ),
                   ),
                   AppSpacing.horizontalSpaceSm,
@@ -177,7 +183,7 @@ class ScheduleCard extends StatelessWidget {
                     child: Text(
                       'Creada por $createdBy',
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),

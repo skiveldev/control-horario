@@ -39,7 +39,9 @@ class TimePickerField extends StatelessWidget {
         Text(
           label,
           style: AppTextStyles.labelLarge.copyWith(
-            color: enabled ? AppColors.textPrimary : AppColors.textTertiary,
+            color: enabled
+                ? Theme.of(context).colorScheme.onSurface
+                : Theme.of(context).colorScheme.outline,
           ),
         ),
         AppSpacing.verticalSpaceXs,
@@ -57,12 +59,16 @@ class TimePickerField extends StatelessWidget {
               vertical: AppSpacing.md,
             ),
             decoration: BoxDecoration(
-              color: enabled ? AppColors.surface : AppColors.surfaceVariant,
+              color: enabled
+                  ? Theme.of(context).colorScheme.surface
+                  : Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
               border: Border.all(
                 color: hasError
                     ? AppColors.error
-                    : (enabled ? AppColors.border : AppColors.borderLight),
+                    : (enabled
+                        ? Theme.of(context).colorScheme.outline
+                        : Theme.of(context).colorScheme.outlineVariant),
                 width: hasError ? 2 : 1,
               ),
             ),
@@ -74,8 +80,8 @@ class TimePickerField extends StatelessWidget {
                   color: hasError
                       ? AppColors.error
                       : (enabled
-                          ? AppColors.textSecondary
-                          : AppColors.textTertiary),
+                          ? Theme.of(context).colorScheme.onSurfaceVariant
+                          : Theme.of(context).colorScheme.outline),
                 ),
                 AppSpacing.horizontalSpaceMd,
                 Expanded(
@@ -84,9 +90,9 @@ class TimePickerField extends StatelessWidget {
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: enabled
                           ? (value != null
-                              ? AppColors.textPrimary
-                              : AppColors.textTertiary)
-                          : AppColors.textTertiary,
+                              ? Theme.of(context).colorScheme.onSurface
+                              : Theme.of(context).colorScheme.outline)
+                          : Theme.of(context).colorScheme.outline,
                       fontSize: 16,
                     ),
                   ),
@@ -95,8 +101,8 @@ class TimePickerField extends StatelessWidget {
                   Icons.arrow_drop_down,
                   size: AppSpacing.iconLg,
                   color: enabled
-                      ? AppColors.textSecondary
-                      : AppColors.textTertiary,
+                      ? Theme.of(context).colorScheme.onSurfaceVariant
+                      : Theme.of(context).colorScheme.outline,
                 ),
               ],
             ),
@@ -142,13 +148,14 @@ class TimePickerField extends StatelessWidget {
           child: Theme(
             data: Theme.of(context).copyWith(
               timePickerTheme: TimePickerThemeData(
-                backgroundColor: AppColors.surface,
-                hourMinuteTextColor: AppColors.textPrimary,
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                hourMinuteTextColor: Theme.of(context).colorScheme.onSurface,
                 dialHandColor: AppColors.primary,
-                dialBackgroundColor: AppColors.surfaceVariant,
+                dialBackgroundColor:
+                    Theme.of(context).colorScheme.surfaceContainerHighest,
                 entryModeIconColor: AppColors.primary,
                 helpTextStyle: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ),

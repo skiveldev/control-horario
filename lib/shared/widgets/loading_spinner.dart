@@ -62,11 +62,11 @@ class LoadingSpinner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final spinner = _buildSpinner();
+    final spinner = _buildSpinner(context);
 
     if (fullScreen) {
       return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(child: spinner),
       );
     }
@@ -74,7 +74,7 @@ class LoadingSpinner extends StatelessWidget {
     return spinner;
   }
 
-  Widget _buildSpinner() {
+  Widget _buildSpinner(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -94,7 +94,7 @@ class LoadingSpinner extends StatelessWidget {
           Text(
             message!,
             style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
@@ -164,7 +164,7 @@ class LoadingOverlay extends StatelessWidget {
         child: Container(
           padding: AppSpacing.allXxl,
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           ),
           child: LoadingSpinner(message: message, size: SpinnerSize.large),

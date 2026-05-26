@@ -124,8 +124,8 @@ class _WeekScheduleEditorState extends State<WeekScheduleEditor> {
                         dayName,
                         style: AppTextStyles.h6.copyWith(
                           color: isWeekend
-                              ? AppColors.textSecondary
-                              : AppColors.textPrimary,
+                              ? Theme.of(context).colorScheme.onSurfaceVariant
+                              : Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
@@ -230,8 +230,11 @@ class _WeekScheduleEditorState extends State<WeekScheduleEditor> {
       child: Row(
         children: [
           // Ícono de turno
-          Icon(Icons.schedule_outlined,
-              size: 18, color: AppColors.textSecondary),
+          Icon(
+            Icons.schedule_outlined,
+            size: 18,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
           AppSpacing.horizontalSpaceSm,
 
           // Hora inicio
@@ -342,8 +345,9 @@ class _WeekScheduleEditorState extends State<WeekScheduleEditor> {
           child: Theme(
             data: Theme.of(context).copyWith(
               timePickerTheme: TimePickerThemeData(
-                backgroundColor: AppColors.surface,
-                dialBackgroundColor: AppColors.surfaceVariant,
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                dialBackgroundColor:
+                    Theme.of(context).colorScheme.surfaceContainerHighest,
               ),
             ),
             child: child!,

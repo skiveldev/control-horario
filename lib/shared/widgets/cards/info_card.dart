@@ -123,7 +123,7 @@ class InfoCard extends StatelessWidget {
                 child: Text(
                   title,
                   style: AppTextStyles.labelLarge.copyWith(
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -135,7 +135,7 @@ class InfoCard extends StatelessWidget {
                 Icon(
                   Icons.arrow_forward_ios,
                   size: AppSpacing.iconSm,
-                  color: AppColors.textTertiary,
+                  color: Theme.of(context).colorScheme.outline,
                 ),
             ],
           ),
@@ -163,7 +163,7 @@ class InfoCard extends StatelessWidget {
             Text(
               subtitle!,
               style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.textTertiary,
+                color: Theme.of(context).colorScheme.outline,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -178,7 +178,7 @@ class InfoCard extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: progress,
                 minHeight: 4,
-                backgroundColor: AppColors.borderLight,
+                backgroundColor: Theme.of(context).colorScheme.outlineVariant,
                 valueColor: AlwaysStoppedAnimation<Color>(color),
               ),
             ),
