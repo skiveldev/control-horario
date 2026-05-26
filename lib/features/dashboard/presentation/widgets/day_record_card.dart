@@ -59,17 +59,17 @@ class _DayRecordCardState extends State<DayRecordCard> {
         right: isMobile ? 0 : AppSpacing.sm,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: AppSpacing.borderRadiusMd,
         border: Border.all(
           color: widget.isToday
-              ? AppColors.primary.withValues(alpha: 0.3)
-              : AppColors.borderLight,
+              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)
+              : Theme.of(context).colorScheme.outlineVariant,
           width: widget.isToday ? 2 : 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow,
+            color: Theme.of(context).shadowColor,
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -101,7 +101,8 @@ class _DayRecordCardState extends State<DayRecordCard> {
 
     final workedHours = totalMinutes / 60;
     final plannedHours = widget.plannedMinutes / 60;
-    final differenceColor = _getDifferenceColor(differenceMinutes);
+    final cs = Theme.of(context).colorScheme;
+    final differenceColor = _getDifferenceColor(cs, differenceMinutes);
 
     return InkWell(
       onTap: () {
@@ -127,7 +128,10 @@ class _DayRecordCardState extends State<DayRecordCard> {
                             vertical: AppSpacing.xs,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.1),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withValues(alpha: 0.1),
                             borderRadius: AppSpacing.borderRadiusXs,
                           ),
                           child: Row(
@@ -136,13 +140,13 @@ class _DayRecordCardState extends State<DayRecordCard> {
                               Icon(
                                 Icons.star,
                                 size: AppSpacing.iconXs,
-                                color: AppColors.primary,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                               AppSpacing.horizontalSpaceXs,
                               Text(
                                 'HOY',
                                 style: AppTextStyles.labelSmall.copyWith(
-                                  color: AppColors.primary,
+                                  color: Theme.of(context).colorScheme.primary,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -165,7 +169,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
                       Text(
                         weekDayCapitalized,
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                       if (widget.complianceStatus != null) ...[
@@ -188,7 +192,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
                   Icon(
                     Icons.access_time,
                     size: AppSpacing.iconMd,
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   AppSpacing.horizontalSpaceSm,
                   Text(
@@ -214,7 +218,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
               iconSize: AppSpacing.iconMd,
               onPressed: null, // Sin acciones por ahora
               tooltip: 'Próximamente',
-              color: AppColors.textTertiary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
 
             AppSpacing.horizontalSpaceSm,
@@ -245,10 +249,10 @@ class _DayRecordCardState extends State<DayRecordCard> {
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOut,
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           border: Border(
             top: BorderSide(
-              color: AppColors.borderLight,
+              color: Theme.of(context).colorScheme.outlineVariant,
               width: 1,
             ),
           ),
@@ -276,13 +280,13 @@ class _DayRecordCardState extends State<DayRecordCard> {
           Icon(
             Icons.event_busy,
             size: AppSpacing.iconXxl,
-            color: AppColors.textTertiary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
           AppSpacing.verticalSpaceMd,
           Text(
             'Sin registros',
             style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -319,8 +323,8 @@ class _DayRecordCardState extends State<DayRecordCard> {
         horizontal: AppSpacing.md,
         vertical: AppSpacing.sm,
       ),
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceVariant,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(AppSpacing.radiusSm),
           topRight: Radius.circular(AppSpacing.radiusSm),
@@ -333,7 +337,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
             child: Text(
               'TIEMPO',
               style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -342,7 +346,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
             child: Text(
               'CATEGORÍA',
               style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -351,7 +355,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
             child: Text(
               'UBICACIÓN',
               style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -360,7 +364,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
             child: Text(
               'ESTADO',
               style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -389,10 +393,12 @@ class _DayRecordCardState extends State<DayRecordCard> {
         vertical: AppSpacing.md,
       ),
       decoration: BoxDecoration(
-        color: isEven ? AppColors.surface : AppColors.surfaceVariant,
-        border: const Border(
+        color: isEven
+            ? Theme.of(context).colorScheme.surface
+            : Theme.of(context).colorScheme.surfaceContainerHighest,
+        border: Border(
           bottom: BorderSide(
-            color: AppColors.borderLight,
+            color: Theme.of(context).colorScheme.outlineVariant,
             width: 1,
           ),
         ),
@@ -407,7 +413,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
                 Icon(
                   Icons.access_time,
                   size: AppSpacing.iconSm,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 AppSpacing.horizontalSpaceXs,
                 // ✨ Mostrar --:-- si es registro activo
@@ -460,7 +466,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
                 Icon(
                   Icons.place,
                   size: AppSpacing.iconSm,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 AppSpacing.horizontalSpaceXs,
                 Expanded(
@@ -494,8 +500,8 @@ class _DayRecordCardState extends State<DayRecordCard> {
                       : null,
                   tooltip: 'Editar',
                   color: record.canEdit
-                      ? AppColors.textSecondary
-                      : AppColors.textTertiary,
+                      ? Theme.of(context).colorScheme.onSurfaceVariant
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 IconButton(
                   icon: const Icon(Icons.content_copy),
@@ -504,7 +510,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
                       ? () => widget.onCopyRecord!(record)
                       : null,
                   tooltip: 'Copiar',
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete),
@@ -515,7 +521,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
                   tooltip: 'Eliminar',
                   color: record.canDelete
                       ? AppColors.error
-                      : AppColors.textTertiary,
+                      : Theme.of(context).colorScheme.outline,
                 ),
               ],
             ),
@@ -533,7 +539,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
       padding: AppSpacing.allMd,
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: AppSpacing.borderRadiusSm,
       ),
       child: Column(
@@ -567,7 +573,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
               Icon(
                 Icons.access_time,
                 size: AppSpacing.iconSm,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               AppSpacing.horizontalSpaceXs,
               // ✨ Mostrar --:-- si es registro activo
@@ -588,7 +594,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
                       ? '(En curso...)'
                       : '(${(record.durationMinutes / 60).toStringAsFixed(1)}h)',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -601,7 +607,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
               Icon(
                 Icons.place,
                 size: AppSpacing.iconSm,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               AppSpacing.horizontalSpaceXs,
               Expanded(
@@ -637,7 +643,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
                 icon: const Icon(Icons.delete, size: AppSpacing.iconSm),
                 label: const Text('Eliminar'),
                 style: TextButton.styleFrom(
-                  foregroundColor: AppColors.error,
+                  foregroundColor: Theme.of(context).colorScheme.error,
                 ),
               ),
             ],
@@ -717,7 +723,7 @@ class _DayRecordCardState extends State<DayRecordCard> {
         padding: AppSpacing.allMd,
         decoration: BoxDecoration(
           border: Border.all(
-            color: AppColors.primary.withValues(alpha: 0.3),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
             width: 1,
             strokeAlign: BorderSide.strokeAlignInside,
           ),
@@ -732,13 +738,13 @@ class _DayRecordCardState extends State<DayRecordCard> {
             Icon(
               Icons.add,
               size: AppSpacing.iconMd,
-              color: AppColors.primary,
+              color: Theme.of(context).colorScheme.primary,
             ),
             AppSpacing.horizontalSpaceSm,
             Text(
               'Añadir',
               style: AppTextStyles.labelLarge.copyWith(
-                color: AppColors.primary,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -748,9 +754,9 @@ class _DayRecordCardState extends State<DayRecordCard> {
     );
   }
 
-  Color _getDifferenceColor(int differenceMinutes) {
+  Color _getDifferenceColor(ColorScheme cs, int differenceMinutes) {
     if (differenceMinutes >= 120) return AppColors.success;
-    if (differenceMinutes >= -60) return AppColors.textSecondary;
+    if (differenceMinutes >= -60) return cs.onSurfaceVariant;
     return AppColors.error;
   }
 }

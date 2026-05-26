@@ -105,18 +105,20 @@ class OvertimeReviewScreen extends ConsumerWidget {
     final requests = state.pendingRequests;
     final isProcessing = state.isProcessing;
 
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Revisión de Horas Extra')),
       body: Padding(
         padding: AppSpacing.allLg,
         child: requests.isEmpty
-            ? _buildEmptyState()
-            : _buildRequestList(context, ref, requests, isProcessing),
+            ? _buildEmptyState(cs)
+            : _buildRequestList(context, ref, requests, isProcessing, cs),
       ),
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(ColorScheme cs) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -126,7 +128,7 @@ class OvertimeReviewScreen extends ConsumerWidget {
           AppSpacing.verticalSpaceMd,
           Text(
             'No hay solicitudes pendientes',
-            style: AppTextStyles.h5.copyWith(color: AppColors.textSecondary),
+            style: AppTextStyles.h5.copyWith(color: cs.onSurfaceVariant),
           ),
         ],
       ),
@@ -138,6 +140,7 @@ class OvertimeReviewScreen extends ConsumerWidget {
     WidgetRef ref,
     List<OvertimeRequestModel> requests,
     bool isProcessing,
+    ColorScheme cs,
   ) {
     final notifier = ref.read(overtimeReviewScreenProvider.notifier);
     return ListView.builder(
@@ -147,6 +150,7 @@ class OvertimeReviewScreen extends ConsumerWidget {
         return _OvertimeRequestCard(
           request: request,
           isProcessing: isProcessing,
+          cs: cs,
           onApprove: () {
             notifier.approveRequest(request.id, approvedBy: 'admin');
           },
@@ -163,12 +167,14 @@ class OvertimeReviewScreen extends ConsumerWidget {
 class _OvertimeRequestCard extends StatelessWidget {
   final OvertimeRequestModel request;
   final bool isProcessing;
+  final ColorScheme cs;
   final VoidCallback onApprove;
   final VoidCallback onReject;
 
   const _OvertimeRequestCard({
     required this.request,
     required this.isProcessing,
+    required this.cs,
     required this.onApprove,
     required this.onReject,
   });
@@ -204,7 +210,7 @@ class _OvertimeRequestCard extends StatelessWidget {
                       Row(
                         children: [
                           Icon(Icons.access_time,
-                              size: 14, color: AppColors.textSecondary),
+                              size: 14, color: cs.onSurfaceVariant),
                           AppSpacing.horizontalSpaceXs,
                           Text(
                             '${request.requestedHours}h extra',

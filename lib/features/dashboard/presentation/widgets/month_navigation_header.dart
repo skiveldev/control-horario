@@ -38,11 +38,11 @@ class MonthNavigationHeader extends StatelessWidget {
       padding: EdgeInsets.all(
         isMobile ? AppSpacing.lg : AppSpacing.xxl,
       ),
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
         border: Border(
           bottom: BorderSide(
-            color: AppColors.borderLight,
+            color: Theme.of(context).colorScheme.outlineVariant,
             width: 1,
           ),
         ),
@@ -84,7 +84,7 @@ class MonthNavigationHeader extends StatelessWidget {
         vertical: AppSpacing.sm,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: AppSpacing.borderRadiusMd,
       ),
       child: Row(
@@ -110,7 +110,7 @@ class MonthNavigationHeader extends StatelessWidget {
             child: Text(
               monthName,
               style: AppTextStyles.labelLarge.copyWith(
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
               ),
               overflow: TextOverflow.ellipsis,
@@ -146,13 +146,14 @@ class MonthNavigationHeader extends StatelessWidget {
         : 0.0;
 
     // Color según diferencia
-    final differenceColor = _getDifferenceColor(differenceMinutes);
+    final cs = Theme.of(context).colorScheme;
+    final differenceColor = _getDifferenceColor(differenceMinutes, cs);
     final differenceIcon = _getDifferenceIcon(differenceMinutes);
 
     return Container(
       padding: AppSpacing.allLg,
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
+        color: cs.surfaceContainerHighest,
         borderRadius: AppSpacing.borderRadiusMd,
       ),
       child: Column(
@@ -164,14 +165,14 @@ class MonthNavigationHeader extends StatelessWidget {
               Icon(
                 Icons.summarize_outlined,
                 size: AppSpacing.iconMd,
-                color: AppColors.textSecondary,
+                color: cs.onSurfaceVariant,
               ),
               AppSpacing.horizontalSpaceSm,
               Flexible(
                 child: Text(
                   'Resumen del Mes',
                   style: AppTextStyles.labelLarge.copyWith(
-                    color: AppColors.textSecondary,
+                    color: cs.onSurfaceVariant,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -190,6 +191,7 @@ class MonthNavigationHeader extends StatelessWidget {
               differencePercent,
               differenceColor,
               differenceIcon,
+              cs,
             )
           else
             _buildMetricsDesktop(
@@ -199,6 +201,7 @@ class MonthNavigationHeader extends StatelessWidget {
               differencePercent,
               differenceColor,
               differenceIcon,
+              cs,
             ),
         ],
       ),
@@ -212,6 +215,7 @@ class MonthNavigationHeader extends StatelessWidget {
     double differencePercent,
     Color differenceColor,
     IconData differenceIcon,
+    ColorScheme cs,
   ) {
     return Row(
       children: [
@@ -219,15 +223,17 @@ class MonthNavigationHeader extends StatelessWidget {
           child: _buildMetricItem(
             label: 'Horas trabajadas',
             value: '${workedHours.toStringAsFixed(1)}h',
-            color: AppColors.textPrimary,
+            color: cs.onSurface,
+            cs: cs,
           ),
         ),
-        AppSpacing.horizontalSpaceLg,
+        AppSpacing.horizontalSpaceMd,
         Expanded(
           child: _buildMetricItem(
             label: 'Horas planificadas',
             value: '${plannedHours.toStringAsFixed(1)}h',
-            color: AppColors.textPrimary,
+            color: cs.onSurface,
+            cs: cs,
           ),
         ),
         AppSpacing.horizontalSpaceLg,
@@ -240,6 +246,7 @@ class MonthNavigationHeader extends StatelessWidget {
             subtitle:
                 '${differencePercent >= 0 ? '+' : ''}${differencePercent.toStringAsFixed(1)}%',
             icon: differenceIcon,
+            cs: cs,
           ),
         ),
       ],
@@ -253,6 +260,7 @@ class MonthNavigationHeader extends StatelessWidget {
     double differencePercent,
     Color differenceColor,
     IconData differenceIcon,
+    ColorScheme cs,
   ) {
     return Column(
       children: [
@@ -262,15 +270,17 @@ class MonthNavigationHeader extends StatelessWidget {
               child: _buildMetricItem(
                 label: 'Horas trabajadas',
                 value: '${workedHours.toStringAsFixed(1)}h',
-                color: AppColors.textPrimary,
+                color: cs.onSurface,
+                cs: cs,
               ),
             ),
-            AppSpacing.horizontalSpaceMd,
+            AppSpacing.horizontalSpaceLg,
             Expanded(
               child: _buildMetricItem(
                 label: 'Horas planificadas',
                 value: '${plannedHours.toStringAsFixed(1)}h',
-                color: AppColors.textPrimary,
+                color: cs.onSurface,
+                cs: cs,
               ),
             ),
           ],
@@ -284,6 +294,7 @@ class MonthNavigationHeader extends StatelessWidget {
           subtitle:
               '${differencePercent >= 0 ? '+' : ''}${differencePercent.toStringAsFixed(1)}%',
           icon: differenceIcon,
+          cs: cs,
         ),
       ],
     );
@@ -293,6 +304,7 @@ class MonthNavigationHeader extends StatelessWidget {
     required String label,
     required String value,
     required Color color,
+    required ColorScheme cs,
     String? subtitle,
     IconData? icon,
   }) {
@@ -302,7 +314,7 @@ class MonthNavigationHeader extends StatelessWidget {
         Text(
           label,
           style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textSecondary,
+            color: cs.onSurfaceVariant,
           ),
         ),
         AppSpacing.verticalSpaceXs,
@@ -342,9 +354,9 @@ class MonthNavigationHeader extends StatelessWidget {
     );
   }
 
-  Color _getDifferenceColor(int differenceMinutes) {
+  Color _getDifferenceColor(int differenceMinutes, ColorScheme cs) {
     if (differenceMinutes >= 120) return AppColors.success; // +2h o más
-    if (differenceMinutes >= -60) return AppColors.textSecondary; // -1h a +2h
+    if (differenceMinutes >= -60) return cs.onSurfaceVariant; // -1h a +2h
     return AppColors.error; // -2h o menos
   }
 

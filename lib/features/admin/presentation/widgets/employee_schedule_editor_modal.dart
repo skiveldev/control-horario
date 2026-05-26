@@ -66,6 +66,7 @@ class _EmployeeScheduleEditorModalState
   Widget build(BuildContext context) {
     // Observar plantillas disponibles
     final templatesAsync = ref.watch(allScheduleTemplatesProvider);
+    final cs = Theme.of(context).colorScheme;
 
     return Dialog(
       child: Container(
@@ -96,7 +97,7 @@ class _EmployeeScheduleEditorModalState
                       Text(
                         widget.employee.fullName,
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textSecondary,
+                          color: cs.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -110,7 +111,7 @@ class _EmployeeScheduleEditorModalState
             ),
 
             AppSpacing.verticalSpaceLg,
-            Divider(color: AppColors.border),
+            Divider(color: cs.outline),
             AppSpacing.verticalSpaceLg,
 
             // ===== TIPO DE HORARIO =====
@@ -175,12 +176,12 @@ class _EmployeeScheduleEditorModalState
             // ===== CONTENIDO SEGÚN TIPO =====
             Expanded(
               child: _scheduleType == 'template'
-                  ? _buildTemplateSelector(templatesAsync)
-                  : _buildCustomScheduleEditor(),
+                  ? _buildTemplateSelector(cs, templatesAsync)
+                  : _buildCustomScheduleEditor(cs),
             ),
 
             AppSpacing.verticalSpaceLg,
-            Divider(color: AppColors.border),
+            Divider(color: cs.outline),
             AppSpacing.verticalSpaceMd,
 
             // ===== BOTONES =====
@@ -225,7 +226,7 @@ class _EmployeeScheduleEditorModalState
   // ==========================================================================
 
   Widget _buildTemplateSelector(
-      AsyncValue<List<ScheduleModel>> templatesAsync) {
+      ColorScheme cs, AsyncValue<List<ScheduleModel>> templatesAsync) {
     return templatesAsync.when(
       data: (templates) {
         if (templates.isEmpty) {
@@ -236,7 +237,7 @@ class _EmployeeScheduleEditorModalState
                 Icon(
                   Icons.schedule_outlined,
                   size: 64,
-                  color: AppColors.textTertiary,
+                  color: cs.outline,
                 ),
                 AppSpacing.verticalSpaceMd,
                 Text(
@@ -247,7 +248,7 @@ class _EmployeeScheduleEditorModalState
                 Text(
                   'Crea una plantilla primero o usa horario personalizado',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: cs.onSurfaceVariant,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -277,7 +278,7 @@ class _EmployeeScheduleEditorModalState
             Text(
               'Selecciona una plantilla',
               style: AppTextStyles.labelLarge.copyWith(
-                color: AppColors.textSecondary,
+                color: cs.onSurfaceVariant,
               ),
             ),
             AppSpacing.verticalSpaceSm,
@@ -348,21 +349,21 @@ class _EmployeeScheduleEditorModalState
     );
   }
 
-  Widget _buildCustomScheduleEditor() {
+  Widget _buildCustomScheduleEditor(ColorScheme cs) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Configura el horario personalizado',
           style: AppTextStyles.labelLarge.copyWith(
-            color: AppColors.textSecondary,
+            color: cs.onSurfaceVariant,
           ),
         ),
         AppSpacing.verticalSpaceSm,
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: cs.outline),
               borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
             ),
             child: WeekScheduleEditor(

@@ -21,15 +21,16 @@ class EmployeeListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
       child: Container(
         padding: AppSpacing.allMd,
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: cs.surface,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: cs.outline),
         ),
         child: Row(
           children: [
@@ -64,7 +65,7 @@ class EmployeeListItem extends StatelessWidget {
                   Text(
                     employee.position ?? 'Sin cargo',
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textSecondary,
+                      color: cs.onSurfaceVariant,
                     ),
                   ),
                   AppSpacing.verticalSpaceXs,
@@ -74,14 +75,14 @@ class EmployeeListItem extends StatelessWidget {
                       Icon(
                         Icons.business,
                         size: 12,
-                        color: AppColors.textTertiary,
+                        color: cs.outline,
                       ),
                       const SizedBox(width: 4),
                       Flexible(
                         child: Text(
                           employee.department ?? 'Sin asignar',
                           style: AppTextStyles.labelSmall.copyWith(
-                            color: AppColors.textTertiary,
+                            color: cs.outline,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -96,12 +97,12 @@ class EmployeeListItem extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _buildStatusBadge(),
+                _buildStatusBadge(cs),
                 AppSpacing.verticalSpaceXs,
                 Icon(
                   Icons.arrow_forward_ios,
                   size: 16,
-                  color: AppColors.textTertiary,
+                  color: cs.outline,
                 ),
               ],
             ),
@@ -121,13 +122,13 @@ class EmployeeListItem extends StatelessWidget {
         : name.toUpperCase();
   }
 
-  Widget _buildStatusBadge() {
+  Widget _buildStatusBadge(ColorScheme cs) {
     // Determinar estado basado en isActive y role
     Color color;
     String label;
 
     if (!employee.isActive) {
-      color = AppColors.textTertiary;
+      color = cs.outline;
       label = 'Inactivo';
     } else {
       // Activo: mostrar rol

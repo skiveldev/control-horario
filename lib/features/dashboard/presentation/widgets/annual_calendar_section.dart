@@ -67,13 +67,13 @@ class _AnnualCalendarSectionState extends ConsumerState<AnnualCalendarSection> {
             Icon(
               Icons.calendar_month_outlined,
               size: 20,
-              color: AppColors.primary,
+              color: Theme.of(context).colorScheme.primary,
             ),
             AppSpacing.horizontalSpaceSm,
             Flexible(
               child: Text(
                 calendar.name,
-                style: AppTextStyles.h4.copyWith(color: AppColors.textPrimary),
+                style: AppTextStyles.h4,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -84,13 +84,16 @@ class _AnnualCalendarSectionState extends ConsumerState<AnnualCalendarSection> {
                 vertical: AppSpacing.xs,
               ),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
               ),
               child: Text(
                 '${calendar.year}',
                 style: AppTextStyles.labelSmall.copyWith(
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -124,9 +127,9 @@ class _AnnualCalendarSectionState extends ConsumerState<AnnualCalendarSection> {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
       child: TableCalendar<CalendarEventModel>(
         locale: 'es_ES',
@@ -139,46 +142,55 @@ class _AnnualCalendarSectionState extends ConsumerState<AnnualCalendarSection> {
         headerStyle: HeaderStyle(
           formatButtonVisible: false,
           titleCentered: true,
-          titleTextStyle: AppTextStyles.bodyMedium.copyWith(
+          titleTextStyle:
+              (Theme.of(context).textTheme.bodyMedium ?? const TextStyle())
+                  .copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
           ),
           leftChevronIcon: Icon(
             Icons.chevron_left,
-            color: AppColors.textSecondary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
           rightChevronIcon: Icon(
             Icons.chevron_right,
-            color: AppColors.textSecondary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
           headerPadding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
         ),
         daysOfWeekStyle: DaysOfWeekStyle(
-          weekdayStyle: AppTextStyles.labelSmall.copyWith(
-            color: AppColors.textSecondary,
+          weekdayStyle:
+              (Theme.of(context).textTheme.labelSmall ?? const TextStyle())
+                  .copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
-          weekendStyle: AppTextStyles.labelSmall.copyWith(
-            color: AppColors.error.withValues(alpha: 0.7),
+          weekendStyle:
+              (Theme.of(context).textTheme.labelSmall ?? const TextStyle())
+                  .copyWith(
+            color: Theme.of(context).colorScheme.error.withValues(alpha: 0.7),
           ),
         ),
         calendarStyle: CalendarStyle(
           outsideDaysVisible: false,
-          defaultTextStyle: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textPrimary,
-          ),
-          weekendTextStyle: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textSecondary,
+          defaultTextStyle:
+              Theme.of(context).textTheme.bodySmall ?? const TextStyle(),
+          weekendTextStyle:
+              (Theme.of(context).textTheme.bodySmall ?? const TextStyle())
+                  .copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
           todayDecoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.15),
+            color:
+                Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
             shape: BoxShape.circle,
           ),
-          todayTextStyle: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.primary,
+          todayTextStyle:
+              (Theme.of(context).textTheme.bodySmall ?? const TextStyle())
+                  .copyWith(
+            color: Theme.of(context).colorScheme.primary,
             fontWeight: FontWeight.w600,
           ),
-          selectedDecoration: const BoxDecoration(
-            color: AppColors.primary,
+          selectedDecoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary,
             shape: BoxShape.circle,
           ),
           markerDecoration: const BoxDecoration(
@@ -337,9 +349,9 @@ class _LegendItem extends StatelessWidget {
         Flexible(
           child: Text(
             label,
-            style: AppTextStyles.labelSmall.copyWith(
-              color: AppColors.textSecondary,
-            ),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -364,10 +376,9 @@ class _MonthEventsList extends StatelessWidget {
         padding: AppSpacing.verticalMd,
         child: Text(
           'Sin eventos este mes',
-          style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textTertiary,
-            fontStyle: FontStyle.italic,
-          ),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                fontStyle: FontStyle.italic,
+              ),
         ),
       );
     }
@@ -377,9 +388,9 @@ class _MonthEventsList extends StatelessWidget {
       children: [
         Text(
           'Días especiales — ${monthName.toLowerCase()}',
-          style: AppTextStyles.labelMedium.copyWith(
-            color: AppColors.textSecondary,
-          ),
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
         ),
         AppSpacing.verticalSpaceSm,
         ...events.map((event) => _EventRow(event: event)),
@@ -415,18 +426,16 @@ class _EventRow extends StatelessWidget {
             width: AppSpacing.xl * 2,
             child: Text(
               dayStr,
-              style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.textSecondary,
-              ),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
             ),
           ),
           const SizedBox(width: AppSpacing.xs),
           Flexible(
             child: Text(
               event.name,
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.textPrimary,
-              ),
+              style: Theme.of(context).textTheme.bodySmall,
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -442,10 +451,10 @@ class _EventRow extends StatelessWidget {
             ),
             child: Text(
               event.type.shortLabel,
-              style: AppTextStyles.labelSmall.copyWith(
-                color: color,
-                fontSize: 10,
-              ),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: color,
+                    fontSize: 10,
+                  ),
             ),
           ),
         ],
@@ -460,6 +469,8 @@ class _NoCalendarEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onSurfaceVar = Theme.of(context).colorScheme.onSurfaceVariant;
+
     return Padding(
       padding: AppSpacing.allXxl,
       child: Column(
@@ -468,23 +479,22 @@ class _NoCalendarEmptyState extends StatelessWidget {
           Icon(
             Icons.event_busy_outlined,
             size: 64,
-            color: AppColors.textTertiary,
+            color: onSurfaceVar,
           ),
           AppSpacing.verticalSpaceMd,
           Text(
             'Sin calendario laboral asignado',
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w600,
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
             textAlign: TextAlign.center,
           ),
           AppSpacing.verticalSpaceSm,
           Text(
             'Contacta con tu administrador para que te asigne un calendario.',
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textTertiary,
-            ),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: onSurfaceVar,
+                ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -502,6 +512,8 @@ class _FirestoreErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onSurfaceVar = Theme.of(context).colorScheme.onSurfaceVariant;
+
     return Padding(
       padding: AppSpacing.allXxl,
       child: Column(
@@ -510,23 +522,22 @@ class _FirestoreErrorState extends StatelessWidget {
           Icon(
             Icons.cloud_off_outlined,
             size: 64,
-            color: AppColors.textTertiary,
+            color: onSurfaceVar,
           ),
           AppSpacing.verticalSpaceMd,
           Text(
             'Error al cargar el calendario',
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w600,
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
             textAlign: TextAlign.center,
           ),
           AppSpacing.verticalSpaceSm,
           Text(
             errorMessage ?? 'Comprueba tu conexión e inténtalo de nuevo.',
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textTertiary,
-            ),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: onSurfaceVar,
+                ),
             textAlign: TextAlign.center,
           ),
           AppSpacing.verticalSpaceLg,

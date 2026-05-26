@@ -80,11 +80,11 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
   Widget _buildMobileHeader(BuildContext scaffoldContext) {
     return Container(
       padding: AppSpacing.allLg,
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
         border: Border(
           bottom: BorderSide(
-            color: AppColors.borderLight,
+            color: Theme.of(context).colorScheme.outlineVariant,
             width: 1,
           ),
         ),
@@ -103,10 +103,7 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
           Flexible(
             child: Text(
               'Mi Control Horario',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(scaffoldContext).textTheme.titleMedium,
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -183,20 +180,20 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.error_outline,
                         size: 64,
-                        color: AppColors.error,
+                        color: Theme.of(context).colorScheme.error,
                       ),
                       AppSpacing.verticalSpaceMd,
                       Text(
                         'Error al cargar registros',
-                        style: const TextStyle(fontSize: 18),
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
                       AppSpacing.verticalSpaceSm,
                       Text(
                         error.toString(),
-                        style: const TextStyle(color: AppColors.textSecondary),
+                        style: Theme.of(context).textTheme.bodyMedium,
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -402,7 +399,6 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
             AppSpacing.verticalSpaceMd,
             const Text(
               'Esta acción no se puede deshacer.',
-              style: TextStyle(color: AppColors.textSecondary),
             ),
           ],
         ),
@@ -442,8 +438,8 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: AppColors.textOnPrimary,
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
             ),
             child: const Text('Eliminar'),
           ),

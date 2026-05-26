@@ -345,34 +345,30 @@ class EmployeeHeader extends StatelessWidget {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Notificaciones
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined, size: 20),
-                onPressed: onNotificationsTap,
-                tooltip: 'Notificaciones',
-                padding: const EdgeInsets.all(8),
-                constraints: const BoxConstraints(
-                  minWidth: 36,
-                  minHeight: 36,
+          // Notificaciones (disabled — no backend yet)
+          IconButton(
+            icon: Icon(
+              Icons.notifications_outlined,
+              size: 20,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurfaceVariant
+                  .withValues(alpha: 0.5),
+            ),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Próximamente'),
+                  duration: Duration(seconds: 2),
                 ),
-              ),
-              // Badge
-              Positioned(
-                right: 4,
-                top: 4,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.error,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-            ],
+              );
+            },
+            tooltip: 'Notificaciones no disponibles',
+            padding: const EdgeInsets.all(8),
+            constraints: const BoxConstraints(
+              minWidth: 36,
+              minHeight: 36,
+            ),
           ),
 
           // Configuración
@@ -394,43 +390,23 @@ class EmployeeHeader extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Notificaciones (con badge)
-        Stack(
-          clipBehavior: Clip.none,
-          children: [
-            IconButtonCustom(
-              icon: Icons.notifications_outlined,
-              variant: IconButtonVariant.tonal,
-              onPressed: onNotificationsTap,
-              tooltip: 'Notificaciones',
-            ),
-
-            // Badge de notificaciones sin leer
-            Positioned(
-              right: 6,
-              top: 6,
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.error,
-                  shape: BoxShape.circle,
-                ),
-                constraints: const BoxConstraints(
-                  minWidth: 8,
-                  minHeight: 8,
-                ),
-                child: Text(
-                  '3',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onError,
-                    fontSize: 8,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+        // Notificaciones (disabled — no backend yet)
+        IconButtonCustom(
+          icon: Icons.notifications_outlined,
+          variant: IconButtonVariant.tonal,
+          iconColor: Theme.of(context)
+              .colorScheme
+              .onSurfaceVariant
+              .withValues(alpha: 0.5),
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Próximamente'),
+                duration: Duration(seconds: 2),
               ),
-            ),
-          ],
+            );
+          },
+          tooltip: 'Notificaciones no disponibles',
         ),
 
         AppSpacing.horizontalSpaceSm,

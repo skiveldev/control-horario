@@ -90,6 +90,7 @@ class AnomaliesScreen extends ConsumerWidget {
     final state = ref.watch(anomaliesScreenProvider);
     final anomalies = state.anomalies;
     final isDetecting = state.isDetecting;
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Detección de Anomalías')),
@@ -105,8 +106,8 @@ class AnomaliesScreen extends ConsumerWidget {
             // Lista de anomalías
             Expanded(
               child: anomalies.isEmpty
-                  ? _buildEmptyState(isDetecting)
-                  : _buildAnomalyList(anomalies),
+                  ? _buildEmptyState(isDetecting, cs)
+                  : _buildAnomalyList(anomalies, cs),
             ),
           ],
         ),
@@ -146,7 +147,7 @@ class AnomaliesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState(bool isDetecting) {
+  Widget _buildEmptyState(bool isDetecting, ColorScheme cs) {
     if (isDetecting) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -159,13 +160,12 @@ class AnomaliesScreen extends ConsumerWidget {
           AppSpacing.verticalSpaceMd,
           Text(
             'No se encontraron anomalías',
-            style: AppTextStyles.h5.copyWith(color: AppColors.textSecondary),
+            style: AppTextStyles.h5.copyWith(color: cs.onSurfaceVariant),
           ),
           AppSpacing.verticalSpaceSm,
           Text(
             'Todos los registros del período seleccionado son correctos.',
-            style: AppTextStyles.bodyMedium
-                .copyWith(color: AppColors.textTertiary),
+            style: AppTextStyles.bodyMedium.copyWith(color: cs.outline),
             textAlign: TextAlign.center,
           ),
         ],
@@ -173,13 +173,13 @@ class AnomaliesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAnomalyList(List<AnomalyModel> anomalies) {
+  Widget _buildAnomalyList(List<AnomalyModel> anomalies, ColorScheme cs) {
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: AppSpacing.xl),
       itemCount: anomalies.length,
       itemBuilder: (context, index) {
         final anomaly = anomalies[index];
-        return _AnomalyCard(anomaly: anomaly);
+        return _AnomalyCard(anomaly: anomaly, cs: cs);
       },
     );
   }
@@ -188,8 +188,9 @@ class AnomaliesScreen extends ConsumerWidget {
 /// Tarjeta individual de anomalía
 class _AnomalyCard extends StatelessWidget {
   final AnomalyModel anomaly;
+  final ColorScheme cs;
 
-  const _AnomalyCard({required this.anomaly});
+  const _AnomalyCard({required this.anomaly, required this.cs});
 
   @override
   Widget build(BuildContext context) {
@@ -226,7 +227,7 @@ class _AnomalyCard extends StatelessWidget {
                       const Spacer(),
                       Text(_typeLabel,
                           style: AppTextStyles.labelSmall.copyWith(
-                            color: AppColors.textSecondary,
+                            color: cs.onSurfaceVariant,
                           )),
                     ],
                   ),
@@ -235,7 +236,7 @@ class _AnomalyCard extends StatelessWidget {
                     Text(
                       anomaly.description!,
                       style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textSecondary,
+                        color: cs.onSurfaceVariant,
                       ),
                     ),
                   ],

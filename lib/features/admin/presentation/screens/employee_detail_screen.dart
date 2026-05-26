@@ -32,9 +32,10 @@ class EmployeeDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Obtener datos del empleado desde Firebase
     final employeeAsync = ref.watch(userByIdProvider(employeeId));
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: const CustomAppBar(
         title: 'Detalle de Empleado',
         automaticallyImplyLeading: true,
@@ -42,20 +43,20 @@ class EmployeeDetailScreen extends ConsumerWidget {
       body: employeeAsync.when(
         data: (employee) {
           if (employee == null) {
-            return _buildNotFound(context);
+            return _buildNotFound(context, cs);
           }
-          return _buildContent(context, ref, employee);
+          return _buildContent(context, cs, ref, employee);
         },
         loading: () => const Center(
           child: CircularProgressIndicator(),
         ),
-        error: (error, _) => _buildError(context, error.toString()),
+        error: (error, _) => _buildError(context, cs, error.toString()),
       ),
     );
   }
 
   Widget _buildContent(
-      BuildContext context, WidgetRef ref, UserModel employee) {
+      BuildContext context, ColorScheme cs, WidgetRef ref, UserModel employee) {
     return SingleChildScrollView(
       padding: EdgeInsets.all(
         context.responsiveValue(
@@ -102,7 +103,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
                           Text(
                             employee.position ?? 'Sin cargo asignado',
                             style: AppTextStyles.bodyLarge.copyWith(
-                              color: AppColors.textSecondary,
+                              color: cs.onSurfaceVariant,
                             ),
                           ),
                           AppSpacing.verticalSpaceSm,
@@ -111,14 +112,15 @@ class EmployeeDetailScreen extends ConsumerWidget {
                               Icon(
                                 Icons.email,
                                 size: 16,
-                                color: AppColors.textSecondary,
+                                color: cs.onSurfaceVariant,
                               ),
                               const SizedBox(width: 4),
                               Flexible(
                                 child: Text(
                                   employee.email,
                                   style: AppTextStyles.bodySmall.copyWith(
-                                    color: AppColors.textSecondary,
+                                    color: cs.onSurfaceVariant,
+                                    fontStyle: FontStyle.italic,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -161,30 +163,33 @@ class EmployeeDetailScreen extends ConsumerWidget {
                   children: [
                     Text('Información del Empleado', style: AppTextStyles.h5),
                     AppSpacing.verticalSpaceLg,
-                    _buildInfoRow('ID Empleado', employee.employeeId),
-                    _buildInfoRow('DNI/NIE', employee.dni ?? 'No especificado'),
+                    _buildInfoRow('ID Empleado', employee.employeeId, cs),
                     _buildInfoRow(
-                        'Teléfono', employee.telefono ?? 'No especificado'),
+                        'DNI/NIE', employee.dni ?? 'No especificado', cs),
+                    _buildInfoRow(
+                        'Teléfono', employee.telefono ?? 'No especificado', cs),
                     _buildInfoRow('Departamento',
-                        employee.department ?? 'No especificado'),
+                        employee.department ?? 'No especificado', cs),
                     _buildInfoRow(
-                        'Empresa', employee.empresa ?? 'No especificado'),
-                    _buildInfoRow('Rol', _formatRole(employee.role)),
+                        'Empresa', employee.empresa ?? 'No especificado', cs),
+                    _buildInfoRow('Rol', _formatRole(employee.role), cs),
                     _buildInfoRow(
                       'Puede supervisar',
                       employee.canSuperviseTeam ? 'Sí' : 'No',
+                      cs,
                     ),
-                    _buildAssignedSupervisorRow(ref, employee),
+                    _buildAssignedSupervisorRow(ref, employee, cs),
                     _buildInfoRow('Horas Semanales',
-                        '${employee.weeklyHours.toStringAsFixed(0)}h'),
-                    _buildInfoRow(
-                        'Estado', employee.isActive ? 'Activo' : 'Inactivo'),
+                        '${employee.weeklyHours.toStringAsFixed(0)}h', cs),
+                    _buildInfoRow('Estado',
+                        employee.isActive ? 'Activo' : 'Inactivo', cs),
                     if (employee.fechaInicio != null)
                       _buildInfoRow(
                         'Fecha Inicio',
                         DateFormat('dd/MM/yyyy').format(employee.fechaInicio!),
+                        cs,
                       ),
-                    _buildCalendarRow(context, ref, employee),
+                    _buildCalendarRow(context, cs, ref, employee),
                   ],
                 ),
               ),
@@ -244,8 +249,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
                     Text(
                       'Próximamente: Registros de fichajes',
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
-                        fontStyle: FontStyle.italic,
+                        color: cs.onSurfaceVariant,
                       ),
                     ),
                     // TODO: Conectar con provider de registros
@@ -273,7 +277,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildNotFound(BuildContext context) {
+  Widget _buildNotFound(BuildContext context, ColorScheme cs) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -281,7 +285,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
           Icon(
             Icons.person_off,
             size: 64,
-            color: AppColors.textTertiary,
+            color: cs.outline,
           ),
           AppSpacing.verticalSpaceLg,
           Text(
@@ -292,7 +296,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
           Text(
             'El empleado con ID $employeeId no existe',
             style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
+              color: cs.onSurfaceVariant,
             ),
           ),
         ],
@@ -300,7 +304,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildError(BuildContext context, String error) {
+  Widget _buildError(BuildContext context, ColorScheme cs, String error) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -321,7 +325,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
             child: Text(
               error,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: cs.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
@@ -331,7 +335,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(String label, String value, ColorScheme cs) {
     return Padding(
       padding: AppSpacing.verticalSm,
       child: Row(
@@ -342,7 +346,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
             child: Text(
               label,
               style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: cs.onSurfaceVariant,
               ),
             ),
           ),
@@ -405,6 +409,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
   /// Fila de calendario con nombre resuelto y botón "Cambiar"
   Widget _buildCalendarRow(
     BuildContext context,
+    ColorScheme cs,
     WidgetRef ref,
     UserModel employee,
   ) {
@@ -418,7 +423,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
             child: Text(
               'Calendario',
               style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: cs.onSurfaceVariant,
               ),
             ),
           ),
@@ -581,14 +586,15 @@ class EmployeeDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAssignedSupervisorRow(WidgetRef ref, UserModel employee) {
+  Widget _buildAssignedSupervisorRow(
+      WidgetRef ref, UserModel employee, ColorScheme cs) {
     if (employee.role == UserRole.admin) {
-      return _buildInfoRow('Supervisor asignado', 'No aplica');
+      return _buildInfoRow('Supervisor asignado', 'No aplica', cs);
     }
 
     if (employee.supervisorId == null ||
         employee.supervisorId!.trim().isEmpty) {
-      return _buildInfoRow('Supervisor asignado', 'Sin asignar');
+      return _buildInfoRow('Supervisor asignado', 'Sin asignar', cs);
     }
 
     final supervisorAsync = ref.watch(userByIdProvider(employee.supervisorId!));
@@ -603,7 +609,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
             child: Text(
               'Supervisor asignado',
               style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: cs.onSurfaceVariant,
               ),
             ),
           ),

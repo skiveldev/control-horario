@@ -23,16 +23,19 @@ class CategoryTabSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
+        color: cs.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
       child: Row(
         children: [
           Expanded(
             child: _buildTab(
+              cs,
               label: 'Trabajo',
               icon: Icons.work_outline,
               category: RecordCategory.work,
@@ -41,6 +44,7 @@ class CategoryTabSelector extends StatelessWidget {
           ),
           Expanded(
             child: _buildTab(
+              cs,
               label: 'Pausa',
               icon: Icons.coffee_outlined,
               category: RecordCategory.breakTime,
@@ -52,7 +56,8 @@ class CategoryTabSelector extends StatelessWidget {
     );
   }
 
-  Widget _buildTab({
+  Widget _buildTab(
+    ColorScheme cs, {
     required String label,
     required IconData icon,
     required RecordCategory category,
@@ -72,7 +77,7 @@ class CategoryTabSelector extends StatelessWidget {
             horizontal: AppSpacing.lg,
           ),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.surface : Colors.transparent,
+            color: isSelected ? cs.surface : Colors.transparent,
             borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
             border: Border.all(
               color: isSelected ? color : Colors.transparent,
@@ -94,13 +99,13 @@ class CategoryTabSelector extends StatelessWidget {
               Icon(
                 icon,
                 size: AppSpacing.iconXl,
-                color: isSelected ? color : AppColors.textSecondary,
+                color: isSelected ? color : cs.onSurfaceVariant,
               ),
               AppSpacing.verticalSpaceXs,
               Text(
                 label,
                 style: AppTextStyles.labelMedium.copyWith(
-                  color: isSelected ? color : AppColors.textSecondary,
+                  color: isSelected ? color : cs.onSurfaceVariant,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 ),
               ),

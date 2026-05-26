@@ -20,6 +20,7 @@ class FutureMonthEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final monthName = DateFormat('MMMM yyyy', 'es_ES').format(month);
 
     return Center(
@@ -33,13 +34,13 @@ class FutureMonthEmptyState extends StatelessWidget {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
+                color: cs.surfaceContainerHighest,
                 borderRadius: AppSpacing.borderRadiusXl,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.calendar_month_outlined,
                 size: 64,
-                color: AppColors.textSecondary,
+                color: cs.onSurfaceVariant,
               ),
             ),
 
@@ -49,7 +50,7 @@ class FutureMonthEmptyState extends StatelessWidget {
             Text(
               'Mes no disponible',
               style: AppTextStyles.h3.copyWith(
-                color: AppColors.textPrimary,
+                color: cs.onSurface,
               ),
               textAlign: TextAlign.center,
             ),
@@ -60,7 +61,7 @@ class FutureMonthEmptyState extends StatelessWidget {
             Text(
               'No se ha activado los días para este mes',
               style: AppTextStyles.bodyLarge.copyWith(
-                color: AppColors.textSecondary,
+                color: cs.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
@@ -90,7 +91,7 @@ class FutureMonthEmptyState extends StatelessWidget {
                     child: Text(
                       'Los registros de $monthName estarán disponibles cuando comience el período.',
                       style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textPrimary,
+                        color: cs.onSurface,
                       ),
                     ),
                   ),
@@ -106,8 +107,8 @@ class FutureMonthEmptyState extends StatelessWidget {
               icon: const Icon(Icons.arrow_back, size: AppSpacing.iconSm),
               label: const Text('Volver al mes actual'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.textOnPrimary,
+                backgroundColor: cs.primary,
+                foregroundColor: cs.onPrimary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.xxl,
                   vertical: AppSpacing.lg,

@@ -101,7 +101,7 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
         decoration: BoxDecoration(
           color: isHovered
               ? AppColors.primary.withValues(alpha: 0.04)
-              : AppColors.surface,
+              : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
           border: Border.all(
             color: isHovered
@@ -113,7 +113,9 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
           child: Text(
             '${day.day}',
             style: TextStyle(
-              color: isHovered ? AppColors.primary : AppColors.textPrimary,
+              color: isHovered
+                  ? AppColors.primary
+                  : Theme.of(context).colorScheme.onSurface,
               fontWeight: FontWeight.w500,
               fontSize: 13,
             ),
@@ -258,15 +260,16 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final isDesktop = MediaQuery.of(context).size.width >= Breakpoints.desktop;
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           Column(
             children: [
-              _buildPageHeader(),
-              Divider(height: 1, color: AppColors.border),
+              _buildPageHeader(cs),
+              Divider(height: 1, color: cs.outline),
               Expanded(
                 child: isDesktop ? _buildDesktopLayout() : _buildMobileLayout(),
               ),
@@ -283,13 +286,13 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
     );
   }
 
-  Widget _buildPageHeader() {
+  Widget _buildPageHeader(ColorScheme cs) {
     final title = widget.existingCalendar == null
         ? 'Nuevo Calendario'
         : 'Editar Calendario';
 
     return Container(
-      color: AppColors.surface,
+      color: cs.surface,
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.xxl,
         vertical: AppSpacing.md,
@@ -319,7 +322,7 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
                 Text(
                   'Configuración de festivos y jornada',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -410,11 +413,12 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
         vertical: AppSpacing.md,
       ),
       decoration: BoxDecoration(
-        color: AppColors.textPrimary,
+        color: Theme.of(context).colorScheme.onSurface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
         boxShadow: [
           BoxShadow(
-            color: AppColors.textPrimary.withValues(alpha: 0.35),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.35),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -436,7 +440,10 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
               Text(
                 'ESTADO ACTUAL',
                 style: AppTextStyles.labelSmall.copyWith(
-                  color: AppColors.surface.withValues(alpha: 0.5),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surface
+                      .withValues(alpha: 0.5),
                   letterSpacing: 0.8,
                   fontSize: 10,
                 ),
@@ -444,7 +451,7 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
               Text(
                 'Configuración válida para $_selectedYear',
                 style: AppTextStyles.labelMedium.copyWith(
-                  color: AppColors.surface,
+                  color: Theme.of(context).colorScheme.surface,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -454,13 +461,13 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
           Icon(
             Icons.edit_outlined,
             size: AppSpacing.iconMd,
-            color: AppColors.surface.withValues(alpha: 0.6),
+            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
           ),
           AppSpacing.horizontalSpaceMd,
           Icon(
             Icons.more_vert,
             size: AppSpacing.iconMd,
-            color: AppColors.surface.withValues(alpha: 0.6),
+            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
           ),
         ],
       ),
@@ -470,9 +477,9 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
   Widget _buildFormFields() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
         boxShadow: AppShadows.subtleShadow,
       ),
       child: Column(
@@ -486,14 +493,14 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
                 Icon(
                   Icons.settings_outlined,
                   size: AppSpacing.iconLg,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 AppSpacing.horizontalSpaceSm,
                 Text('Información del Calendario', style: AppTextStyles.h6),
               ],
             ),
           ),
-          Divider(height: 1, color: AppColors.border),
+          Divider(height: 1, color: Theme.of(context).colorScheme.outline),
           Padding(
             padding: AppSpacing.allLg,
             child: Row(
@@ -508,7 +515,7 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
                       Text(
                         'NOMBRE DEL CALENDARIO *',
                         style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -541,7 +548,7 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
                       Text(
                         'AÑO',
                         style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -586,7 +593,7 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
                     Text(
                       'ESTADO',
                       style: AppTextStyles.labelSmall.copyWith(
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -603,7 +610,7 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
                       style: AppTextStyles.labelSmall.copyWith(
                         color: _isActive
                             ? AppColors.success
-                            : AppColors.textTertiary,
+                            : Theme.of(context).colorScheme.outline,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.5,
                       ),
@@ -625,9 +632,9 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
   Widget _buildCalendarSection() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
         boxShadow: AppShadows.subtleShadow,
       ),
       child: Column(
@@ -647,7 +654,7 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
                       child: Text(
                         'Toca un día para añadir o editar un festivo',
                         style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -660,7 +667,7 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
             ),
           ),
 
-          Divider(height: 1, color: AppColors.border),
+          Divider(height: 1, color: Theme.of(context).colorScheme.outline),
 
           // TableCalendar — Theme neutraliza el hover circular nativo
           Theme(
@@ -811,7 +818,7 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
             Text(
               type.shortLabel,
               style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -827,9 +834,9 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
   Widget _buildEventsSummary() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
         boxShadow: AppShadows.subtleShadow,
       ),
       child: Column(
@@ -873,14 +880,14 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
                 Text(
                   DateFormat('MMMM yyyy', 'es').format(_focusedDay),
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
               ],
             ),
           ),
-          Divider(height: 1, color: AppColors.border),
+          Divider(height: 1, color: Theme.of(context).colorScheme.outline),
           _buildEventsList(_eventsForFocusedMonth),
         ],
       ),
@@ -890,9 +897,9 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
   Widget _buildEventsSummaryMobile() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
         boxShadow: AppShadows.subtleShadow,
       ),
       child: Column(
@@ -930,7 +937,7 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
               ],
             ),
           ),
-          Divider(height: 1, color: AppColors.border),
+          Divider(height: 1, color: Theme.of(context).colorScheme.outline),
           _buildEventsList(_eventsForFocusedMonth),
         ],
       ),
@@ -948,20 +955,20 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
             Icon(
               Icons.calendar_today_outlined,
               size: 40,
-              color: AppColors.textTertiary,
+              color: Theme.of(context).colorScheme.outline,
             ),
             AppSpacing.verticalSpaceMd,
             Text(
               'Sin festivos',
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             AppSpacing.verticalSpaceSm,
             Text(
               'Toca un día en el calendario para añadir',
               style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.textTertiary,
+                color: Theme.of(context).colorScheme.outline,
               ),
               textAlign: TextAlign.center,
             ),
@@ -989,7 +996,7 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
 
         return Container(
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: Theme.of(context).colorScheme.surface,
             border: Border(
               left: BorderSide(color: color, width: 3),
             ),
@@ -1029,14 +1036,14 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
                           Icon(
                             Icons.access_time_outlined,
                             size: 11,
-                            color: AppColors.textTertiary,
+                            color: Theme.of(context).colorScheme.outline,
                           ),
                           const SizedBox(width: 3),
                           Flexible(
                             child: Text(
                               dateStr,
                               style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.textTertiary,
+                                color: Theme.of(context).colorScheme.outline,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -1048,7 +1055,7 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.close, size: 14),
-                  color: AppColors.textTertiary,
+                  color: Theme.of(context).colorScheme.outline,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
                     minWidth: 28,

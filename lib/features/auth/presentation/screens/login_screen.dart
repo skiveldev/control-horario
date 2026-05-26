@@ -64,9 +64,9 @@ class LoginScreen extends ConsumerWidget {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Container(
-        color: AppColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         child: LayoutBuilder(
           builder: (context, constraints) {
             final isDesktop = constraints.maxWidth >= Breakpoints.desktop;
@@ -122,7 +122,7 @@ class LoginScreen extends ConsumerWidget {
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
           boxShadow: [
             BoxShadow(
@@ -150,7 +150,7 @@ class LoginScreen extends ConsumerWidget {
                   Text(
                     'Bienvenido de nuevo',
                     style: AppTextStyles.displayMedium.copyWith(
-                      color: AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.w700,
                     ),
                     textAlign: TextAlign.center,
@@ -162,7 +162,7 @@ class LoginScreen extends ConsumerWidget {
                   Text(
                     'Inicia sesión para acceder a tu panel de control',
                     style: AppTextStyles.bodyLarge.copyWith(
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     textAlign: TextAlign.center,
                   ),

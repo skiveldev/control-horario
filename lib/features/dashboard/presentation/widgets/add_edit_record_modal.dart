@@ -95,12 +95,13 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final isMobile = context.isMobile;
     final isEdit = widget.recordToEdit != null;
     final isValidated = widget.recordToEdit?.isValidated ?? false;
 
     return Dialog(
-      backgroundColor: AppColors.surface,
+      backgroundColor: cs.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       ),
@@ -185,7 +186,7 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
                       child: Text(
                         '—',
                         style: AppTextStyles.h4.copyWith(
-                          color: AppColors.textTertiary,
+                          color: cs.outline,
                         ),
                       ),
                     ),
@@ -244,8 +245,8 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
                     child: ElevatedButton(
                       onPressed: _canSave() && !_isLoading ? _handleSave : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: AppColors.textOnPrimary,
+                        backgroundColor: cs.primary,
+                        foregroundColor: cs.onPrimary,
                         padding: const EdgeInsets.symmetric(
                           vertical: AppSpacing.lg,
                         ),
@@ -255,13 +256,13 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
                         ),
                       ),
                       child: _isLoading
-                          ? const SizedBox(
+                          ? SizedBox(
                               height: 20,
                               width: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation(
-                                  AppColors.textOnPrimary,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  cs.onPrimary,
                                 ),
                               ),
                             )
@@ -280,6 +281,7 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
   }
 
   Widget _buildHeader(BuildContext context, bool isEdit, bool isMobile) {
+    final cs = Theme.of(context).colorScheme;
     final dateStr = DateFormat('d MMMM yyyy', 'es_ES').format(widget.date);
     final weekDay = DateFormat('EEEE', 'es_ES').format(widget.date);
 
@@ -288,7 +290,7 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
         Icon(
           isEdit ? Icons.edit : Icons.add_circle_outline,
           size: AppSpacing.iconXl,
-          color: AppColors.primary,
+          color: cs.primary,
         ),
         AppSpacing.horizontalSpaceMd,
         Expanded(
@@ -302,7 +304,7 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
               Text(
                 '$weekDay, $dateStr',
                 style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
+                  color: cs.onSurfaceVariant,
                 ),
               ),
             ],
@@ -318,6 +320,8 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
   }
 
   Widget _buildValidatedWarning() {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       padding: AppSpacing.allMd,
       decoration: BoxDecoration(
@@ -351,7 +355,7 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
                 Text(
                   'Al editarlo, quedará marcado como modificado después de la validación.',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -364,6 +368,8 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
 
   /// ✨ Warning para registros activos
   Widget _buildActiveRecordWarning() {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       padding: AppSpacing.allMd,
       decoration: BoxDecoration(
@@ -388,7 +394,7 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
                   ? 'Registro en curso. Solo puedes editar la hora de entrada.'
                   : 'Pausa en curso. Solo puedes editar la hora de inicio de pausa.',
               style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.textPrimary,
+                color: cs.onSurface,
               ),
             ),
           ),
@@ -416,15 +422,18 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
   }
 
   Widget _buildSectionLabel(String label) {
+    final cs = Theme.of(context).colorScheme;
+
     return Text(
       label,
       style: AppTextStyles.overline.copyWith(
-        color: AppColors.textSecondary,
+        color: cs.onSurfaceVariant,
       ),
     );
   }
 
   Widget _buildDurationDisplay() {
+    final cs = Theme.of(context).colorScheme;
     final duration = _calculateDuration();
     final hasValidTimes = _startTime != null && _endTime != null;
 
@@ -433,14 +442,14 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
         Icon(
           Icons.schedule,
           size: AppSpacing.iconMd,
-          color: hasValidTimes ? AppColors.primary : AppColors.textTertiary,
+          color: hasValidTimes ? cs.primary : cs.outline,
         ),
         AppSpacing.horizontalSpaceSm,
         Flexible(
           child: Text(
             'Duración estimada: ',
             style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
+              color: cs.onSurfaceVariant,
             ),
             overflow: TextOverflow.ellipsis,
           ),
@@ -449,7 +458,7 @@ class _AddEditRecordModalState extends State<AddEditRecordModal> {
           child: Text(
             hasValidTimes ? _formatDuration(duration) : '--h --m',
             style: AppTextStyles.bodyMedium.copyWith(
-              color: hasValidTimes ? AppColors.primary : AppColors.textTertiary,
+              color: hasValidTimes ? cs.primary : cs.outline,
               fontWeight: FontWeight.w600,
             ),
             overflow: TextOverflow.ellipsis,

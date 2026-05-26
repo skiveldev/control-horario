@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 
@@ -26,7 +25,7 @@ class LoginFooter extends StatelessWidget {
           Text(
             'Al continuar, aceptas nuestros términos de servicio y política de privacidad',
             style: AppTextStyles.caption.copyWith(
-              color: AppColors.textTertiary,
+              color: Theme.of(context).colorScheme.outline,
             ),
             textAlign: TextAlign.center,
           ),
@@ -37,7 +36,7 @@ class LoginFooter extends StatelessWidget {
           Text(
             'Sistema seguro • © 2026 Time Rega',
             style: AppTextStyles.caption.copyWith(
-              color: AppColors.textTertiary,
+              color: Theme.of(context).colorScheme.outline,
             ),
             textAlign: TextAlign.center,
           ),

@@ -58,7 +58,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
               Icon(
                 Icons.error_outline,
                 size: 64,
-                color: AppColors.error,
+                color: Theme.of(context).colorScheme.error,
               ),
               AppSpacing.verticalSpaceMd,
               Text(
@@ -69,7 +69,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
               Text(
                 error.toString(),
                 style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -96,7 +96,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
               Text(
                 'Plantillas predefinidas que puedes asignar a tus empleados. Tienes $templateCount ${templateCount == 1 ? 'plantilla disponible' : 'plantillas disponibles'}.',
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -169,7 +169,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
             Icon(
               Icons.schedule_outlined,
               size: 64,
-              color: AppColors.textTertiary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             AppSpacing.verticalSpaceLg,
             Text(
@@ -180,7 +180,7 @@ class ScheduleManagementScreen extends ConsumerWidget {
             Text(
               'Crea tu primera plantilla de horario',
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             AppSpacing.verticalSpaceLg,

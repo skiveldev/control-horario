@@ -36,7 +36,7 @@ class _AdminProfileScreenState extends ConsumerState<AdminProfileScreen> {
     final authNotifierState = ref.watch(authNotifierProvider);
     final isLoggingOut = authNotifierState.isLoading;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: const CustomAppBar(
         title: 'Mi Perfil',
         automaticallyImplyLeading: true,
@@ -159,7 +159,7 @@ class _AdminProfileScreenState extends ConsumerState<AdminProfileScreen> {
                 CustomCard(
                   elevation: CardElevation.none,
                   padding: AppSpacing.cardLarge,
-                  borderColor: AppColors.error,
+                  borderColor: Theme.of(context).colorScheme.error,
                   child: InkWell(
                     onTap: isLoggingOut
                         ? null
@@ -174,11 +174,12 @@ class _AdminProfileScreenState extends ConsumerState<AdminProfileScreen> {
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: AppColors.error,
+                              color: Theme.of(context).colorScheme.error,
                             ),
                           )
                         else
-                          Icon(Icons.logout, color: AppColors.error),
+                          Icon(Icons.logout,
+                              color: Theme.of(context).colorScheme.error),
                         AppSpacing.horizontalSpaceMd,
                         Expanded(
                           child: Text(
@@ -186,7 +187,7 @@ class _AdminProfileScreenState extends ConsumerState<AdminProfileScreen> {
                                 ? 'Cerrando sesión...'
                                 : 'Cerrar sesión',
                             style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.error,
+                              color: Theme.of(context).colorScheme.error,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -195,7 +196,7 @@ class _AdminProfileScreenState extends ConsumerState<AdminProfileScreen> {
                           Icon(
                             Icons.arrow_forward_ios,
                             size: 16,
-                            color: AppColors.error,
+                            color: Theme.of(context).colorScheme.error,
                           ),
                       ],
                     ),
@@ -222,7 +223,9 @@ class _AdminProfileScreenState extends ConsumerState<AdminProfileScreen> {
           padding: AppSpacing.horizontalSm,
           child: Row(
             children: [
-              Icon(icon, size: AppSpacing.iconMd, color: AppColors.primary),
+              Icon(icon,
+                  size: AppSpacing.iconMd,
+                  color: Theme.of(context).colorScheme.primary),
               AppSpacing.horizontalSpaceSm,
               Expanded(child: Text(title, style: AppTextStyles.h5)),
             ],
@@ -297,7 +300,9 @@ class _AdminProfileScreenState extends ConsumerState<AdminProfileScreen> {
       title: Text(title, style: AppTextStyles.bodyMedium),
       subtitle: Text(
         subtitle,
-        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
       ),
       trailing: Switch(value: value, onChanged: onChanged),
     );
@@ -318,7 +323,9 @@ class _AdminProfileScreenState extends ConsumerState<AdminProfileScreen> {
       title: Text(title, style: AppTextStyles.bodyMedium),
       subtitle: Text(
         subtitle,
-        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
       ),
       trailing: DropdownButton<String>(
         value: value,
@@ -348,15 +355,19 @@ class _AdminProfileScreenState extends ConsumerState<AdminProfileScreen> {
       leading: Container(
         padding: AppSpacing.allSm,
         decoration: BoxDecoration(
-          color: AppColors.surfaceVariant,
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
         ),
-        child: Icon(icon, size: AppSpacing.iconMd, color: AppColors.primary),
+        child: Icon(icon,
+            size: AppSpacing.iconMd,
+            color: Theme.of(context).colorScheme.primary),
       ),
       title: Text(title, style: AppTextStyles.bodyMedium),
       subtitle: Text(
         subtitle,
-        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: onTap,
@@ -372,9 +383,9 @@ class _AdminProfileScreenState extends ConsumerState<AdminProfileScreen> {
       title: Text(title, style: AppTextStyles.bodyMedium),
       trailing: Text(
         value,
-        style: AppTextStyles.bodyMedium.copyWith(
-          color: AppColors.textSecondary,
-        ),
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
       ),
     );
   }
@@ -402,7 +413,8 @@ class _AdminProfileScreenState extends ConsumerState<AdminProfileScreen> {
                 context.go(AppRouter.login);
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error),
             child: const Text('Cerrar sesión'),
           ),
         ],

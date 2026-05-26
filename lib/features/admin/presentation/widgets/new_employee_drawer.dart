@@ -210,7 +210,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
             duration: const Duration(seconds: 5),
             action: SnackBarAction(
               label: 'COPIAR',
-              textColor: AppColors.surface,
+              textColor: Theme.of(context).colorScheme.surface,
               onPressed: () => _copyToClipboard(
                 temporaryPassword,
                 successMessage: 'Contraseña copiada al portapapeles',
@@ -388,17 +388,20 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.border),
+                border:
+                    Border.all(color: Theme.of(context).colorScheme.outline),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.email,
-                          size: 16, color: AppColors.textSecondary),
+                      Icon(Icons.email,
+                          size: 16,
+                          color:
+                              Theme.of(context).colorScheme.onSurfaceVariant),
                       const SizedBox(width: AppSpacing.sm),
                       Flexible(
                         child: Text(
@@ -413,8 +416,10 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                   const SizedBox(height: AppSpacing.sm),
                   Row(
                     children: [
-                      const Icon(Icons.lock,
-                          size: 16, color: AppColors.textSecondary),
+                      Icon(Icons.lock,
+                          size: 16,
+                          color:
+                              Theme.of(context).colorScheme.onSurfaceVariant),
                       const SizedBox(width: AppSpacing.sm),
                       Flexible(
                         child: Text(
@@ -435,7 +440,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
               '⚠️ El empleado deberá cambiar la contraseña en su primer acceso.',
               style: TextStyle(
                 fontSize: 12,
-                color: AppColors.textSecondary,
+                color: AppColors.warning,
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -579,6 +584,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
   Widget build(BuildContext context) {
     if (!widget.isOpen) return const SizedBox.shrink();
 
+    final theme = Theme.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final drawerWidth = screenWidth < Breakpoints.tablet ? screenWidth : 650.0;
 
@@ -591,7 +597,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
           child: GestureDetector(
             onTap: widget.onClose,
             child: Container(
-              color: AppColors.textPrimary,
+              color: theme.colorScheme.onSurface,
               width: double.infinity,
               height: double.infinity,
             ),
@@ -609,11 +615,11 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
           child: Material(
             elevation: 8,
             child: Container(
-              color: AppColors.surface,
+              color: theme.colorScheme.surface,
               child: Column(
                 children: [
                   // Header
-                  _buildHeader(),
+                  _buildHeader(theme),
 
                   // Scrollable Content
                   Expanded(
@@ -622,18 +628,18 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildPersonalSection(),
+                          _buildPersonalSection(theme),
                           AppSpacing.verticalSpaceXxl,
-                          _buildWorkSection(),
+                          _buildWorkSection(theme),
                           AppSpacing.verticalSpaceXxl,
-                          _buildScheduleSection(),
+                          _buildScheduleSection(theme),
                         ],
                       ),
                     ),
                   ),
 
                   // Footer
-                  _buildFooter(),
+                  _buildFooter(theme),
                 ],
               ),
             ),
@@ -643,13 +649,13 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(ThemeData theme) {
     return Container(
       height: 60,
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: theme.colorScheme.surface,
         border: Border(
-          bottom: BorderSide(color: AppColors.border),
+          bottom: BorderSide(color: theme.colorScheme.outline),
         ),
       ),
       padding: AppSpacing.horizontalLg,
@@ -664,20 +670,20 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
           IconButton(
             icon: const Icon(Icons.close),
             onPressed: widget.onClose,
-            color: AppColors.textSecondary,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFooter() {
+  Widget _buildFooter(ThemeData theme) {
     return Container(
       height: 80,
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: theme.colorScheme.surface,
         border: Border(
-          top: BorderSide(color: AppColors.border),
+          top: BorderSide(color: theme.colorScheme.outline),
         ),
       ),
       padding: AppSpacing.allLg,
@@ -710,7 +716,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
   // SECCIÓN 1: INFORMACIÓN PERSONAL
   // ============================================================================
 
-  Widget _buildPersonalSection() {
+  Widget _buildPersonalSection(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -793,7 +799,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
   // SECCIÓN 2: INFORMACIÓN LABORAL
   // ============================================================================
 
-  Widget _buildWorkSection() {
+  Widget _buildWorkSection(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -837,7 +843,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
         Text(
           '✨ Si se deja vacío, se generará automáticamente (EMP-001, EMP-002...)',
           style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textTertiary,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         AppSpacing.verticalSpaceMd,
@@ -860,7 +866,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                 decoration: InputDecoration(
                   labelText: 'Departamento',
                   labelStyle: AppTextStyles.labelMedium.copyWith(
-                    color: AppColors.textSecondary,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                   floatingLabelBehavior: FloatingLabelBehavior.always,
                   contentPadding: const EdgeInsets.symmetric(
@@ -869,11 +875,11 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: AppColors.border),
+                    borderSide: BorderSide(color: theme.colorScheme.outline),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: AppColors.border),
+                    borderSide: BorderSide(color: theme.colorScheme.outline),
                   ),
                   errorText: _showValidation ? _errors['departamento'] : null,
                 ),
@@ -917,7 +923,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
   // SECCIÓN 3: CONTROL HORARIO
   // ============================================================================
 
-  Widget _buildScheduleSection() {
+  Widget _buildScheduleSection(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -934,15 +940,16 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
         Text(
           'Rol en el sistema *',
           style: AppTextStyles.labelMedium.copyWith(
-            color: AppColors.textSecondary,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         AppSpacing.verticalSpaceSm,
-        _buildRoleRadio(
-            'employee', 'Empleado', 'Solo puede fichar y ver su información'),
-        _buildRoleRadio('supervisor', 'Supervisor',
+        _buildRoleRadio(theme, 'employee', 'Empleado',
+            'Solo puede fichar y ver su información'),
+        _buildRoleRadio(theme, 'supervisor', 'Supervisor',
             'Puede ver su equipo y aprobar solicitudes'),
-        _buildRoleRadio('admin', 'Administrador', 'Acceso completo al sistema'),
+        _buildRoleRadio(
+            theme, 'admin', 'Administrador', 'Acceso completo al sistema'),
         AppSpacing.verticalSpaceMd,
 
         // Fecha inicio y Horario (row)
@@ -955,7 +962,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                   Text(
                     'Fecha de inicio',
                     style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.textSecondary,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -977,13 +984,14 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: theme.colorScheme.outline),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
                         children: [
                           Icon(Icons.calendar_today,
-                              size: 16, color: AppColors.textSecondary),
+                              size: 16,
+                              color: theme.colorScheme.onSurfaceVariant),
                           const SizedBox(width: 8),
                           Text(
                             '${_fechaInicio.day}/${_fechaInicio.month}/${_fechaInicio.year}',
@@ -1004,7 +1012,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                   Text(
                     'Horario',
                     style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.textSecondary,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -1027,11 +1035,13 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: AppColors.border),
+                                borderSide: BorderSide(
+                                    color: theme.colorScheme.outline),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: AppColors.border),
+                                borderSide: BorderSide(
+                                    color: theme.colorScheme.outline),
                               ),
                             ),
                             items: [
@@ -1103,7 +1113,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
               child: Text(
                 'El horario puede asignarse después desde el detalle del empleado',
                 style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textTertiary,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
@@ -1115,7 +1125,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
         Text(
           'Calendario laboral',
           style: AppTextStyles.labelMedium.copyWith(
-            color: AppColors.textSecondary,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         const SizedBox(height: 8),
@@ -1136,11 +1146,11 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: AppColors.border),
+                      borderSide: BorderSide(color: theme.colorScheme.outline),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: AppColors.border),
+                      borderSide: BorderSide(color: theme.colorScheme.outline),
                     ),
                   ),
                   items: [
@@ -1207,7 +1217,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                   Text(
                     'Fecha de fin',
                     style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.textSecondary,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -1230,13 +1240,14 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: theme.colorScheme.outline),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
                         children: [
                           Icon(Icons.event_busy,
-                              size: 16, color: AppColors.textSecondary),
+                              size: 16,
+                              color: theme.colorScheme.onSurfaceVariant),
                           const SizedBox(width: 8),
                           Text(
                             _fechaFin == null
@@ -1244,8 +1255,8 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                                 : '${_fechaFin!.day}/${_fechaFin!.month}/${_fechaFin!.year}',
                             style: AppTextStyles.bodyMedium.copyWith(
                               color: _fechaFin == null
-                                  ? AppColors.textTertiary
-                                  : AppColors.textPrimary,
+                                  ? theme.colorScheme.onSurfaceVariant
+                                  : theme.colorScheme.onSurface,
                             ),
                           ),
                           if (_fechaFin != null) ...[
@@ -1253,7 +1264,8 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                             InkWell(
                               onTap: () => setState(() => _fechaFin = null),
                               child: Icon(Icons.clear,
-                                  size: 16, color: AppColors.textSecondary),
+                                  size: 16,
+                                  color: theme.colorScheme.onSurfaceVariant),
                             ),
                           ],
                         ],
@@ -1271,7 +1283,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                   Text(
                     'Horas semanales',
                     style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.textSecondary,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -1287,11 +1299,13 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppColors.border),
+                        borderSide:
+                            BorderSide(color: theme.colorScheme.outline),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppColors.border),
+                        borderSide:
+                            BorderSide(color: theme.colorScheme.outline),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -1309,7 +1323,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
         Text(
           'Dejar vacío para indefinido. Horas se calculan automáticamente del horario.',
           style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textTertiary,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         AppSpacing.verticalSpaceMd,
@@ -1318,9 +1332,9 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.surfaceVariant,
+            color: theme.colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: theme.colorScheme.outline),
           ),
           child: Row(
             children: [
@@ -1346,7 +1360,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                           ? 'El empleado podrá fichar y acceder al sistema'
                           : 'El empleado no podrá acceder al sistema',
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -1392,7 +1406,8 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
     );
   }
 
-  Widget _buildRoleRadio(String value, String title, String description) {
+  Widget _buildRoleRadio(
+      ThemeData theme, String value, String title, String description) {
     final isSelected = _selectedRole == value;
     return InkWell(
       onTap: () => setState(() {
@@ -1406,7 +1421,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
+            color: isSelected ? AppColors.primary : theme.colorScheme.outline,
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(8),
@@ -1423,7 +1438,9 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : AppColors.border,
+                  color: isSelected
+                      ? AppColors.primary
+                      : theme.colorScheme.outline,
                   width: isSelected ? 6 : 2,
                 ),
               ),
@@ -1443,7 +1460,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                   Text(
                     description,
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textSecondary,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
@@ -20,6 +19,7 @@ class EmployeeTableHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDesktop = context.isDesktop;
     final isTablet = context.isTablet;
+    final cs = Theme.of(context).colorScheme;
 
     return Container(
       padding: AppSpacing.symmetric(
@@ -27,10 +27,10 @@ class EmployeeTableHeader extends StatelessWidget {
         vertical: AppSpacing.md,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
+        color: cs.surfaceContainerHighest,
         border: Border(
           bottom: BorderSide(
-            color: AppColors.border,
+            color: cs.outline,
             width: 1,
           ),
         ),
@@ -43,7 +43,7 @@ class EmployeeTableHeader extends StatelessWidget {
             child: Text(
               'NOMBRE Y PERFIL',
               style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.textTertiary,
+                color: cs.outline,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.5,
               ),
@@ -56,7 +56,7 @@ class EmployeeTableHeader extends StatelessWidget {
             child: Text(
               'DEPARTAMENTO',
               style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.textTertiary,
+                color: cs.outline,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.5,
               ),
@@ -70,7 +70,7 @@ class EmployeeTableHeader extends StatelessWidget {
               child: Text(
                 'EMPRESA',
                 style: AppTextStyles.labelSmall.copyWith(
-                  color: AppColors.textTertiary,
+                  color: cs.outline,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.5,
                 ),
@@ -83,7 +83,7 @@ class EmployeeTableHeader extends StatelessWidget {
             child: Text(
               'ESTADO',
               style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.textTertiary,
+                color: cs.outline,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.5,
               ),
@@ -96,7 +96,7 @@ class EmployeeTableHeader extends StatelessWidget {
             child: Text(
               'ÚLTIMO FICHAJE',
               style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.textTertiary,
+                color: cs.outline,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.5,
               ),

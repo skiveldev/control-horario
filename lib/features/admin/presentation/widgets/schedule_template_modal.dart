@@ -71,6 +71,7 @@ class _ScheduleTemplateModalState extends ConsumerState<ScheduleTemplateModal> {
   Widget build(BuildContext context) {
     // Observar estado del provider para loading/error
     final state = ref.watch(scheduleManagementProvider);
+    final cs = Theme.of(context).colorScheme;
 
     return Dialog(
       child: Container(
@@ -158,7 +159,7 @@ class _ScheduleTemplateModalState extends ConsumerState<ScheduleTemplateModal> {
               Text(
                 'Define qué días son laborables y sus turnos de trabajo',
                 style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
+                  color: cs.onSurfaceVariant,
                 ),
               ),
 
@@ -168,7 +169,7 @@ class _ScheduleTemplateModalState extends ConsumerState<ScheduleTemplateModal> {
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.border),
+                    border: Border.all(color: cs.outline),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                   ),
                   child: WeekScheduleEditor(

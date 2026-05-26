@@ -25,7 +25,7 @@ class ProfileScreen extends ConsumerWidget {
     final userAsync = ref.watch(currentUserProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: const CustomAppBar(
         title: 'Mi Perfil',
         automaticallyImplyLeading: true,
@@ -33,14 +33,14 @@ class ProfileScreen extends ConsumerWidget {
       body: userAsync.when(
         data: (user) {
           if (user == null) {
-            return _buildNoUserError();
+            return _buildNoUserError(context);
           }
           return _buildProfileContent(context, user);
         },
         loading: () => const Center(
           child: CircularProgressIndicator(),
         ),
-        error: (error, stackTrace) => _buildErrorState(error),
+        error: (error, stackTrace) => _buildErrorState(context, error),
       ),
     );
   }
@@ -66,12 +66,13 @@ class ProfileScreen extends ConsumerWidget {
           child: Column(
             children: [
               // Header con avatar grande
-              _buildProfileHeader(user),
+              _buildProfileHeader(context, user),
 
               AppSpacing.verticalSpaceXxl,
 
               // Información personal
               _buildInfoSection(
+                context,
                 title: 'Información Personal',
                 icon: Icons.person,
                 items: [
@@ -109,6 +110,7 @@ class ProfileScreen extends ConsumerWidget {
 
               // Información laboral
               _buildInfoSection(
+                context,
                 title: 'Información Laboral',
                 icon: Icons.work,
                 items: [
@@ -150,6 +152,7 @@ class ProfileScreen extends ConsumerWidget {
 
               // Mi Horario Laboral
               _buildInfoSection(
+                context,
                 title: 'Mi Horario Laboral',
                 icon: Icons.schedule,
                 items: [
@@ -235,17 +238,17 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   /// Estado de error cuando no hay usuario autenticado
-  Widget _buildNoUserError() {
+  Widget _buildNoUserError(BuildContext context) {
     return Center(
       child: Padding(
         padding: AppSpacing.allXxl,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.person_off,
               size: 64,
-              color: AppColors.textSecondary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             AppSpacing.verticalSpaceLg,
             Text(
@@ -256,9 +259,9 @@ class ProfileScreen extends ConsumerWidget {
             AppSpacing.verticalSpaceMd,
             Text(
               'Por favor, cierra sesión e inicia sesión nuevamente',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -268,17 +271,17 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   /// Estado de error general
-  Widget _buildErrorState(Object error) {
+  Widget _buildErrorState(BuildContext context, Object error) {
     return Center(
       child: Padding(
         padding: AppSpacing.allXxl,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.error_outline,
               size: 64,
-              color: AppColors.error,
+              color: Theme.of(context).colorScheme.error,
             ),
             AppSpacing.verticalSpaceLg,
             Text(
@@ -289,9 +292,9 @@ class ProfileScreen extends ConsumerWidget {
             AppSpacing.verticalSpaceMd,
             Text(
               error.toString(),
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -300,7 +303,7 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProfileHeader(UserModel user) {
+  Widget _buildProfileHeader(BuildContext context, UserModel user) {
     // Obtener el rol en texto
     String roleText;
     switch (user.role) {
@@ -324,22 +327,26 @@ class ProfileScreen extends ConsumerWidget {
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: AppColors.primary, width: 4),
+              border: Border.all(
+                  color: Theme.of(context).colorScheme.primary, width: 4),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.3),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: 0.3),
                   blurRadius: 16,
                   offset: const Offset(0, 4),
                 ),
               ],
             ),
-            child: const CircleAvatar(
+            child: CircleAvatar(
               radius: 60,
-              backgroundColor: AppColors.primary,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               child: Icon(
                 Icons.person,
                 size: 60,
-                color: AppColors.textOnPrimary,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
             ),
           ),
@@ -358,9 +365,9 @@ class ProfileScreen extends ConsumerWidget {
           // Puesto
           Text(
             user.position ?? 'Sin asignar',
-            style: AppTextStyles.bodyLarge.copyWith(
-              color: AppColors.textSecondary,
-            ),
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
             textAlign: TextAlign.center,
           ),
 
@@ -373,26 +380,30 @@ class ProfileScreen extends ConsumerWidget {
               vertical: AppSpacing.sm,
             ),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color:
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
               border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.3),
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   Icons.verified_user,
                   size: 16,
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 AppSpacing.horizontalSpaceSm,
                 Text(
                   roleText,
                   style: AppTextStyles.labelMedium.copyWith(
-                    color: AppColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ],
@@ -403,7 +414,8 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildInfoSection({
+  Widget _buildInfoSection(
+    BuildContext context, {
     required String title,
     required IconData icon,
     required List<_InfoItem> items,
@@ -429,7 +441,7 @@ class ProfileScreen extends ConsumerWidget {
           ...items.map((item) {
             return Padding(
               padding: AppSpacing.verticalSm,
-              child: _buildInfoItem(item),
+              child: _buildInfoItem(context, item),
             );
           }),
         ],
@@ -437,7 +449,7 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildInfoItem(_InfoItem item) {
+  Widget _buildInfoItem(BuildContext context, _InfoItem item) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -445,10 +457,11 @@ class ProfileScreen extends ConsumerWidget {
         Container(
           padding: AppSpacing.allXs,
           decoration: BoxDecoration(
-            color: AppColors.surfaceVariant,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
           ),
-          child: Icon(item.icon, size: 16, color: AppColors.textSecondary),
+          child: Icon(item.icon,
+              size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
 
         AppSpacing.horizontalSpaceMd,
@@ -460,9 +473,9 @@ class ProfileScreen extends ConsumerWidget {
             children: [
               Text(
                 item.label,
-                style: AppTextStyles.labelSmall.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
               ),
               AppSpacing.verticalSpaceXs,
               Text(

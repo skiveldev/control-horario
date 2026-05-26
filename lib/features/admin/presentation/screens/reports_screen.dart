@@ -182,7 +182,7 @@ class ReportsScreen extends ConsumerWidget {
           children: [
             Text('Período',
                 style: AppTextStyles.labelLarge.copyWith(
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 )),
             AppSpacing.verticalSpaceSm,
             // Usamos Key con el mes para que Flutter reconstruya el widget

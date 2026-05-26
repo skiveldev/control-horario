@@ -32,11 +32,12 @@ class CalendarCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: cs.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: cs.outline),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow.withValues(alpha: 0.05),
@@ -49,22 +50,22 @@ class CalendarCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          _buildHeader(),
+          _buildHeader(cs),
 
           // Divider
-          Divider(height: 1, color: AppColors.border),
+          Divider(height: 1, color: cs.outline),
 
           // Contenido: contadores de festivos
           _buildStats(),
 
           // Footer: botones de acción
-          _buildActions(),
+          _buildActions(cs),
         ],
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(ColorScheme cs) {
     return Padding(
       padding: AppSpacing.allLg,
       child: Row(
@@ -99,7 +100,7 @@ class CalendarCard extends StatelessWidget {
                 Text(
                   'Año ${calendar.year}',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -107,13 +108,13 @@ class CalendarCard extends StatelessWidget {
           ),
 
           // Badge de estado
-          _buildStatusBadge(),
+          _buildStatusBadge(cs),
         ],
       ),
     );
   }
 
-  Widget _buildStatusBadge() {
+  Widget _buildStatusBadge(ColorScheme cs) {
     return Container(
       padding: AppSpacing.symmetric(
         horizontal: AppSpacing.sm,
@@ -122,12 +123,12 @@ class CalendarCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: calendar.isActive
             ? AppColors.success.withValues(alpha: 0.1)
-            : AppColors.textTertiary.withValues(alpha: 0.1),
+            : cs.outline.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         border: Border.all(
           color: calendar.isActive
               ? AppColors.success.withValues(alpha: 0.4)
-              : AppColors.textTertiary.withValues(alpha: 0.4),
+              : cs.outline.withValues(alpha: 0.4),
         ),
       ),
       child: Row(
@@ -138,18 +139,14 @@ class CalendarCard extends StatelessWidget {
             height: 6,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: calendar.isActive
-                  ? AppColors.success
-                  : AppColors.textTertiary,
+              color: calendar.isActive ? AppColors.success : cs.outline,
             ),
           ),
           const SizedBox(width: 4),
           Text(
             calendar.isActive ? 'Activo' : 'Borrador',
             style: AppTextStyles.labelSmall.copyWith(
-              color: calendar.isActive
-                  ? AppColors.success
-                  : AppColors.textTertiary,
+              color: calendar.isActive ? AppColors.success : cs.outline,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -226,7 +223,7 @@ class CalendarCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActions() {
+  Widget _buildActions(ColorScheme cs) {
     return Padding(
       padding: AppSpacing.symmetric(
         horizontal: AppSpacing.lg,
@@ -240,7 +237,7 @@ class CalendarCard extends StatelessWidget {
             icon: const Icon(Icons.copy_outlined, size: 16),
             label: const Text('Duplicar'),
             style: TextButton.styleFrom(
-              foregroundColor: AppColors.textSecondary,
+              foregroundColor: cs.onSurfaceVariant,
               textStyle: AppTextStyles.labelMedium,
             ),
           ),

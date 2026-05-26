@@ -72,6 +72,7 @@ class _DayEditorDialogState extends State<DayEditorDialog> {
   @override
   Widget build(BuildContext context) {
     final formatter = DateFormat('d MMMM yyyy', 'es');
+    final cs = Theme.of(context).colorScheme;
 
     return AlertDialog(
       title: Row(
@@ -102,7 +103,7 @@ class _DayEditorDialogState extends State<DayEditorDialog> {
                 Text(
                   formatter.format(widget.selectedDate),
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -120,11 +121,11 @@ class _DayEditorDialogState extends State<DayEditorDialog> {
             Text(
               'Tipo de día',
               style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: cs.onSurfaceVariant,
               ),
             ),
             AppSpacing.verticalSpaceSm,
-            _buildTypeSelector(),
+            _buildTypeSelector(cs),
 
             AppSpacing.verticalSpaceMd,
 
@@ -156,7 +157,7 @@ class _DayEditorDialogState extends State<DayEditorDialog> {
               subtitle: Text(
                 'Marca múltiples días de una vez',
                 style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
+                  color: cs.onSurfaceVariant,
                 ),
               ),
               value: _isRange,
@@ -168,7 +169,7 @@ class _DayEditorDialogState extends State<DayEditorDialog> {
             ),
             if (_isRange) ...[
               AppSpacing.verticalSpaceSm,
-              _buildDateRangePicker(),
+              _buildDateRangePicker(cs),
             ],
           ],
         ),
@@ -209,7 +210,7 @@ class _DayEditorDialogState extends State<DayEditorDialog> {
     );
   }
 
-  Widget _buildTypeSelector() {
+  Widget _buildTypeSelector(ColorScheme cs) {
     return Column(
       children: HolidayType.values.map((type) {
         final isSelected = _selectedType == type;
@@ -224,7 +225,7 @@ class _DayEditorDialogState extends State<DayEditorDialog> {
             ),
             decoration: BoxDecoration(
               border: Border.all(
-                color: isSelected ? _typeColor(type) : AppColors.border,
+                color: isSelected ? _typeColor(type) : cs.outline,
                 width: isSelected ? 2 : 1,
               ),
               borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
@@ -269,7 +270,7 @@ class _DayEditorDialogState extends State<DayEditorDialog> {
     );
   }
 
-  Widget _buildDateRangePicker() {
+  Widget _buildDateRangePicker(ColorScheme cs) {
     final formatter = DateFormat('d MMM yyyy', 'es');
     final rangeDisplay = _rangeEnd != null
         ? '${formatter.format(widget.selectedDate)} → ${formatter.format(_rangeEnd!)}'
@@ -281,9 +282,9 @@ class _DayEditorDialogState extends State<DayEditorDialog> {
       child: Container(
         padding: AppSpacing.allMd,
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: cs.outline),
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-          color: AppColors.surfaceVariant,
+          color: cs.surfaceContainerHighest,
         ),
         child: Row(
           children: [
@@ -293,13 +294,11 @@ class _DayEditorDialogState extends State<DayEditorDialog> {
               child: Text(
                 rangeDisplay,
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: _rangeEnd != null
-                      ? AppColors.textPrimary
-                      : AppColors.textTertiary,
+                  color: _rangeEnd != null ? cs.onSurface : cs.outline,
                 ),
               ),
             ),
-            Icon(Icons.arrow_drop_down, color: AppColors.textSecondary),
+            Icon(Icons.arrow_drop_down, color: cs.onSurfaceVariant),
           ],
         ),
       ),

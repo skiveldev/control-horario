@@ -28,13 +28,13 @@ class ScheduleSummarySection extends ConsumerWidget {
             Icon(
               Icons.schedule_outlined,
               size: 20,
-              color: AppColors.primary,
+              color: Theme.of(context).colorScheme.primary,
             ),
             AppSpacing.horizontalSpaceSm,
             Flexible(
               child: Text(
                 'Mi Horario',
-                style: AppTextStyles.h4.copyWith(color: AppColors.textPrimary),
+                style: AppTextStyles.h4,
                 overflow: TextOverflow.ellipsis,
               ),
             ),

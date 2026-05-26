@@ -42,10 +42,11 @@ class BlockedRecordModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final isMobile = context.isMobile;
 
     return Dialog(
-      backgroundColor: AppColors.surface,
+      backgroundColor: cs.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       ),
@@ -123,7 +124,7 @@ class BlockedRecordModal extends StatelessWidget {
                         Text(
                           'Este registro fue bloqueado por un administrador.',
                           style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.textSecondary,
+                            color: cs.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -137,6 +138,7 @@ class BlockedRecordModal extends StatelessWidget {
 
             // Información del bloqueo
             _buildInfoSection(
+              cs,
               title: 'Información del bloqueo',
               items: [
                 if (blockedByName != null)
@@ -166,6 +168,7 @@ class BlockedRecordModal extends StatelessWidget {
 
             // Detalles del registro
             _buildInfoSection(
+              cs,
               title: 'Detalles del registro',
               items: [
                 _InfoItem(
@@ -195,7 +198,7 @@ class BlockedRecordModal extends StatelessWidget {
             Text(
               'Si necesitas modificar este registro, contacta con tu supervisor o el departamento de RRHH.',
               style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.textSecondary,
+                color: cs.onSurfaceVariant,
               ),
             ),
 
@@ -207,8 +210,8 @@ class BlockedRecordModal extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.textOnPrimary,
+                  backgroundColor: cs.primary,
+                  foregroundColor: cs.onPrimary,
                   padding: const EdgeInsets.symmetric(
                     vertical: AppSpacing.lg,
                   ),
@@ -225,7 +228,8 @@ class BlockedRecordModal extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoSection({
+  Widget _buildInfoSection(
+    ColorScheme cs, {
     required String title,
     required List<Widget> items,
   }) {
@@ -235,7 +239,7 @@ class BlockedRecordModal extends StatelessWidget {
         Text(
           title,
           style: AppTextStyles.labelLarge.copyWith(
-            color: AppColors.textSecondary,
+            color: cs.onSurfaceVariant,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -243,7 +247,7 @@ class BlockedRecordModal extends StatelessWidget {
         Container(
           padding: AppSpacing.allMd,
           decoration: BoxDecoration(
-            color: AppColors.surfaceVariant,
+            color: cs.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
           child: Column(
@@ -268,6 +272,8 @@ class _InfoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
       child: Row(
@@ -276,7 +282,7 @@ class _InfoItem extends StatelessWidget {
           Icon(
             icon,
             size: AppSpacing.iconMd,
-            color: AppColors.textSecondary,
+            color: cs.onSurfaceVariant,
           ),
           AppSpacing.horizontalSpaceMd,
           Expanded(
@@ -286,14 +292,14 @@ class _InfoItem extends StatelessWidget {
                 Text(
                   label,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
                 AppSpacing.verticalSpaceXs,
                 Text(
                   value,
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textPrimary,
+                    color: cs.onSurface,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

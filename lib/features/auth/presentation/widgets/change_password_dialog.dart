@@ -191,13 +191,13 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
         Container(
           padding: AppSpacing.allMd,
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.lock_outline,
             size: 28,
-            color: AppColors.primary,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
 
@@ -220,10 +220,10 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
     return Container(
       padding: AppSpacing.allMd,
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.1),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
         border: Border.all(
-          color: AppColors.info.withValues(alpha: 0.3),
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -233,13 +233,14 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
           Icon(
             Icons.info_outline,
             size: AppSpacing.iconSm,
-            color: AppColors.info,
+            color: Theme.of(context).colorScheme.primary,
           ),
           AppSpacing.horizontalSpaceSm,
           Expanded(
             child: Text(
               'Tu contraseña debe tener al menos 8 caracteres y combinar mayúsculas, minúsculas, números y símbolos para mayor seguridad.',
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.info),
+              style: AppTextStyles.bodySmall
+                  .copyWith(color: Theme.of(context).colorScheme.primary),
             ),
           ),
         ],

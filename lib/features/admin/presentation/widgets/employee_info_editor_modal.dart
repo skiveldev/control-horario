@@ -93,6 +93,7 @@ class _EmployeeInfoEditorModalState
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Dialog(
       child: Container(
         width: 700,
@@ -126,7 +127,7 @@ class _EmployeeInfoEditorModalState
               ),
 
               AppSpacing.verticalSpaceLg,
-              Divider(color: AppColors.border),
+              Divider(color: cs.outline),
               AppSpacing.verticalSpaceLg,
 
               // ===== CONTENIDO SCROLLEABLE =====
@@ -349,7 +350,7 @@ class _EmployeeInfoEditorModalState
                             ? 'Los administradores no se asignan a un supervisor.'
                             : 'Puedes asignar o quitar el supervisor responsable de este empleado.',
                         style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
+                          color: cs.onSurfaceVariant,
                         ),
                       ),
 
@@ -400,7 +401,7 @@ class _EmployeeInfoEditorModalState
               ),
 
               AppSpacing.verticalSpaceLg,
-              Divider(color: AppColors.border),
+              Divider(color: cs.outline),
               AppSpacing.verticalSpaceMd,
 
               // ===== BOTONES =====

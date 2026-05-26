@@ -1,37 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_colors_dark.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/router/app_router.dart';
+import '../../providers/auth_provider.dart';
+import '../../models/user_model.dart';
 
 /// Pantalla de splash (carga inicial)
 ///
 /// Primera pantalla que se muestra al abrir la app.
 /// Muestra el logo y nombre de la app con una animación.
-/// Después de 2 segundos navega a Login.
-///
-/// TODO [FASE-2]: Agregar lógica para verificar sesión activa
-/// Si hay sesión activa, ir a Dashboard directamente.
-class SplashScreen extends StatefulWidget {
+/// Verifica el estado de autenticación y navega al destino apropiado
+/// sin demora artificial cuando ya hay una sesión activa.
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
+  bool _hasNavigated = false;
 
   @override
   void initState() {
     super.initState();
     _setupAnimations();
-    _navigateToLogin();
   }
 
   void _setupAnimations() {
@@ -51,23 +53,6 @@ class _SplashScreenState extends State<SplashScreen>
     _animationController.forward();
   }
 
-  Future<void> _navigateToLogin() async {
-    // TODO [FASE-2]: Verificar si hay sesión activa
-    // final hasSession = await ref.read(authProvider).checkSession();
-    // if (hasSession) {
-    //   context.go(AppRouter.dashboard);
-    // } else {
-    //   context.go(AppRouter.login);
-    // }
-
-    // Por ahora, siempre ir a login después de 2 segundos
-    await Future.delayed(AppConstants.splashDuration);
-
-    if (mounted) {
-      context.go(AppRouter.login);
-    }
-  }
-
   @override
   void dispose() {
     _animationController.dispose();
@@ -76,11 +61,35 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(currentUserProvider, (previous, next) {
+      if (_hasNavigated) return;
+      next.whenData((userModel) {
+        _hasNavigated = true;
+        if (!mounted) return;
+        if (userModel == null) {
+          context.go(AppRouter.login);
+        } else if (userModel.role == UserRole.admin) {
+          context.go(AppRouter.admin);
+        } else {
+          context.go(AppRouter.dashboard);
+        }
+      });
+    });
+
+    return _buildSplashContent();
+  }
+
+  Widget _buildSplashContent() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Container(
-        // Gradiente sutil de fondo
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        decoration: BoxDecoration(
+          gradient: isDark
+              ? AppColorsDark.backgroundGradient
+              : AppColors.backgroundGradient,
+        ),
         child: Center(
           child: FadeTransition(
             opacity: _fadeAnimation,
@@ -124,7 +133,7 @@ class _SplashScreenState extends State<SplashScreen>
                   Text(
                     'Sistema de Control de Tiempo',
                     style: AppTextStyles.bodyLarge.copyWith(
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
 

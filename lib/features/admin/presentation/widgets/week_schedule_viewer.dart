@@ -42,7 +42,7 @@ class WeekScheduleViewer extends ConsumerWidget {
     return scheduleAsync.when(
       data: (schedule) {
         if (schedule == null) {
-          return _buildEmptyState();
+          return _buildEmptyState(context);
         }
 
         final isTemplate = schedule.type == 'template';
@@ -52,6 +52,7 @@ class WeekScheduleViewer extends ConsumerWidget {
           children: [
             // Header con información del tipo de horario
             _buildHeader(
+              context,
               isTemplate,
               schedule.templateName,
               schedule.weeklyHours,
@@ -60,7 +61,7 @@ class WeekScheduleViewer extends ConsumerWidget {
             AppSpacing.verticalSpaceMd,
 
             // Tabla de horarios
-            _buildScheduleTable(schedule.schedule),
+            _buildScheduleTable(context, schedule.schedule),
           ],
         );
       },
@@ -76,12 +77,14 @@ class WeekScheduleViewer extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.error_outline, size: 48, color: AppColors.error),
+              Icon(Icons.error_outline,
+                  size: 48, color: Theme.of(context).colorScheme.error),
               AppSpacing.verticalSpaceMd,
               Text(
                 'Error al cargar horario',
-                style:
-                    AppTextStyles.bodyMedium.copyWith(color: AppColors.error),
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: Theme.of(context).colorScheme.error,
+                ),
               ),
             ],
           ),
@@ -90,18 +93,19 @@ class WeekScheduleViewer extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(bool isTemplate, String templateName, int weeklyHours) {
+  Widget _buildHeader(BuildContext context, bool isTemplate,
+      String templateName, int weeklyHours) {
     return Container(
       padding: AppSpacing.allMd,
       decoration: BoxDecoration(
         color: isTemplate
-            ? AppColors.primary.withValues(alpha: 0.05)
-            : AppColors.secondary.withValues(alpha: 0.05),
+            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.05)
+            : Theme.of(context).colorScheme.secondary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
         border: Border.all(
           color: isTemplate
-              ? AppColors.primary.withValues(alpha: 0.2)
-              : AppColors.secondary.withValues(alpha: 0.2),
+              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)
+              : Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -109,7 +113,9 @@ class WeekScheduleViewer extends ConsumerWidget {
           Icon(
             isTemplate ? Icons.assignment : Icons.person_outline,
             size: 20,
-            color: isTemplate ? AppColors.primary : AppColors.secondary,
+            color: isTemplate
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.secondary,
           ),
           AppSpacing.horizontalSpaceSm,
           Expanded(
@@ -119,7 +125,7 @@ class WeekScheduleViewer extends ConsumerWidget {
                 Text(
                   isTemplate ? 'Plantilla' : 'Horario personalizado',
                   style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -127,7 +133,9 @@ class WeekScheduleViewer extends ConsumerWidget {
                   templateName,
                   style: AppTextStyles.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: isTemplate ? AppColors.primary : AppColors.secondary,
+                    color: isTemplate
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.secondary,
                   ),
                 ),
               ],
@@ -159,6 +167,7 @@ class WeekScheduleViewer extends ConsumerWidget {
   }
 
   Widget _buildScheduleTable(
+    BuildContext context,
     Map<String, DaySchedule> weekSchedule,
   ) {
     final days = [
@@ -173,7 +182,7 @@ class WeekScheduleViewer extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
       ),
       child: Column(
@@ -183,13 +192,14 @@ class WeekScheduleViewer extends ConsumerWidget {
           final dayData = weekSchedule[dayKey];
           final isLast = index == days.length - 1;
 
-          return _buildDayRow(dayKey, dayData, isLast: isLast);
+          return _buildDayRow(context, dayKey, dayData, isLast: isLast);
         }).toList(),
       ),
     );
   }
 
   Widget _buildDayRow(
+    BuildContext context,
     String dayKey,
     DaySchedule? dayData, {
     required bool isLast,
@@ -204,7 +214,10 @@ class WeekScheduleViewer extends ConsumerWidget {
         border: isLast
             ? null
             : Border(
-                bottom: BorderSide(color: AppColors.borderLight, width: 1),
+                bottom: BorderSide(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                  width: 1,
+                ),
               ),
       ),
       child: Padding(
@@ -216,12 +229,13 @@ class WeekScheduleViewer extends ConsumerWidget {
               width: 90,
               child: Text(
                 dayName,
-                style: AppTextStyles.labelMedium.copyWith(
-                  color: isWorkDay
-                      ? AppColors.textPrimary
-                      : AppColors.textTertiary,
-                  fontWeight: isWorkDay ? FontWeight.w600 : FontWeight.normal,
-                ),
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: isWorkDay
+                          ? Theme.of(context).colorScheme.onSurface
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontWeight:
+                          isWorkDay ? FontWeight.w600 : FontWeight.normal,
+                    ),
               ),
             ),
 
@@ -230,13 +244,14 @@ class WeekScheduleViewer extends ConsumerWidget {
             // Horarios
             Expanded(
               child: isWorkDay
-                  ? _buildShiftsList(shifts)
+                  ? _buildShiftsList(context, shifts)
                   : Text(
                       'Libre',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textTertiary,
-                        fontStyle: FontStyle.italic,
-                      ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            fontStyle: FontStyle.italic,
+                          ),
                     ),
             ),
 
@@ -248,15 +263,15 @@ class WeekScheduleViewer extends ConsumerWidget {
                   vertical: AppSpacing.xs,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                 ),
                 child: Text(
                   '${dailyHours}h',
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
               ),
           ],
@@ -265,11 +280,13 @@ class WeekScheduleViewer extends ConsumerWidget {
     );
   }
 
-  Widget _buildShiftsList(List<TimeShift> shifts) {
+  Widget _buildShiftsList(BuildContext context, List<TimeShift> shifts) {
     if (shifts.isEmpty) {
       return Text(
         'Sin horario',
-        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textTertiary),
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
       );
     }
 
@@ -278,7 +295,9 @@ class WeekScheduleViewer extends ConsumerWidget {
       final shift = shifts[0];
       return Text(
         '${shift.startTime} - ${shift.endTime}',
-        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textPrimary),
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
       );
     }
 
@@ -295,17 +314,17 @@ class WeekScheduleViewer extends ConsumerWidget {
           children: [
             Text(
               '${shift.startTime}-${shift.endTime}',
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.textPrimary,
-              ),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
             ),
             if (index < shifts.length - 1) ...[
               AppSpacing.horizontalSpaceXs,
               Text(
                 '/',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textTertiary,
-                ),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
               ),
               AppSpacing.horizontalSpaceXs,
             ],
@@ -329,33 +348,33 @@ class WeekScheduleViewer extends ConsumerWidget {
     return names[dayKey] ?? dayKey;
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Container(
       padding: AppSpacing.allXl,
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
       child: Column(
         children: [
           Icon(
             Icons.schedule_outlined,
             size: 48,
-            color: AppColors.textTertiary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
           AppSpacing.verticalSpaceMd,
           Text(
             'Sin horario asignado',
             style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           AppSpacing.verticalSpaceSm,
           Text(
             'Este empleado aún no tiene un horario configurado',
             style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textTertiary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),

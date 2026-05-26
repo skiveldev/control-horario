@@ -143,14 +143,13 @@ class CalendarScreen extends ConsumerWidget {
               Icon(
                 Icons.calendar_month_outlined,
                 size: 24,
-                color: AppColors.primary,
+                color: Theme.of(context).colorScheme.primary,
               ),
               AppSpacing.horizontalSpaceMd,
               Flexible(
                 child: Text(
                   'Calendario',
-                  style:
-                      AppTextStyles.h4.copyWith(color: AppColors.textPrimary),
+                  style: AppTextStyles.h4,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

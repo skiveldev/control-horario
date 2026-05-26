@@ -36,6 +36,7 @@ class SupervisorAssignmentField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return supervisorsAsync.when(
       data: (supervisors) {
         final availableSupervisors = availableSupervisorsForAssignment(
@@ -58,7 +59,7 @@ class SupervisorAssignmentField extends StatelessWidget {
               decoration: InputDecoration(
                 labelText: label,
                 labelStyle: AppTextStyles.labelMedium.copyWith(
-                  color: AppColors.textSecondary,
+                  color: cs.onSurfaceVariant,
                 ),
                 floatingLabelBehavior: FloatingLabelBehavior.always,
                 contentPadding: const EdgeInsets.symmetric(
@@ -67,11 +68,11 @@ class SupervisorAssignmentField extends StatelessWidget {
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: AppColors.border),
+                  borderSide: BorderSide(color: cs.outline),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: AppColors.border),
+                  borderSide: BorderSide(color: cs.outline),
                 ),
               ),
               items: [
@@ -101,7 +102,7 @@ class SupervisorAssignmentField extends StatelessWidget {
             Text(
               availableSupervisors.isEmpty ? emptyText : helperText,
               style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.textTertiary,
+                color: cs.outline,
               ),
             ),
           ],
