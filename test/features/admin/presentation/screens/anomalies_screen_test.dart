@@ -131,8 +131,7 @@ void main() {
               'El botón Detectar debe llamar al método detectAnomalies del notifier');
     });
 
-    testWidgets('el botón se deshabilita durante la detección',
-        (tester) async {
+    testWidgets('el botón se deshabilita durante la detección', (tester) async {
       final containerDetecting = ProviderContainer(
         overrides: [
           anomaliesScreenProvider.overrideWith(

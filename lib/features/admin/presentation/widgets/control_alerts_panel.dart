@@ -27,12 +27,13 @@ class ControlAlertsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       padding: AppSpacing.allLg,
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: cs.surface,
         borderRadius: AppSpacing.borderRadiusMd,
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: cs.outline),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow.withValues(alpha: 0.05),
@@ -54,23 +55,47 @@ class ControlAlertsPanel extends StatelessWidget {
 
           AppSpacing.verticalSpaceLg,
 
-          // Lista de alertas
-          ...alerts.asMap().entries.map((entry) {
-            final index = entry.key;
-            final alert = entry.value;
-            final isLast = index == alerts.length - 1;
-
-            return Column(
-              children: [
-                _AlertItem(
-                  type: alert['type'] ?? 'info',
-                  title: alert['title'] ?? '',
-                  message: alert['message'] ?? '',
+          // Lista de alertas o estado vacío
+          if (alerts.isEmpty)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.check_circle_outline,
+                      size: 40,
+                      color: AppColors.success.withValues(alpha: 0.5),
+                    ),
+                    AppSpacing.verticalSpaceMd,
+                    Text(
+                      'Sin alertas activas',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: cs.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
-                if (!isLast) AppSpacing.verticalSpaceMd,
-              ],
-            );
-          }),
+              ),
+            )
+          else
+            ...alerts.asMap().entries.map((entry) {
+              final index = entry.key;
+              final alert = entry.value;
+              final isLast = index == alerts.length - 1;
+
+              return Column(
+                children: [
+                  _AlertItem(
+                    cs: cs,
+                    type: alert['type'] ?? 'info',
+                    title: alert['title'] ?? '',
+                    message: alert['message'] ?? '',
+                  ),
+                  if (!isLast) AppSpacing.verticalSpaceMd,
+                ],
+              );
+            }),
         ],
       ),
     );
@@ -79,11 +104,13 @@ class ControlAlertsPanel extends StatelessWidget {
 
 /// Item individual de alerta
 class _AlertItem extends StatelessWidget {
+  final ColorScheme cs;
   final String type;
   final String title;
   final String message;
 
   const _AlertItem({
+    required this.cs,
     required this.type,
     required this.title,
     required this.message,
@@ -130,14 +157,14 @@ class _AlertItem extends StatelessWidget {
                   title,
                   style: AppTextStyles.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: cs.onSurface,
                   ),
                 ),
                 AppSpacing.verticalSpaceXs,
                 Text(
                   message,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
               ],

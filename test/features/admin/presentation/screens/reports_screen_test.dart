@@ -87,8 +87,7 @@ void main() {
       await tester.pump();
 
       expect(fakeService.generateCalled, isTrue,
-          reason:
-              'El botón Generar debe llamar a generateReport del notifier');
+          reason: 'El botón Generar debe llamar a generateReport del notifier');
     });
   });
 }

@@ -3,7 +3,6 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
-import '../../../../core/constants/mock_data.dart';
 import '../../../auth/models/user_model.dart';
 
 /// Fila de tabla para empleado
@@ -47,6 +46,7 @@ class _EmployeeTableRowState extends State<EmployeeTableRow> {
   @override
   Widget build(BuildContext context) {
     final isDesktop = context.isDesktop;
+    final cs = Theme.of(context).colorScheme;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -60,11 +60,11 @@ class _EmployeeTableRowState extends State<EmployeeTableRow> {
           ),
           decoration: BoxDecoration(
             color: _isHovered
-                ? AppColors.primary.withValues(alpha: 0.02)
-                : AppColors.surface,
+                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.02)
+                : Theme.of(context).colorScheme.surface,
             border: Border(
               bottom: BorderSide(
-                color: AppColors.border,
+                color: Theme.of(context).colorScheme.outline,
                 width: 1,
               ),
             ),
@@ -106,7 +106,7 @@ class _EmployeeTableRowState extends State<EmployeeTableRow> {
               Icon(
                 Icons.arrow_forward_ios,
                 size: AppSpacing.iconSm,
-                color: AppColors.textTertiary,
+                color: Theme.of(context).colorScheme.outline,
               ),
             ],
           ),
@@ -152,14 +152,14 @@ class _EmployeeTableRowState extends State<EmployeeTableRow> {
                   Icon(
                     Icons.email_outlined,
                     size: 12,
-                    color: AppColors.textTertiary,
+                    color: Theme.of(context).colorScheme.outline,
                   ),
                   const SizedBox(width: 4),
                   Flexible(
                     child: Text(
                       widget.employee.email,
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
@@ -182,14 +182,14 @@ class _EmployeeTableRowState extends State<EmployeeTableRow> {
         Icon(
           Icons.business,
           size: 14,
-          color: AppColors.textTertiary,
+          color: Theme.of(context).colorScheme.outline,
         ),
         const SizedBox(width: 6),
         Flexible(
           child: Text(
             department,
             style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
@@ -207,14 +207,14 @@ class _EmployeeTableRowState extends State<EmployeeTableRow> {
         Icon(
           Icons.domain,
           size: 14,
-          color: AppColors.textTertiary,
+          color: Theme.of(context).colorScheme.outline,
         ),
         const SizedBox(width: 6),
         Flexible(
           child: Text(
             company,
             style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
@@ -231,7 +231,7 @@ class _EmployeeTableRowState extends State<EmployeeTableRow> {
     IconData? icon;
 
     if (!widget.employee.isActive) {
-      color = AppColors.textTertiary;
+      color = Theme.of(context).colorScheme.outline;
       label = 'Inactivo';
       icon = Icons.block;
     } else {
@@ -248,21 +248,9 @@ class _EmployeeTableRowState extends State<EmployeeTableRow> {
           icon = Icons.people;
           break;
         case UserRole.employee:
-          // Mock: alternar entre estados según userId hash
-          final hash = widget.employee.userId.hashCode.abs();
-          if (hash % 10 < 7) {
-            color = AppColors.success;
-            label = 'Activo';
-            icon = Icons.check_circle;
-          } else if (hash % 10 < 9) {
-            color = AppColors.warning;
-            label = 'Ausente';
-            icon = Icons.warning_amber;
-          } else {
-            color = AppColors.info;
-            label = 'Vacaciones';
-            icon = Icons.beach_access;
-          }
+          color = AppColors.success;
+          label = 'Activo';
+          icon = Icons.check_circle;
           break;
       }
     }
@@ -298,13 +286,11 @@ class _EmployeeTableRowState extends State<EmployeeTableRow> {
   }
 
   Widget _buildLastClockIn() {
-    // Obtener último fichaje desde mock data
-    final lastClockIn = MockData.getLastClockIn(widget.employee.userId);
-
+    // Placeholder honesto — pendiente integrar con Firestore timeRecords
     return Text(
-      lastClockIn,
+      '—',
       style: AppTextStyles.bodySmall.copyWith(
-        color: AppColors.textSecondary,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
       textAlign: TextAlign.right,
       overflow: TextOverflow.ellipsis,

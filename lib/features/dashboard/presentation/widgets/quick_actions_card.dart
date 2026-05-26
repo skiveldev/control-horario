@@ -2,23 +2,45 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/constants/mock_data.dart';
 import '../../../../shared/widgets/cards/custom_card.dart';
-import 'edit_entrance_dialog.dart';
 
 /// Card de acciones rápidas
 ///
 /// Muestra atajos a funcionalidades comunes.
-///
-/// MOCK DATA: Usa MockData.quickActions
+/// Las acciones no implementadas muestran badge "Próximo".
 class QuickActionsCard extends StatelessWidget {
   const QuickActionsCard({super.key});
+
+  // Acciones definidas directamente (sin MockData)
+  // Ninguna acción está implementada — todas muestran "Próximo"
+  static const _actions = [
+    {
+      'id': 'request_vacation',
+      'title': 'Solicitar vacaciones',
+      'icon': 'calendar_month',
+      'color': 'info',
+      'enabled': false, // No implementado
+    },
+    {
+      'id': 'edit_record',
+      'title': 'Editar registro',
+      'icon': 'edit',
+      'color': 'secondary',
+      'enabled': false, // No implementado — antes mock dialog, ahora honesto
+    },
+    {
+      'id': 'view_reports',
+      'title': 'Ver reportes',
+      'icon': 'assessment',
+      'color': 'accent',
+      'enabled': false, // No implementado
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
     final colors = AppColorsHelper.of(context);
-    // Datos mock
-    final actions = MockData.quickActions;
+    final actions = _actions;
 
     return CustomCard(
       elevation: CardElevation.medium,
@@ -65,21 +87,7 @@ class QuickActionsCard extends StatelessWidget {
     final icon = _getIconForName(action['icon'] as String);
 
     return InkWell(
-      onTap: isEnabled
-          ? () {
-              // Detectar si es la acción "Editar Registro"
-              final title = action['title'] as String;
-              if (title.contains('Editar') ||
-                  title.toLowerCase().contains('registro')) {
-                _handleEditEntrance(context);
-              } else {
-                // TODO [FASE-2]: Implementar otras acciones
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${action['title']} - En desarrollo')),
-                );
-              }
-            }
-          : null,
+      onTap: null, // Todas las acciones están deshabilitadas
       borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
       child: Container(
         padding: AppSpacing.allMd,
@@ -124,28 +132,23 @@ class QuickActionsCard extends StatelessWidget {
               ),
             ),
 
-            // Flecha
-            if (isEnabled)
-              Icon(Icons.arrow_forward_ios, size: 14, color: color),
-
             // Indicator "Próximamente"
-            if (!isEnabled)
-              Container(
-                padding: AppSpacing.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: AppSpacing.xs,
-                ),
-                decoration: BoxDecoration(
-                  color: colors.textTertiary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
-                ),
-                child: Text(
-                  'Próximo',
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: colors.textTertiary,
-                  ),
+            Container(
+              padding: AppSpacing.symmetric(
+                horizontal: AppSpacing.sm,
+                vertical: AppSpacing.xs,
+              ),
+              decoration: BoxDecoration(
+                color: colors.textTertiary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+              ),
+              child: Text(
+                'Próximo',
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: colors.textTertiary,
                 ),
               ),
+            ),
           ],
         ),
       ),
@@ -177,30 +180,5 @@ class QuickActionsCard extends StatelessWidget {
       default:
         return Icons.help;
     }
-  }
-
-  /// Maneja la acción de editar hora de entrada (DEMO)
-  void _handleEditEntrance(BuildContext context) {
-    // MOCK DATA: Datos de ejemplo para demostración visual
-    final currentEntrance = const TimeOfDay(hour: 9, minute: 0);
-    final exitTime = const TimeOfDay(hour: 18, minute: 0);
-
-    showEditEntranceDialog(
-      context: context,
-      currentEntrance: currentEntrance,
-      exitTime: exitTime,
-      onSave: (newTime) {
-        final colors = AppColorsHelper.of(context);
-        // TODO [FASE-2]: Guardar en Firebase/Riverpod
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Hora de entrada actualizada a ${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}',
-            ),
-            backgroundColor: colors.success,
-          ),
-        );
-      },
-    );
   }
 }

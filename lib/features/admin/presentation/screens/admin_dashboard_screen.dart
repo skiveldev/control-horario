@@ -4,7 +4,6 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
-import '../../../../core/constants/mock_data.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../shared/widgets/layouts/admin_layout.dart';
 import '../../../../shared/widgets/cards/metric_card.dart';
@@ -20,7 +19,7 @@ import '../../providers/admin_provider.dart';
 ///
 /// DÍA 4 - SPRINT 4.2: Conectado con Firestore via employeesCountProvider
 /// - Total Empleados: dato real desde Firestore
-/// - Otras métricas: aún con MockData (se implementarán después)
+/// - Otras métricas: placeholder "—" (pendiente de Firestore)
 class AdminDashboardScreen extends ConsumerWidget {
   const AdminDashboardScreen({super.key});
 
@@ -66,8 +65,8 @@ class AdminDashboardScreen extends ConsumerWidget {
 
           // Gráfico de actividad semanal
           // TODO [DÍA-5+]: Conectar con datos reales de fichajes
-          WeeklyActivityChart(
-            data: MockData.weeklyActivity,
+          const WeeklyActivityChart(
+            data: {}, // Sin datos — pendiente de Firestore
           ),
 
           AppSpacing.verticalSpaceXxl,
@@ -91,9 +90,9 @@ class AdminDashboardScreen extends ConsumerWidget {
         AppSpacing.verticalSpaceXs,
         Text(
           'Bienvenido de nuevo, aquí está lo que ha pasado hoy.',
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.textSecondary,
-          ),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
         ),
       ],
     );
@@ -107,9 +106,6 @@ class AdminDashboardScreen extends ConsumerWidget {
     final isTablet = context.isTablet;
     final columns = isMobile ? 1 : (isTablet ? 2 : 4);
     final gap = context.gridGap;
-
-    // Datos mock para las otras métricas (se implementarán después)
-    final stats = MockData.adminStats;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -131,43 +127,38 @@ class AdminDashboardScreen extends ConsumerWidget {
                     ? '...' // Loading
                     : employeesCount.toString(), // Dato real
                 color: AppColors.primary,
-                badgeText: employeesCount == null ? null : '+12',
+                badgeText: null, // Sin badge — no hay dato real de cambio
                 badgeColor: AppColors.success,
               ),
             ),
-            // Fichados Hoy - TODO: Implementar en DÍA 5+
+            // Fichados Hoy — Pendiente de Firestore
             SizedBox(
               width: cardWidth,
-              child: MetricCard(
+              child: const MetricCard(
                 icon: Icons.check_circle,
                 label: 'Fichados Hoy',
-                value: stats['clockedInToday'].toString(),
+                value: '—',
                 color: AppColors.success,
-                badgeText: '97%',
               ),
             ),
-            // Ausencias - TODO: Implementar en DÍA 5+
+            // Ausencias — Pendiente de Firestore
             SizedBox(
               width: cardWidth,
-              child: MetricCard(
+              child: const MetricCard(
                 icon: Icons.warning_amber,
                 label: 'Ausencias',
-                value: stats['absencesToday'].toString(),
+                value: '—',
                 color: AppColors.warning,
-                badgeText: '-2',
-                badgeColor: AppColors.success,
               ),
             ),
-            // Solicitudes - TODO: Implementar en DÍA 5+
+            // Solicitudes — Pendiente de Firestore
             SizedBox(
               width: cardWidth,
-              child: MetricCard(
+              child: const MetricCard(
                 icon: Icons.assignment,
                 label: 'Solicitudes',
-                value: stats['pendingRequests'].toString(),
+                value: '—',
                 color: AppColors.info,
-                badgeText: '+4',
-                badgeColor: AppColors.info,
               ),
             ),
           ],
@@ -181,15 +172,11 @@ class AdminDashboardScreen extends ConsumerWidget {
 
     if (isMobileOrTablet) {
       // En mobile/tablet: columna vertical
-      return Column(
+      return const Column(
         children: [
-          RecentRequestsList(
-            requests: MockData.recentRequests,
-          ),
+          RecentRequestsList(requests: []),
           AppSpacing.verticalSpaceXxl,
-          ControlAlertsPanel(
-            alerts: MockData.controlAlerts,
-          ),
+          ControlAlertsPanel(alerts: []),
         ],
       );
     }
@@ -207,16 +194,12 @@ class AdminDashboardScreen extends ConsumerWidget {
           children: [
             SizedBox(
               width: requestsWidth,
-              child: RecentRequestsList(
-                requests: MockData.recentRequests,
-              ),
+              child: const RecentRequestsList(requests: []),
             ),
             AppSpacing.horizontalSpaceXxl,
             SizedBox(
               width: alertsWidth,
-              child: ControlAlertsPanel(
-                alerts: MockData.controlAlerts,
-              ),
+              child: const ControlAlertsPanel(alerts: []),
             ),
           ],
         );

@@ -84,8 +84,8 @@ void main() {
       );
 
       // El PDF con anomalías debe ser más grande (contiene tabla adicional)
-      expect(bytesWithAnomalies.length,
-          greaterThan(bytesWithoutAnomalies.length));
+      expect(
+          bytesWithAnomalies.length, greaterThan(bytesWithoutAnomalies.length));
     });
 
     test('generateMonthlyReport maneja cero anomalías sin error', () async {

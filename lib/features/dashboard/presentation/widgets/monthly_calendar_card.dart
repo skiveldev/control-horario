@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/constants/mock_data.dart';
 import '../../../../shared/widgets/cards/custom_card.dart';
 import '../../../../shared/widgets/buttons/icon_button_custom.dart';
 import 'calendar_grid.dart';
@@ -10,10 +9,9 @@ import 'calendar_legend.dart';
 
 /// Card de calendario mensual
 ///
-/// Muestra el calendario del mes actual con indicadores
-/// de días especiales (festivos, vacaciones, eventos, etc.).
-///
-/// MOCK DATA: Usa MockData.calendarDays
+/// Muestra el calendario del mes actual.
+/// Los datos especiales de días (festivos, vacaciones) estarán disponibles
+/// cuando se implemente la integración con Firestore.
 class MonthlyCalendarCard extends StatefulWidget {
   const MonthlyCalendarCard({super.key});
 
@@ -116,12 +114,12 @@ class _MonthlyCalendarCardState extends State<MonthlyCalendarCard> {
 
           AppSpacing.verticalSpaceLg,
 
-          // Grid del calendario
+          // Grid del calendario (sin datos especiales — pendiente Firestore)
           CalendarGrid(
             year: _currentDate.year,
             month: _currentDate.month,
             currentDay: isCurrentMonth ? DateTime.now().day : -1,
-            specialDays: MockData.calendarDays,
+            specialDays: const {}, // Pendiente: integrar con Firestore
             onDayTap: (day) {
               // TODO [FASE-2]: Mostrar detalle del día
               ScaffoldMessenger.of(

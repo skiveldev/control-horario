@@ -44,12 +44,13 @@ class _WeeklyActivityChartState extends State<WeeklyActivityChart> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       padding: AppSpacing.allLg,
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: cs.surface,
         borderRadius: AppSpacing.borderRadiusMd,
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: cs.outline),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow.withValues(alpha: 0.05),
@@ -78,7 +79,7 @@ class _WeeklyActivityChartState extends State<WeeklyActivityChart> {
                     Text(
                       'Fichajes registrados los últimos 7 días',
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                        color: cs.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -91,7 +92,7 @@ class _WeeklyActivityChartState extends State<WeeklyActivityChart> {
                   vertical: AppSpacing.sm,
                 ),
                 decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: cs.outline),
                   borderRadius: AppSpacing.borderRadiusSm,
                 ),
                 child: DropdownButton<String>(
@@ -103,7 +104,7 @@ class _WeeklyActivityChartState extends State<WeeklyActivityChart> {
                     size: AppSpacing.iconMd,
                   ),
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textPrimary,
+                    color: cs.onSurface,
                   ),
                   items: const [
                     DropdownMenuItem(
@@ -134,14 +135,46 @@ class _WeeklyActivityChartState extends State<WeeklyActivityChart> {
 
           AppSpacing.verticalSpaceXxl,
 
-          // Gráfico
-          SizedBox(
-            height: 250,
-            child: _ChartPainter(
-              data: widget.data,
-              maxValue: widget.maxValue,
+          // Gráfico o placeholder si no hay datos
+          if (widget.data.isEmpty)
+            SizedBox(
+              height: 250,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.bar_chart,
+                      size: 48,
+                      color: cs.outline.withValues(alpha: 0.5),
+                    ),
+                    AppSpacing.verticalSpaceMd,
+                    Text(
+                      'Sin datos',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: cs.onSurfaceVariant,
+                      ),
+                    ),
+                    AppSpacing.verticalSpaceXs,
+                    Text(
+                      'Los datos de actividad estarán disponibles próximamente',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: cs.outline,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            SizedBox(
+              height: 250,
+              child: _ChartPainter(
+                data: widget.data,
+                maxValue: widget.maxValue,
+              ),
             ),
-          ),
         ],
       ),
     );
@@ -160,6 +193,7 @@ class _ChartPainter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final days = data.keys.toList();
     final values = data.values.toList();
 
@@ -191,7 +225,7 @@ class _ChartPainter extends StatelessWidget {
                             child: Text(
                               value.toString(),
                               style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.textTertiary,
+                                color: cs.outline,
                                 fontSize: 10,
                               ),
                               textAlign: TextAlign.right,
@@ -201,7 +235,7 @@ class _ChartPainter extends StatelessWidget {
                           Expanded(
                             child: Container(
                               height: 1,
-                              color: AppColors.border,
+                              color: cs.outline,
                             ),
                           ),
                         ],
@@ -274,7 +308,7 @@ class _ChartPainter extends StatelessWidget {
                     child: Text(
                       day,
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                        color: cs.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                       ),
                       textAlign: TextAlign.center,

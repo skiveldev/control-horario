@@ -67,127 +67,125 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
       children: [
         AdminLayout(
           currentRoute: AppRouter.adminEmployees,
-          child: SingleChildScrollView(
-            padding: AppSpacing.allXxl,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Título
-                Text('Gestión de Trabajadores', style: AppTextStyles.h3),
-                AppSpacing.verticalSpaceXs,
-                Text(
-                  'Administra los empleados del sistema y sus turnos',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Título
+              Text('Gestión de Trabajadores', style: AppTextStyles.h3),
+              AppSpacing.verticalSpaceXs,
+              Text(
+                'Administra los empleados del sistema y sus turnos',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+
+              AppSpacing.verticalSpaceLg,
+
+              // Búsqueda, Filtros, Exportar y botón nuevo
+              _buildActionBar(context),
+
+              AppSpacing.verticalSpaceMd,
+
+              // Filtros
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildFilterChip('Todos', 'todos'),
+                    AppSpacing.horizontalSpaceSm,
+                    _buildFilterChip('Tecnología', 'Tecnología'),
+                    AppSpacing.horizontalSpaceSm,
+                    _buildFilterChip('Docente', 'Docente'),
+                    AppSpacing.horizontalSpaceSm,
+                    _buildFilterChip('Administración', 'Administración'),
+                    AppSpacing.horizontalSpaceSm,
+                    _buildFilterChip('RRHH', 'Recursos Humanos'),
+                  ],
                 ),
+              ),
 
-                AppSpacing.verticalSpaceLg,
+              AppSpacing.verticalSpaceLg,
 
-                // Búsqueda, Filtros, Exportar y botón nuevo
-                _buildActionBar(context),
+              // Lista de empleados con tabla o cards según pantalla
+              employeesAsync.when(
+                data: (filteredEmployees) {
+                  if (filteredEmployees.isEmpty) {
+                    return SizedBox(
+                      height: 400,
+                      child: _buildEmptyState(),
+                    );
+                  }
 
-                AppSpacing.verticalSpaceMd,
+                  // Calcular paginación
+                  final totalPages =
+                      (filteredEmployees.length / _itemsPerPage).ceil();
+                  final startIndex = (_currentPage - 1) * _itemsPerPage;
+                  final endIndex = (startIndex + _itemsPerPage)
+                      .clamp(0, filteredEmployees.length);
+                  final paginatedEmployees =
+                      filteredEmployees.sublist(startIndex, endIndex);
 
-                // Filtros
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
+                  // Responsive: tabla en desktop/tablet, cards en mobile
+                  final isMobile = context.isMobile;
+
+                  return Column(
                     children: [
-                      _buildFilterChip('Todos', 'todos'),
-                      AppSpacing.horizontalSpaceSm,
-                      _buildFilterChip('Tecnología', 'Tecnología'),
-                      AppSpacing.horizontalSpaceSm,
-                      _buildFilterChip('Docente', 'Docente'),
-                      AppSpacing.horizontalSpaceSm,
-                      _buildFilterChip('Administración', 'Administración'),
-                      AppSpacing.horizontalSpaceSm,
-                      _buildFilterChip('RRHH', 'Recursos Humanos'),
+                      // Tabla o Cards según dispositivo
+                      if (isMobile)
+                        _buildCardsList(paginatedEmployees)
+                      else
+                        _buildTable(paginatedEmployees),
+
+                      AppSpacing.verticalSpaceLg,
+
+                      // Footer con contador y paginación
+                      _buildFooter(
+                        context,
+                        allEmployeesAsync,
+                        filteredEmployees.length,
+                        totalPages,
+                      ),
                     ],
+                  );
+                },
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(48.0),
+                    child: CircularProgressIndicator(),
                   ),
                 ),
-
-                AppSpacing.verticalSpaceLg,
-
-                // Lista de empleados con tabla o cards según pantalla
-                employeesAsync.when(
-                  data: (filteredEmployees) {
-                    if (filteredEmployees.isEmpty) {
-                      return SizedBox(
-                        height: 400,
-                        child: _buildEmptyState(),
-                      );
-                    }
-
-                    // Calcular paginación
-                    final totalPages =
-                        (filteredEmployees.length / _itemsPerPage).ceil();
-                    final startIndex = (_currentPage - 1) * _itemsPerPage;
-                    final endIndex = (startIndex + _itemsPerPage)
-                        .clamp(0, filteredEmployees.length);
-                    final paginatedEmployees =
-                        filteredEmployees.sublist(startIndex, endIndex);
-
-                    // Responsive: tabla en desktop/tablet, cards en mobile
-                    final isMobile = context.isMobile;
-
-                    return Column(
+                error: (error, stack) => Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(48.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Tabla o Cards según dispositivo
-                        if (isMobile)
-                          _buildCardsList(paginatedEmployees)
-                        else
-                          _buildTable(paginatedEmployees),
-
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
                         AppSpacing.verticalSpaceLg,
-
-                        // Footer con contador y paginación
-                        _buildFooter(
-                          context,
-                          allEmployeesAsync,
-                          filteredEmployees.length,
-                          totalPages,
+                        Text(
+                          'Error al cargar empleados',
+                          style: AppTextStyles.h4,
+                        ),
+                        AppSpacing.verticalSpaceSm,
+                        Text(
+                          error.toString(),
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ],
-                    );
-                  },
-                  loading: () => const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(48.0),
-                      child: CircularProgressIndicator(),
-                    ),
-                  ),
-                  error: (error, stack) => Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(48.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.error_outline,
-                            size: 64,
-                            color: AppColors.error,
-                          ),
-                          AppSpacing.verticalSpaceLg,
-                          Text(
-                            'Error al cargar empleados',
-                            style: AppTextStyles.h4,
-                          ),
-                          AppSpacing.verticalSpaceSm,
-                          Text(
-                            error.toString(),
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
 
@@ -218,12 +216,15 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
           // El provider se actualiza automáticamente
         });
       },
-      backgroundColor: AppColors.surfaceVariant,
-      selectedColor: AppColors.primary.withValues(alpha: 0.1),
-      checkmarkColor: AppColors.primary,
-      labelStyle: AppTextStyles.labelMedium.copyWith(
-        color: isSelected ? AppColors.primary : AppColors.textPrimary,
-      ),
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+      selectedColor:
+          Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+      checkmarkColor: Theme.of(context).colorScheme.primary,
+      labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
+            color: isSelected
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.onSurface,
+          ),
       labelPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
       padding: const EdgeInsets.symmetric(horizontal: 4),
     );
@@ -234,14 +235,15 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_off, size: 64, color: AppColors.textTertiary),
+          Icon(Icons.search_off,
+              size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
           AppSpacing.verticalSpaceLg,
           Text('No se encontraron empleados', style: AppTextStyles.h4),
           AppSpacing.verticalSpaceSm,
           Text(
             'Intenta con otros filtros o búsqueda',
             style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -308,7 +310,7 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
       );
     }
 
-    // En desktop/tablet: diseño horizontal
+    // En desktop/tablet: diseño horizontal con botones flexibles
     return Row(
       children: [
         // Búsqueda
@@ -328,27 +330,33 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
         ),
         AppSpacing.horizontalSpaceMd,
         // Filtros
-        CustomButton(
-          text: 'Filtros',
-          icon: Icons.filter_list,
-          variant: ButtonVariant.outline,
-          onPressed: _showFiltersPlaceholder,
+        Flexible(
+          child: CustomButton(
+            text: 'Filtros',
+            icon: Icons.filter_list,
+            variant: ButtonVariant.outline,
+            onPressed: _showFiltersPlaceholder,
+          ),
         ),
         AppSpacing.horizontalSpaceSm,
         // Exportar
-        CustomButton(
-          text: 'Exportar',
-          icon: Icons.download,
-          variant: ButtonVariant.outline,
-          onPressed: _showExportPlaceholder,
+        Flexible(
+          child: CustomButton(
+            text: 'Exportar',
+            icon: Icons.download,
+            variant: ButtonVariant.outline,
+            onPressed: _showExportPlaceholder,
+          ),
         ),
         AppSpacing.horizontalSpaceMd,
         // Nuevo Trabajador
-        CustomButton(
-          text: 'Nuevo Trabajador',
-          icon: Icons.add,
-          variant: ButtonVariant.brand,
-          onPressed: () => setState(() => _isDrawerOpen = true),
+        Flexible(
+          child: CustomButton(
+            text: 'Nuevo Trabajador',
+            icon: Icons.add,
+            variant: ButtonVariant.brand,
+            onPressed: () => setState(() => _isDrawerOpen = true),
+          ),
         ),
       ],
     );
@@ -357,9 +365,9 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
   Widget _buildTable(List<UserModel> employees) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: AppSpacing.borderRadiusMd,
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
       child: Column(
         children: [
@@ -420,20 +428,22 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
         allEmployeesAsync.when(
           data: (allEmployees) => Text(
             'Mostrando $filteredCount de ${allEmployees.length} empleados',
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textSecondary,
-            ),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
             textAlign: TextAlign.center,
           ),
           loading: () => Text(
             'Cargando...',
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textSecondary,
-            ),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
           ),
           error: (_, __) => Text(
             'Error',
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.error),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.error,
+                ),
           ),
         ),
 
@@ -456,8 +466,9 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
           icon: const Icon(Icons.arrow_back_ios, size: 16),
           label: const Text('Anterior'),
           style: TextButton.styleFrom(
-            foregroundColor:
-                _currentPage > 1 ? AppColors.primary : AppColors.textTertiary,
+            foregroundColor: _currentPage > 1
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
 
@@ -470,15 +481,15 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
             vertical: AppSpacing.sm,
           ),
           decoration: BoxDecoration(
-            color: AppColors.primary,
+            color: Theme.of(context).colorScheme.primary,
             borderRadius: AppSpacing.borderRadiusXs,
           ),
           child: Text(
             '$_currentPage',
-            style: AppTextStyles.labelMedium.copyWith(
-              color: AppColors.textOnPrimary,
-              fontWeight: FontWeight.w600,
-            ),
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
           ),
         ),
 
@@ -486,9 +497,9 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
 
         Text(
           'de $totalPages',
-          style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textSecondary,
-          ),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
         ),
 
         AppSpacing.horizontalSpaceMd,
@@ -500,8 +511,8 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
               : null,
           style: TextButton.styleFrom(
             foregroundColor: _currentPage < totalPages
-                ? AppColors.primary
-                : AppColors.textTertiary,
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.onSurfaceVariant,
           ),
           child: const Row(
             mainAxisSize: MainAxisSize.min,
@@ -525,9 +536,9 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
       SnackBar(
         content: Text(
           'Panel de filtros avanzados - Próximamente',
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.textOnPrimary,
-          ),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
         ),
         backgroundColor: AppColors.info,
         duration: const Duration(seconds: 2),
@@ -540,9 +551,9 @@ class _EmployeesListScreenState extends ConsumerState<EmployeesListScreen> {
       SnackBar(
         content: Text(
           'Exportar a CSV/Excel - Próximamente',
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.textOnPrimary,
-          ),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
         ),
         backgroundColor: AppColors.success,
         duration: const Duration(seconds: 2),

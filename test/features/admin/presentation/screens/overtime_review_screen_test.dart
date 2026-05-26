@@ -39,8 +39,7 @@ void main() {
       expect(find.byIcon(Icons.close), findsWidgets);
     });
 
-    testWidgets('muestra estado "Pendiente" en cada solicitud',
-        (tester) async {
+    testWidgets('muestra estado "Pendiente" en cada solicitud', (tester) async {
       final container = _containerWithRequests(mockOvertimeRequests());
       addTearDown(container.dispose);
 
@@ -87,8 +86,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(fakeService.approvedIds, isNotEmpty,
-          reason:
-              'El botón aprobar debe llamar al servicio approveRequest');
+          reason: 'El botón aprobar debe llamar al servicio approveRequest');
       expect(fakeService.approvedIds.first, 'ot-1');
     });
 
@@ -119,15 +117,13 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(fakeService.rejectedIds, isNotEmpty,
-          reason:
-              'El botón rechazar debe llamar al servicio rejectRequest');
+          reason: 'El botón rechazar debe llamar al servicio rejectRequest');
       expect(fakeService.rejectedIds.first, 'ot-1');
     });
   });
 }
 
-ProviderContainer _containerWithRequests(
-    List<OvertimeRequestModel> requests) {
+ProviderContainer _containerWithRequests(List<OvertimeRequestModel> requests) {
   final fakeService = _FakeOvertimeService();
   return ProviderContainer(
     overrides: [
