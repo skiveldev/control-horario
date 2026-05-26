@@ -240,13 +240,6 @@ service cloud.firestore {
           request.resource.data.status == 'closed';
       }
 
-      function keepsExistingClosureIdentity() {
-        return request.resource.data.supervisorId == resource.data.supervisorId &&
-          request.resource.data.closedBy == resource.data.closedBy &&
-          request.resource.data.month == resource.data.month &&
-          resource.data.status == 'closed';
-      }
-
       allow read: if isAdminUser() || isOwnTeamClosure();
       // Un cierre de mes es inmutable una vez creado: no se permite update.
       allow create: if isOwnTeamClosureWrite(closureId);
@@ -294,6 +287,5 @@ service cloud.firestore {
     }
   }
 }
-
 
 
