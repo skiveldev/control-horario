@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
@@ -23,10 +22,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  // Estados mock de configuraciones
-  bool _emailNotifications = true;
-  bool _pushNotifications = true;
-  bool _clockingReminders = false;
   String _language = 'es';
 
   @override
@@ -35,9 +30,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final authNotifierState = ref.watch(authNotifierProvider);
     final isLoggingOut = authNotifierState.isLoading;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: const CustomAppBar(
-        title: 'Configuración',
+        title: 'Mi cuenta',
         automaticallyImplyLeading: true,
       ),
       body: SingleChildScrollView(
@@ -54,40 +49,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Sección: Notificaciones
-                _buildSection(
-                  title: 'Notificaciones',
-                  icon: Icons.notifications,
-                  children: [
-                    _buildSwitchItem(
-                      title: 'Notificaciones por correo',
-                      subtitle: 'Recibir alertas y resúmenes por email',
-                      value: _emailNotifications,
-                      onChanged: (value) {
-                        setState(() => _emailNotifications = value);
-                      },
-                    ),
-                    _buildSwitchItem(
-                      title: 'Notificaciones push',
-                      subtitle: 'Recibir notificaciones en tiempo real',
-                      value: _pushNotifications,
-                      onChanged: (value) {
-                        setState(() => _pushNotifications = value);
-                      },
-                    ),
-                    _buildSwitchItem(
-                      title: 'Recordatorios de fichaje',
-                      subtitle: 'Avisos para entrada y salida',
-                      value: _clockingReminders,
-                      onChanged: (value) {
-                        setState(() => _clockingReminders = value);
-                      },
-                    ),
-                  ],
-                ),
-
-                AppSpacing.verticalSpaceLg,
-
                 // Sección: Preferencias
                 _buildSection(
                   title: 'Preferencias',
@@ -158,7 +119,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 CustomCard(
                   elevation: CardElevation.none,
                   padding: AppSpacing.cardLarge,
-                  borderColor: AppColors.error,
+                  borderColor: Theme.of(context).colorScheme.error,
                   child: InkWell(
                     onTap: isLoggingOut
                         ? null
@@ -173,11 +134,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: AppColors.error,
+                              color: Theme.of(context).colorScheme.error,
                             ),
                           )
                         else
-                          Icon(Icons.logout, color: AppColors.error),
+                          Icon(
+                            Icons.logout,
+                            color: Theme.of(context).colorScheme.error,
+                          ),
                         AppSpacing.horizontalSpaceMd,
                         Expanded(
                           child: Text(
@@ -185,7 +149,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 ? 'Cerrando sesión...'
                                 : 'Cerrar sesión',
                             style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.error,
+                              color: Theme.of(context).colorScheme.error,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -194,7 +158,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           Icon(
                             Icons.arrow_forward_ios,
                             size: 16,
-                            color: AppColors.error,
+                            color: Theme.of(context).colorScheme.error,
                           ),
                       ],
                     ),
@@ -221,7 +185,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           padding: AppSpacing.horizontalSm,
           child: Row(
             children: [
-              Icon(icon, size: AppSpacing.iconMd, color: AppColors.primary),
+              Icon(
+                icon,
+                size: AppSpacing.iconMd,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               AppSpacing.horizontalSpaceSm,
               Expanded(child: Text(title, style: AppTextStyles.h5)),
             ],
@@ -282,26 +250,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  Widget _buildSwitchItem({
-    required String title,
-    required String subtitle,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) {
-    return ListTile(
-      contentPadding: AppSpacing.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.sm,
-      ),
-      title: Text(title, style: AppTextStyles.bodyMedium),
-      subtitle: Text(
-        subtitle,
-        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-      ),
-      trailing: Switch(value: value, onChanged: onChanged),
-    );
-  }
-
   Widget _buildDropdownItem({
     required String title,
     required String subtitle,
@@ -317,7 +265,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       title: Text(title, style: AppTextStyles.bodyMedium),
       subtitle: Text(
         subtitle,
-        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+        style: AppTextStyles.bodySmall.copyWith(
+          color: Theme.of(context).textTheme.bodySmall?.color,
+        ),
       ),
       trailing: DropdownButton<String>(
         value: value,
@@ -347,15 +297,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       leading: Container(
         padding: AppSpacing.allSm,
         decoration: BoxDecoration(
-          color: AppColors.surfaceVariant,
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
         ),
-        child: Icon(icon, size: AppSpacing.iconMd, color: AppColors.primary),
+        child: Icon(
+          icon,
+          size: AppSpacing.iconMd,
+          color: Theme.of(context).colorScheme.primary,
+        ),
       ),
       title: Text(title, style: AppTextStyles.bodyMedium),
       subtitle: Text(
         subtitle,
-        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+        style: AppTextStyles.bodySmall.copyWith(
+          color: Theme.of(context).textTheme.bodySmall?.color,
+        ),
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: onTap,
@@ -372,7 +328,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       trailing: Text(
         value,
         style: AppTextStyles.bodyMedium.copyWith(
-          color: AppColors.textSecondary,
+          color: Theme.of(context).textTheme.bodySmall?.color,
         ),
       ),
     );
@@ -401,7 +357,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 context.go(AppRouter.login);
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
             child: const Text('Cerrar sesión'),
           ),
         ],

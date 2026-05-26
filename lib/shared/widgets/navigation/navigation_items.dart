@@ -63,11 +63,6 @@ class NavigationItems {
           icon: Icons.groups_outlined,
           route: AppRouter.team,
         ),
-      const NavigationItem(
-        label: 'Configuración',
-        icon: Icons.settings_outlined,
-        route: AppRouter.settings,
-      ),
     ];
   }
 

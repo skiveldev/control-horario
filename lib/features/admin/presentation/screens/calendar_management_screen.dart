@@ -11,7 +11,6 @@ import '../../../../shared/widgets/layouts/admin_layout.dart';
 import '../../models/work_calendar_model.dart';
 import '../../providers/calendar_management_provider.dart';
 import '../widgets/calendar_card.dart';
-import 'calendar_editor_screen.dart';
 
 /// Pantalla de gestión de calendarios laborales (Admin)
 ///
@@ -55,7 +54,7 @@ class CalendarManagementScreen extends ConsumerWidget {
                 ),
               ),
               AppSpacing.verticalSpaceXl,
-              _buildTipBanner(),
+              _buildTipBanner(context),
             ],
           ),
         ),
@@ -80,27 +79,27 @@ class CalendarManagementScreen extends ConsumerWidget {
               onTap: () => context.go(AppRouter.admin),
               child: Text(
                 'Panel Admin',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
               child: Text(
                 '›',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textTertiary,
-                ),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
               ),
             ),
             Flexible(
               child: Text(
                 'Calendarios Laborales',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.w600,
+                    ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
@@ -122,7 +121,7 @@ class CalendarManagementScreen extends ConsumerWidget {
                     'Gestiona festivos y vacaciones por región. '
                     'Tienes $count ${count == 1 ? 'calendario disponible' : 'calendarios disponibles'}.',
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -189,8 +188,8 @@ class CalendarManagementScreen extends ConsumerWidget {
         horizontal: AppSpacing.massive,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: Border.all(color: AppColors.border),
+        color: Theme.of(context).colorScheme.surface,
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
       child: Center(
@@ -223,7 +222,7 @@ class CalendarManagementScreen extends ConsumerWidget {
                 'Crea tu primer calendario laboral para empezar a gestionar '
                 'festivos, vacaciones y jornadas especiales por región o departamento.',
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -247,19 +246,19 @@ class CalendarManagementScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTipBanner() {
+  Widget _buildTipBanner(BuildContext context) {
     return Container(
       padding: AppSpacing.allLg,
       decoration: BoxDecoration(
-        color: AppColors.textPrimary,
+        color: Theme.of(context).colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
+          Icon(
             Icons.info_outline,
-            color: AppColors.surface,
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
             size: AppSpacing.iconLg,
           ),
           AppSpacing.horizontalSpaceMd,
@@ -269,19 +268,22 @@ class CalendarManagementScreen extends ConsumerWidget {
               children: [
                 Text(
                   '¿Cómo funcionan los calendarios laborales?',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.surface,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
                 AppSpacing.verticalSpaceXs,
                 Text(
                   'Cada calendario define los días festivos y jornadas especiales '
                   'de una región. Puedes asignarlo a tus empleados para calcular '
                   'correctamente sus horas trabajadas.',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.surface.withValues(alpha: 0.7),
-                  ),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onPrimaryContainer
+                            .withValues(alpha: 0.7),
+                      ),
                 ),
               ],
             ),
@@ -292,12 +294,8 @@ class CalendarManagementScreen extends ConsumerWidget {
   }
 
   void _navigateToEditor(BuildContext context, {WorkCalendarModel? calendar}) {
-    // TODO: Use GoRouter context.push() when CalendarEditorScreen route is added to app_router.dart
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => CalendarEditorScreen(existingCalendar: calendar),
-      ),
-    );
+    context.go('/admin/calendars/${calendar?.id ?? 'new'}/edit',
+        extra: calendar);
   }
 
   Future<void> _duplicateCalendar(

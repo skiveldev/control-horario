@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/constants/breakpoints.dart';
 import '../../../core/router/app_router.dart';
 import '../../../features/admin/presentation/widgets/admin_sidebar.dart';
+import '../../../features/auth/models/user_model.dart';
+import '../../../features/auth/providers/auth_provider.dart';
+import '../../widgets/navigation/mobile_drawer.dart'; // initialsFromName
 
 /// Layout base para pantallas de administrador
 ///
@@ -22,7 +26,7 @@ import '../../../features/admin/presentation/widgets/admin_sidebar.dart';
 ///   ),
 /// )
 /// ```
-class AdminLayout extends StatelessWidget {
+class AdminLayout extends ConsumerWidget {
   /// Contenido principal a mostrar
   final Widget child;
 
@@ -48,11 +52,12 @@ class AdminLayout extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isMobileOrTablet = context.isMobileOrTablet;
+    final currentUser = ref.watch(currentUserProvider).valueOrNull;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       // En mobile/tablet: mostrar drawer
       drawer: isMobileOrTablet
           ? Drawer(
@@ -79,6 +84,7 @@ class AdminLayout extends StatelessWidget {
                   showSearch: showSearch,
                   onSearchChanged: onSearchChanged,
                   title: title,
+                  currentUser: currentUser,
                 ),
 
                 // Contenido scrollable
@@ -109,12 +115,14 @@ class _AdminHeader extends StatefulWidget {
   final bool showSearch;
   final ValueChanged<String>? onSearchChanged;
   final String? title;
+  final UserModel? currentUser;
 
   const _AdminHeader({
     required this.showMenuButton,
     this.showSearch = false,
     this.onSearchChanged,
     this.title,
+    this.currentUser,
   });
 
   @override
@@ -136,10 +144,10 @@ class _AdminHeaderState extends State<_AdminHeader> {
       height: 64,
       padding: AppSpacing.horizontalXxl,
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         border: Border(
           bottom: BorderSide(
-            color: AppColors.border,
+            color: Theme.of(context).colorScheme.outline,
             width: 1,
           ),
         ),
@@ -187,10 +195,11 @@ class _AdminHeaderState extends State<_AdminHeader> {
                     prefixIcon: Icon(
                       Icons.search,
                       size: AppSpacing.iconMd,
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     filled: true,
-                    fillColor: AppColors.background,
+                    fillColor:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     border: OutlineInputBorder(
                       borderRadius: AppSpacing.borderRadiusSm,
                       borderSide: BorderSide.none,
@@ -206,30 +215,21 @@ class _AdminHeaderState extends State<_AdminHeader> {
 
           AppSpacing.horizontalSpaceLg,
 
-          // Notificaciones
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined),
-                onPressed: () {
-                  // TODO [FASE-2]: Mostrar panel de notificaciones
-                },
-                tooltip: 'Notificaciones',
-              ),
-              // Badge de notificaciones
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: AppColors.error,
-                    shape: BoxShape.circle,
-                  ),
+          // Notificaciones (disabled — no backend yet)
+          IconButton(
+            icon: Icon(
+              Icons.notifications_outlined,
+              color: Theme.of(context).disabledColor,
+            ),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Próximamente'),
+                  duration: Duration(seconds: 2),
                 ),
-              ),
-            ],
+              );
+            },
+            tooltip: 'Notificaciones no disponibles',
           ),
 
           AppSpacing.horizontalSpaceSm,
@@ -252,11 +252,13 @@ class _AdminHeaderState extends State<_AdminHeader> {
                   children: [
                     CircleAvatar(
                       radius: 16,
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       child: Text(
-                        'AD',
+                        initialsFromName(
+                          widget.currentUser?.fullName ?? '',
+                        ),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.textOnPrimary,
+                              color: Theme.of(context).colorScheme.onPrimary,
                               fontWeight: FontWeight.w600,
                             ),
                       ),
@@ -269,7 +271,7 @@ class _AdminHeaderState extends State<_AdminHeader> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Administrador',
+                              widget.currentUser?.fullName ?? 'Usuario',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyMedium
@@ -279,12 +281,16 @@ class _AdminHeaderState extends State<_AdminHeader> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              'Gestión de RRHH',
+                              widget.currentUser?.position ??
+                                  widget.currentUser?.department ??
+                                  'Admin',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall
                                   ?.copyWith(
-                                    color: AppColors.textSecondary,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
                                     fontSize: 11,
                                   ),
                               overflow: TextOverflow.ellipsis,

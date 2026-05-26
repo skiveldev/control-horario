@@ -21,10 +21,13 @@ import '../../features/dashboard/presentation/screens/settings_screen.dart';
 // Pantallas de admin
 import '../../features/admin/presentation/screens/admin_dashboard_screen.dart';
 import '../../features/admin/presentation/screens/admin_profile_screen.dart';
+import '../../features/admin/presentation/screens/admin_settings_screen.dart';
 import '../../features/admin/presentation/screens/employees_list_screen.dart';
 import '../../features/admin/presentation/screens/employee_detail_screen.dart';
 import '../../features/admin/presentation/screens/schedule_management_screen.dart';
 import '../../features/admin/presentation/screens/calendar_management_screen.dart';
+import '../../features/admin/presentation/screens/calendar_editor_screen.dart';
+import '../../features/admin/models/work_calendar_model.dart';
 import '../../features/admin/presentation/screens/anomalies_screen.dart';
 import '../../features/admin/presentation/screens/overtime_review_screen.dart';
 import '../../features/admin/presentation/screens/reports_screen.dart';
@@ -61,8 +64,10 @@ class AppRouter {
   static const String adminEmployeeDetail = '/admin/employees/:id';
   static const String adminSchedules = '/admin/schedules';
   static const String adminCalendars = '/admin/calendars';
+  static const String adminCalendarEditor = '/admin/calendars/:id/edit';
   static const String adminAnomalies = '/admin/anomalies';
   static const String adminOvertime = '/admin/overtime';
+  static const String adminSettings = '/admin/settings';
   static const String adminReports = '/admin/reports';
 
   // ============================================================================
@@ -229,6 +234,16 @@ class AppRouter {
               child: const AdminProfileScreen(),
             ),
           ),
+          // Configuración del sistema (admin)
+          GoRoute(
+            path: 'settings',
+            name: 'admin-settings',
+            pageBuilder: (context, state) => _buildPageWithTransition(
+              context: context,
+              state: state,
+              child: const AdminSettingsScreen(),
+            ),
+          ),
           // Lista de empleados
           GoRoute(
             path: 'employees',
@@ -273,6 +288,20 @@ class AppRouter {
               state: state,
               child: const CalendarManagementScreen(),
             ),
+            routes: [
+              GoRoute(
+                path: ':id/edit',
+                name: 'admin-calendar-editor',
+                pageBuilder: (context, state) {
+                  final calendar = state.extra as WorkCalendarModel?;
+                  return _buildPageWithTransition(
+                    context: context,
+                    state: state,
+                    child: CalendarEditorScreen(existingCalendar: calendar),
+                  );
+                },
+              ),
+            ],
           ),
           // Detección de anomalías
           GoRoute(
@@ -366,8 +395,9 @@ class _ErrorScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: Text(
                 error,
-                style: const TextStyle(
-                    fontSize: 14, color: AppColors.textSecondary),
+                style: TextStyle(
+                    fontSize: 14,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant),
                 textAlign: TextAlign.center,
               ),
             ),

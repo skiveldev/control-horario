@@ -7,8 +7,29 @@ import '../../../core/theme/app_gradients.dart';
 import '../../../core/theme/app_shadows.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../features/auth/models/user_model.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import 'navigation_items.dart';
+
+/// Extrae las iniciales de un nombre completo.
+///
+/// Para nombres compuestos usa la primera letra del primer nombre y la
+/// primera letra del primer apellido (segunda palabra). Para un solo
+/// nombre usa una sola inicial. Si el nombre está vacío, retorna 'U'
+/// como fallback (Usuario).
+///
+/// Ejemplos:
+/// - "Juan Pérez" → "JP"
+/// - "Juan Pérez López" → "JP"
+/// - "María" → "M"
+/// - "" → "U"
+String initialsFromName(String fullName) {
+  final trimmed = fullName.trim();
+  if (trimmed.isEmpty) return 'U';
+  final parts = trimmed.split(RegExp(r'\s+'));
+  if (parts.length == 1) return parts.first[0].toUpperCase();
+  return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+}
 
 /// Drawer de navegación para mobile y tablet
 ///
@@ -48,7 +69,7 @@ class MobileDrawer extends ConsumerWidget {
       child: Column(
         children: [
           // Header con avatar y datos de usuario
-          _buildDrawerHeader(context),
+          _buildDrawerHeader(context, currentUser),
 
           // Lista de items de navegación
           Expanded(
@@ -81,21 +102,21 @@ class MobileDrawer extends ConsumerWidget {
     );
   }
 
-  /// Construye el header del drawer con avatar y datos de usuario
-  Widget _buildDrawerHeader(BuildContext context) {
+  /// Construye el header del drawer con avatar y datos de usuario.
+  ///
+  /// Usa los datos reales de [currentUser] cuando están disponibles.
+  /// Si [currentUser] es null, muestra "Usuario" como fallback.
+  Widget _buildDrawerHeader(BuildContext context, UserModel? currentUser) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final displayName = currentUser?.fullName ?? 'Usuario';
+    final initials = initialsFromName(
+      currentUser?.fullName ?? '',
+    ); // initialsFromName already handles empty → 'U'
 
     return DrawerHeader(
       decoration: BoxDecoration(
         gradient: isDark
-            ? LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.primary,
-                  Theme.of(context).colorScheme.secondary,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
+            ? AppColorsDark.primaryGradient // Dark brand gradient (cyan→purple)
             : AppColors.primaryGradient,
       ),
       child: Column(
@@ -105,23 +126,26 @@ class MobileDrawer extends ConsumerWidget {
           // Avatar
           CircleAvatar(
             radius: 32,
-            backgroundColor: AppColors.textOnPrimary.withValues(alpha: 0.2),
+            backgroundColor:
+                Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.2),
             child: Text(
-              'MG',
-              style: AppTextStyles.h4.copyWith(color: AppColors.textOnPrimary),
+              initials,
+              style: AppTextStyles.h4.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
             ),
           ),
 
           AppSpacing.verticalSpaceMd,
 
-          // Nombre - Información principal
+          // Nombre — datos reales del provider
           Text(
-            'María García López', // TODO [FASE-2]: Conectar con user provider
+            displayName,
             style: AppTextStyles.h5.copyWith(
-              color: AppColors.textOnPrimary,
+              color: Theme.of(context).colorScheme.onPrimary,
               fontWeight: FontWeight.w600,
             ),
-            maxLines: 2, // Permitir 2 líneas para nombres largos
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
         ],

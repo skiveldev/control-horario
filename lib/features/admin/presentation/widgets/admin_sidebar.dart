@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_colors_dark.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -31,7 +32,7 @@ class AdminSidebar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(
-      color: AppColors.surface,
+      color: Theme.of(context).colorScheme.surface,
       child: Column(
         children: [
           // Logo y título
@@ -110,11 +111,13 @@ class AdminSidebar extends ConsumerWidget {
                 _SidebarItem(
                   icon: Icons.settings_outlined,
                   activeIcon: Icons.settings,
-                  label: 'Configuración',
-                  route: AppRouter.settings,
-                  isActive: currentRoute == AppRouter.settings,
-                  onTap: () => _navigate(context, AppRouter.settings),
+                  label: 'Configuración del sistema',
+                  route: AppRouter.adminSettings,
+                  isActive: currentRoute == AppRouter.adminSettings,
+                  onTap: () => _navigate(context, AppRouter.adminSettings),
                 ),
+                // PR#11: "Mi cuenta" removed from lateral sidebar.
+                // Profile access is via header avatar area only.
               ],
             ),
           ),
@@ -127,34 +130,38 @@ class AdminSidebar extends ConsumerWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
-      padding: AppSpacing.allXxl,
+      height: 64,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
       decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient,
+        border: Border(
+          bottom: BorderSide(
+            color: Theme.of(context).colorScheme.outline,
+            width: 1,
+          ),
+        ),
       ),
       child: Row(
         children: [
           // Ícono de reloj
-          Container(
-            padding: AppSpacing.allSm,
-            decoration: BoxDecoration(
-              color: AppColors.textOnPrimary.withValues(alpha: 0.2),
-              borderRadius: AppSpacing.borderRadiusSm,
-            ),
-            child: Icon(
-              Icons.access_time,
-              size: AppSpacing.iconXl,
-              color: AppColors.textOnPrimary,
-            ),
+          Icon(
+            Icons.access_time,
+            size: 28,
+            color: Theme.of(context).colorScheme.primary,
           ),
-          AppSpacing.horizontalSpaceMd,
+          AppSpacing.horizontalSpaceSm,
           // Título
           Expanded(
             child: Text(
               AppConstants.appName,
-              style: AppTextStyles.h5.copyWith(
-                color: AppColors.textOnPrimary,
-                fontWeight: FontWeight.bold,
+              style: TextStyle(
+                fontSize: 18,
+                color: isDark
+                    ? AppColorsDark.textPrimary
+                    : Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
@@ -169,7 +176,7 @@ class AdminSidebar extends ConsumerWidget {
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(
-            color: AppColors.border,
+            color: Theme.of(context).colorScheme.outline,
             width: 1,
           ),
         ),
@@ -189,8 +196,10 @@ class AdminSidebar extends ConsumerWidget {
           ),
           label: const Text('Cerrar Sesión'),
           style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.error,
-            side: BorderSide(color: AppColors.error.withValues(alpha: 0.3)),
+            foregroundColor: Theme.of(context).colorScheme.error,
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.error.withValues(alpha: 0.3),
+            ),
             padding: AppSpacing.symmetric(
               horizontal: AppSpacing.lg,
               vertical: AppSpacing.md,
@@ -250,13 +259,13 @@ class _SidebarItem extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: isActive
-                ? AppColors.primary.withValues(alpha: 0.1)
+                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
                 : AppColors.transparent,
             borderRadius: AppSpacing.borderRadiusSm,
             border: isActive
                 ? Border(
                     left: BorderSide(
-                      color: AppColors.primary,
+                      color: Theme.of(context).colorScheme.primary,
                       width: 3,
                     ),
                   )
@@ -267,14 +276,18 @@ class _SidebarItem extends StatelessWidget {
               Icon(
                 isActive ? activeIcon : icon,
                 size: AppSpacing.iconLg,
-                color: isActive ? AppColors.primary : AppColors.textSecondary,
+                color: isActive
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               AppSpacing.horizontalSpaceMd,
               Expanded(
                 child: Text(
                   label,
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: isActive ? AppColors.primary : AppColors.textPrimary,
+                    color: isActive
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurface,
                     fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
