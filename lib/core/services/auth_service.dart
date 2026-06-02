@@ -120,4 +120,28 @@ class AuthService {
   ) async {
     await _firestore.collection('users').doc(userId).update(data);
   }
+
+  /// Cambiar la contraseña del usuario actual
+  ///
+  /// Requiere la contraseña actual para reautenticar al usuario
+  /// antes de actualizar a la nueva contraseña (requisito de Firebase Auth).
+  ///
+  /// Lanza [FirebaseAuthException] si la contraseña actual es incorrecta
+  /// o si la nueva no cumple los requisitos de Firebase.
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final user = _auth.currentUser;
+    if (user == null) throw Exception('No hay usuario autenticado');
+    if (user.email == null) throw Exception('El usuario no tiene email');
+
+    final credential = EmailAuthProvider.credential(
+      email: user.email!,
+      password: currentPassword,
+    );
+
+    await user.reauthenticateWithCredential(credential);
+    await user.updatePassword(newPassword);
+  }
 }

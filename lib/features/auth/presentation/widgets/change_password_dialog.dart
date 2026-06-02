@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/services/auth_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -10,18 +13,16 @@ import '../../../../shared/widgets/buttons/custom_button.dart';
 /// Dialog para cambiar contraseña
 ///
 /// Permite al usuario actualizar su contraseña de forma segura,
-/// con validaciones de fortaleza y coincidencia.
-///
-/// MOCK UI: Solo muestra SnackBar de éxito, sin persistencia real.
-/// TODO [FASE-2]: Conectar con Firebase Auth para cambio real de contraseña
-class ChangePasswordDialog extends StatefulWidget {
+/// con validaciones de fortaleza, coincidencia y Firebase Auth real.
+class ChangePasswordDialog extends ConsumerStatefulWidget {
   const ChangePasswordDialog({super.key});
 
   @override
-  State<ChangePasswordDialog> createState() => _ChangePasswordDialogState();
+  ConsumerState<ChangePasswordDialog> createState() =>
+      _ChangePasswordDialogState();
 }
 
-class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
+class _ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _currentPasswordController;
   late TextEditingController _newPasswordController;
@@ -30,6 +31,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
   String _currentPassword = '';
   String _newPassword = '';
   String _confirmPassword = '';
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -49,19 +51,16 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
 
   /// Verifica si el formulario es válido para enviar
   bool get _isFormValid {
-    // Campos no vacíos
     if (_currentPassword.isEmpty ||
         _newPassword.isEmpty ||
         _confirmPassword.isEmpty) {
       return false;
     }
 
-    // Fortaleza mínima (al menos media = 2)
     if (calculatePasswordStrength(_newPassword, minLength: 8) < 2) {
       return false;
     }
 
-    // Contraseñas coinciden
     if (_newPassword != _confirmPassword) {
       return false;
     }
@@ -82,24 +81,69 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
     return null;
   }
 
-  void _handleSave() {
-    if (!_isFormValid) return;
+  Future<void> _handleSave() async {
+    if (!_isFormValid || _isLoading) return;
 
-    // TODO [FASE-2]: Cambiar contraseña con Firebase Auth
-    Navigator.of(context).pop();
+    setState(() => _isLoading = true);
 
-    // Mock UI feedback
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Contraseña actualizada correctamente'),
-        backgroundColor: AppColors.success,
-      ),
-    );
+    try {
+      final authService = ref.read(authServiceProvider);
+      await authService.changePassword(
+        currentPassword: _currentPassword,
+        newPassword: _newPassword,
+      );
+
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Contraseña actualizada correctamente'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        final message = _mapFirebaseError(e);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al cambiar la contraseña: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  String _mapFirebaseError(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'wrong-password':
+      case 'invalid-credential':
+        return 'La contraseña actual es incorrecta';
+      case 'weak-password':
+        return 'La nueva contraseña es demasiado débil. Usa al menos 6 caracteres';
+      case 'requires-recent-login':
+        return 'Por seguridad, inicia sesión nuevamente antes de cambiar la contraseña';
+      default:
+        return 'Error al cambiar la contraseña. Inténtalo de nuevo';
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final isMobile = context.isMobile;
+    final canSubmit = _isFormValid && !_isLoading;
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -116,12 +160,8 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Header con ícono y título
                   _buildHeader(),
-
                   AppSpacing.verticalSpaceXxl,
-
-                  // Campo: Contraseña actual
                   CustomPasswordField(
                     label: 'Contraseña actual',
                     controller: _currentPasswordController,
@@ -133,10 +173,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                       });
                     },
                   ),
-
                   AppSpacing.verticalSpaceLg,
-
-                  // Campo: Nueva contraseña (con indicador de fortaleza)
                   CustomPasswordField(
                     label: 'Nueva contraseña',
                     controller: _newPasswordController,
@@ -150,10 +187,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                       });
                     },
                   ),
-
                   AppSpacing.verticalSpaceLg,
-
-                  // Campo: Confirmar contraseña
                   CustomPasswordField(
                     label: 'Confirmar nueva contraseña',
                     controller: _confirmPasswordController,
@@ -165,16 +199,10 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                       });
                     },
                   ),
-
                   AppSpacing.verticalSpaceXxl,
-
-                  // Mensaje de ayuda
                   _buildSecurityNote(),
-
                   AppSpacing.verticalSpaceXxl,
-
-                  // Botones de acción
-                  _buildActions(isMobile),
+                  _buildActions(isMobile, canSubmit),
                 ],
               ),
             ),
@@ -248,22 +276,24 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
     );
   }
 
-  Widget _buildActions(bool isMobile) {
+  Widget _buildActions(bool isMobile, bool canSubmit) {
+    final buttonText = _isLoading ? 'Actualizando...' : 'Actualizar Contraseña';
+
     if (isMobile) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           CustomButton(
-            text: 'Actualizar Contraseña',
+            text: buttonText,
             variant: ButtonVariant.primary,
-            icon: Icons.check,
-            onPressed: _isFormValid ? _handleSave : null,
+            icon: _isLoading ? null : Icons.check,
+            onPressed: canSubmit ? _handleSave : null,
           ),
           AppSpacing.verticalSpaceMd,
           CustomButton(
             text: 'Cancelar',
             variant: ButtonVariant.outline,
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
           ),
         ],
       );
@@ -275,14 +305,14 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
         CustomButton(
           text: 'Cancelar',
           variant: ButtonVariant.outline,
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
         ),
         AppSpacing.horizontalSpaceMd,
         CustomButton(
-          text: 'Actualizar Contraseña',
+          text: buttonText,
           variant: ButtonVariant.primary,
-          icon: Icons.check,
-          onPressed: _isFormValid ? _handleSave : null,
+          icon: _isLoading ? null : Icons.check,
+          onPressed: canSubmit ? _handleSave : null,
         ),
       ],
     );

@@ -11,6 +11,7 @@ import '../../../../shared/widgets/cards/custom_card.dart';
 import '../../../../shared/widgets/layouts/custom_app_bar.dart';
 import '../../../auth/presentation/widgets/change_password_dialog.dart';
 import '../../../auth/providers/auth_provider.dart';
+import '../../../dashboard/presentation/widgets/profile_edit_dialog.dart';
 
 /// Pantalla de perfil del administrador
 ///
@@ -121,7 +122,16 @@ class _AdminProfileScreenState extends ConsumerState<AdminProfileScreen> {
                       subtitle: 'Ver y editar información personal',
                       icon: Icons.person,
                       onTap: () {
-                        context.push(AppRouter.profile);
+                        final userAsync =
+                            ref.read(currentUserProvider).valueOrNull;
+                        if (userAsync != null) {
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => ProfileEditDialog(
+                              user: userAsync,
+                            ),
+                          );
+                        }
                       },
                     ),
                     _buildNavigationItem(

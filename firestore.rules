@@ -61,6 +61,12 @@ service cloud.firestore {
         request.resource.data.role == 'employee' &&
         request.resource.data.isSupervisor == false;
     }
+
+    function isSafeSelfProfileUpdate(userId) {
+      return isActiveOwner(userId) &&
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['nombre', 'apellido1', 'apellido2', 'displayName', 'telefono', 'dni']);
+    }
     
     // Colección de usuarios
     match /users/{userId} {
@@ -79,8 +85,9 @@ service cloud.firestore {
       // perfil base sin privilegios para evitar escalado de rol/capacidad.
       allow create: if isAdminOrRrhh() || isSafeSelfUserCreate(userId);
       
-      // Solo admin y RRHH pueden actualizar usuarios (Sprint 1.4)
-      allow update: if isAdminOrRrhh();
+      // Admin y RRHH pueden actualizar cualquier campo.
+      // Un empleado activo puede editar solo campos seguros de su propio perfil.
+      allow update: if isAdminOrRrhh() || isSafeSelfProfileUpdate(userId);
       
       // No permitir eliminar usuarios (seguridad)
       allow delete: if false;

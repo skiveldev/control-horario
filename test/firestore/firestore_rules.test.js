@@ -654,3 +654,156 @@ describe('Issue 3 - block/unblock admin operations', () => {
     );
   });
 });
+
+describe('Employee self-profile update', () => {
+  it('allows an employee to update safe profile fields on their own document', async () => {
+    const employeeRef = doc(authedDb('employeeA'), 'users', 'employeeA');
+
+    await assertSucceeds(
+      updateDoc(employeeRef, {
+        nombre: 'Carlos',
+        apellido1: 'García',
+        apellido2: 'López',
+        displayName: 'Carlos García López',
+        telefono: '+34 600 111 222',
+        dni: '12345678Z',
+      }),
+    );
+
+    const snapshot = await assertSucceeds(getDoc(employeeRef));
+    assert.equal(snapshot.data().nombre, 'Carlos');
+    assert.equal(snapshot.data().displayName, 'Carlos García López');
+    assert.equal(snapshot.data().dni, '12345678Z');
+  });
+
+  it('denies an employee from changing role on their own document', async () => {
+    const employeeRef = doc(authedDb('employeeA'), 'users', 'employeeA');
+
+    await assertFails(
+      updateDoc(employeeRef, {
+        nombre: 'Carlos',
+        role: 'admin',
+      }),
+    );
+  });
+
+  it('denies an employee from changing isSupervisor on their own document', async () => {
+    const employeeRef = doc(authedDb('employeeA'), 'users', 'employeeA');
+
+    await assertFails(
+      updateDoc(employeeRef, {
+        apellido1: 'García',
+        isSupervisor: true,
+      }),
+    );
+  });
+
+  it('denies an employee from changing weeklyHours on their own document', async () => {
+    const employeeRef = doc(authedDb('employeeA'), 'users', 'employeeA');
+
+    await assertFails(
+      updateDoc(employeeRef, {
+        displayName: 'Updated Name',
+        weeklyHours: 20,
+      }),
+    );
+  });
+
+  it('denies an employee from changing isActive on their own document', async () => {
+    const employeeRef = doc(authedDb('employeeA'), 'users', 'employeeA');
+
+    await assertFails(
+      updateDoc(employeeRef, {
+        telefono: '+34 600 000 000',
+        isActive: false,
+      }),
+    );
+  });
+
+  it('denies an employee from changing employeeId on their own document', async () => {
+    const employeeRef = doc(authedDb('employeeA'), 'users', 'employeeA');
+
+    await assertFails(
+      updateDoc(employeeRef, {
+        dni: '87654321X',
+        employeeId: 'EMP-HACKED',
+      }),
+    );
+  });
+
+  it('denies an employee from changing supervisorId on their own document', async () => {
+    const employeeRef = doc(authedDb('employeeA'), 'users', 'employeeA');
+
+    await assertFails(
+      updateDoc(employeeRef, {
+        nombre: 'Hacker',
+        supervisorId: 'supervisorB',
+      }),
+    );
+  });
+
+  it('denies an employee from changing email on their own document', async () => {
+    const employeeRef = doc(authedDb('employeeA'), 'users', 'employeeA');
+
+    await assertFails(
+      updateDoc(employeeRef, {
+        apellido2: 'Hacked',
+        email: 'hacked@example.com',
+      }),
+    );
+  });
+
+  it('denies an employee from changing createdAt on their own document', async () => {
+    const employeeRef = doc(authedDb('employeeA'), 'users', 'employeeA');
+
+    await assertFails(
+      updateDoc(employeeRef, {
+        displayName: 'Time Traveler',
+        createdAt: new Date('2025-01-01T00:00:00.000Z'),
+      }),
+    );
+  });
+
+  it('denies an inactive employee from updating their own profile', async () => {
+    const employeeRef = doc(
+      authedDb('inactiveEmployee'),
+      'users',
+      'inactiveEmployee',
+    );
+
+    await assertFails(
+      updateDoc(employeeRef, {
+        nombre: 'Ghost',
+        displayName: 'Ghost',
+      }),
+    );
+  });
+
+  it('denies an employee from updating another employee profile', async () => {
+    const employeeRef = doc(authedDb('employeeA'), 'users', 'employeeB');
+
+    await assertFails(
+      updateDoc(employeeRef, {
+        nombre: 'Should Fail',
+        displayName: 'Should Fail',
+      }),
+    );
+  });
+
+  it('still allows admin to update any field on an employee document', async () => {
+    const employeeRef = doc(authedDb('admin'), 'users', 'employeeA');
+
+    await assertSucceeds(
+      updateDoc(employeeRef, {
+        role: 'rrhh',
+        isSupervisor: true,
+        weeklyHours: 30,
+      }),
+    );
+
+    const snapshot = await assertSucceeds(getDoc(employeeRef));
+    assert.equal(snapshot.data().role, 'rrhh');
+    assert.equal(snapshot.data().isSupervisor, true);
+    assert.equal(snapshot.data().weeklyHours, 30);
+  });
+});
