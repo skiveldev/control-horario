@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors_dark.dart';
 import '../../../core/theme/app_gradients.dart';
 import '../../../core/theme/app_shadows.dart';
@@ -131,6 +132,9 @@ class DesktopSidebar extends ConsumerWidget {
               }).toList(),
             ),
           ),
+
+          // Logout footer
+          _buildLogoutFooter(context, ref, isExpanded, isDark),
         ],
       ),
     );
@@ -290,5 +294,70 @@ class DesktopSidebar extends ConsumerWidget {
 
     // Tooltip cuando está colapsado
     return isExpanded ? widget : Tooltip(message: item.label, child: widget);
+  }
+
+  Widget _buildLogoutFooter(
+    BuildContext context,
+    WidgetRef ref,
+    bool isExpanded,
+    bool isDark,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: Theme.of(context).dividerColor,
+            width: 1,
+          ),
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () async {
+            await ref.read(authNotifierProvider.notifier).signOut();
+            if (context.mounted) {
+              context.go(AppRouter.login);
+            }
+          },
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            height: 56,
+            margin: EdgeInsets.symmetric(
+              horizontal: AppSpacing.xs,
+              vertical: AppSpacing.xs / 2,
+            ),
+            padding: EdgeInsets.symmetric(
+              horizontal: isExpanded ? AppSpacing.md : 0,
+            ),
+            child: Row(
+              mainAxisAlignment: isExpanded
+                  ? MainAxisAlignment.start
+                  : MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.logout,
+                  size: 24,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                if (isExpanded) ...[
+                  AppSpacing.horizontalSpaceMd,
+                  Expanded(
+                    child: Text(
+                      'Cerrar Sesión',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
