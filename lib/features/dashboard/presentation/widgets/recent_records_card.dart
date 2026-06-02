@@ -1,51 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors_helper.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/constants/breakpoints.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../shared/widgets/cards/custom_card.dart';
-import '../../models/time_record_model.dart'; // ✨ AGREGADO para RecordCategory
+import '../../models/time_record_model.dart';
 import '../../providers/dashboard_provider.dart';
 import 'records_table.dart';
 
 /// Card de registros recientes
 ///
-/// Muestra una tabla con los últimos 5 fichajes del empleado.
-/// Incluye navegación para ver historial completo.
+/// Muestra una tabla con los últimos 5 días agrupados del empleado.
+/// Incluye navegación para ver todos los días (últimos 30 días).
 ///
 /// Conectado con Riverpod para mostrar datos reales desde Firebase.
 class RecentRecordsCard extends ConsumerWidget {
   const RecentRecordsCard({super.key});
 
+  static const int maxGroupedDays = 5;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final monthlyRecordsAsync = ref.watch(monthlyRecordsProvider);
+    final last30DaysAsync = ref.watch(last30DaysRecordsProvider);
 
-    return monthlyRecordsAsync.when(
+    return last30DaysAsync.when(
       data: (recordsList) {
-        // Limitar según breakpoint
-        final maxRecords = context.isMobile ? 3 : 5;
-        final records = recordsList.take(maxRecords).toList();
-
-        // Si no hay registros
-        if (records.isEmpty) {
+        if (recordsList.isEmpty) {
           return _buildEmptyState();
         }
 
-        // Agrupar registros por fecha
-        final groupedByDate = <String, List<dynamic>>{};
-        for (final record in records) {
+        // Agrupar TODOS los registros por fecha (ordenados DESC desde Firestore)
+        final groupedByDate = <String, List<TimeRecordModel>>{};
+        for (final record in recordsList) {
           groupedByDate.putIfAbsent(record.date, () => []).add(record);
         }
 
+        // Limitar a N días agrupados (ya ordenados de más nuevo a más viejo)
+        final limitedDays = groupedByDate.entries.take(maxGroupedDays);
+
         // Mapear a estructura esperada por RecordsTable (1 fila por día)
-        final mappedRecords = groupedByDate.entries.map((entry) {
+        final mappedRecords = limitedDays.map((entry) {
           final date = entry.key;
           final dayRecords = entry.value;
 
-          // Calcular totales del día
           final workRecords = dayRecords
               .where((r) => r.category == RecordCategory.work)
               .toList();
@@ -60,7 +59,7 @@ class RecentRecordsCard extends ConsumerWidget {
 
           final totalMinutes = workRecords.fold<int>(
             0,
-            (sum, r) => sum + (r.durationMinutes as int),
+            (sum, r) => sum + r.durationMinutes,
           );
           final totalHours = _formatDuration(totalMinutes);
 
@@ -72,8 +71,7 @@ class RecentRecordsCard extends ConsumerWidget {
             'exit': exit,
             'total': totalHours,
             'hadBreak': hadBreak,
-            'status':
-                'complete', // Todos los registros en time_records son completos
+            'status': 'complete',
           };
         }).toList();
 
@@ -125,12 +123,7 @@ class RecentRecordsCard extends ConsumerWidget {
               // Botón ver todo
               TextButton.icon(
                 onPressed: () {
-                  // TODO [FASE-2-SPRINT-2]: Navegar a historial completo
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Historial completo en desarrollo'),
-                    ),
-                  );
+                  context.push(AppRouter.allRecentRecords);
                 },
                 icon: const Icon(Icons.arrow_forward, size: 16),
                 label: const Text('Ver todo'),
@@ -171,7 +164,7 @@ class RecentRecordsCard extends ConsumerWidget {
                 AppSpacing.horizontalSpaceSm,
                 Expanded(
                   child: Text(
-                    'Mostrando los últimos ${records.length} registros. Ver historial completo para más.',
+                    'Mostrando los últimos ${records.length} días con actividad. Ver todo para más.',
                     style: AppTextStyles.bodySmall.copyWith(color: colors.info),
                   ),
                 ),
@@ -262,7 +255,7 @@ class RecentRecordsCard extends ConsumerWidget {
                     ),
                     AppSpacing.verticalSpaceMd,
                     Text(
-                      'No hay registros este mes',
+                      'No hay registros recientes',
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: colors.textSecondary,
                       ),
@@ -333,12 +326,11 @@ class RecentRecordsCard extends ConsumerWidget {
   // HELPERS
   // ==========================================================================
 
-  /// Formatear fecha de YYYY-MM-DD a formato legible
+  /// Formatear fecha de YYYY-MM-DD a DD/MM/YYYY
   String _formatDate(String dateString) {
     try {
       final date = DateTime.parse(dateString);
-      final formatter = DateFormat('dd/MM/yyyy', 'es');
-      return formatter.format(date);
+      return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
     } catch (e) {
       return dateString;
     }

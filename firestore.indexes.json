@@ -29,6 +29,20 @@
       ]
     },
     {
+      "collectionGroup": "time_records",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "startTime",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "overtime_requests",
       "queryScope": "COLLECTION",
       "fields": [

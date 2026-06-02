@@ -31,6 +31,32 @@ final monthlyRecordsProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef MonthlyRecordsRef = AutoDisposeStreamProviderRef<List<TimeRecordModel>>;
+String _$last30DaysRecordsHash() => r'6895de2e961215dfc2cc834d99cfda6795364266';
+
+/// Provider para obtener registros de los últimos 30 días
+///
+/// Query intencionalmente limitado para evitar obtener datos históricos.
+/// Ordenados de más nuevo a más viejo (date DESC, startTime DESC).
+///
+/// Retorna lista vacía si no hay usuario autenticado.
+///
+/// Copied from [last30DaysRecords].
+@ProviderFor(last30DaysRecords)
+final last30DaysRecordsProvider =
+    AutoDisposeStreamProvider<List<TimeRecordModel>>.internal(
+  last30DaysRecords,
+  name: r'last30DaysRecordsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$last30DaysRecordsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef Last30DaysRecordsRef
+    = AutoDisposeStreamProviderRef<List<TimeRecordModel>>;
 String _$todayTotalMinutesHash() => r'2ec4969403914c9212316eb6445935e652cf8ff9';
 
 /// Provider computado: Total de minutos trabajados hoy

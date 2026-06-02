@@ -259,6 +259,36 @@ class TimeRecordsService {
     }
   }
 
+  /// Obtener registros de los últimos 30 días
+  ///
+  /// Query limitado intencionalmente a 30 días para evitar
+  /// obtener datos históricos completos.
+  /// Ordena por date DESC, startTime DESC (nuevos primero).
+  ///
+  /// Requiere índice compuesto en Firestore:
+  ///   date DESC, startTime DESC
+  /// Colección: users/{userId}/time_records
+  Stream<List<TimeRecordModel>> getLast30DaysRecords(String userId) {
+    final now = DateTime.now();
+    final startDate = now.subtract(const Duration(days: 30));
+    final endDate = now;
+
+    final startDateStr = _formatDate(startDate);
+    final endDateStr = _formatDate(endDate);
+
+    return _getRecordsCollection(userId)
+        .where('date', isGreaterThanOrEqualTo: startDateStr)
+        .where('date', isLessThanOrEqualTo: endDateStr)
+        .orderBy('date', descending: true)
+        .orderBy('startTime', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return TimeRecordModel.fromFirestore(doc);
+      }).toList();
+    });
+  }
+
   /// Formatear fecha a string YYYY-MM-DD
   String _formatDate(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';

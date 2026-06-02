@@ -35,6 +35,32 @@ Stream<List<TimeRecordModel>> monthlyRecords(MonthlyRecordsRef ref) async* {
 }
 
 // ==============================================================================
+// STREAM PROVIDER - Registros Últimos 30 Días
+// ==============================================================================
+
+/// Provider para obtener registros de los últimos 30 días
+///
+/// Query intencionalmente limitado para evitar obtener datos históricos.
+/// Ordenados de más nuevo a más viejo (date DESC, startTime DESC).
+///
+/// Retorna lista vacía si no hay usuario autenticado.
+@riverpod
+Stream<List<TimeRecordModel>> last30DaysRecords(
+  Last30DaysRecordsRef ref,
+) async* {
+  final user = await ref.watch(currentUserProvider.future);
+
+  if (user == null) {
+    yield [];
+    return;
+  }
+
+  final timeRecordsService = ref.watch(timeRecordsServiceProvider);
+
+  yield* timeRecordsService.getLast30DaysRecords(user.userId);
+}
+
+// ==============================================================================
 // COMPUTED PROVIDERS - Cálculos de Horas
 // ==============================================================================
 
