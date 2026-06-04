@@ -30,6 +30,8 @@ import '../widgets/quick_actions_card.dart';
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
+  static const double _desktopFloatingHeaderReservedHeight = 144.0;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Observar usuario actual
@@ -80,6 +82,12 @@ class DashboardScreen extends ConsumerWidget {
 
   Widget _buildDashboard(BuildContext context, WidgetRef ref, user) {
     final isMobile = context.isMobile || context.isTablet;
+    final isDesktop = context.isDesktop;
+
+    final header = Builder(
+      builder: (scaffoldContext) =>
+          _buildHeaderWithHamburger(scaffoldContext, ref, user, isMobile),
+    );
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -90,23 +98,40 @@ class DashboardScreen extends ConsumerWidget {
           children: [
             // Header con información del empleado + botón hamburguesa
             // IMPORTANTE: Usar Builder para el contexto correcto del Scaffold
-            Builder(
-              builder: (scaffoldContext) => _buildHeaderWithHamburger(
-                  scaffoldContext, ref, user, isMobile),
-            ),
+            if (!isDesktop) header,
 
             // Contenido principal con scroll
             Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(
-                  context.responsiveValue(
-                    mobile: AppSpacing.lg,
-                    tablet: AppSpacing.xxl,
-                    desktop: AppSpacing.xxxl,
-                  ),
-                ),
-                child: _buildDashboardGrid(context, ref),
-              ),
+              child: isDesktop
+                  ? Stack(
+                      children: [
+                        SingleChildScrollView(
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSpacing.xxxl,
+                            _desktopFloatingHeaderReservedHeight,
+                            AppSpacing.xxxl,
+                            AppSpacing.xxxl,
+                          ),
+                          child: _buildDashboardGrid(context, ref),
+                        ),
+                        Positioned(
+                          top: 0,
+                          left: AppSpacing.xxxl,
+                          right: AppSpacing.xxxl,
+                          child: header,
+                        ),
+                      ],
+                    )
+                  : SingleChildScrollView(
+                      padding: EdgeInsets.all(
+                        context.responsiveValue(
+                          mobile: AppSpacing.lg,
+                          tablet: AppSpacing.xxl,
+                          desktop: AppSpacing.xxxl,
+                        ),
+                      ),
+                      child: _buildDashboardGrid(context, ref),
+                    ),
             ),
           ],
         ),
@@ -115,6 +140,9 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   /// Construye el header con el botón hamburguesa integrado
+  ///
+  /// Desktop: Header flotante con bordes redondeados y sombra suave
+  /// Mobile/Tablet: Barra plana tradicional (optimiza espacio)
   Widget _buildHeaderWithHamburger(
     BuildContext context,
     WidgetRef ref,
@@ -123,7 +151,80 @@ class DashboardScreen extends ConsumerWidget {
   ) {
     // Observar estado de horario laboral
     final scheduleStatus = ref.watch(workScheduleStatusNotifierProvider);
+    final isDesktopLayout = context.isDesktop;
 
+    final headerContent = SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.responsiveValue(
+            mobile: AppSpacing.md,
+            tablet: AppSpacing.lg,
+            desktop: AppSpacing.lg,
+          ),
+          vertical: AppSpacing.lg,
+        ),
+        child: Row(
+          children: [
+            // Botón hamburguesa SOLO en mobile (en desktop el sidebar tiene su propio botón)
+            if (isMobile) ...[
+              IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+                tooltip: 'Abrir menú',
+              ),
+              AppSpacing.horizontalSpaceMd,
+            ],
+
+            // Contenido del EmployeeHeader (expandido)
+            Expanded(
+              child: EmployeeHeader(
+                employeeName: user.fullName,
+                employeeId: user.employeeId,
+                position: user.position,
+                department: user.department,
+                isActive: true, // TODO [FASE-2]: Implementar estado online real
+                isInWorkSchedule: scheduleStatus.isInWorkSchedule,
+                currentDate: scheduleStatus.formattedDate,
+                onAvatarTap: () => context.push(AppRouter.profile),
+                onNotificationsTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Notificaciones en desarrollo'),
+                    ),
+                  );
+                },
+                onSettingsTap: () => context.push(AppRouter.settings),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    // Desktop: Header flotante separado del contenido
+    if (isDesktopLayout) {
+      return Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+          border: Border.all(
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.3),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: headerContent,
+      );
+    }
+
+    // Mobile/Tablet: Barra plana tradicional
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -138,55 +239,7 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ],
       ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: context.responsiveValue(
-              mobile: AppSpacing.md,
-              tablet: AppSpacing.lg,
-              desktop: AppSpacing.xxl,
-            ),
-            vertical: AppSpacing.lg,
-          ),
-          child: Row(
-            children: [
-              // Botón hamburguesa SOLO en mobile (en desktop el sidebar tiene su propio botón)
-              if (isMobile) ...[
-                IconButton(
-                  icon: const Icon(Icons.menu),
-                  onPressed: () => Scaffold.of(context).openDrawer(),
-                  tooltip: 'Abrir menú',
-                ),
-                AppSpacing.horizontalSpaceMd,
-              ],
-
-              // Contenido del EmployeeHeader (expandido)
-              Expanded(
-                child: EmployeeHeader(
-                  employeeName: user.fullName,
-                  employeeId: user.employeeId,
-                  position: user.position,
-                  department: user.department,
-                  isActive:
-                      true, // TODO [FASE-2]: Implementar estado online real
-                  isInWorkSchedule: scheduleStatus.isInWorkSchedule,
-                  currentDate: scheduleStatus.formattedDate,
-                  onAvatarTap: () => context.push(AppRouter.profile),
-                  onNotificationsTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Notificaciones en desarrollo'),
-                      ),
-                    );
-                  },
-                  onSettingsTap: () => context.push(AppRouter.settings),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      child: headerContent,
     );
   }
 

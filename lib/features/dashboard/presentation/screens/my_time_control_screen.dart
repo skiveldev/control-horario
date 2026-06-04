@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
+import '../../../../shared/widgets/floating_card.dart';
 import '../../../../shared/widgets/navigation/mobile_drawer.dart';
 import '../../../../shared/widgets/navigation/responsive_navigation.dart';
 import '../../../auth/providers/auth_provider.dart';
@@ -43,33 +44,202 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
     _selectedMonth = DateTime.now();
   }
 
+  static const double _desktopFloatingHeaderReservedHeight = 300.0;
+
   @override
   Widget build(BuildContext context) {
     final isMobile = context.isMobile || context.isTablet;
+    final isDesktop = context.isDesktop;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       drawer: isMobile ? const MobileDrawer() : null,
       body: ResponsiveNavigation(
-        child: Column(
-          children: [
-            // Header con hamburger en mobile
-            // IMPORTANTE: Usar Builder para obtener el contexto correcto del Scaffold
-            if (isMobile)
-              Builder(
-                builder: (scaffoldContext) =>
-                    _buildMobileHeader(scaffoldContext),
-              ),
+        child: isDesktop ? _buildDesktopLayout() : _buildMobileLayout(),
+      ),
+    );
+  }
 
-            // Contenido principal
-            Expanded(
-              child: _isFutureMonth(_selectedMonth)
-                  ? _buildFutureMonthView()
-                  : _buildNormalMonthView(),
-            ),
-          ],
+  Widget _buildMobileLayout() {
+    return Column(
+      children: [
+        Builder(
+          builder: (scaffoldContext) => _buildMobileHeader(scaffoldContext),
+        ),
+        Expanded(
+          child: _isFutureMonth(_selectedMonth)
+              ? _buildFutureMonthView()
+              : _buildNormalMonthView(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDesktopLayout() {
+    final userAsync = ref.watch(currentUserProvider);
+
+    return userAsync.when(
+      data: (user) {
+        if (user == null) {
+          return const Center(child: Text('Usuario no autenticado'));
+        }
+
+        if (_isFutureMonth(_selectedMonth)) {
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.xxxl,
+                  _desktopFloatingHeaderReservedHeight,
+                  AppSpacing.xxxl,
+                  AppSpacing.xxxl,
+                ),
+                child: FutureMonthEmptyState(
+                  month: _selectedMonth,
+                  onGoToCurrentMonth: () {
+                    setState(() {
+                      _selectedMonth = DateTime.now();
+                    });
+                  },
+                ),
+              ),
+              _buildFloatingMonthHeader(onNextMonth: null),
+            ],
+          );
+        }
+
+        final recordsAsync = ref.watch(
+          monthTimeRecordsProvider(
+            userId: user.userId,
+            month: _selectedMonth,
+          ),
+        );
+
+        return recordsAsync.when(
+          data: (records) => _buildDesktopDataView(records, user.userId),
+          loading: () => _buildDesktopLoadingView(),
+          error: (error, _) => _buildDesktopErrorView(error.toString()),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(child: Text('Error: $error')),
+    );
+  }
+
+  Widget _buildFloatingMonthHeader({
+    VoidCallback? onNextMonth,
+    int totalWorkedMinutes = 0,
+    int totalPlannedMinutes = 0,
+  }) {
+    return Positioned(
+      top: 0,
+      left: AppSpacing.xxxl,
+      right: AppSpacing.xxxl,
+      child: FloatingCard(
+        child: MonthNavigationHeader(
+          selectedMonth: _selectedMonth,
+          onPreviousMonth: _goToPreviousMonth,
+          onNextMonth: onNextMonth,
+          totalWorkedMinutes: totalWorkedMinutes,
+          totalPlannedMinutes: totalPlannedMinutes,
         ),
       ),
+    );
+  }
+
+  Widget _buildDesktopDataView(
+    List<TimeRecordModel> records,
+    String userId,
+  ) {
+    final totalWorkedMinutes = records.fold<int>(
+      0,
+      (sum, record) => sum + record.durationMinutes,
+    );
+    const totalPlannedMinutes = 8 * 60 * 22;
+    final daysInMonth = _getDaysInMonth(_selectedMonth);
+
+    return Stack(
+      children: [
+        ListView.builder(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.xxxl,
+            _desktopFloatingHeaderReservedHeight,
+            AppSpacing.xxxl,
+            AppSpacing.xxxl,
+          ),
+          itemCount: daysInMonth.length,
+          itemBuilder: (context, index) {
+            final day = daysInMonth[index];
+            final dayRecords =
+                records.where((r) => r.date == _formatDate(day)).toList();
+            final isToday = _isToday(day);
+            return DayRecordCard(
+              date: day,
+              records: dayRecords,
+              plannedMinutes: 8 * 60,
+              isToday: isToday,
+              complianceStatus: _computeDayCompliance(day, dayRecords),
+              onAddRecord: () =>
+                  _handleAddRecord(context, day, userId, dayRecords),
+              onEditRecord: (record) =>
+                  _handleEditRecord(context, record, userId, dayRecords),
+              onCopyRecord: (record) =>
+                  _handleCopyRecord(context, record, userId),
+              onDeleteRecord: (record) =>
+                  _handleDeleteRecord(context, record, userId),
+            );
+          },
+        ),
+        _buildFloatingMonthHeader(
+          onNextMonth: _canNavigateToNextMonth() ? _goToNextMonth : null,
+          totalWorkedMinutes: totalWorkedMinutes,
+          totalPlannedMinutes: totalPlannedMinutes,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDesktopLoadingView() {
+    return Stack(
+      children: [
+        const Center(child: CircularProgressIndicator()),
+        _buildFloatingMonthHeader(
+          onNextMonth: _canNavigateToNextMonth() ? _goToNextMonth : null,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDesktopErrorView(String error) {
+    return Stack(
+      children: [
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Theme.of(context).colorScheme.error,
+              ),
+              AppSpacing.verticalSpaceMd,
+              Text(
+                'Error al cargar registros',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              AppSpacing.verticalSpaceSm,
+              Text(
+                error,
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+        _buildFloatingMonthHeader(
+          onNextMonth: _canNavigateToNextMonth() ? _goToNextMonth : null,
+        ),
+      ],
     );
   }
 

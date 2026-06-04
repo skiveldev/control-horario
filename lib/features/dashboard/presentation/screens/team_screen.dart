@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/breakpoints.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../shared/widgets/floating_card.dart';
 import '../../../../shared/widgets/navigation/mobile_drawer.dart';
 import '../../../../shared/widgets/navigation/responsive_navigation.dart';
 import '../../../auth/models/user_model.dart';
@@ -30,6 +31,8 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
   late DateTime _selectedMonth;
   final Set<String> _validatingRecordKeys = <String>{};
 
+  static const double _desktopFloatingHeaderReservedHeight = 120.0;
+
   @override
   void initState() {
     super.initState();
@@ -40,6 +43,7 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < Breakpoints.desktop;
+    final isDesktop = context.isDesktop;
     final currentUser = ref.watch(currentUserProvider).valueOrNull;
 
     if (currentUser == null) {
@@ -68,80 +72,96 @@ class _TeamScreenState extends ConsumerState<TeamScreen> {
     final monthlyOverviewAsync =
         ref.watch(teamMonthlyOverviewProvider(_selectedMonth));
 
+    final header = TeamScreenHeader(
+      isMobile: isMobile,
+      selectedMonth: _selectedMonth,
+      isClosed: monthClosureAsync.valueOrNull?.isClosed ?? false,
+      pendingCount: monthlyOverviewAsync.valueOrNull?.pendingRecords ?? 0,
+      onCloseMonth: () => _handleCloseMonth(
+        monthlyOverviewAsync.valueOrNull,
+      ),
+      onPreviousMonth: _goToPreviousMonth,
+      onNextMonth: _goToNextMonth,
+    );
+
+    final content = teamMembersAsync.when(
+      data: (members) {
+        if (members.isEmpty) {
+          return const Center(
+            child: Text('No tienes empleados asignados en tu equipo.'),
+          );
+        }
+
+        return monthlyOverviewAsync.when(
+          data: (overview) => ListView(
+            padding: isDesktop ? AppSpacing.allXxxl : AppSpacing.allXl,
+            children: [
+              TeamMonthSummaryCard(
+                overview: overview,
+                isClosed: monthClosureAsync.valueOrNull?.isClosed ?? false,
+              ),
+              if (overview.pendingBreakdown.isNotEmpty) ...[
+                AppSpacing.verticalSpaceLg,
+                TeamPendingBreakdownCard(
+                  items: overview.pendingBreakdown,
+                ),
+              ],
+              AppSpacing.verticalSpaceLg,
+              ...overview.memberSummaries.map((summary) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: TeamMemberMonthCard(
+                    summary: summary,
+                    isMonthClosed:
+                        monthClosureAsync.valueOrNull?.isClosed ?? false,
+                    validatingRecordKeys: _validatingRecordKeys,
+                    onValidateRecord: (record) =>
+                        _handleValidateRecord(summary.member, record),
+                  ),
+                );
+              }),
+            ],
+          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => Center(
+            child: Text('Error al cargar resumen mensual: $error'),
+          ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(
+        child: Text('Error al cargar equipo: $error'),
+      ),
+    );
+
     return Scaffold(
       drawer: isMobile ? const MobileDrawer() : null,
       body: ResponsiveNavigation(
-        child: Column(
-          children: [
-            TeamScreenHeader(
-              isMobile: isMobile,
-              selectedMonth: _selectedMonth,
-              isClosed: monthClosureAsync.valueOrNull?.isClosed ?? false,
-              pendingCount:
-                  monthlyOverviewAsync.valueOrNull?.pendingRecords ?? 0,
-              onCloseMonth: () => _handleCloseMonth(
-                monthlyOverviewAsync.valueOrNull,
+        child: isDesktop
+            ? Stack(
+                children: [
+                  Column(
+                    children: [
+                      const SizedBox(
+                        height: _desktopFloatingHeaderReservedHeight,
+                      ),
+                      Expanded(child: content),
+                    ],
+                  ),
+                  Positioned(
+                    top: 0,
+                    left: AppSpacing.xxxl,
+                    right: AppSpacing.xxxl,
+                    child: FloatingCard(child: header),
+                  ),
+                ],
+              )
+            : Column(
+                children: [
+                  header,
+                  Expanded(child: content),
+                ],
               ),
-              onPreviousMonth: _goToPreviousMonth,
-              onNextMonth: _goToNextMonth,
-            ),
-            Expanded(
-              child: teamMembersAsync.when(
-                data: (members) {
-                  if (members.isEmpty) {
-                    return const Center(
-                      child:
-                          Text('No tienes empleados asignados en tu equipo.'),
-                    );
-                  }
-
-                  return monthlyOverviewAsync.when(
-                    data: (overview) => ListView(
-                      padding: AppSpacing.allXl,
-                      children: [
-                        TeamMonthSummaryCard(
-                          overview: overview,
-                          isClosed:
-                              monthClosureAsync.valueOrNull?.isClosed ?? false,
-                        ),
-                        if (overview.pendingBreakdown.isNotEmpty) ...[
-                          AppSpacing.verticalSpaceLg,
-                          TeamPendingBreakdownCard(
-                            items: overview.pendingBreakdown,
-                          ),
-                        ],
-                        AppSpacing.verticalSpaceLg,
-                        ...overview.memberSummaries.map((summary) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: TeamMemberMonthCard(
-                              summary: summary,
-                              isMonthClosed:
-                                  monthClosureAsync.valueOrNull?.isClosed ??
-                                      false,
-                              validatingRecordKeys: _validatingRecordKeys,
-                              onValidateRecord: (record) =>
-                                  _handleValidateRecord(summary.member, record),
-                            ),
-                          );
-                        }),
-                      ],
-                    ),
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
-                    error: (error, _) => Center(
-                      child: Text('Error al cargar resumen mensual: $error'),
-                    ),
-                  );
-                },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, _) => Center(
-                  child: Text('Error al cargar equipo: $error'),
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

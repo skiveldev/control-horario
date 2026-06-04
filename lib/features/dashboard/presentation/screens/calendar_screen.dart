@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
+import '../../../../shared/widgets/floating_card.dart';
 import '../../../../shared/widgets/navigation/mobile_drawer.dart';
 import '../../../../shared/widgets/navigation/responsive_navigation.dart';
 import '../../../auth/providers/auth_provider.dart';
@@ -65,44 +65,121 @@ class CalendarScreen extends ConsumerWidget {
     );
   }
 
+  static const double _desktopFloatingHeaderReservedHeight = 88.0;
+
   Widget _buildScreen(BuildContext context, String userId) {
     final isMobile = context.isMobile || context.isTablet;
+    final isDesktop = context.isDesktop;
+
+    final appBar = _buildAppBar(context, isMobile);
+    final content = _buildCalendarContent(context, userId);
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       drawer: isMobile ? const MobileDrawer() : null,
       body: ResponsiveNavigation(
-        child: Column(
-          children: [
-            _buildAppBar(context, isMobile),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(
-                  context.responsiveValue(
-                    mobile: AppSpacing.lg,
-                    tablet: AppSpacing.xxl,
-                    desktop: AppSpacing.xxxl,
+        child: isDesktop
+            ? Stack(
+                children: [
+                  SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.xxxl,
+                      _desktopFloatingHeaderReservedHeight,
+                      AppSpacing.xxxl,
+                      AppSpacing.xxxl,
+                    ),
+                    child: content,
                   ),
+                  Positioned(
+                    top: 0,
+                    left: AppSpacing.xxxl,
+                    right: AppSpacing.xxxl,
+                    child: appBar,
+                  ),
+                ],
+              )
+            : Column(
+                children: [
+                  appBar,
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.all(
+                        context.responsiveValue(
+                          mobile: AppSpacing.lg,
+                          tablet: AppSpacing.xxl,
+                          desktop: AppSpacing.xxxl,
+                        ),
+                      ),
+                      child: content,
+                    ),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+
+  Widget _buildCalendarContent(BuildContext context, String userId) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ScheduleSummarySection(employeeId: userId),
+        const SizedBox(height: AppSpacing.xxl),
+        const Divider(),
+        const SizedBox(height: AppSpacing.xxl),
+        const AnnualCalendarSection(),
+      ],
+    );
+  }
+
+  Widget _buildAppBar(BuildContext context, bool isMobile) {
+    final isDesktop = context.isDesktop;
+
+    final content = SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.responsiveValue(
+            mobile: AppSpacing.md,
+            tablet: AppSpacing.lg,
+            desktop: AppSpacing.lg,
+          ),
+          vertical: AppSpacing.lg,
+        ),
+        child: Row(
+          children: [
+            if (isMobile) ...[
+              Builder(
+                builder: (scaffoldContext) => IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => Scaffold.of(scaffoldContext).openDrawer(),
+                  tooltip: 'Abrir menú',
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ScheduleSummarySection(employeeId: userId),
-                    const SizedBox(height: AppSpacing.xxl),
-                    const Divider(),
-                    const SizedBox(height: AppSpacing.xxl),
-                    const AnnualCalendarSection(),
-                  ],
-                ),
+              ),
+              AppSpacing.horizontalSpaceMd,
+            ],
+            Icon(
+              Icons.calendar_month_outlined,
+              size: 24,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            AppSpacing.horizontalSpaceMd,
+            Flexible(
+              child: Text(
+                'Calendario',
+                style: AppTextStyles.h4,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
         ),
       ),
     );
-  }
 
-  Widget _buildAppBar(BuildContext context, bool isMobile) {
+    if (isDesktop) {
+      return FloatingCard(child: content);
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -117,46 +194,7 @@ class CalendarScreen extends ConsumerWidget {
           ),
         ],
       ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: context.responsiveValue(
-              mobile: AppSpacing.md,
-              tablet: AppSpacing.lg,
-              desktop: AppSpacing.xxl,
-            ),
-            vertical: AppSpacing.lg,
-          ),
-          child: Row(
-            children: [
-              if (isMobile) ...[
-                Builder(
-                  builder: (scaffoldContext) => IconButton(
-                    icon: const Icon(Icons.menu),
-                    onPressed: () => Scaffold.of(scaffoldContext).openDrawer(),
-                    tooltip: 'Abrir menú',
-                  ),
-                ),
-                AppSpacing.horizontalSpaceMd,
-              ],
-              Icon(
-                Icons.calendar_month_outlined,
-                size: 24,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              AppSpacing.horizontalSpaceMd,
-              Flexible(
-                child: Text(
-                  'Calendario',
-                  style: AppTextStyles.h4,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      child: content,
     );
   }
 }
