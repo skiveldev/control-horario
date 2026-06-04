@@ -158,19 +158,18 @@ class CustomCard extends StatelessWidget {
       case CardElevation.low:
         return [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 4.0,
-            offset: const Offset(0, 1),
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8.0,
+            offset: const Offset(0, 2),
             spreadRadius: 0,
           ),
         ];
 
       case CardElevation.medium:
-        // Fase 1.5.1: Elevación media personalizada para mejor contraste
         return [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.10),
-            blurRadius: 12.0,
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 20.0,
             offset: const Offset(0, 4),
             spreadRadius: 0,
           ),
@@ -179,8 +178,8 @@ class CustomCard extends StatelessWidget {
       case CardElevation.high:
         return [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 20.0,
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 24.0,
             offset: const Offset(0, 8),
             spreadRadius: 0,
           ),

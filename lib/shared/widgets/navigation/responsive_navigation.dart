@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/breakpoints.dart';
+import '../../../core/theme/app_spacing.dart';
 import 'desktop_sidebar.dart';
 
 /// Wrapper de navegación responsive
 ///
 /// Decide qué navegación mostrar según el tamaño de pantalla:
-/// - **Desktop (>1024px)**: Sidebar fijo + contenido
+/// - **Desktop (>1024px)**: Sidebar flotante (con margen, esquinas redondeadas) + contenido
 /// - **Mobile/Tablet (<1024px)**: Solo contenido (drawer via Scaffold)
 ///
 /// El sidebar colapsable solo está visible en desktop.
@@ -33,11 +34,27 @@ class ResponsiveNavigation extends StatelessWidget {
         final isDesktop = constraints.maxWidth >= Breakpoints.desktop;
 
         if (isDesktop) {
-          // Desktop: Mostrar sidebar + contenido
+          // Desktop: Sidebar flotante con margen + contenido con margen derecho
           return Row(
             children: [
-              const DesktopSidebar(),
-              Expanded(child: child),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: AppSpacing.lg,
+                  top: AppSpacing.lg,
+                  bottom: AppSpacing.lg,
+                ),
+                child: const DesktopSidebar(),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    right: AppSpacing.xxl,
+                    top: AppSpacing.lg,
+                    bottom: AppSpacing.xxl,
+                  ),
+                  child: child,
+                ),
+              ),
             ],
           );
         } else {

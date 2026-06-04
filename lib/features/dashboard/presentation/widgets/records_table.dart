@@ -25,7 +25,7 @@ import '../../../../shared/widgets/cards/clocking_status_badge.dart';
 ///   ],
 /// )
 /// ```
-class RecordsTable extends StatelessWidget {
+class RecordsTable extends StatefulWidget {
   /// Lista de registros a mostrar
   final List<Map<String, dynamic>> records;
 
@@ -33,6 +33,13 @@ class RecordsTable extends StatelessWidget {
   final void Function(Map<String, dynamic>)? onRecordTap;
 
   const RecordsTable({super.key, required this.records, this.onRecordTap});
+
+  @override
+  State<RecordsTable> createState() => _RecordsTableState();
+}
+
+class _RecordsTableState extends State<RecordsTable> {
+  int? _hoveredIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -73,10 +80,10 @@ class RecordsTable extends StatelessWidget {
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: records.length,
+      itemCount: widget.records.length,
       separatorBuilder: (context, index) => AppSpacing.verticalSpaceMd,
       itemBuilder: (context, index) {
-        final record = records[index];
+        final record = widget.records[index];
         return _buildMobileRecordCard(record);
       },
     );
@@ -87,7 +94,9 @@ class RecordsTable extends StatelessWidget {
       builder: (context) {
         final colors = AppColorsHelper.of(context);
         return InkWell(
-          onTap: onRecordTap != null ? () => onRecordTap!(record) : null,
+          onTap: widget.onRecordTap != null
+              ? () => widget.onRecordTap!(record)
+              : null,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
           child: Container(
             padding: AppSpacing.allMd,
@@ -245,18 +254,23 @@ class RecordsTable extends StatelessWidget {
             1: FlexColumnWidth(1.5), // Entrada
             2: FlexColumnWidth(1.5), // Salida
             3: FlexColumnWidth(1.5), // Total
-            4: FlexColumnWidth(1), // Pausa ✨ NUEVO
+            4: FlexColumnWidth(1), // Pausa
             5: FlexColumnWidth(2), // Estado
           },
           border: TableBorder(
-            horizontalInside: BorderSide(color: colors.border, width: 1),
+            horizontalInside: BorderSide(
+              color: colors.border.withValues(alpha: 0.4),
+              width: 1,
+            ),
           ),
           children: [
             // Header
             _buildTableHeader(context),
 
             // Rows
-            ...records.map((record) => _buildTableRow(context, record)),
+            ...widget.records.asMap().entries.map((entry) {
+              return _buildTableRow(context, entry.value, entry.key);
+            }),
           ],
         );
       },
@@ -302,52 +316,99 @@ class RecordsTable extends StatelessWidget {
     );
   }
 
-  TableRow _buildTableRow(BuildContext context, Map<String, dynamic> record) {
+  TableRow _buildTableRow(
+    BuildContext context,
+    Map<String, dynamic> record,
+    int index,
+  ) {
     final colors = AppColorsHelper.of(context);
     final hadBreak = record['hadBreak'] as bool? ?? false;
+    final isHovered = _hoveredIndex == index;
 
     return TableRow(
-      decoration: BoxDecoration(color: colors.surface),
+      decoration: BoxDecoration(
+        color:
+            isHovered ? colors.primary.withValues(alpha: 0.04) : colors.surface,
+      ),
       children: [
-        _buildTableCell(context, record['date'] as String),
-        _buildTableCell(context, record['entrance'] as String),
-        _buildTableCell(context, record['exit'] as String),
-        _buildTableCell(context, record['total'] as String, bold: true),
-        // ✨ NUEVO: Celda de pausa
-        Padding(
-          padding: AppSpacing.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.md,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                hadBreak ? Icons.coffee : Icons.coffee_outlined,
-                size: 16,
-                color: hadBreak ? colors.warning : colors.textTertiary,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                hadBreak ? 'Sí' : 'No',
-                style: AppTextStyles.bodySmall.copyWith(
-                  fontWeight: hadBreak ? FontWeight.w600 : FontWeight.normal,
+        _buildTableCellWithHover(
+          context,
+          record['date'] as String,
+          index,
+        ),
+        _buildTableCellWithHover(
+          context,
+          record['entrance'] as String,
+          index,
+        ),
+        _buildTableCellWithHover(
+          context,
+          record['exit'] as String,
+          index,
+        ),
+        _buildTableCellWithHover(
+          context,
+          record['total'] as String,
+          index,
+          bold: true,
+        ),
+        // Celda de pausa con hover
+        MouseRegion(
+          onEnter: (_) => setState(() => _hoveredIndex = index),
+          onExit: (_) => setState(() => _hoveredIndex = null),
+          child: Padding(
+            padding: AppSpacing.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.md,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  hadBreak ? Icons.coffee : Icons.coffee_outlined,
+                  size: 16,
                   color: hadBreak ? colors.warning : colors.textTertiary,
                 ),
-              ),
-            ],
+                const SizedBox(width: 4),
+                Text(
+                  hadBreak ? 'Sí' : 'No',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    fontWeight: hadBreak ? FontWeight.w600 : FontWeight.normal,
+                    color: hadBreak ? colors.warning : colors.textTertiary,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-        Padding(
-          padding: AppSpacing.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.md,
-          ),
-          child: ClockingStatusBadge(
-            status: _mapStatusToEnum(record['status'] as String),
+        // Celda de estado con hover
+        MouseRegion(
+          onEnter: (_) => setState(() => _hoveredIndex = index),
+          onExit: (_) => setState(() => _hoveredIndex = null),
+          child: Padding(
+            padding: AppSpacing.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.md,
+            ),
+            child: ClockingStatusBadge(
+              status: _mapStatusToEnum(record['status'] as String),
+            ),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildTableCellWithHover(
+    BuildContext context,
+    String text,
+    int index, {
+    bool bold = false,
+  }) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hoveredIndex = index),
+      onExit: (_) => setState(() => _hoveredIndex = null),
+      child: _buildTableCell(context, text, bold: bold),
     );
   }
 

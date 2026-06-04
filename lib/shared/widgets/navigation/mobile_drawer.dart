@@ -65,61 +65,50 @@ class MobileDrawer extends ConsumerWidget {
       canSuperviseTeam: currentUser?.canSuperviseTeam ?? false,
     );
 
+    final cs = Theme.of(context).colorScheme;
+
     return Drawer(
-      width: 280,
-      child: Column(
-        children: [
-          // Header con avatar y datos de usuario
-          _buildDrawerHeader(context, currentUser),
-
-          // Lista de items de navegación
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: navItems.map((item) {
-                return _buildNavItem(
-                  context,
-                  item,
-                  isSelected: currentRoute == item.route,
-                );
-              }).toList(),
-            ),
-          ),
-
-          // Divider y logout
-          const Divider(),
-          ListTile(
-            leading: Icon(
-              Icons.logout,
-              color: Theme.of(context).colorScheme.error,
-            ),
-            title: Text(
-              'Cerrar Sesión',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: Theme.of(context).colorScheme.error,
+      width: 304,
+      backgroundColor: cs.surface,
+      child: SafeArea(
+        child: Padding(
+          padding: AppSpacing.allLg,
+          child: Column(
+            children: [
+              _buildDrawerHeader(context, currentUser),
+              AppSpacing.verticalSpaceLg,
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    ...navItems.map((item) {
+                      return _buildNavItem(
+                        context,
+                        item,
+                        isSelected: currentRoute == item.route,
+                      );
+                    }),
+                    AppSpacing.verticalSpaceSm,
+                    _buildAccountItem(
+                      context,
+                      isSelected: currentRoute == AppRouter.settings ||
+                          currentRoute == AppRouter.profile,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            onTap: () async {
-              await ref.read(authNotifierProvider.notifier).signOut();
-              if (context.mounted) {
-                context.go(AppRouter.login);
-              }
-            },
-          ),
-
-          // Divider y versión
-          const Divider(),
-          Padding(
-            padding: AppSpacing.allMd,
-            child: Text(
-              'Control Horario v1.0.0',
-              style: AppTextStyles.bodySmall.copyWith(
-                color: Theme.of(context).textTheme.bodySmall?.color,
+              _buildLogoutItem(context, ref),
+              AppSpacing.verticalSpaceSm,
+              Text(
+                'Control Horario v1.0.0',
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: cs.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -129,46 +118,101 @@ class MobileDrawer extends ConsumerWidget {
   /// Usa los datos reales de [currentUser] cuando están disponibles.
   /// Si [currentUser] es null, muestra "Usuario" como fallback.
   Widget _buildDrawerHeader(BuildContext context, UserModel? currentUser) {
+    final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final displayName = currentUser?.fullName ?? 'Usuario';
+    final role = currentUser?.position ?? 'Empleado';
+    final department = currentUser?.department;
+    final email = currentUser?.email;
     final initials = initialsFromName(
       currentUser?.fullName ?? '',
     ); // initialsFromName already handles empty → 'U'
 
-    return DrawerHeader(
+    return Container(
+      width: double.infinity,
+      padding: AppSpacing.allLg,
       decoration: BoxDecoration(
-        gradient: isDark
-            ? AppColorsDark.primaryGradient // Dark brand gradient (cyan→purple)
-            : AppColors.primaryGradient,
+        gradient:
+            isDark ? AppColorsDark.primaryGradient : AppColors.primaryGradient,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        boxShadow: AppShadows.subtleShadow,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Stack(
         children: [
-          // Avatar
-          CircleAvatar(
-            radius: 32,
-            backgroundColor:
-                Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.2),
-            child: Text(
-              initials,
-              style: AppTextStyles.h4.copyWith(
-                color: Theme.of(context).colorScheme.onPrimary,
+          Positioned(
+            right: -32,
+            top: -32,
+            child: Container(
+              width: 96,
+              height: 96,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: cs.onPrimary.withValues(alpha: 0.10),
               ),
             ),
           ),
-
-          AppSpacing.verticalSpaceMd,
-
-          // Nombre — datos reales del provider
-          Text(
-            displayName,
-            style: AppTextStyles.h5.copyWith(
-              color: Theme.of(context).colorScheme.onPrimary,
-              fontWeight: FontWeight.w600,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundColor: cs.onPrimary.withValues(alpha: 0.18),
+                    child: Text(
+                      initials,
+                      style: AppTextStyles.h5.copyWith(
+                        color: cs.onPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  AppSpacing.horizontalSpaceMd,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          displayName,
+                          style: AppTextStyles.h5.copyWith(
+                            color: cs.onPrimary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        AppSpacing.verticalSpaceXs,
+                        Text(
+                          role,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: cs.onPrimary.withValues(alpha: 0.85),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              if (department != null || email != null) ...[
+                AppSpacing.verticalSpaceMd,
+                if (department != null)
+                  _buildHeaderMeta(
+                    context,
+                    icon: Icons.business_outlined,
+                    label: department,
+                  ),
+                if (email != null) ...[
+                  AppSpacing.verticalSpaceXs,
+                  _buildHeaderMeta(
+                    context,
+                    icon: Icons.mail_outline,
+                    label: email,
+                  ),
+                ],
+              ],
+            ],
           ),
         ],
       ),
@@ -182,14 +226,12 @@ class MobileDrawer extends ConsumerWidget {
     required bool isSelected,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
 
     // Si está seleccionado en DARK MODE, usar Container con gradiente cyan
     if (isSelected && isDark) {
       return Container(
-        margin: EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs / 2,
-        ),
+        margin: const EdgeInsets.only(bottom: AppSpacing.xs),
         decoration: BoxDecoration(
           gradient: AppGradients.cardCyanSubtle, // Gradiente cyan (dark mode)
           borderRadius: BorderRadius.circular(8),
@@ -216,36 +258,123 @@ class MobileDrawer extends ConsumerWidget {
     }
 
     // Item normal (seleccionado en light mode o no seleccionado)
-    return ListTile(
-      selected: isSelected,
-      selectedTileColor: Theme.of(
-        context,
-      ).colorScheme.primary.withValues(alpha: 0.1),
-      leading: Icon(
-        item.icon,
-        color: isSelected
-            ? Theme.of(context).colorScheme.primary
-            : (isDark
-                ? AppColorsDark.textPrimary // Blanco en dark
-                : Theme.of(context).colorScheme.onSurface), // Negro en light
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.xs),
+      decoration: BoxDecoration(
+        color: isSelected ? cs.primary.withValues(alpha: 0.10) : null,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
-      title: Text(
-        item.label,
-        style: AppTextStyles.bodyMedium.copyWith(
-          color: isSelected
-              ? Theme.of(context).colorScheme.primary
-              : (isDark
-                  ? AppColorsDark.textPrimary // Blanco en dark
-                  : Theme.of(
-                      context,
-                    ).colorScheme.onSurface), // Negro en light
-          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+      child: ListTile(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         ),
+        leading: Icon(
+          item.icon,
+          color: isSelected
+              ? cs.primary
+              : (isDark ? AppColorsDark.textPrimary : cs.onSurfaceVariant),
+        ),
+        title: Text(
+          item.label,
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: isSelected
+                ? cs.primary
+                : (isDark ? AppColorsDark.textPrimary : cs.onSurface),
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
+        onTap: () {
+          context.go(item.route);
+          Navigator.pop(context);
+        },
       ),
-      onTap: () {
-        context.go(item.route);
-        Navigator.pop(context);
-      },
+    );
+  }
+
+  Widget _buildHeaderMeta(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: cs.onPrimary.withValues(alpha: 0.75)),
+        AppSpacing.horizontalSpaceXs,
+        Expanded(
+          child: Text(
+            label,
+            style: AppTextStyles.labelSmall.copyWith(
+              color: cs.onPrimary.withValues(alpha: 0.80),
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAccountItem(BuildContext context, {required bool isSelected}) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.xs),
+      decoration: BoxDecoration(
+        color: isSelected ? cs.primary.withValues(alpha: 0.10) : null,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      ),
+      child: ListTile(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        ),
+        leading: Icon(
+          Icons.person_outline,
+          color: isSelected ? cs.primary : cs.onSurfaceVariant,
+        ),
+        title: Text(
+          'Mi cuenta',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: isSelected ? cs.primary : cs.onSurface,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
+        onTap: () {
+          context.go(AppRouter.settings);
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
+  Widget _buildLogoutItem(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: cs.error.withValues(alpha: 0.20)),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      ),
+      child: ListTile(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        ),
+        leading: Icon(Icons.logout, color: cs.error),
+        title: Text(
+          'Cerrar sesión',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: cs.error,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        onTap: () async {
+          await ref.read(authNotifierProvider.notifier).signOut();
+          if (context.mounted) {
+            context.go(AppRouter.login);
+          }
+        },
+      ),
     );
   }
 }
