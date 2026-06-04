@@ -326,7 +326,7 @@ void main() {
       // Section titles visible
       expect(find.text('Preferencias'), findsOneWidget);
       expect(find.text('Modo oscuro'), findsOneWidget);
-      expect(find.text('Cuenta'), findsOneWidget);
+      expect(find.text('Mi cuenta'), findsOneWidget);
     });
   });
 

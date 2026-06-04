@@ -69,8 +69,8 @@ void main() {
       expect(find.text('Modo oscuro'), findsOneWidget);
       expect(find.text('Idioma'), findsOneWidget);
 
-      // Cuenta section should still exist
-      expect(find.text('Cuenta'), findsOneWidget);
+      // Cuenta section should still exist (now "Mi cuenta" header)
+      expect(find.text('Mi cuenta'), findsOneWidget);
       expect(find.text('Mi perfil'), findsOneWidget);
 
       // Acerca de section should still exist
