@@ -7,237 +7,689 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
 import '../../../../shared/widgets/cards/custom_card.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
-import '../../../../shared/widgets/layouts/custom_app_bar.dart';
+import '../../../../shared/widgets/navigation/mobile_drawer.dart';
+import '../../../../shared/widgets/navigation/responsive_navigation.dart';
+import '../../../../shared/widgets/floating_page_header.dart';
+import '../../../../shared/widgets/floating_page_shell.dart';
 import '../widgets/profile_edit_dialog.dart';
 import '../../../admin/presentation/widgets/week_schedule_viewer.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../../../auth/models/user_model.dart';
 
-/// Pantalla de perfil del empleado
-///
-/// Muestra la información personal y laboral del usuario.
-/// Conectada con Firebase a través de currentUserProvider.
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isMobile = context.isMobile || context.isTablet;
     final userAsync = ref.watch(currentUserProvider);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: const CustomAppBar(
-        title: 'Mi Perfil',
-        automaticallyImplyLeading: true,
-      ),
-      body: userAsync.when(
-        data: (user) {
-          if (user == null) {
-            return _buildNoUserError(context);
-          }
-          return _buildProfileContent(context, user);
-        },
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        error: (error, stackTrace) => _buildErrorState(context, error),
-      ),
-    );
-  }
-
-  /// Contenido del perfil cuando hay datos del usuario
-  Widget _buildProfileContent(BuildContext context, UserModel user) {
-    final dateFormatter = DateFormat('dd/MM/yyyy');
-    final joinDate = user.fechaInicio != null
-        ? dateFormatter.format(user.fechaInicio!)
-        : dateFormatter.format(user.createdAt);
-
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(
-        context.responsiveValue(
-          mobile: AppSpacing.lg,
-          tablet: AppSpacing.xxl,
-          desktop: AppSpacing.xxxl,
-        ),
-      ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 800),
-          child: Column(
-            children: [
-              // Header con avatar grande
-              _buildProfileHeader(context, user),
-
-              AppSpacing.verticalSpaceXxl,
-
-              // Información personal
-              _buildInfoSection(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      drawer: isMobile ? const MobileDrawer() : null,
+      body: ResponsiveNavigation(
+        child: userAsync.when(
+          data: (user) {
+            if (user == null) {
+              return _buildScaffoldBody(
                 context,
-                title: 'Información Personal',
-                icon: Icons.person,
-                items: [
-                  _InfoItem(
-                    label: 'Nombre completo',
-                    value: user.fullName,
-                    icon: Icons.badge,
-                  ),
-                  _InfoItem(
-                    label: 'Correo electrónico',
-                    value: user.email,
-                    icon: Icons.email,
-                  ),
-                  _InfoItem(
-                    label: 'ID Empleado',
-                    value: user.employeeId,
-                    icon: Icons.tag,
-                  ),
-                  if (user.dni != null)
-                    _InfoItem(
-                      label: 'DNI/NIE',
-                      value: user.dni!,
-                      icon: Icons.credit_card,
-                    ),
-                  if (user.telefono != null)
-                    _InfoItem(
-                      label: 'Teléfono',
-                      value: user.telefono!,
-                      icon: Icons.phone,
-                    ),
-                ],
-              ),
-
-              AppSpacing.verticalSpaceLg,
-
-              // Información laboral
-              _buildInfoSection(
-                context,
-                title: 'Información Laboral',
-                icon: Icons.work,
-                items: [
-                  _InfoItem(
-                    label: 'Puesto',
-                    value: user.position ?? 'Sin asignar',
-                    icon: Icons.work_outline,
-                  ),
-                  _InfoItem(
-                    label: 'Departamento',
-                    value: user.department ?? 'Sin asignar',
-                    icon: Icons.business,
-                  ),
-                  if (user.empresa != null)
-                    _InfoItem(
-                      label: 'Empresa',
-                      value: user.empresa!,
-                      icon: Icons.apartment,
-                    ),
-                  _InfoItem(
-                    label: 'Fecha de ingreso',
-                    value: joinDate,
-                    icon: Icons.calendar_today,
-                  ),
-                  _InfoItem(
-                    label: 'Horario asignado',
-                    value: user.schedule ?? 'Consultar RRHH',
-                    icon: Icons.schedule,
-                  ),
-                  _InfoItem(
-                    label: 'Horas semanales',
-                    value: '${user.weeklyHours}h/semana',
-                    icon: Icons.access_time,
-                  ),
-                ],
-              ),
-
-              AppSpacing.verticalSpaceLg,
-
-              // Mi Horario Laboral
-              _buildInfoSection(
-                context,
-                title: 'Mi Horario Laboral',
-                icon: Icons.schedule,
-                items: [
-                  _InfoItem(
-                    label: 'Horario contratado',
-                    value: '${user.weeklyHours}h/semana',
-                    icon: Icons.access_time,
-                  ),
-                ],
-              ),
-
-              AppSpacing.verticalSpaceSm,
-
-              CustomCard(
-                elevation: CardElevation.low,
-                padding: AppSpacing.card,
-                child: Column(
-                  children: [
-                    WeekScheduleViewer(
-                      employeeId: user.employeeId,
-                      isReadOnly: true,
-                    ),
-                    AppSpacing.verticalSpaceMd,
-                    Container(
-                      padding: AppSpacing.allMd,
-                      decoration: BoxDecoration(
-                        color: AppColors.info.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusSm,
-                        ),
-                        border: Border.all(
-                          color: AppColors.info.withValues(alpha: 0.3),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.info_outline,
-                            size: 16,
-                            color: AppColors.info,
-                          ),
-                          AppSpacing.horizontalSpaceSm,
-                          Expanded(
-                            child: Text(
-                              'Para cambios en tu horario, contacta a Recursos Humanos',
-                              style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.info,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              AppSpacing.verticalSpaceXxl,
-
-              // Botón editar
-              CustomButton(
-                text: 'Editar Perfil',
-                icon: Icons.edit,
-                variant: ButtonVariant.primary,
-                fullWidth: context.isMobile,
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => ProfileEditDialog(
-                      user: user,
-                      onSave: (updatedData) {
-                        // La actualización se maneja dentro del dialog
-                      },
-                    ),
-                  );
-                },
-              ),
-            ],
+                isMobile,
+                _buildNoUserError(context),
+              );
+            }
+            return _buildScaffoldBody(
+              context,
+              isMobile,
+              _buildProfileContent(context, ref, user),
+            );
+          },
+          loading: () => Center(
+            child: CircularProgressIndicator(),
+          ),
+          error: (error, stackTrace) => _buildScaffoldBody(
+            context,
+            isMobile,
+            _buildErrorState(context, error),
           ),
         ),
       ),
     );
   }
 
-  /// Estado de error cuando no hay usuario autenticado
+  Widget _buildScaffoldBody(
+    BuildContext context,
+    bool isMobile,
+    Widget content,
+  ) {
+    if (context.isDesktop) {
+      return FloatingPageShell(
+        header: _buildHeader(context, context, isMobile: false),
+        child: content,
+      );
+    }
+
+    return Column(
+      children: [
+        Builder(
+          builder: (scaffoldContext) =>
+              _buildHeader(context, scaffoldContext, isMobile: true),
+        ),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(
+              context.responsiveValue(
+                mobile: AppSpacing.lg,
+                tablet: AppSpacing.xxl,
+                desktop: AppSpacing.xxxl,
+              ),
+            ),
+            child: content,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeader(
+    BuildContext context,
+    BuildContext scaffoldContext, {
+    required bool isMobile,
+  }) {
+    return FloatingPageHeader(
+      title: 'Mi Perfil',
+      icon: Icons.person,
+      scaffoldContext: scaffoldContext,
+      isMobile: isMobile,
+    );
+  }
+
+  Widget _buildProfileContent(
+    BuildContext context,
+    WidgetRef ref,
+    UserModel user,
+  ) {
+    final cs = Theme.of(context).colorScheme;
+    final dateFormatter = DateFormat('dd/MM/yyyy');
+    final joinDate = user.fechaInicio != null
+        ? dateFormatter.format(user.fechaInicio!)
+        : dateFormatter.format(user.createdAt);
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 900),
+        child: Column(
+          children: [
+            _buildProfileHero(context, cs, user, joinDate, ref),
+            AppSpacing.verticalSpaceLg,
+            ..._buildInfoGrid(cs, user, joinDate, context, ref),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileHero(
+    BuildContext context,
+    ColorScheme cs,
+    UserModel user,
+    String joinDate,
+    WidgetRef ref,
+  ) {
+    final roleText = _roleLabel(user.role);
+    final isDesktop = context.isDesktop;
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            cs.primary,
+            Color.lerp(cs.primary, cs.secondary, 0.3)!,
+          ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: cs.primary.withValues(alpha: 0.25),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            right: -30,
+            top: -30,
+            child: Container(
+              width: 140,
+              height: 140,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: cs.onPrimary.withValues(alpha: 0.08),
+              ),
+            ),
+          ),
+          Positioned(
+            left: -20,
+            bottom: -20,
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: cs.secondary.withValues(alpha: 0.15),
+              ),
+            ),
+          ),
+          Padding(
+            padding:
+                EdgeInsets.all(isDesktop ? AppSpacing.xxxl : AppSpacing.xxl),
+            child: isDesktop
+                ? _buildHeroDesktop(context, cs, user, roleText, joinDate, ref)
+                : _buildHeroMobile(context, cs, user, roleText, joinDate, ref),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeroDesktop(
+    BuildContext context,
+    ColorScheme cs,
+    UserModel user,
+    String roleText,
+    String joinDate,
+    WidgetRef ref,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          width: 88,
+          height: 88,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: cs.onPrimary.withValues(alpha: 0.3),
+              width: 3,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: cs.shadow.withValues(alpha: 0.2),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: CircleAvatar(
+            radius: 44,
+            backgroundColor: cs.onPrimary.withValues(alpha: 0.15),
+            child: Icon(Icons.person, size: 44, color: cs.onPrimary),
+          ),
+        ),
+        AppSpacing.horizontalSpaceXl,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      user.fullName,
+                      style: AppTextStyles.h2.copyWith(
+                        color: cs.onPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  AppSpacing.horizontalSpaceSm,
+                  Container(
+                    padding: AppSpacing.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.xs,
+                    ),
+                    decoration: BoxDecoration(
+                      color: user.isActive
+                          ? cs.onPrimary.withValues(alpha: 0.2)
+                          : cs.error.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCircular,
+                      ),
+                    ),
+                    child: Text(
+                      user.isActive ? 'Activo' : 'Inactivo',
+                      style: AppTextStyles.labelSmall.copyWith(
+                        color: cs.onPrimary,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              AppSpacing.verticalSpaceXs,
+              Row(
+                children: [
+                  Icon(
+                    Icons.badge,
+                    size: 16,
+                    color: cs.onPrimary.withValues(alpha: 0.7),
+                  ),
+                  AppSpacing.horizontalSpaceXs,
+                  Text(
+                    '$roleText · #${user.employeeId}',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: cs.onPrimary.withValues(alpha: 0.85),
+                    ),
+                  ),
+                ],
+              ),
+              AppSpacing.verticalSpaceXs,
+              Row(
+                children: [
+                  Icon(
+                    Icons.calendar_today,
+                    size: 14,
+                    color: cs.onPrimary.withValues(alpha: 0.6),
+                  ),
+                  AppSpacing.horizontalSpaceXs,
+                  Text(
+                    'Ingreso: $joinDate',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: cs.onPrimary.withValues(alpha: 0.7),
+                    ),
+                  ),
+                  if (user.department != null) ...[
+                    AppSpacing.horizontalSpaceMd,
+                    Icon(
+                      Icons.business,
+                      size: 14,
+                      color: cs.onPrimary.withValues(alpha: 0.6),
+                    ),
+                    AppSpacing.horizontalSpaceXs,
+                    Flexible(
+                      child: Text(
+                        user.department!,
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: cs.onPrimary.withValues(alpha: 0.7),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ),
+        ),
+        AppSpacing.horizontalSpaceLg,
+        CustomButton(
+          text: 'Editar',
+          icon: Icons.edit,
+          variant: ButtonVariant.secondary,
+          size: ButtonSize.medium,
+          onPressed: () => _openEditDialog(context, ref, user),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeroMobile(
+    BuildContext context,
+    ColorScheme cs,
+    UserModel user,
+    String roleText,
+    String joinDate,
+    WidgetRef ref,
+  ) {
+    return Column(
+      children: [
+        Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: cs.onPrimary.withValues(alpha: 0.3),
+              width: 3,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: cs.shadow.withValues(alpha: 0.2),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: CircleAvatar(
+            radius: 40,
+            backgroundColor: cs.onPrimary.withValues(alpha: 0.15),
+            child: Icon(Icons.person, size: 40, color: cs.onPrimary),
+          ),
+        ),
+        AppSpacing.verticalSpaceMd,
+        Text(
+          user.fullName,
+          style: AppTextStyles.h3.copyWith(
+            color: cs.onPrimary,
+            fontWeight: FontWeight.w700,
+          ),
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        AppSpacing.verticalSpaceXs,
+        Container(
+          padding: AppSpacing.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.xs,
+          ),
+          decoration: BoxDecoration(
+            color: user.isActive
+                ? cs.onPrimary.withValues(alpha: 0.2)
+                : cs.error.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusCircular),
+          ),
+          child: Text(
+            user.isActive ? 'Activo' : 'Inactivo',
+            style: AppTextStyles.labelSmall.copyWith(
+              color: cs.onPrimary,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ),
+        AppSpacing.verticalSpaceXs,
+        Text(
+          '$roleText · #${user.employeeId}',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: cs.onPrimary.withValues(alpha: 0.85),
+          ),
+          textAlign: TextAlign.center,
+        ),
+        AppSpacing.verticalSpaceXs,
+        Text(
+          'Ingreso: $joinDate',
+          style: AppTextStyles.bodySmall.copyWith(
+            color: cs.onPrimary.withValues(alpha: 0.7),
+          ),
+          textAlign: TextAlign.center,
+        ),
+        if (user.department != null)
+          Text(
+            user.department!,
+            style: AppTextStyles.bodySmall.copyWith(
+              color: cs.onPrimary.withValues(alpha: 0.7),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        AppSpacing.verticalSpaceLg,
+        CustomButton(
+          text: 'Editar Perfil',
+          icon: Icons.edit,
+          variant: ButtonVariant.secondary,
+          size: ButtonSize.medium,
+          fullWidth: true,
+          onPressed: () => _openEditDialog(context, ref, user),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _buildInfoGrid(
+    ColorScheme cs,
+    UserModel user,
+    String joinDate,
+    BuildContext context,
+    WidgetRef ref,
+  ) {
+    final personalItems = _buildPersonalItems(user);
+    final laboralItems = _buildLaboralItems(user, joinDate);
+
+    if (context.isDesktop) {
+      return [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: _buildInfoSectionCard(
+                cs,
+                title: 'Información Personal',
+                icon: Icons.person,
+                iconColor: cs.primary,
+                items: personalItems,
+              ),
+            ),
+            AppSpacing.horizontalSpaceLg,
+            Expanded(
+              child: _buildInfoSectionCard(
+                cs,
+                title: 'Información Laboral',
+                icon: Icons.work,
+                iconColor: cs.secondary,
+                items: laboralItems,
+              ),
+            ),
+          ],
+        ),
+        AppSpacing.verticalSpaceLg,
+        _buildScheduleCard(cs, user),
+      ];
+    }
+
+    return [
+      _buildInfoSectionCard(
+        cs,
+        title: 'Información Personal',
+        icon: Icons.person,
+        iconColor: cs.primary,
+        items: personalItems,
+      ),
+      AppSpacing.verticalSpaceMd,
+      _buildInfoSectionCard(
+        cs,
+        title: 'Información Laboral',
+        icon: Icons.work,
+        iconColor: cs.secondary,
+        items: laboralItems,
+      ),
+      AppSpacing.verticalSpaceMd,
+      _buildScheduleCard(cs, user),
+    ];
+  }
+
+  Widget _buildInfoSectionCard(
+    ColorScheme cs, {
+    required String title,
+    required IconData icon,
+    required Color iconColor,
+    required List<Widget> items,
+  }) {
+    return CustomCard(
+      elevation: CardElevation.low,
+      padding: AppSpacing.cardLarge,
+      borderRadius: AppSpacing.radiusLg,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: AppSpacing.allXs,
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+                ),
+                child: Icon(icon, size: AppSpacing.iconMd, color: iconColor),
+              ),
+              AppSpacing.horizontalSpaceSm,
+              Text(title, style: AppTextStyles.h5),
+            ],
+          ),
+          AppSpacing.verticalSpaceLg,
+          ...items,
+          if (items.isNotEmpty) AppSpacing.verticalSpaceSm,
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildPersonalItems(UserModel user) {
+    final items = <Widget>[
+      _InfoTile(
+        icon: Icons.badge,
+        label: 'Nombre completo',
+        value: user.fullName,
+      ),
+      _InfoTile(
+        icon: Icons.email,
+        label: 'Correo electrónico',
+        value: user.email,
+      ),
+      _InfoTile(
+        icon: Icons.tag,
+        label: 'ID Empleado',
+        value: user.employeeId,
+      ),
+    ];
+
+    if (user.dni != null) {
+      items.add(_InfoTile(
+        icon: Icons.credit_card,
+        label: 'DNI/NIE',
+        value: user.dni!,
+      ));
+    }
+
+    if (user.telefono != null) {
+      items.add(_InfoTile(
+        icon: Icons.phone,
+        label: 'Teléfono',
+        value: user.telefono!,
+      ));
+    }
+
+    return items;
+  }
+
+  List<Widget> _buildLaboralItems(UserModel user, String joinDate) {
+    return [
+      _InfoTile(
+        icon: Icons.work_outline,
+        label: 'Puesto',
+        value: user.position ?? 'Sin asignar',
+      ),
+      _InfoTile(
+        icon: Icons.business,
+        label: 'Departamento',
+        value: user.department ?? 'Sin asignar',
+      ),
+      if (user.empresa != null)
+        _InfoTile(
+          icon: Icons.apartment,
+          label: 'Empresa',
+          value: user.empresa!,
+        ),
+      _InfoTile(
+        icon: Icons.calendar_today,
+        label: 'Fecha de ingreso',
+        value: joinDate,
+      ),
+      _InfoTile(
+        icon: Icons.schedule,
+        label: 'Horario asignado',
+        value: user.schedule ?? 'Consultar RRHH',
+      ),
+      _InfoTile(
+        icon: Icons.access_time,
+        label: 'Horas semanales',
+        value: '${user.weeklyHours}h/semana',
+      ),
+    ];
+  }
+
+  Widget _buildScheduleCard(ColorScheme cs, UserModel user) {
+    return CustomCard(
+      elevation: CardElevation.low,
+      padding: AppSpacing.cardLarge,
+      borderRadius: AppSpacing.radiusLg,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: AppSpacing.allXs,
+                decoration: BoxDecoration(
+                  color: AppColors.info.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+                ),
+                child: const Icon(
+                  Icons.schedule,
+                  size: 20,
+                  color: AppColors.info,
+                ),
+              ),
+              AppSpacing.horizontalSpaceSm,
+              Text('Mi Horario Laboral', style: AppTextStyles.h5),
+            ],
+          ),
+          AppSpacing.verticalSpaceMd,
+          WeekScheduleViewer(
+            employeeId: user.employeeId,
+            isReadOnly: true,
+          ),
+          AppSpacing.verticalSpaceMd,
+          Container(
+            padding: AppSpacing.allMd,
+            decoration: BoxDecoration(
+              color: AppColors.info.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+              border: Border.all(
+                color: AppColors.info.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.info_outline,
+                  size: 16,
+                  color: AppColors.info,
+                ),
+                AppSpacing.horizontalSpaceSm,
+                Expanded(
+                  child: Text(
+                    'Para cambios en tu horario, contacta a Recursos Humanos',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.info,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openEditDialog(BuildContext context, WidgetRef ref, UserModel user) {
+    showDialog(
+      context: context,
+      builder: (context) => ProfileEditDialog(
+        user: user,
+        onSave: (updatedData) {},
+      ),
+    );
+  }
+
   Widget _buildNoUserError(BuildContext context) {
     return Center(
       child: Padding(
@@ -270,7 +722,6 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  /// Estado de error general
   Widget _buildErrorState(BuildContext context, Object error) {
     return Center(
       child: Padding(
@@ -303,107 +754,68 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context, UserModel user) {
-    // Obtener el rol en texto
-    String roleText;
-    switch (user.role) {
+  String _roleLabel(UserRole role) {
+    switch (role) {
       case UserRole.admin:
-        roleText = 'Administrador';
-        break;
+        return 'Administrador';
       case UserRole.rrhh:
-        roleText = 'Recursos Humanos';
-        break;
+        return 'Recursos Humanos';
       case UserRole.employee:
-        roleText = 'Empleado';
-        break;
+        return 'Empleado';
     }
+  }
+}
 
-    return CustomCard(
-      elevation: CardElevation.low,
-      padding: AppSpacing.allXxl,
-      child: Column(
+class _InfoTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _InfoTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: AppSpacing.verticalSm,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Avatar grande
           Container(
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                  color: Theme.of(context).colorScheme.primary, width: 4),
-              boxShadow: [
-                BoxShadow(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .primary
-                      .withValues(alpha: 0.3),
-                  blurRadius: 16,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              color: cs.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
             ),
-            child: CircleAvatar(
-              radius: 60,
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              child: Icon(
-                Icons.person,
-                size: 60,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
+            child: Icon(
+              icon,
+              size: 20,
+              color: cs.primary,
             ),
           ),
-
-          AppSpacing.verticalSpaceLg,
-
-          // Nombre
-          Text(
-            user.fullName,
-            style: AppTextStyles.h2,
-            textAlign: TextAlign.center,
-          ),
-
-          AppSpacing.verticalSpaceXs,
-
-          // Puesto
-          Text(
-            user.position ?? 'Sin asignar',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-            textAlign: TextAlign.center,
-          ),
-
-          AppSpacing.verticalSpaceMd,
-
-          // Badge de rol
-          Container(
-            padding: AppSpacing.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.sm,
-            ),
-            decoration: BoxDecoration(
-              color:
-                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-              border: Border.all(
-                color: Theme.of(context)
-                    .colorScheme
-                    .primary
-                    .withValues(alpha: 0.3),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
+          AppSpacing.horizontalSpaceMd,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.verified_user,
-                  size: 16,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                AppSpacing.horizontalSpaceSm,
                 Text(
-                  roleText,
-                  style: AppTextStyles.labelMedium.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
+                  label,
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: cs.onSurfaceVariant,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+                AppSpacing.verticalSpaceXs,
+                Text(
+                  value,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -413,90 +825,4 @@ class ProfileScreen extends ConsumerWidget {
       ),
     );
   }
-
-  Widget _buildInfoSection(
-    BuildContext context, {
-    required String title,
-    required IconData icon,
-    required List<_InfoItem> items,
-  }) {
-    return CustomCard(
-      elevation: CardElevation.low,
-      padding: AppSpacing.cardLarge,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Título de la sección
-          Row(
-            children: [
-              Icon(icon, size: AppSpacing.iconMd, color: AppColors.primary),
-              AppSpacing.horizontalSpaceSm,
-              Expanded(child: Text(title, style: AppTextStyles.h5)),
-            ],
-          ),
-
-          AppSpacing.verticalSpaceLg,
-
-          // Items de información
-          ...items.map((item) {
-            return Padding(
-              padding: AppSpacing.verticalSm,
-              child: _buildInfoItem(context, item),
-            );
-          }),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoItem(BuildContext context, _InfoItem item) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Ícono
-        Container(
-          padding: AppSpacing.allXs,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
-          ),
-          child: Icon(item.icon,
-              size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
-        ),
-
-        AppSpacing.horizontalSpaceMd,
-
-        // Label y valor
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                item.label,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-              ),
-              AppSpacing.verticalSpaceXs,
-              Text(
-                item.value,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Clase helper para items de información
-class _InfoItem {
-  final String label;
-  final String value;
-  final IconData icon;
-
-  _InfoItem({required this.label, required this.value, required this.icon});
 }
