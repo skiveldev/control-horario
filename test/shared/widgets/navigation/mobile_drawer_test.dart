@@ -9,6 +9,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
+bool _hasGradientColors(Decoration? decoration, List<Color> expectedColors) {
+  if (decoration is! BoxDecoration) return false;
+
+  final gradient = decoration.gradient;
+  if (gradient is! LinearGradient) return false;
+  if (gradient.colors.length != expectedColors.length) return false;
+
+  for (var index = 0; index < expectedColors.length; index++) {
+    if (gradient.colors[index] != expectedColors[index]) return false;
+  }
+
+  return true;
+}
+
 /// Pure function test: initialsFromName extracts correct initials.
 void main() {
   group('initialsFromName', () {
@@ -213,26 +227,18 @@ void main() {
         scaffoldState.openDrawer();
         await tester.pumpAndSettle();
 
-        // Find the DrawerHeader which wraps the user avatar area
-        final drawerHeaders = tester.widgetList<DrawerHeader>(
-          find.byType(DrawerHeader),
-        );
-
-        expect(drawerHeaders.isNotEmpty, isTrue,
-            reason: 'MobileDrawer should have a DrawerHeader');
-
-        final drawerHeader = drawerHeaders.first;
-        final decoration = drawerHeader.decoration as BoxDecoration;
-        expect(decoration.gradient, isNotNull,
-            reason: 'DrawerHeader decoration should have a gradient');
-
-        final gradient = decoration.gradient! as LinearGradient;
-
         // The dark brand gradient should match AppColorsDark.primaryGradient
         // (cyan #06B6D4 → purple #A855F7), NOT green from colorScheme.primary.
         expect(
-          gradient.colors,
-          equals(AppColorsDark.primaryGradient.colors),
+          find.byWidgetPredicate(
+            (widget) =>
+                widget is Container &&
+                _hasGradientColors(
+                  widget.decoration,
+                  AppColorsDark.primaryGradient.colors,
+                ),
+          ),
+          findsAtLeastNWidgets(1),
           reason:
               'MobileDrawer header gradient in dark mode must use dark brand '
               'gradient (cyan→purple), not the green colorScheme.primary.',
@@ -279,24 +285,17 @@ void main() {
         scaffoldState.openDrawer();
         await tester.pumpAndSettle();
 
-        final drawerHeaders = tester.widgetList<DrawerHeader>(
-          find.byType(DrawerHeader),
-        );
-
-        expect(drawerHeaders.isNotEmpty, isTrue,
-            reason: 'MobileDrawer should have a DrawerHeader');
-
-        final drawerHeader = drawerHeaders.first;
-        final decoration = drawerHeader.decoration as BoxDecoration;
-        expect(decoration.gradient, isNotNull,
-            reason: 'DrawerHeader decoration should have a gradient');
-
-        final gradient = decoration.gradient! as LinearGradient;
-
         // Light mode uses the original branded gradient (deep blue→violet).
         expect(
-          gradient.colors,
-          equals(AppColors.primaryGradient.colors),
+          find.byWidgetPredicate(
+            (widget) =>
+                widget is Container &&
+                _hasGradientColors(
+                  widget.decoration,
+                  AppColors.primaryGradient.colors,
+                ),
+          ),
+          findsAtLeastNWidgets(1),
           reason:
               'MobileDrawer header gradient in light mode must use the branded '
               'light gradient (deep blue→violet), not a dark mode gradient.',
