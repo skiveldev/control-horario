@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../shared/widgets/layouts/admin_layout.dart';
 import '../../../dashboard/models/overtime_request_model.dart';
 import '../../../dashboard/providers/overtime_provider.dart';
 import '../../../dashboard/services/overtime_service.dart';
@@ -107,13 +109,18 @@ class OvertimeReviewScreen extends ConsumerWidget {
 
     final cs = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Revisión de Horas Extra')),
-      body: Padding(
-        padding: AppSpacing.allLg,
-        child: requests.isEmpty
-            ? _buildEmptyState(cs)
-            : _buildRequestList(context, ref, requests, isProcessing, cs),
+    return AdminLayout(
+      currentRoute: AppRouter.adminOvertime,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Revisión de Horas Extra', style: AppTextStyles.h3),
+          AppSpacing.verticalSpaceMd,
+          if (requests.isEmpty)
+            _buildEmptyState(cs)
+          else
+            _buildRequestList(context, ref, requests, isProcessing, cs),
+        ],
       ),
     );
   }
@@ -144,6 +151,8 @@ class OvertimeReviewScreen extends ConsumerWidget {
   ) {
     final notifier = ref.read(overtimeReviewScreenProvider.notifier);
     return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: requests.length,
       itemBuilder: (context, index) {
         final request = requests[index];

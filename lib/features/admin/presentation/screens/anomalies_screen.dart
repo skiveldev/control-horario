@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../shared/widgets/layouts/admin_layout.dart';
 import '../../../admin/models/schedule_model.dart';
 import '../../../dashboard/models/anomaly_model.dart';
 import '../../../dashboard/models/time_record_model.dart';
@@ -92,25 +94,20 @@ class AnomaliesScreen extends ConsumerWidget {
     final isDetecting = state.isDetecting;
     final cs = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Detección de Anomalías')),
-      body: Padding(
-        padding: AppSpacing.allLg,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Botón Detectar
-            _buildDetectButton(ref, isDetecting),
-            AppSpacing.verticalSpaceLg,
-
-            // Lista de anomalías
-            Expanded(
-              child: anomalies.isEmpty
-                  ? _buildEmptyState(isDetecting, cs)
-                  : _buildAnomalyList(anomalies, cs),
-            ),
-          ],
-        ),
+    return AdminLayout(
+      currentRoute: AppRouter.adminAnomalies,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Detección de Anomalías', style: AppTextStyles.h3),
+          AppSpacing.verticalSpaceMd,
+          _buildDetectButton(ref, isDetecting),
+          AppSpacing.verticalSpaceLg,
+          if (anomalies.isEmpty)
+            _buildEmptyState(isDetecting, cs)
+          else
+            _buildAnomalyList(anomalies, cs),
+        ],
       ),
     );
   }
@@ -175,6 +172,8 @@ class AnomaliesScreen extends ConsumerWidget {
 
   Widget _buildAnomalyList(List<AnomalyModel> anomalies, ColorScheme cs) {
     return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.only(bottom: AppSpacing.xl),
       itemCount: anomalies.length,
       itemBuilder: (context, index) {

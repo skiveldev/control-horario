@@ -2,9 +2,11 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../shared/widgets/layouts/admin_layout.dart';
 import '../../../dashboard/services/report_service.dart';
 
 /// Provider para el servicio de reportes (sobreescribible en tests)
@@ -126,28 +128,27 @@ class ReportsScreen extends ConsumerWidget {
     final hasPdf = state.hasPdf;
     final selectedMonth = state.selectedMonth;
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Generar Reportes')),
-      body: Padding(
-        padding: AppSpacing.allLg,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Período
-            _buildPeriodSection(ref, context, selectedMonth),
-            AppSpacing.verticalSpaceLg,
+    return AdminLayout(
+      currentRoute: AppRouter.adminReports,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Generar Reportes', style: AppTextStyles.h3),
+          AppSpacing.verticalSpaceMd,
+          // Período
+          _buildPeriodSection(ref, context, selectedMonth),
+          AppSpacing.verticalSpaceLg,
 
-            // Botón de generar
-            _buildGenerateButton(ref, isGenerating),
-            AppSpacing.verticalSpaceLg,
+          // Botón de generar
+          _buildGenerateButton(ref, isGenerating),
+          AppSpacing.verticalSpaceLg,
 
-            // Estado / resultado
-            if (isGenerating)
-              const Center(child: CircularProgressIndicator())
-            else if (hasPdf)
-              _buildPdfReadyBanner(),
-          ],
-        ),
+          // Estado / resultado
+          if (isGenerating)
+            const Center(child: CircularProgressIndicator())
+          else if (hasPdf)
+            _buildPdfReadyBanner(),
+        ],
       ),
     );
   }
