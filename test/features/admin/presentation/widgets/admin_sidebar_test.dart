@@ -226,10 +226,13 @@ void main() {
       await tester.pumpAndSettle();
 
       // Find the brand header Container: the one with a bottom border
-      // (only the header has a bottom border; logout button uses a top border)
+      // (only the header has a bottom border AND explicit height: 64;
+      //  outer container now also carries a BoxDecoration with a right border,
+      //  so minHeight==64 disambiguates).
       final headerFinder = find.byWidgetPredicate(
         (w) =>
             w is Container &&
+            w.constraints?.minHeight == 64 &&
             w.decoration is BoxDecoration &&
             (w.decoration as BoxDecoration).border?.bottom != null,
       );
@@ -295,10 +298,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Find brand header Container
+      // Find brand header Container (minHeight==64 disambiguates from
+      // the outer container which now also has a BoxDecoration+border)
       final headerFinder = find.byWidgetPredicate(
         (w) =>
             w is Container &&
+            w.constraints?.minHeight == 64 &&
             w.decoration is BoxDecoration &&
             (w.decoration as BoxDecoration).border?.bottom != null,
       );

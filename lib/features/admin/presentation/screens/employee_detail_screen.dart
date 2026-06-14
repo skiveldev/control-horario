@@ -5,10 +5,10 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
-import '../../../../shared/widgets/layouts/custom_app_bar.dart';
+import '../../../../core/router/app_router.dart';
+import '../../../../shared/widgets/layouts/admin_layout.dart';
 import '../../../../shared/widgets/cards/custom_card.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
-import '../../../dashboard/presentation/widgets/records_table.dart';
 import '../widgets/week_schedule_viewer.dart';
 import '../widgets/employee_schedule_editor_modal.dart';
 import '../widgets/employee_info_editor_modal.dart';
@@ -34,13 +34,9 @@ class EmployeeDetailScreen extends ConsumerWidget {
     final employeeAsync = ref.watch(userByIdProvider(employeeId));
     final cs = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: const CustomAppBar(
-        title: 'Detalle de Empleado',
-        automaticallyImplyLeading: true,
-      ),
-      body: employeeAsync.when(
+    return AdminLayout(
+      currentRoute: AppRouter.adminEmployees,
+      child: employeeAsync.when(
         data: (employee) {
           if (employee == null) {
             return _buildNotFound(context, cs);
@@ -57,222 +53,617 @@ class EmployeeDetailScreen extends ConsumerWidget {
 
   Widget _buildContent(
       BuildContext context, ColorScheme cs, WidgetRef ref, UserModel employee) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(
-        context.responsiveValue(
-          mobile: AppSpacing.lg,
-          tablet: AppSpacing.xxl,
-          desktop: AppSpacing.xxxl,
+    final isDesktop = context.isDesktop;
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1000),
+        child: Column(
+          children: [
+            // ── HERO CARD ──────────────────────────────────────────────
+            _buildHeroCard(context, cs, employee),
+
+            AppSpacing.verticalSpaceXl,
+
+            // ── TWO-COLUMN / STACKED LAYOUT ────────────────────────────
+            if (isDesktop)
+              _buildDesktopGrid(context, cs, ref, employee)
+            else
+              _buildMobileStack(context, cs, ref, employee),
+
+            AppSpacing.verticalSpaceXl,
+
+            // ── RECORDS CARD ───────────────────────────────────────────
+            _buildRecordsCard(context, cs),
+
+            // ── MOBILE EDIT BUTTON ─────────────────────────────────────
+            if (!isDesktop) ...[
+              AppSpacing.verticalSpaceXl,
+              CustomButton(
+                text: 'Editar Empleado',
+                icon: Icons.edit,
+                variant: ButtonVariant.primary,
+                fullWidth: true,
+                onPressed: () => _showInfoEditorModal(context, employee),
+              ),
+            ],
+          ],
         ),
       ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1000),
-          child: Column(
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // HERO CARD
+  // ═══════════════════════════════════════════════════════════════════════
+
+  Widget _buildHeroCard(
+      BuildContext context, ColorScheme cs, UserModel employee) {
+    final isMobile = context.isMobile;
+
+    return CustomCard(
+      elevation: CardElevation.medium,
+      padding: AppSpacing.cardLarge,
+      child: Flex(
+        direction: isMobile ? Axis.vertical : Axis.horizontal,
+        mainAxisAlignment: isMobile
+            ? MainAxisAlignment.center
+            : MainAxisAlignment.spaceBetween,
+        crossAxisAlignment:
+            isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+        children: [
+          // Left: Avatar + info
+          Flex(
+            direction: isMobile ? Axis.vertical : Axis.horizontal,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment:
+                isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
             children: [
-              // Header del empleado
-              CustomCard(
-                elevation: CardElevation.low,
-                padding: AppSpacing.cardLarge,
-                child: Row(
-                  children: [
-                    // Avatar
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: AppColors.primary,
-                      child: Text(
-                        _getInitials(employee.displayName),
-                        style: AppTextStyles.h3.copyWith(
-                          color: AppColors.textOnPrimary,
-                        ),
-                      ),
-                    ),
+              // Bigger avatar
+              _buildHeroAvatar(cs, employee),
+              if (isMobile) AppSpacing.verticalSpaceMd,
+              if (!isMobile) AppSpacing.horizontalSpaceXl,
+              // Name + details
+              Flexible(
+                child: _buildHeroInfo(context, cs, employee, isMobile),
+              ),
+            ],
+          ),
 
-                    AppSpacing.horizontalSpaceLg,
+          // Right: Action buttons (desktop only)
+          if (!isMobile) _buildHeroActions(context, cs, employee),
+        ],
+      ),
+    );
+  }
 
-                    // Información
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            employee.fullName,
-                            style: AppTextStyles.h3,
-                          ),
-                          AppSpacing.verticalSpaceXs,
-                          Text(
-                            employee.position ?? 'Sin cargo asignado',
-                            style: AppTextStyles.bodyLarge.copyWith(
-                              color: cs.onSurfaceVariant,
-                            ),
-                          ),
-                          AppSpacing.verticalSpaceSm,
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.email,
-                                size: 16,
-                                color: cs.onSurfaceVariant,
-                              ),
-                              const SizedBox(width: 4),
-                              Flexible(
-                                child: Text(
-                                  employee.email,
-                                  style: AppTextStyles.bodySmall.copyWith(
-                                    color: cs.onSurfaceVariant,
-                                    fontStyle: FontStyle.italic,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
+  Widget _buildHeroAvatar(ColorScheme cs, UserModel employee) {
+    return CircleAvatar(
+      radius: 45,
+      backgroundColor: cs.primary,
+      child: Text(
+        _getInitials(employee.displayName),
+        style: AppTextStyles.h2.copyWith(
+          color: cs.onPrimary,
+        ),
+      ),
+    );
+  }
 
-                    // Botones de acción
-                    if (!context.isMobile) ...[
-                      CustomButton(
-                        text: 'Editar',
-                        icon: Icons.edit,
-                        variant: ButtonVariant.outline,
-                        onPressed: () =>
-                            _showInfoEditorModal(context, employee),
-                      ),
-                      AppSpacing.horizontalSpaceSm,
-                      CustomButton(
-                        text: 'Más',
-                        icon: Icons.more_vert,
-                        variant: ButtonVariant.text,
-                        onPressed: () {},
-                      ),
-                    ],
-                  ],
+  Widget _buildHeroInfo(
+      BuildContext context, ColorScheme cs, UserModel employee, bool isMobile) {
+    return Column(
+      crossAxisAlignment:
+          isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      children: [
+        // Row: Name + status chip
+        Wrap(
+          alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: AppSpacing.sm,
+          runSpacing: AppSpacing.xs,
+          children: [
+            Text(employee.fullName, style: AppTextStyles.h2),
+            _buildStatusChip(cs, employee.isActive),
+          ],
+        ),
+        AppSpacing.verticalSpaceXs,
+        // Position
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.badge, size: 18, color: cs.primary),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                employee.position ?? 'Sin cargo asignado',
+                style: AppTextStyles.bodyLarge.copyWith(
+                  color: cs.onSurfaceVariant,
                 ),
               ),
+            ),
+          ],
+        ),
+        AppSpacing.verticalSpaceSm,
+        // Email + ID in a row
+        Wrap(
+          alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
+          spacing: AppSpacing.lg,
+          runSpacing: AppSpacing.xs,
+          children: [
+            _buildHeroBadge(
+              icon: Icons.email,
+              label: employee.email,
+              cs: cs,
+            ),
+            _buildHeroBadge(
+              icon: Icons.fingerprint,
+              label: 'ID: ${employee.employeeId}',
+              cs: cs,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 
-              AppSpacing.verticalSpaceLg,
+  Widget _buildStatusChip(ColorScheme cs, bool isActive) {
+    final color = isActive ? AppColors.success : cs.outline;
+    final bgColor = isActive
+        ? AppColors.success.withValues(alpha: 0.1)
+        : cs.surfaceContainerHighest;
+    final label = isActive ? 'Activo' : 'Inactivo';
 
-              // Información detallada
-              CustomCard(
-                elevation: CardElevation.low,
-                padding: AppSpacing.cardLarge,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusCircular),
+        border: Border.all(
+          color: color.withValues(alpha: 0.4),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            margin: const EdgeInsets.only(right: 6),
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          Text(
+            label,
+            style: AppTextStyles.labelSmall.copyWith(
+              color: color,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeroBadge({
+    required IconData icon,
+    required String label,
+    required ColorScheme cs,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: cs.onSurfaceVariant),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: AppTextStyles.bodySmall.copyWith(
+            color: cs.onSurfaceVariant,
+          ),
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeroActions(
+      BuildContext context, ColorScheme cs, UserModel employee) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CustomButton(
+          text: 'Editar',
+          icon: Icons.edit,
+          variant: ButtonVariant.outline,
+          onPressed: () => _showInfoEditorModal(context, employee),
+        ),
+      ],
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // DESKTOP GRID (two columns)
+  // ═══════════════════════════════════════════════════════════════════════
+
+  Widget _buildDesktopGrid(
+      BuildContext context, ColorScheme cs, WidgetRef ref, UserModel employee) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Left column: Personal info + Weekly hours
+        Expanded(
+          flex: 5,
+          child: _buildLeftColumn(context, cs, ref, employee),
+        ),
+        AppSpacing.horizontalSpaceXxl,
+        // Right column: Schedule card
+        Expanded(
+          flex: 7,
+          child: _buildScheduleCard(context, cs, employee),
+        ),
+      ],
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // MOBILE/TABLET STACK
+  // ═══════════════════════════════════════════════════════════════════════
+
+  Widget _buildMobileStack(
+      BuildContext context, ColorScheme cs, WidgetRef ref, UserModel employee) {
+    return Column(
+      children: [
+        _buildPersonalInfoCard(context, cs, ref, employee),
+        AppSpacing.verticalSpaceLg,
+        _buildWeeklyHoursCard(cs, employee),
+        AppSpacing.verticalSpaceLg,
+        _buildScheduleCard(context, cs, employee),
+      ],
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // LEFT COLUMN (Desktop)
+  // ═══════════════════════════════════════════════════════════════════════
+
+  Widget _buildLeftColumn(
+      BuildContext context, ColorScheme cs, WidgetRef ref, UserModel employee) {
+    return Column(
+      children: [
+        _buildPersonalInfoCard(context, cs, ref, employee),
+        AppSpacing.verticalSpaceLg,
+        _buildWeeklyHoursCard(cs, employee),
+      ],
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // PERSONAL INFO CARD
+  // ═══════════════════════════════════════════════════════════════════════
+
+  Widget _buildPersonalInfoCard(
+      BuildContext context, ColorScheme cs, WidgetRef ref, UserModel employee) {
+    return CustomCard(
+      elevation: CardElevation.low,
+      padding: AppSpacing.cardLarge,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section header with icon
+          _buildSectionHeader(
+            icon: Icons.info_outline,
+            title: 'Información Personal',
+            cs: cs,
+          ),
+          AppSpacing.verticalSpaceMd,
+          _buildSeparator(cs),
+          AppSpacing.verticalSpaceMd,
+          // Info rows with icons
+          _buildIconInfoRow(
+            icon: Icons.contact_page,
+            label: 'DNI/NIE',
+            value: employee.dni ?? 'No especificado',
+            cs: cs,
+          ),
+          _buildIconInfoRow(
+            icon: Icons.call,
+            label: 'Teléfono',
+            value: employee.telefono ?? 'No especificado',
+            cs: cs,
+          ),
+          _buildIconInfoRow(
+            icon: Icons.domain,
+            label: 'Departamento',
+            value: employee.department ?? 'No especificado',
+            cs: cs,
+          ),
+          _buildIconInfoRow(
+            icon: Icons.business,
+            label: 'Empresa',
+            value: employee.empresa ?? 'No especificado',
+            cs: cs,
+          ),
+          _buildIconInfoRow(
+            icon: Icons.manage_accounts,
+            label: 'Rol',
+            value: _formatRole(employee.role),
+            cs: cs,
+          ),
+          _buildIconInfoRow(
+            icon: Icons.visibility,
+            label: 'Puede supervisar',
+            value: employee.canSuperviseTeam ? 'Sí' : 'No',
+            cs: cs,
+          ),
+          _buildSupervisorIconRow(ref, employee, cs),
+          if (employee.fechaInicio != null)
+            _buildIconInfoRow(
+              icon: Icons.calendar_today,
+              label: 'Fecha Inicio',
+              value: DateFormat('dd/MM/yyyy').format(employee.fechaInicio!),
+              cs: cs,
+            ),
+          _buildCalendarRow(context, cs, ref, employee),
+        ],
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // WEEKLY HOURS CARD
+  // ═══════════════════════════════════════════════════════════════════════
+
+  Widget _buildWeeklyHoursCard(ColorScheme cs, UserModel employee) {
+    final weeklyHours = employee.weeklyHours.toStringAsFixed(0);
+    final statusLabel =
+        employee.isActive ? 'Contrato activo' : 'Empleado inactivo';
+    final statusColor = employee.isActive ? AppColors.success : cs.outline;
+
+    return CustomCard(
+      elevation: CardElevation.low,
+      padding: AppSpacing.cardLarge,
+      backgroundColor: cs.surfaceContainerLowest,
+      borderColor: cs.primary.withValues(alpha: 0.25),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: AppSpacing.allMd,
+                decoration: BoxDecoration(
+                  color: cs.primary.withValues(alpha: 0.1),
+                  borderRadius: AppSpacing.borderRadiusSm,
+                ),
+                child: Icon(
+                  Icons.access_time,
+                  size: 18,
+                  color: cs.primary,
+                ),
+              ),
+              AppSpacing.horizontalSpaceSm,
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Información del Empleado', style: AppTextStyles.h5),
-                    AppSpacing.verticalSpaceLg,
-                    _buildInfoRow('ID Empleado', employee.employeeId, cs),
-                    _buildInfoRow(
-                        'DNI/NIE', employee.dni ?? 'No especificado', cs),
-                    _buildInfoRow(
-                        'Teléfono', employee.telefono ?? 'No especificado', cs),
-                    _buildInfoRow('Departamento',
-                        employee.department ?? 'No especificado', cs),
-                    _buildInfoRow(
-                        'Empresa', employee.empresa ?? 'No especificado', cs),
-                    _buildInfoRow('Rol', _formatRole(employee.role), cs),
-                    _buildInfoRow(
-                      'Puede supervisar',
-                      employee.canSuperviseTeam ? 'Sí' : 'No',
-                      cs,
-                    ),
-                    _buildAssignedSupervisorRow(ref, employee, cs),
-                    _buildInfoRow('Horas Semanales',
-                        '${employee.weeklyHours.toStringAsFixed(0)}h', cs),
-                    _buildInfoRow('Estado',
-                        employee.isActive ? 'Activo' : 'Inactivo', cs),
-                    if (employee.fechaInicio != null)
-                      _buildInfoRow(
-                        'Fecha Inicio',
-                        DateFormat('dd/MM/yyyy').format(employee.fechaInicio!),
-                        cs,
-                      ),
-                    _buildCalendarRow(context, cs, ref, employee),
-                  ],
-                ),
-              ),
-
-              AppSpacing.verticalSpaceLg,
-
-              // Horario Laboral
-              CustomCard(
-                elevation: CardElevation.low,
-                padding: AppSpacing.cardLarge,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.schedule,
-                          size: 20,
-                          color: AppColors.primary,
-                        ),
-                        AppSpacing.horizontalSpaceSm,
-                        Expanded(
-                          child: Text(
-                            'Horario Laboral',
-                            style: AppTextStyles.h5,
-                          ),
-                        ),
-                        // Botón Editar Horario
-                        OutlinedButton.icon(
-                          onPressed: () =>
-                              _showScheduleEditorModal(context, employee),
-                          icon: const Icon(Icons.edit, size: 18),
-                          label: const Text('Editar Horario'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColors.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    AppSpacing.verticalSpaceLg,
-                    WeekScheduleViewer(employeeId: employeeId),
-                  ],
-                ),
-              ),
-
-              AppSpacing.verticalSpaceLg,
-
-              // Registros recientes
-              CustomCard(
-                elevation: CardElevation.low,
-                padding: AppSpacing.cardLarge,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Registros Recientes', style: AppTextStyles.h5),
-                    AppSpacing.verticalSpaceSm,
                     Text(
-                      'Próximamente: Registros de fichajes',
-                      style: AppTextStyles.bodySmall.copyWith(
+                      'Horas Semanales',
+                      style: AppTextStyles.labelLarge.copyWith(
                         color: cs.onSurfaceVariant,
                       ),
                     ),
-                    // TODO: Conectar con provider de registros
-                    // AppSpacing.verticalSpaceLg,
-                    // RecordsTable(userId: employeeId),
+                    AppSpacing.verticalSpaceXs,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: statusColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusCircular,
+                        ),
+                      ),
+                      child: Text(
+                        statusLabel,
+                        style: AppTextStyles.labelSmall.copyWith(
+                          color: statusColor,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
-
-              // Botones de acción (mobile)
-              if (context.isMobile) ...[
-                AppSpacing.verticalSpaceLg,
-                CustomButton(
-                  text: 'Editar Empleado',
-                  icon: Icons.edit,
-                  variant: ButtonVariant.primary,
-                  fullWidth: true,
-                  onPressed: () => _showInfoEditorModal(context, employee),
-                ),
-              ],
             ],
           ),
+          AppSpacing.verticalSpaceLg,
+          Text(
+            '${weeklyHours}h',
+            style: AppTextStyles.displaySmall.copyWith(
+              color: cs.primary,
+            ),
+          ),
+          AppSpacing.verticalSpaceXs,
+          Text(
+            'Jornada semanal asignada',
+            style: AppTextStyles.bodySmall.copyWith(
+              color: cs.onSurfaceVariant,
+            ),
+          ),
+          AppSpacing.verticalSpaceLg,
+          ClipRRect(
+            borderRadius: AppSpacing.borderRadiusXs,
+            child: LinearProgressIndicator(
+              value: 1,
+              minHeight: 8,
+              backgroundColor: cs.primary.withValues(alpha: 0.12),
+              valueColor: AlwaysStoppedAnimation<Color>(cs.primary),
+            ),
+          ),
+          AppSpacing.verticalSpaceSm,
+          Row(
+            children: [
+              Icon(
+                Icons.check_circle_outline,
+                size: 16,
+                color: cs.onSurfaceVariant,
+              ),
+              AppSpacing.horizontalSpaceXs,
+              Expanded(
+                child: Text(
+                  'Objetivo semanal configurado',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: cs.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // SCHEDULE CARD
+  // ═══════════════════════════════════════════════════════════════════════
+
+  Widget _buildScheduleCard(
+      BuildContext context, ColorScheme cs, UserModel employee) {
+    return CustomCard(
+      elevation: CardElevation.low,
+      padding: AppSpacing.cardLarge,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row
+          Row(
+            children: [
+              Expanded(
+                child: _buildSectionHeader(
+                  icon: Icons.schedule,
+                  title: 'Horario Laboral',
+                  cs: cs,
+                ),
+              ),
+              // Edit schedule button
+              OutlinedButton.icon(
+                onPressed: () => _showScheduleEditorModal(context, employee),
+                icon: const Icon(Icons.edit, size: 16),
+                label: const Text('Editar Horario'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: cs.primary,
+                  side: BorderSide(color: cs.primary.withValues(alpha: 0.5)),
+                ),
+              ),
+            ],
+          ),
+          AppSpacing.verticalSpaceLg,
+          WeekScheduleViewer(employeeId: employeeId),
+        ],
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // RECORDS CARD
+  // ═══════════════════════════════════════════════════════════════════════
+
+  Widget _buildRecordsCard(BuildContext context, ColorScheme cs) {
+    return CustomCard(
+      elevation: CardElevation.low,
+      padding: AppSpacing.cardLarge,
+      child: Column(
+        children: [
+          // Section header with icon
+          _buildSectionHeader(
+            icon: Icons.history,
+            title: 'Registros Recientes',
+            cs: cs,
+          ),
+          AppSpacing.verticalSpaceMd,
+          _buildSeparator(cs),
+          AppSpacing.verticalSpaceXxl,
+          // Empty state
+          Icon(Icons.history,
+              size: 40, color: cs.outline.withValues(alpha: 0.5)),
+          AppSpacing.verticalSpaceMd,
+          Text(
+            'Próximamente: Visualiza aquí el historial detallado de fichajes, '
+            'pausas e incidencias de este empleado.',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: cs.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // SHARED BUILDING BLOCKS
+  // ═══════════════════════════════════════════════════════════════════════
+
+  Widget _buildSectionHeader({
+    required IconData icon,
+    required String title,
+    required ColorScheme cs,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: cs.primary),
+        AppSpacing.horizontalSpaceSm,
+        Text(
+          title,
+          style: AppTextStyles.h5.copyWith(color: cs.primary),
         ),
+      ],
+    );
+  }
+
+  Widget _buildSeparator(ColorScheme cs) {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      color: cs.outlineVariant,
+    );
+  }
+
+  Widget _buildIconInfoRow({
+    required IconData icon,
+    required String label,
+    required String value,
+    required ColorScheme cs,
+  }) {
+    return Padding(
+      padding: AppSpacing.verticalSm,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(icon, size: 18, color: cs.outline),
+          const SizedBox(width: 10),
+          SizedBox(
+            width: 120,
+            child: Text(
+              label,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: cs.onSurfaceVariant,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: AppTextStyles.bodyMedium.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -335,34 +726,6 @@ class EmployeeDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildInfoRow(String label, String value, ColorScheme cs) {
-    return Padding(
-      padding: AppSpacing.verticalSm,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 140,
-            child: Text(
-              label,
-              style: AppTextStyles.labelMedium.copyWith(
-                color: cs.onSurfaceVariant,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: AppTextStyles.bodyMedium.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   String _getInitials(String name) {
     final parts = name.split(' ');
     if (parts.length >= 2) {
@@ -406,7 +769,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
     );
   }
 
-  /// Fila de calendario con nombre resuelto y botón "Cambiar"
+  /// Fila de calendario con nombre resuelto y botón "Cambiar" (icon-row style)
   Widget _buildCalendarRow(
     BuildContext context,
     ColorScheme cs,
@@ -418,11 +781,13 @@ class EmployeeDetailScreen extends ConsumerWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          Icon(Icons.calendar_month, size: 18, color: cs.outline),
+          const SizedBox(width: 10),
           SizedBox(
-            width: 140,
+            width: 120,
             child: Text(
               'Calendario',
-              style: AppTextStyles.labelMedium.copyWith(
+              style: AppTextStyles.bodySmall.copyWith(
                 color: cs.onSurfaceVariant,
               ),
             ),
@@ -462,12 +827,80 @@ class EmployeeDetailScreen extends ConsumerWidget {
           ),
           TextButton.icon(
             onPressed: () => _showCalendarChangeDialog(context, ref, employee),
-            icon: const Icon(Icons.edit_outlined, size: 14),
-            label: const Text('Cambiar'),
+            icon: Icon(Icons.edit_outlined, size: 14, color: cs.primary),
+            label: Text(
+              'Cambiar',
+              style: TextStyle(color: cs.primary),
+            ),
             style: TextButton.styleFrom(
-              foregroundColor: AppColors.primary,
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Supervisor row with icon pattern
+  Widget _buildSupervisorIconRow(
+      WidgetRef ref, UserModel employee, ColorScheme cs) {
+    if (employee.role == UserRole.admin) {
+      return _buildIconInfoRow(
+        icon: Icons.supervisor_account,
+        label: 'Supervisor',
+        value: 'No aplica',
+        cs: cs,
+      );
+    }
+
+    if (employee.supervisorId == null ||
+        employee.supervisorId!.trim().isEmpty) {
+      return _buildIconInfoRow(
+        icon: Icons.supervisor_account,
+        label: 'Supervisor',
+        value: 'Sin asignar',
+        cs: cs,
+      );
+    }
+
+    final supervisorAsync = ref.watch(userByIdProvider(employee.supervisorId!));
+
+    return Padding(
+      padding: AppSpacing.verticalSm,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(Icons.supervisor_account, size: 18, color: cs.outline),
+          const SizedBox(width: 10),
+          SizedBox(
+            width: 120,
+            child: Text(
+              'Supervisor',
+              style: AppTextStyles.bodySmall.copyWith(
+                color: cs.onSurfaceVariant,
+              ),
+            ),
+          ),
+          Expanded(
+            child: supervisorAsync.when(
+              data: (supervisor) => Text(
+                supervisor?.fullName ?? 'Supervisor no encontrado',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              loading: () => const SizedBox(
+                height: 16,
+                width: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              error: (_, __) => Text(
+                employee.supervisorId!,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
           ),
         ],
@@ -582,59 +1015,6 @@ class EmployeeDetailScreen extends ConsumerWidget {
             ],
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildAssignedSupervisorRow(
-      WidgetRef ref, UserModel employee, ColorScheme cs) {
-    if (employee.role == UserRole.admin) {
-      return _buildInfoRow('Supervisor asignado', 'No aplica', cs);
-    }
-
-    if (employee.supervisorId == null ||
-        employee.supervisorId!.trim().isEmpty) {
-      return _buildInfoRow('Supervisor asignado', 'Sin asignar', cs);
-    }
-
-    final supervisorAsync = ref.watch(userByIdProvider(employee.supervisorId!));
-
-    return Padding(
-      padding: AppSpacing.verticalSm,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 140,
-            child: Text(
-              'Supervisor asignado',
-              style: AppTextStyles.labelMedium.copyWith(
-                color: cs.onSurfaceVariant,
-              ),
-            ),
-          ),
-          Expanded(
-            child: supervisorAsync.when(
-              data: (supervisor) => Text(
-                supervisor?.fullName ?? 'Supervisor no encontrado',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              loading: () => const SizedBox(
-                height: 16,
-                width: 16,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-              error: (_, __) => Text(
-                employee.supervisorId!,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
