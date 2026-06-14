@@ -1,12 +1,12 @@
 import 'package:control_horario/core/router/app_router.dart';
 import 'package:control_horario/features/admin/presentation/screens/admin_settings_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('AppRouter.adminSettings', () {
     test('existe y equivale a "/admin/settings"', () {
-      // RED: AppRouter.adminSettings no existe aún — esta prueba fallará en compilación.
       expect(AppRouter.adminSettings, equals('/admin/settings'));
     });
 
@@ -19,13 +19,15 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: AdminSettingsScreen(),
+        const ProviderScope(
+          child: MaterialApp(
+            home: AdminSettingsScreen(),
+          ),
         ),
       );
 
       expect(find.text('Configuración del sistema'), findsWidgets);
-      expect(find.text('Coming soon'), findsOneWidget);
+      expect(find.text('Próximamente'), findsOneWidget);
       expect(
         find.textContaining('parámetros globales del sistema'),
         findsOneWidget,

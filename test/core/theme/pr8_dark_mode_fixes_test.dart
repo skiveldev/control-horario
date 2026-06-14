@@ -671,15 +671,15 @@ void main() {
       await tester.pumpAndSettle();
 
       // Section titles must be visible
-      expect(find.text('Notificaciones'), findsOneWidget);
       expect(find.text('Preferencias'), findsOneWidget);
       expect(find.text('Cuenta'), findsOneWidget);
 
-      // Body text items must be visible
-      expect(find.text('Notificaciones por correo'), findsOneWidget);
-      expect(find.text('Notificaciones push'), findsOneWidget);
+      // Body text items must be visible (honest content — no fake controls)
       expect(find.text('Modo oscuro'), findsOneWidget);
-      expect(find.text('Idioma'), findsOneWidget);
+      expect(find.text('Notificaciones'), findsOneWidget);
+      expect(find.text('Próximamente'), findsOneWidget);
+      expect(find.text('Mi perfil'), findsOneWidget);
+      expect(find.text('Contraseña y Seguridad'), findsOneWidget);
     });
   });
 }
