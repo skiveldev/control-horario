@@ -66,9 +66,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Madrid 2025'), findsOneWidget);
-      expect(find.text('Año 2025'), findsOneWidget);
+      expect(find.text('Configuración 2025'), findsOneWidget);
       expect(find.text('Activo'), findsOneWidget);
-      expect(find.text('Editar'), findsOneWidget);
+      expect(find.text('Editar Calendario'), findsOneWidget);
     });
   });
 
