@@ -7,7 +7,9 @@ import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/constants/breakpoints.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
+import '../../../../shared/widgets/layouts/admin_layout.dart';
 import '../../models/calendar_event_model.dart';
 import '../../models/holiday_type.dart';
 import '../../models/work_calendar_model.dart';
@@ -262,25 +264,14 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
     final isDesktop = MediaQuery.of(context).size.width >= Breakpoints.desktop;
     final cs = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Stack(
+    return AdminLayout(
+      currentRoute: AppRouter.adminCalendars,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            children: [
-              _buildPageHeader(cs),
-              Divider(height: 1, color: cs.outline),
-              Expanded(
-                child: isDesktop ? _buildDesktopLayout() : _buildMobileLayout(),
-              ),
-            ],
-          ),
-          Positioned(
-            bottom: AppSpacing.xxl,
-            left: 0,
-            right: 0,
-            child: Center(child: _buildStatusBar()),
-          ),
+          _buildPageHeader(cs),
+          AppSpacing.verticalSpaceXxl,
+          isDesktop ? _buildDesktopLayout() : _buildMobileLayout(),
         ],
       ),
     );
@@ -292,55 +283,146 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
         : 'Editar Calendario';
 
     return Container(
-      color: cs.surface,
+      padding: AppSpacing.allXl,
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.6)),
+        boxShadow: AppShadows.subtleShadow,
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isCompact = constraints.maxWidth < Breakpoints.tablet;
+
+          final titleBlock = Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: AppColors.secondary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                ),
+                child: const Icon(
+                  Icons.calendar_month_outlined,
+                  color: AppColors.secondary,
+                  size: AppSpacing.iconXl,
+                ),
+              ),
+              AppSpacing.horizontalSpaceMd,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: AppTextStyles.h3),
+                    AppSpacing.verticalSpaceXs,
+                    Text(
+                      'Configura el calendario laboral, festivos y vacaciones del año seleccionado.',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: cs.onSurfaceVariant,
+                      ),
+                    ),
+                    AppSpacing.verticalSpaceMd,
+                    Wrap(
+                      spacing: AppSpacing.sm,
+                      runSpacing: AppSpacing.sm,
+                      children: [
+                        _buildHeroPill(
+                          icon: Icons.event_available_outlined,
+                          label: '$_selectedYear',
+                          color: AppColors.secondary,
+                        ),
+                        _buildHeroPill(
+                          icon: _isActive
+                              ? Icons.check_circle_outline
+                              : Icons.drafts_outlined,
+                          label: _isActive ? 'Activo' : 'Borrador',
+                          color: _isActive ? AppColors.success : cs.outline,
+                        ),
+                        _buildHeroPill(
+                          icon: Icons.flag_outlined,
+                          label: '${_events.length} días marcados',
+                          color: AppColors.primary,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+
+          final actions = Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            alignment: isCompact ? WrapAlignment.start : WrapAlignment.end,
+            children: [
+              CustomButton(
+                text: 'Cancelar',
+                variant: ButtonVariant.text,
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              CustomButton(
+                text: 'Guardar Calendario',
+                icon: Icons.save_outlined,
+                variant: ButtonVariant.brand,
+                onPressed: _saveCalendar,
+              ),
+            ],
+          );
+
+          if (isCompact) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                titleBlock,
+                AppSpacing.verticalSpaceLg,
+                actions,
+              ],
+            );
+          }
+
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: titleBlock),
+              AppSpacing.horizontalSpaceXl,
+              actions,
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildHeroPill({
+    required IconData icon,
+    required String label,
+    required Color color,
+  }) {
+    return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xxl,
-        vertical: AppSpacing.md,
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.xs,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusCircular),
+        border: Border.all(color: color.withValues(alpha: 0.22)),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: AppColors.secondary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-            ),
-            child: const Icon(
-              Icons.calendar_month_outlined,
-              color: AppColors.secondary,
-              size: AppSpacing.iconLg,
+          Icon(icon, size: AppSpacing.iconSm, color: color),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: AppTextStyles.labelSmall.copyWith(
+              color: color,
+              fontWeight: FontWeight.w700,
             ),
           ),
-          AppSpacing.horizontalSpaceMd,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(title, style: AppTextStyles.h5),
-                Text(
-                  'Configuración de festivos y jornada',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: cs.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          CustomButton(
-            text: 'Cancelar',
-            variant: ButtonVariant.text,
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          AppSpacing.horizontalSpaceSm,
-          CustomButton(
-            text: 'Guardar Calendario',
-            icon: Icons.save_outlined,
-            variant: ButtonVariant.brand,
-            onPressed: _saveCalendar,
-          ),
-          AppSpacing.horizontalSpaceMd,
         ],
       ),
     );
@@ -348,131 +430,46 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
 
   // Desktop: Calendario a la izquierda, sidebar card independiente a la derecha
   Widget _buildDesktopLayout() {
-    return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.xxl,
-        AppSpacing.xl,
-        AppSpacing.xxl,
-        AppSpacing.massive +
-            AppSpacing.xxl, // espacio para el statusbar flotante
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Columna izquierda: formulario + calendario
-          Expanded(
-            child: Column(
-              children: [
-                _buildFormFields(),
-                AppSpacing.verticalSpaceXl,
-                _buildCalendarSection(),
-              ],
-            ),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Columna izquierda: formulario + calendario
+        Expanded(
+          child: Column(
+            children: [
+              _buildFormFields(),
+              AppSpacing.verticalSpaceXl,
+              _buildCalendarSection(),
+            ],
           ),
-          AppSpacing.horizontalSpaceXxl,
-          // Sidebar: card independiente con su propio estilo
-          SizedBox(
-            width: 320,
-            child: _buildEventsSummary(),
-          ),
-        ],
-      ),
+        ),
+        AppSpacing.horizontalSpaceXxl,
+        // Sidebar: card independiente con su propio estilo
+        SizedBox(
+          width: 320,
+          child: _buildEventsSummary(),
+        ),
+      ],
     );
   }
 
   // Mobile: Apilado verticalmente
   Widget _buildMobileLayout() {
-    return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.lg,
-        AppSpacing.lg,
-        AppSpacing.massive + AppSpacing.xxl,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildFormFields(),
-          AppSpacing.verticalSpaceXl,
-          _buildCalendarSection(),
-          AppSpacing.verticalSpaceXl,
-          _buildEventsSummaryMobile(),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildFormFields(),
+        AppSpacing.verticalSpaceXl,
+        _buildCalendarSection(),
+        AppSpacing.verticalSpaceXl,
+        _buildEventsSummaryMobile(),
+      ],
     );
   }
 
   // ===========================================================================
   // SECCIÓN: FORMULARIO SUPERIOR
   // ===========================================================================
-
-  Widget _buildStatusBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xxl,
-        vertical: AppSpacing.md,
-      ),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onSurface,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-        boxShadow: [
-          BoxShadow(
-            color:
-                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.35),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.check_circle,
-            color: AppColors.success,
-            size: AppSpacing.iconLg,
-          ),
-          AppSpacing.horizontalSpaceMd,
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'ESTADO ACTUAL',
-                style: AppTextStyles.labelSmall.copyWith(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .surface
-                      .withValues(alpha: 0.5),
-                  letterSpacing: 0.8,
-                  fontSize: 10,
-                ),
-              ),
-              Text(
-                'Configuración válida para $_selectedYear',
-                style: AppTextStyles.labelMedium.copyWith(
-                  color: Theme.of(context).colorScheme.surface,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          AppSpacing.horizontalSpaceLg,
-          Icon(
-            Icons.edit_outlined,
-            size: AppSpacing.iconMd,
-            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
-          ),
-          AppSpacing.horizontalSpaceMd,
-          Icon(
-            Icons.more_vert,
-            size: AppSpacing.iconMd,
-            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildFormFields() {
     return Container(
@@ -503,121 +500,141 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
           Divider(height: 1, color: Theme.of(context).colorScheme.outline),
           Padding(
             padding: AppSpacing.allLg,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Nombre
-                Expanded(
-                  flex: 3,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'NOMBRE DEL CALENDARIO *',
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      AppSpacing.verticalSpaceXs,
-                      TextField(
-                        controller: _nameController,
-                        decoration: InputDecoration(
-                          hintText: 'Ej: Calendario Laboral 2026',
-                          border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.circular(AppSpacing.radiusSm),
-                          ),
-                          contentPadding: AppSpacing.symmetric(
-                            horizontal: AppSpacing.md,
-                            vertical: AppSpacing.md,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                AppSpacing.horizontalSpaceMd,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isCompact = constraints.maxWidth < Breakpoints.tablet;
+                final nameWidth = isCompact
+                    ? constraints.maxWidth
+                    : (constraints.maxWidth - 260 - AppSpacing.md * 2);
 
-                // Año
-                SizedBox(
-                  width: 140,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'AÑO',
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      AppSpacing.verticalSpaceXs,
-                      DropdownButtonFormField<int>(
-                        key: ValueKey(_selectedYear),
-                        initialValue: _selectedYear,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.circular(AppSpacing.radiusSm),
-                          ),
-                          contentPadding: AppSpacing.symmetric(
-                            horizontal: AppSpacing.md,
-                            vertical: AppSpacing.md,
-                          ),
-                        ),
-                        items: _availableYears.map((year) {
-                          return DropdownMenuItem(
-                            value: year,
-                            child: Text('$year'),
-                          );
-                        }).toList(),
-                        onChanged: (year) {
-                          if (year != null) {
-                            setState(() {
-                              _selectedYear = year;
-                              _focusedDay = DateTime(year);
-                            });
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                AppSpacing.horizontalSpaceMd,
-
-                // Estado
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                return Wrap(
+                  spacing: AppSpacing.md,
+                  runSpacing: AppSpacing.lg,
+                  crossAxisAlignment: WrapCrossAlignment.start,
                   children: [
-                    Text(
-                      'ESTADO',
-                      style: AppTextStyles.labelSmall.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        letterSpacing: 0.5,
+                    // Nombre
+                    SizedBox(
+                      width: nameWidth.clamp(240.0, constraints.maxWidth),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'NOMBRE DEL CALENDARIO *',
+                            style: AppTextStyles.labelSmall.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          AppSpacing.verticalSpaceXs,
+                          TextField(
+                            controller: _nameController,
+                            decoration: InputDecoration(
+                              hintText: 'Ej: Calendario Laboral 2026',
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.circular(AppSpacing.radiusSm),
+                              ),
+                              contentPadding: AppSpacing.symmetric(
+                                horizontal: AppSpacing.md,
+                                vertical: AppSpacing.md,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    AppSpacing.verticalSpaceXs,
-                    Switch(
-                      value: _isActive,
-                      onChanged: (v) => setState(() => _isActive = v),
-                      activeThumbColor: AppColors.success,
-                      activeTrackColor:
-                          AppColors.success.withValues(alpha: 0.4),
+
+                    // Año
+                    SizedBox(
+                      width: isCompact ? constraints.maxWidth : 140,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'AÑO',
+                            style: AppTextStyles.labelSmall.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          AppSpacing.verticalSpaceXs,
+                          DropdownButtonFormField<int>(
+                            key: ValueKey(_selectedYear),
+                            initialValue: _selectedYear,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.circular(AppSpacing.radiusSm),
+                              ),
+                              contentPadding: AppSpacing.symmetric(
+                                horizontal: AppSpacing.md,
+                                vertical: AppSpacing.md,
+                              ),
+                            ),
+                            items: _availableYears.map((year) {
+                              return DropdownMenuItem(
+                                value: year,
+                                child: Text('$year'),
+                              );
+                            }).toList(),
+                            onChanged: (year) {
+                              if (year != null) {
+                                setState(() {
+                                  _selectedYear = year;
+                                  _focusedDay = DateTime(year);
+                                });
+                              }
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                    Text(
-                      _isActive ? 'ACTIVO' : 'BORRADOR',
-                      style: AppTextStyles.labelSmall.copyWith(
-                        color: _isActive
-                            ? AppColors.success
-                            : Theme.of(context).colorScheme.outline,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.5,
+
+                    // Estado
+                    SizedBox(
+                      width: isCompact ? constraints.maxWidth : 120,
+                      child: Column(
+                        crossAxisAlignment: isCompact
+                            ? CrossAxisAlignment.start
+                            : CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'ESTADO',
+                            style: AppTextStyles.labelSmall.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          AppSpacing.verticalSpaceXs,
+                          Switch(
+                            value: _isActive,
+                            onChanged: (v) => setState(() => _isActive = v),
+                            activeThumbColor: AppColors.success,
+                            activeTrackColor:
+                                AppColors.success.withValues(alpha: 0.4),
+                          ),
+                          Text(
+                            _isActive ? 'ACTIVO' : 'BORRADOR',
+                            style: AppTextStyles.labelSmall.copyWith(
+                              color: _isActive
+                                  ? AppColors.success
+                                  : Theme.of(context).colorScheme.outline,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
-                ),
-              ],
+                );
+              },
             ),
           ),
         ],

@@ -4,8 +4,10 @@ import 'package:control_horario/features/admin/presentation/screens/calendar_edi
 import 'package:control_horario/features/admin/presentation/widgets/employee_table_row.dart';
 import 'package:control_horario/features/admin/presentation/widgets/weekly_activity_chart.dart';
 import 'package:control_horario/features/auth/models/user_model.dart';
+import 'package:control_horario/features/auth/providers/auth_provider.dart';
 import 'package:control_horario/features/dashboard/presentation/widgets/month_navigation_header.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -19,14 +21,30 @@ import 'package:intl/date_symbol_data_local.dart';
 /// that are jarring in dark mode.
 
 /// Wraps a widget in dark-mode MaterialApp + Scaffold.
-Widget _darkModeWrap(Widget child) {
-  return MaterialApp(
-    themeMode: ThemeMode.dark,
-    darkTheme: AppTheme.darkTheme,
-    theme: AppTheme.lightTheme,
-    home: Scaffold(body: child),
+Widget _darkModeWrap(Widget child, {List<Override>? overrides}) {
+  return ProviderScope(
+    overrides: overrides ?? [],
+    child: MaterialApp(
+      themeMode: ThemeMode.dark,
+      darkTheme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
+      home: Scaffold(body: child),
+    ),
   );
 }
+
+/// Fake admin user for deterministic AdminLayout provider setup in tests.
+final _fakeAdminUser = UserModel(
+  userId: 'admin-001',
+  employeeId: 'admin-001',
+  email: 'admin@test.com',
+  displayName: 'Admin Test',
+  role: UserRole.admin,
+  weeklyHours: 40,
+  createdAt: DateTime(2026, 1, 1),
+  department: 'Admin',
+  position: 'Administrador',
+);
 
 /// Collects style colors from all [Text] widgets in the tree.
 List<Color> _textColors(WidgetTester tester) {
@@ -259,8 +277,13 @@ void main() {
   // 4. CalendarEditorScreen — admin calendar editor (largest file)
   // ===========================================================================
   group('CalendarEditorScreen', () {
+    final adminOverrides = [
+      currentUserProvider.overrideWith((ref) => Stream.value(_fakeAdminUser)),
+    ];
+
     testWidgets('no AppColors.surface in dark mode', (tester) async {
-      await tester.pumpWidget(_darkModeWrap(const CalendarEditorScreen()));
+      await tester.pumpWidget(_darkModeWrap(const CalendarEditorScreen(),
+          overrides: adminOverrides));
       await tester.pumpAndSettle();
 
       // CalendarEditorScreen uses colorScheme.onSurface (white in dark mode)
@@ -271,7 +294,8 @@ void main() {
     });
 
     testWidgets('no AppColors.background in dark mode', (tester) async {
-      await tester.pumpWidget(_darkModeWrap(const CalendarEditorScreen()));
+      await tester.pumpWidget(_darkModeWrap(const CalendarEditorScreen(),
+          overrides: adminOverrides));
       await tester.pumpAndSettle();
 
       expect(_hasContainerWithColor(tester, AppColors.background), isFalse,
@@ -279,28 +303,32 @@ void main() {
     });
 
     testWidgets('no AppColors.textPrimary in dark mode', (tester) async {
-      await tester.pumpWidget(_darkModeWrap(const CalendarEditorScreen()));
+      await tester.pumpWidget(_darkModeWrap(const CalendarEditorScreen(),
+          overrides: adminOverrides));
       await tester.pumpAndSettle();
 
       expect(_textColors(tester), everyElement(isNot(AppColors.textPrimary)));
     });
 
     testWidgets('no AppColors.textSecondary in dark mode', (tester) async {
-      await tester.pumpWidget(_darkModeWrap(const CalendarEditorScreen()));
+      await tester.pumpWidget(_darkModeWrap(const CalendarEditorScreen(),
+          overrides: adminOverrides));
       await tester.pumpAndSettle();
 
       expect(_textColors(tester), everyElement(isNot(AppColors.textSecondary)));
     });
 
     testWidgets('no AppColors.textTertiary in dark mode', (tester) async {
-      await tester.pumpWidget(_darkModeWrap(const CalendarEditorScreen()));
+      await tester.pumpWidget(_darkModeWrap(const CalendarEditorScreen(),
+          overrides: adminOverrides));
       await tester.pumpAndSettle();
 
       expect(_textColors(tester), everyElement(isNot(AppColors.textTertiary)));
     });
 
     testWidgets('renders new calendar title in dark mode', (tester) async {
-      await tester.pumpWidget(_darkModeWrap(const CalendarEditorScreen()));
+      await tester.pumpWidget(_darkModeWrap(const CalendarEditorScreen(),
+          overrides: adminOverrides));
       await tester.pumpAndSettle();
 
       // Real behavioral assertion: title is visible
