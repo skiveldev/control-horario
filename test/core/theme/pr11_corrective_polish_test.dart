@@ -4,6 +4,7 @@ import 'package:control_horario/features/admin/presentation/screens/admin_settin
 import 'package:control_horario/features/dashboard/presentation/widgets/day_record_card.dart';
 import 'package:control_horario/features/dashboard/models/time_record_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -19,11 +20,13 @@ void main() {
     testWidgets(
         'screen background and text use theme tokens, not hardcoded AppColors',
         (tester) async {
-      final router = MaterialApp(
-        themeMode: ThemeMode.dark,
-        darkTheme: AppTheme.darkTheme,
-        theme: AppTheme.lightTheme,
-        home: const AdminSettingsScreen(),
+      final router = ProviderScope(
+        child: MaterialApp(
+          themeMode: ThemeMode.dark,
+          darkTheme: AppTheme.darkTheme,
+          theme: AppTheme.lightTheme,
+          home: const AdminSettingsScreen(),
+        ),
       );
 
       await tester.pumpWidget(router);
