@@ -259,6 +259,10 @@ class _HeaderIntro extends StatelessWidget {
 // =============================================================================
 
 /// Fila de tarjetas con métricas honestas calculadas desde los datos reales.
+///
+/// Sigue el grid de referencia: 4 cards separadas que juntas ocupan
+/// el mismo ancho visual que el área de calendarios inferior.
+/// Breakpoints: 1 col (mobile), 2 cols (≥640px), 4 cols (≥1024px).
 class _StatsRow extends StatelessWidget {
   final ColorScheme cs;
   final List<WorkCalendarModel> calendars;
@@ -274,99 +278,167 @@ class _StatsRow extends StatelessWidget {
     final totalVacationDays =
         calendars.fold<int>(0, (sum, c) => sum + c.totalVacationDays);
 
-    return Wrap(
-      spacing: AppSpacing.md,
-      runSpacing: AppSpacing.md,
-      children: [
-        _StatCard(
-          label: 'Total',
-          value: '$total',
-          icon: Icons.calendar_month,
-          color: cs.primary,
-        ),
-        _StatCard(
-          label: 'Activos',
-          value: '$activeCount',
-          icon: Icons.check_circle_outline,
-          color: AppColors.success,
-        ),
-        _StatCard(
-          label: 'Festivos',
-          value: '$totalHolidays',
-          icon: Icons.flag_outlined,
-          color: AppColors.error,
-        ),
-        _StatCard(
-          label: 'Vacaciones',
-          value: '$totalVacationDays días',
-          icon: Icons.beach_access_outlined,
-          color: AppColors.info,
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        const double gap = 16.0; // Reference: gap-4
+
+        int columns;
+        if (width >= 1024) {
+          columns = 4;
+        } else if (width >= 640) {
+          columns = 2;
+        } else {
+          columns = 1;
+        }
+
+        final cardWidth = (width - (columns - 1) * gap) / columns;
+
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: [
+            SizedBox(
+              width: cardWidth,
+              child: _StatCard(
+                label: 'Total Calendarios',
+                value: '$total',
+                icon: Icons.calendar_today,
+                color: cs.primary,
+                // valueColor null → default cs.onSurface (reference default)
+              ),
+            ),
+            SizedBox(
+              width: cardWidth,
+              child: _StatCard(
+                label: 'Activos',
+                value: '$activeCount',
+                icon: Icons.check_circle,
+                color: AppColors.success,
+                valueColor: AppColors.success, // reference: text-secondary
+              ),
+            ),
+            SizedBox(
+              width: cardWidth,
+              child: _StatCard(
+                label: 'Nacionales 2026',
+                value: '$totalHolidays',
+                icon: Icons.flag,
+                color: cs.primary, // reference: text-tertiary (deep blue)
+                valueColor: cs.primary,
+              ),
+            ),
+            SizedBox(
+              width: cardWidth,
+              child: _StatCard(
+                label: 'Vacaciones',
+                value: '$totalVacationDays días',
+                icon: Icons.beach_access,
+                color: AppColors
+                    .success, // reference: on-secondary-container (teal)
+                // valueColor null → default cs.onSurface (reference default)
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
 
 /// Tarjeta individual de estadística.
+///
+/// Sigue el diseño de referencia: surface card, padding 20px, rounded-2xl,
+/// borde visible, sombra sutil, icono 48x48, label uppercase, valor grande.
+///
+/// Reference: `bg-surface-container-lowest p-5 rounded-2xl shadow-sm
+/// border border-outline-variant flex items-center gap-4`
+///
+/// [color] controls the icon and icon-background tint.
+/// [valueColor] controls the large numeric value color. When null, the value
+/// inherits [cs.onSurface] (matching the reference default for Total and
+/// Vacaciones cards). When provided, the value uses the semantic color
+/// (matching the reference `text-secondary` / `text-tertiary` classes for
+/// Activos and Nacionales cards).
 class _StatCard extends StatelessWidget {
   final String label;
   final String value;
   final IconData icon;
   final Color color;
+  final Color? valueColor;
 
   const _StatCard({
     required this.label,
     required this.value,
     required this.icon,
     required this.color,
+    this.valueColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
-      padding: AppSpacing.allLg,
-      constraints: const BoxConstraints(minWidth: 150),
+      padding: const EdgeInsets.all(20), // reference: p-5
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: AppSpacing.borderRadiusMd,
-        border: Border.all(
-          color: Theme.of(context)
-              .colorScheme
-              .outlineVariant
-              .withValues(alpha: 0.4),
-        ),
+        color: cs.surface,
+        borderRadius:
+            AppSpacing.borderRadiusLg, // reference: rounded-2xl (16px)
+        border: Border.all(color: cs.outline),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadow.withValues(alpha: 0.06),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
+          // Icon box — reference: w-12 h-12 rounded-xl (48x48, 12px radius)
           Container(
-            width: 44,
-            height: 44,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.08),
-              borderRadius: AppSpacing.borderRadiusSm,
+              color: color.withValues(alpha: 0.10),
+              borderRadius:
+                  AppSpacing.borderRadiusMd, // reference: rounded-xl (12px)
             ),
-            child: Icon(icon, size: AppSpacing.iconLg, color: color),
+            child: Icon(icon, size: 28, color: color), // reference: text-[28px]
           ),
-          AppSpacing.horizontalSpaceMd,
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                value,
-                style: AppTextStyles.displaySmall.copyWith(
-                  color: color,
-                  height: 1.1,
+          const SizedBox(width: 16), // reference: gap-4
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Label — reference: font-label-sm text-label-sm uppercase tracking-wider
+                Text(
+                  label.toUpperCase(),
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: cs.onSurfaceVariant,
+                    letterSpacing: 0.6,
+                    height: 1.3,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
-              ),
-              Text(
-                label,
-                style: AppTextStyles.labelSmall.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                const SizedBox(height: 2),
+                // Value — reference: text-display-time font-display-time (48px, 700).
+                // Semantic color per reference: Total/Vacaciones→default,
+                // Activos→secondary, Nacionales→tertiary.
+                Text(
+                  value,
+                  style: AppTextStyles.displayLarge.copyWith(
+                    color: valueColor ?? cs.onSurface,
+                    height: 1.0,
+                    letterSpacing: -0.5,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

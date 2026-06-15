@@ -461,7 +461,7 @@ void main() {
     // ── Navigation: Edit calendar ───────────────────────────────────────
 
     testWidgets(
-        'tapping Editar on a calendar navigates to edit-calendar editor',
+        'tapping Editar Calendario on a card navigates to edit-calendar editor',
         (tester) async {
       _setTallViewport(tester);
       final calendars = [
@@ -473,9 +473,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Editar'), findsOneWidget);
-      await tester.ensureVisible(find.text('Editar'));
-      await tester.tap(find.text('Editar'));
+      expect(find.text('Editar Calendario'), findsOneWidget);
+      await tester.ensureVisible(find.text('Editar Calendario'));
+      await tester.tap(find.text('Editar Calendario'));
       await tester.pumpAndSettle();
 
       expect(find.text('Edit: Madrid 2025'), findsOneWidget);
@@ -688,6 +688,85 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('New Calendar'), findsOneWidget);
+      },
+    );
+
+    // ── CalendarCard visibility & overflow regression ──────────────────
+
+    testWidgets(
+      'CalendarCard no desborda ni pierde contenido en mobile (360px)',
+      (tester) async {
+        tester.view.physicalSize = const Size(360, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        final calendars = [
+          _fakeCalendar(
+              id: 'c1',
+              name: 'Madrid Metropolitano Norte 2025',
+              year: 2025,
+              nationalCount: 12,
+              regionalCount: 5,
+              vacationCount: 24),
+        ];
+
+        await tester.pumpWidget(_wrapApp(calendars: calendars));
+        await tester.pumpAndSettle();
+
+        // Card elements must be present and visible
+        expect(find.byType(CalendarCard), findsOneWidget);
+        expect(find.text('Madrid Metropolitano Norte 2025'), findsOneWidget);
+        expect(find.text('Editar Calendario'), findsOneWidget);
+        expect(find.text('Duplicar'), findsOneWidget);
+        expect(find.text('Eliminar'), findsOneWidget);
+        expect(find.text('Activo'), findsOneWidget);
+
+        // Stats chips must render
+        expect(find.text('12'), findsWidgets); // also stat uses '12'
+        expect(find.text('5'), findsWidgets);
+        expect(find.text('24'), findsWidgets);
+
+        // No RenderFlex overflow
+        final overflowErrors = tester.takeException();
+        expect(overflowErrors, isNull,
+            reason: 'CalendarCard must not overflow at 360px width');
+      },
+    );
+
+    testWidgets(
+      'CalendarCard no desborda ni pierde stats en tablet (768px)',
+      (tester) async {
+        tester.view.physicalSize = const Size(768, 1024);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        final calendars = [
+          _fakeCalendar(
+              id: 'c1',
+              name: 'Madrid 2025',
+              year: 2025,
+              nationalCount: 12,
+              regionalCount: 5,
+              vacationCount: 24),
+        ];
+
+        await tester.pumpWidget(_wrapApp(calendars: calendars));
+        await tester.pumpAndSettle();
+
+        // Card visible with all key elements
+        expect(find.byType(CalendarCard), findsOneWidget);
+        expect(find.text('Editar Calendario'), findsOneWidget);
+
+        // No RenderFlex overflow
+        final overflowErrors = tester.takeException();
+        expect(overflowErrors, isNull,
+            reason: 'CalendarCard must not overflow at 768px width');
       },
     );
 

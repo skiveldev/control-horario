@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../shared/widgets/buttons/custom_button.dart';
 import '../../models/holiday_type.dart';
 import '../../models/work_calendar_model.dart';
 
@@ -40,12 +41,12 @@ class CalendarCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: cs.surface,
-        borderRadius: AppSpacing.borderRadiusMd,
-        border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.4)),
+        borderRadius: AppSpacing.borderRadiusLg,
+        border: Border.all(color: cs.outline),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow.withValues(alpha: 0.05),
-            blurRadius: 8,
+            blurRadius: 4,
             offset: const Offset(0, 2),
           ),
         ],
@@ -56,24 +57,55 @@ class CalendarCard extends StatelessWidget {
         children: [
           // ── Top section: icon, title area, stats chips ──
           Padding(
-            padding: AppSpacing.allLg,
-            child: Wrap(
-              spacing: AppSpacing.lg,
-              runSpacing: AppSpacing.md,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                // Large calendar icon
-                _buildIcon(context, cs),
-                // Name, year, and status badge
-                _buildTitleArea(context, cs),
-                // Stats chips
-                _buildStatsRow(cs),
-              ],
+            padding: AppSpacing.allXxl,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                // Responsive: row layout on wider cards, column on narrow.
+                // At >= 700px we have enough room for icon + title + stats in one row.
+                if (constraints.maxWidth >= 700) {
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Calendar icon — fixed size
+                      _buildIcon(context, cs),
+                      AppSpacing.horizontalSpaceXl,
+                      // Name, year, and status badge — flexible fill
+                      Flexible(
+                        flex: 3,
+                        child: _buildTitleArea(context, cs),
+                      ),
+                      AppSpacing.horizontalSpaceXl,
+                      // Stats chips — flexible so they wrap internally when
+                      // the row is not wide enough for all three chips inline.
+                      Flexible(
+                        flex: 2,
+                        child: _buildStatsRow(cs),
+                      ),
+                    ],
+                  );
+                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _buildIcon(context, cs),
+                        AppSpacing.horizontalSpaceMd,
+                        Flexible(child: _buildTitleArea(context, cs)),
+                      ],
+                    ),
+                    AppSpacing.verticalSpaceMd,
+                    _buildStatsRow(cs),
+                  ],
+                );
+              },
             ),
           ),
 
           // ── Divider ──
-          Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.3)),
+          Divider(height: 1, thickness: 1, color: cs.outlineVariant),
 
           // ── Action bar ──
           _buildActions(cs),
@@ -89,17 +121,17 @@ class CalendarCard extends StatelessWidget {
   Widget _buildIcon(BuildContext context, ColorScheme cs) {
     final isActive = calendar.isActive;
     return Container(
-      width: 48,
-      height: 48,
+      width: 64,
+      height: 64,
       decoration: BoxDecoration(
         color: isActive
-            ? AppColors.primary.withValues(alpha: 0.08)
+            ? AppColors.primary.withValues(alpha: 0.10)
             : cs.surfaceContainerHighest,
-        borderRadius: AppSpacing.borderRadiusSm,
+        borderRadius: AppSpacing.borderRadiusLg,
       ),
       child: Icon(
         Icons.calendar_month,
-        size: AppSpacing.iconXl,
+        size: AppSpacing.iconXxl,
         color: isActive ? AppColors.primary : cs.onSurfaceVariant,
       ),
     );
@@ -114,27 +146,31 @@ class CalendarCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Name + status badge
+        // Name + status badge — both flexible so neither causes overflow
         Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.max,
           children: [
             Flexible(
+              flex: 3,
               child: Text(
                 calendar.name,
-                style: AppTextStyles.h5.copyWith(color: cs.onSurface),
+                style: AppTextStyles.h3.copyWith(color: cs.onSurface),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
             ),
             AppSpacing.horizontalSpaceSm,
-            _buildStatusBadge(cs),
+            Flexible(
+              flex: 1,
+              child: _buildStatusBadge(cs),
+            ),
           ],
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 4),
         // Year subtitle
         Text(
-          'Año ${calendar.year}',
-          style: AppTextStyles.bodySmall.copyWith(
+          'Configuración ${calendar.year}',
+          style: AppTextStyles.bodyMedium.copyWith(
             color: cs.onSurfaceVariant,
           ),
         ),
@@ -150,7 +186,7 @@ class CalendarCard extends StatelessWidget {
     final isActive = calendar.isActive;
     final color = isActive ? AppColors.success : cs.onSurfaceVariant;
     final bgColor = isActive
-        ? AppColors.success.withValues(alpha: 0.08)
+        ? AppColors.success.withValues(alpha: 0.10)
         : cs.surfaceContainerHighest;
 
     return Container(
@@ -160,28 +196,16 @@ class CalendarCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: AppSpacing.borderRadiusSm,
+        borderRadius: AppSpacing.borderRadiusCircular,
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 6,
-            height: 6,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: color,
-            ),
-          ),
-          AppSpacing.horizontalSpaceXs,
-          Text(
-            isActive ? 'Activo' : 'Borrador',
-            style: AppTextStyles.labelSmall.copyWith(
-              color: color,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
+      child: Text(
+        isActive ? 'Activo' : 'Borrador',
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+        style: AppTextStyles.labelSmall.copyWith(
+          color: color,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -201,21 +225,24 @@ class CalendarCard extends StatelessWidget {
 
     return Wrap(
       spacing: AppSpacing.sm,
-      runSpacing: AppSpacing.xs,
+      runSpacing: AppSpacing.sm,
       children: [
         _statChip(
           icon: Icons.flag_outlined,
-          label: '$nationals festivos nac.',
+          value: '$nationals',
+          label: 'Nacionales',
           color: AppColors.error,
         ),
         _statChip(
           icon: Icons.location_city_outlined,
-          label: '$regionals regionales',
-          color: AppColors.info,
+          value: '$regionals',
+          label: 'Regionales',
+          color: cs.primary,
         ),
         _statChip(
           icon: Icons.beach_access_outlined,
-          label: '$vacations días vac.',
+          value: '$vacations',
+          label: 'Vacaciones',
           color: AppColors.success,
         ),
       ],
@@ -224,22 +251,34 @@ class CalendarCard extends StatelessWidget {
 
   Widget _statChip({
     required IconData icon,
+    required String value,
     required String label,
     required Color color,
   }) {
     return Container(
-      padding: AppSpacing.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12, // reference: px-3
+        vertical: 8, // reference: py-2
       ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.06),
-        borderRadius: AppSpacing.borderRadiusSm,
+        borderRadius: AppSpacing.borderRadiusMd, // reference: rounded-xl (12px)
+        border: Border.all(
+          color: color.withValues(alpha: 0.15),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 13, color: color),
+          Icon(icon, size: AppSpacing.iconSm, color: color),
+          AppSpacing.horizontalSpaceSm,
+          Text(
+            value,
+            style: AppTextStyles.labelLarge.copyWith(
+              color: color,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           AppSpacing.horizontalSpaceXs,
           Text(
             label,
@@ -257,57 +296,85 @@ class CalendarCard extends StatelessWidget {
   Widget _buildActions(ColorScheme cs) {
     return Padding(
       padding: AppSpacing.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
       ),
-      child: Wrap(
-        alignment: WrapAlignment.end,
-        spacing: AppSpacing.sm,
-        runSpacing: AppSpacing.sm,
-        children: [
-          TextButton.icon(
-            onPressed: onDuplicate,
-            icon: const Icon(Icons.copy_outlined, size: 16),
-            label: const Text('Duplicar'),
-            style: TextButton.styleFrom(
-              foregroundColor: cs.onSurfaceVariant,
-              textStyle: AppTextStyles.labelMedium,
-              padding: AppSpacing.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: AppSpacing.xs,
-              ),
-            ),
-          ),
-          TextButton.icon(
-            onPressed: onDelete,
-            icon: const Icon(Icons.delete_outline, size: 16),
-            label: const Text('Eliminar'),
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.error,
-              textStyle: AppTextStyles.labelMedium,
-              padding: AppSpacing.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: AppSpacing.xs,
-              ),
-            ),
-          ),
-          FilledButton.icon(
-            onPressed: onEdit,
-            icon: const Icon(Icons.edit_outlined, size: 16),
-            label: const Text('Editar'),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: AppColors.textOnPrimary,
-              textStyle: AppTextStyles.labelMedium,
-              padding: AppSpacing.symmetric(
-                horizontal: AppSpacing.lg,
-                vertical: AppSpacing.sm,
-              ),
-              minimumSize: Size.zero,
-            ),
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Desktop/tablet: single row, right-aligned — matches reference
+          // <div class="flex gap-2"> with three side-by-side buttons.
+          if (constraints.maxWidth >= 450) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                _buildDuplicateButton(cs),
+                AppSpacing.horizontalSpaceSm,
+                _buildDeleteButton(cs),
+                AppSpacing.horizontalSpaceSm,
+                _buildEditButton(),
+              ],
+            );
+          }
+          // Mobile: wrap for overflow safety.  Children stay compact
+          // and never stretch full width because the Wrap gives each
+          // child loose constraints.
+          return Wrap(
+            alignment: WrapAlignment.end,
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              _buildDuplicateButton(cs),
+              _buildDeleteButton(cs),
+              _buildEditButton(),
+            ],
+          );
+        },
       ),
+    );
+  }
+
+  Widget _buildDuplicateButton(ColorScheme cs) {
+    return TextButton.icon(
+      onPressed: onDuplicate,
+      icon: const Icon(Icons.copy_outlined, size: 18),
+      label: const Text('Duplicar'),
+      style: TextButton.styleFrom(
+        foregroundColor: cs.onSurfaceVariant,
+        textStyle: AppTextStyles.labelMedium,
+        padding: AppSpacing.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDeleteButton(ColorScheme cs) {
+    return TextButton.icon(
+      onPressed: onDelete,
+      icon: const Icon(Icons.delete_outline, size: 18),
+      label: const Text('Eliminar'),
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.error,
+        textStyle: AppTextStyles.labelMedium,
+        padding: AppSpacing.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
+      ),
+    );
+  }
+
+  /// Edit action button — shares the same brand gradient style as
+  /// "Nuevo Calendario" for visual coherence.  Medium size matches the
+  /// reference scale without oversizing the action bar.
+  Widget _buildEditButton() {
+    return CustomButton(
+      text: 'Editar Calendario',
+      icon: Icons.edit_outlined,
+      variant: ButtonVariant.brand,
+      size: ButtonSize.medium,
+      onPressed: onEdit,
     );
   }
 }
