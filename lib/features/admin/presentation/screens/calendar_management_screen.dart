@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/constants/breakpoints.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../shared/widgets/buttons/custom_button.dart';
 import '../../../../shared/widgets/layouts/admin_layout.dart';
@@ -163,8 +162,6 @@ class _Content extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = context.isDesktop;
-
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 1200),
@@ -186,7 +183,6 @@ class _Content extends StatelessWidget {
             _CalendarGrid(
               cs: cs,
               calendars: calendars,
-              isDesktop: isDesktop,
               onNavigateToEditor: onNavigateToEditor,
               onDuplicateCalendar: onDuplicateCalendar,
               onConfirmDelete: onConfirmDelete,
@@ -225,18 +221,15 @@ class _HeaderIntro extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Calendarios Laborales',
-                      style: AppTextStyles.h1.copyWith(color: cs.onSurface)),
-                  AppSpacing.verticalSpaceSm,
-                  Text('Panel de administración',
-                      style: AppTextStyles.h4.copyWith(color: cs.primary)),
-                  AppSpacing.verticalSpaceXs,
+                      style: AppTextStyles.h1.copyWith(color: cs.primary)),
+                  const SizedBox(height: 6),
                   Text(
                     'Gestiona festivos nacionales, autonómicos, locales y '
                     'vacaciones. $total ${total == 1 ? 'calendario configurado' : 'calendarios configurados'}.',
@@ -246,15 +239,13 @@ class _HeaderIntro extends StatelessWidget {
                 ],
               ),
             ),
-            AppSpacing.horizontalSpaceXxl,
-            Flexible(
-              child: CustomButton(
-                text: 'Nuevo Calendario',
-                icon: Icons.add,
-                variant: ButtonVariant.brand,
-                size: ButtonSize.large,
-                onPressed: onNavigateToEditor,
-              ),
+            AppSpacing.horizontalSpaceXl,
+            CustomButton(
+              text: 'Nuevo Calendario',
+              icon: Icons.add,
+              variant: ButtonVariant.brand,
+              size: ButtonSize.medium,
+              onPressed: onNavigateToEditor,
             ),
           ],
         ),
@@ -334,7 +325,7 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: AppSpacing.allLg,
-      constraints: const BoxConstraints(minWidth: 140),
+      constraints: const BoxConstraints(minWidth: 150),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: AppSpacing.borderRadiusMd,
@@ -349,13 +340,13 @@ class _StatCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 36,
-            height: 36,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.08),
               borderRadius: AppSpacing.borderRadiusSm,
             ),
-            child: Icon(icon, size: AppSpacing.iconMd, color: color),
+            child: Icon(icon, size: AppSpacing.iconLg, color: color),
           ),
           AppSpacing.horizontalSpaceMd,
           Column(
@@ -364,7 +355,10 @@ class _StatCard extends StatelessWidget {
             children: [
               Text(
                 value,
-                style: AppTextStyles.h5.copyWith(color: color),
+                style: AppTextStyles.displaySmall.copyWith(
+                  color: color,
+                  height: 1.1,
+                ),
               ),
               Text(
                 label,
@@ -387,7 +381,6 @@ class _StatCard extends StatelessWidget {
 class _CalendarGrid extends StatelessWidget {
   final ColorScheme cs;
   final List<WorkCalendarModel> calendars;
-  final bool isDesktop;
   final void Function(WorkCalendarModel?) onNavigateToEditor;
   final void Function(WorkCalendarModel) onDuplicateCalendar;
   final void Function(WorkCalendarModel) onConfirmDelete;
@@ -395,7 +388,6 @@ class _CalendarGrid extends StatelessWidget {
   const _CalendarGrid({
     required this.cs,
     required this.calendars,
-    required this.isDesktop,
     required this.onNavigateToEditor,
     required this.onDuplicateCalendar,
     required this.onConfirmDelete,
@@ -403,31 +395,18 @@ class _CalendarGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final columns = isDesktop ? 2 : 1;
-    const gap = AppSpacing.lg;
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final totalGaps = (columns - 1) * gap;
-        final availableWidth = constraints.maxWidth - totalGaps;
-        final cardWidth = availableWidth / columns;
-
-        return Wrap(
-          spacing: gap,
-          runSpacing: gap,
-          children: calendars.map((calendar) {
-            return SizedBox(
-              width: cardWidth,
-              child: CalendarCard(
-                calendar: calendar,
-                onEdit: () => onNavigateToEditor(calendar),
-                onDuplicate: () => onDuplicateCalendar(calendar),
-                onDelete: () => onConfirmDelete(calendar),
-              ),
-            );
-          }).toList(),
+    return Column(
+      children: calendars.map((calendar) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+          child: CalendarCard(
+            calendar: calendar,
+            onEdit: () => onNavigateToEditor(calendar),
+            onDuplicate: () => onDuplicateCalendar(calendar),
+            onDelete: () => onConfirmDelete(calendar),
+          ),
         );
-      },
+      }).toList(),
     );
   }
 }
@@ -499,7 +478,7 @@ class _EmptyState extends StatelessWidget {
                 text: 'Crear Primer Calendario',
                 icon: Icons.add,
                 variant: ButtonVariant.brand,
-                size: ButtonSize.large,
+                size: ButtonSize.medium,
                 onPressed: onNavigateToEditor,
               ),
             ],

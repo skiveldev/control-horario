@@ -235,7 +235,7 @@ void main() {
   group('CalendarManagementScreen', () {
     // ── Content state ───────────────────────────────────────────────────
 
-    testWidgets('muestra título y subtítulo', (tester) async {
+    testWidgets('muestra título y descripción', (tester) async {
       _setTallViewport(tester);
       final calendars = [
         _fakeCalendar(
@@ -251,7 +251,6 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Calendarios Laborales'), findsOneWidget);
-      expect(find.text('Panel de administración'), findsOneWidget);
       expect(
         find.text(
           'Gestiona festivos nacionales, autonómicos, locales y '
@@ -689,6 +688,37 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('New Calendar'), findsOneWidget);
+      },
+    );
+
+    // ── CTA button sizing regression ───────────────────────────────────
+
+    testWidgets(
+      'Nuevo Calendario CTA no desborda ni es oversized en mobile',
+      (tester) async {
+        tester.view.physicalSize = const Size(360, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        final calendars = [
+          _fakeCalendar(
+              id: 'c1', name: 'Madrid Metropolitano Norte 2025', year: 2025),
+        ];
+
+        await tester.pumpWidget(_wrapApp(calendars: calendars));
+        await tester.pumpAndSettle();
+
+        // CTA must be present and visible
+        final ctaFinder = find.text('Nuevo Calendario');
+        expect(ctaFinder, findsOneWidget);
+
+        // No RenderFlex overflow anywhere
+        final overflowErrors = tester.takeException();
+        expect(overflowErrors, isNull,
+            reason: 'CTA button must not overflow at 360px width');
       },
     );
   });

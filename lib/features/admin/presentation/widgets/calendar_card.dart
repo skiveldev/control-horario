@@ -5,10 +5,10 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../models/holiday_type.dart';
 import '../../models/work_calendar_model.dart';
 
-/// Card para mostrar un calendario laboral en la lista de gestión
+/// Card para mostrar un calendario laboral en la lista de gestión.
 ///
-/// Muestra nombre, año, estado (activo/borrador), estadísticas honestas
-/// de festivos y vacaciones, y botones de acción.
+/// Diseño horizontal amplio: icono, título, badge de estado, chips de
+/// estadísticas y barra de acciones con editar, duplicar y eliminar.
 ///
 /// Ejemplo de uso:
 /// ```dart
@@ -54,92 +54,97 @@ class CalendarCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Accent strip
-          Container(
-            height: 3,
-            decoration: BoxDecoration(
-              color: calendar.isActive
-                  ? AppColors.primary
-                  : cs.outlineVariant.withValues(alpha: 0.4),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(AppSpacing.radiusMd),
-                topRight: Radius.circular(AppSpacing.radiusMd),
-              ),
+          // ── Top section: icon, title area, stats chips ──
+          Padding(
+            padding: AppSpacing.allLg,
+            child: Wrap(
+              spacing: AppSpacing.lg,
+              runSpacing: AppSpacing.md,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                // Large calendar icon
+                _buildIcon(context, cs),
+                // Name, year, and status badge
+                _buildTitleArea(context, cs),
+                // Stats chips
+                _buildStatsRow(cs),
+              ],
             ),
           ),
 
-          // Header
-          _buildHeader(context, cs),
-
-          // Divider
+          // ── Divider ──
           Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.3)),
 
-          // Stats
-          _buildStats(cs),
-
-          // Divider
-          Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.3)),
-
-          // Footer actions
+          // ── Action bar ──
           _buildActions(cs),
         ],
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context, ColorScheme cs) {
-    return Padding(
-      padding: AppSpacing.allLg,
-      child: Row(
-        children: [
-          // Calendar icon
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: calendar.isActive
-                  ? AppColors.primary.withValues(alpha: 0.08)
-                  : cs.surfaceContainerHighest,
-              borderRadius: AppSpacing.borderRadiusSm,
-            ),
-            child: Icon(
-              Icons.calendar_month,
-              size: AppSpacing.iconLg,
-              color:
-                  calendar.isActive ? AppColors.primary : cs.onSurfaceVariant,
-            ),
-          ),
+  // ===========================================================================
+  // ICON
+  // ===========================================================================
 
-          AppSpacing.horizontalSpaceMd,
-
-          // Name + year
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  calendar.name,
-                  style: AppTextStyles.h5.copyWith(color: cs.onSurface),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'Año ${calendar.year}',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: cs.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Status badge
-          _buildStatusBadge(cs),
-        ],
+  Widget _buildIcon(BuildContext context, ColorScheme cs) {
+    final isActive = calendar.isActive;
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: isActive
+            ? AppColors.primary.withValues(alpha: 0.08)
+            : cs.surfaceContainerHighest,
+        borderRadius: AppSpacing.borderRadiusSm,
+      ),
+      child: Icon(
+        Icons.calendar_month,
+        size: AppSpacing.iconXl,
+        color: isActive ? AppColors.primary : cs.onSurfaceVariant,
       ),
     );
   }
+
+  // ===========================================================================
+  // TITLE AREA
+  // ===========================================================================
+
+  Widget _buildTitleArea(BuildContext context, ColorScheme cs) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Name + status badge
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Text(
+                calendar.name,
+                style: AppTextStyles.h5.copyWith(color: cs.onSurface),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
+            AppSpacing.horizontalSpaceSm,
+            _buildStatusBadge(cs),
+          ],
+        ),
+        const SizedBox(height: 2),
+        // Year subtitle
+        Text(
+          'Año ${calendar.year}',
+          style: AppTextStyles.bodySmall.copyWith(
+            color: cs.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ===========================================================================
+  // STATUS BADGE
+  // ===========================================================================
 
   Widget _buildStatusBadge(ColorScheme cs) {
     final isActive = calendar.isActive;
@@ -181,7 +186,11 @@ class CalendarCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStats(ColorScheme cs) {
+  // ===========================================================================
+  // STATS CHIPS
+  // ===========================================================================
+
+  Widget _buildStatsRow(ColorScheme cs) {
     final nationals =
         calendar.events.where((e) => e.type == HolidayType.national).length;
     final regionals = calendar.events
@@ -190,64 +199,60 @@ class CalendarCard extends StatelessWidget {
         .length;
     final vacations = calendar.totalVacationDays;
 
-    return Padding(
-      padding: AppSpacing.allLg,
+    return Wrap(
+      spacing: AppSpacing.sm,
+      runSpacing: AppSpacing.xs,
+      children: [
+        _statChip(
+          icon: Icons.flag_outlined,
+          label: '$nationals festivos nac.',
+          color: AppColors.error,
+        ),
+        _statChip(
+          icon: Icons.location_city_outlined,
+          label: '$regionals regionales',
+          color: AppColors.info,
+        ),
+        _statChip(
+          icon: Icons.beach_access_outlined,
+          label: '$vacations días vac.',
+          color: AppColors.success,
+        ),
+      ],
+    );
+  }
+
+  Widget _statChip({
+    required IconData icon,
+    required String label,
+    required Color color,
+  }) {
+    return Container(
+      padding: AppSpacing.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.06),
+        borderRadius: AppSpacing.borderRadiusSm,
+      ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          _buildStatChip(
-            icon: Icons.flag_outlined,
-            label: '$nationals festivos nac.',
-            color: AppColors.error,
-          ),
-          AppSpacing.horizontalSpaceSm,
-          _buildStatChip(
-            icon: Icons.location_city_outlined,
-            label: '$regionals regionales',
-            color: AppColors.info,
-          ),
-          AppSpacing.horizontalSpaceSm,
-          _buildStatChip(
-            icon: Icons.beach_access_outlined,
-            label: '$vacations días vac.',
-            color: AppColors.success,
+          Icon(icon, size: 13, color: color),
+          AppSpacing.horizontalSpaceXs,
+          Text(
+            label,
+            style: AppTextStyles.labelSmall.copyWith(color: color),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStatChip({
-    required IconData icon,
-    required String label,
-    required Color color,
-  }) {
-    return Expanded(
-      child: Container(
-        padding: AppSpacing.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
-        ),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.06),
-          borderRadius: AppSpacing.borderRadiusSm,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 13, color: color),
-            AppSpacing.horizontalSpaceXs,
-            Flexible(
-              child: Text(
-                label,
-                style: AppTextStyles.labelSmall.copyWith(color: color),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // ===========================================================================
+  // ACTIONS
+  // ===========================================================================
 
   Widget _buildActions(ColorScheme cs) {
     return Padding(
