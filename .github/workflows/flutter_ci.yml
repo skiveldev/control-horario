@@ -147,6 +147,7 @@ jobs:
       # Subir el APK como artifact (disponible para descargar)
       - name: 📤 Upload APK
         uses: actions/upload-artifact@v4
+        continue-on-error: true  # No bloquear CI si GitHub Actions alcanza la cuota de artifacts
         with:
           name: android-apk
           path: build/app/outputs/flutter-apk/app-release.apk
@@ -180,6 +181,7 @@ jobs:
       # Subir build de web como artifact
       - name: 📤 Upload Web Build
         uses: actions/upload-artifact@v4
+        continue-on-error: true  # No bloquear CI si GitHub Actions alcanza la cuota de artifacts
         with:
           name: web-build
           path: build/web/
