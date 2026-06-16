@@ -4,12 +4,10 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../auth/models/user_model.dart';
 
-/// Item de empleado en lista
+/// Item de empleado en lista (vista mobile).
 ///
-/// Muestra información resumida de un empleado.
-/// Versión responsive para mobile y desktop.
-///
-/// DÍA 4: Refactorizado para aceptar UserModel directamente
+/// Muestra información resumida de un empleado con avatar, nombre, cargo,
+/// departamento y badge de estado.
 class EmployeeListItem extends StatelessWidget {
   /// Modelo del empleado
   final UserModel employee;
@@ -31,13 +29,20 @@ class EmployeeListItem extends StatelessWidget {
           color: cs.surface,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
           border: Border.all(color: cs.outline),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadow.withValues(alpha: 0.04),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
             // Avatar
             CircleAvatar(
               radius: 24,
-              backgroundColor: AppColors.primary,
+              backgroundColor: _getAvatarColor(),
               child: Text(
                 _getInitials(employee.displayName),
                 style: AppTextStyles.labelLarge.copyWith(
@@ -58,6 +63,7 @@ class EmployeeListItem extends StatelessWidget {
                     employee.displayName,
                     style: AppTextStyles.bodyMedium.copyWith(
                       fontWeight: FontWeight.w600,
+                      color: cs.onSurface,
                     ),
                   ),
                   AppSpacing.verticalSpaceXs,
@@ -72,11 +78,7 @@ class EmployeeListItem extends StatelessWidget {
                   // Departamento
                   Row(
                     children: [
-                      Icon(
-                        Icons.business,
-                        size: 12,
-                        color: cs.outline,
-                      ),
+                      Icon(Icons.business, size: 12, color: cs.outline),
                       const SizedBox(width: 4),
                       Flexible(
                         child: Text(
@@ -99,11 +101,7 @@ class EmployeeListItem extends StatelessWidget {
               children: [
                 _buildStatusBadge(cs),
                 AppSpacing.verticalSpaceXs,
-                Icon(
-                  Icons.arrow_forward_ios,
-                  size: 16,
-                  color: cs.outline,
-                ),
+                Icon(Icons.arrow_forward_ios, size: 16, color: cs.outline),
               ],
             ),
           ],
@@ -122,8 +120,21 @@ class EmployeeListItem extends StatelessWidget {
         : name.toUpperCase();
   }
 
+  Color _getAvatarColor() {
+    final colors = [
+      AppColors.primary,
+      AppColors.secondary,
+      AppColors.accent,
+      AppColors.success,
+      AppColors.warning,
+      AppColors.info,
+    ];
+
+    final hash = employee.userId.hashCode.abs();
+    return colors[hash % colors.length];
+  }
+
   Widget _buildStatusBadge(ColorScheme cs) {
-    // Determinar estado basado en isActive y role
     Color color;
     String label;
 
@@ -131,7 +142,6 @@ class EmployeeListItem extends StatelessWidget {
       color = cs.outline;
       label = 'Inactivo';
     } else {
-      // Activo: mostrar rol
       switch (employee.role) {
         case UserRole.admin:
           color = AppColors.error;

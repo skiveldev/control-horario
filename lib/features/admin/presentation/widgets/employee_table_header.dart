@@ -20,6 +20,11 @@ class EmployeeTableHeader extends StatelessWidget {
     final isDesktop = context.isDesktop;
     final isTablet = context.isTablet;
     final cs = Theme.of(context).colorScheme;
+    final headerTextStyle = AppTextStyles.labelSmall.copyWith(
+      color: cs.onSurfaceVariant,
+      fontWeight: FontWeight.w700,
+      letterSpacing: 0.5,
+    );
 
     return Container(
       padding: AppSpacing.symmetric(
@@ -42,11 +47,7 @@ class EmployeeTableHeader extends StatelessWidget {
             flex: isDesktop ? 40 : 50,
             child: Text(
               'NOMBRE Y PERFIL',
-              style: AppTextStyles.labelSmall.copyWith(
-                color: cs.outline,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-              ),
+              style: headerTextStyle,
             ),
           ),
 
@@ -55,11 +56,7 @@ class EmployeeTableHeader extends StatelessWidget {
             flex: 20,
             child: Text(
               'DEPARTAMENTO',
-              style: AppTextStyles.labelSmall.copyWith(
-                color: cs.outline,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-              ),
+              style: headerTextStyle,
             ),
           ),
 
@@ -69,11 +66,7 @@ class EmployeeTableHeader extends StatelessWidget {
               flex: 15,
               child: Text(
                 'EMPRESA',
-                style: AppTextStyles.labelSmall.copyWith(
-                  color: cs.outline,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
-                ),
+                style: headerTextStyle,
               ),
             ),
 
@@ -82,11 +75,7 @@ class EmployeeTableHeader extends StatelessWidget {
             flex: 15,
             child: Text(
               'ESTADO',
-              style: AppTextStyles.labelSmall.copyWith(
-                color: cs.outline,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-              ),
+              style: headerTextStyle,
             ),
           ),
 
@@ -95,11 +84,7 @@ class EmployeeTableHeader extends StatelessWidget {
             flex: 15,
             child: Text(
               'ÚLTIMO FICHAJE',
-              style: AppTextStyles.labelSmall.copyWith(
-                color: cs.outline,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-              ),
+              style: headerTextStyle,
               textAlign: TextAlign.right,
             ),
           ),

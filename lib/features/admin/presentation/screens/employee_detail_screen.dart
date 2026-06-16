@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -60,6 +61,9 @@ class EmployeeDetailScreen extends ConsumerWidget {
         constraints: const BoxConstraints(maxWidth: 1000),
         child: Column(
           children: [
+            // ── BACK NAVIGATION ────────────────────────────────────────
+            _buildBackButton(context, cs),
+
             // ── HERO CARD ──────────────────────────────────────────────
             _buildHeroCard(context, cs, employee),
 
@@ -608,6 +612,48 @@ class EmployeeDetailScreen extends ConsumerWidget {
   // SHARED BUILDING BLOCKS
   // ═══════════════════════════════════════════════════════════════════════
 
+  /// Safe back-to-employees-list affordance.
+  ///
+  /// Pops the top route when there is a previous route in the stack (navigated
+  /// from the list). When the detail screen was opened directly (deep-link,
+  /// browser refresh), `canPop()` is false and the button navigates explicitly
+  /// to [AppRouter.adminEmployees] so the user never lands on a blank shell.
+  Widget _buildBackButton(BuildContext context, ColorScheme cs) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: InkWell(
+          onTap: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(AppRouter.adminEmployees);
+            }
+          },
+          borderRadius: AppSpacing.borderRadiusSm,
+          child: Padding(
+            padding: AppSpacing.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.arrow_back, size: 18, color: cs.primary),
+                AppSpacing.horizontalSpaceXs,
+                Text(
+                  'Volver a empleados',
+                  style: AppTextStyles.labelLarge.copyWith(color: cs.primary),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSectionHeader({
     required IconData icon,
     required String title,
@@ -617,9 +663,12 @@ class EmployeeDetailScreen extends ConsumerWidget {
       children: [
         Icon(icon, size: 20, color: cs.primary),
         AppSpacing.horizontalSpaceSm,
-        Text(
-          title,
-          style: AppTextStyles.h5.copyWith(color: cs.primary),
+        Flexible(
+          child: Text(
+            title,
+            style: AppTextStyles.h5.copyWith(color: cs.primary),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );
@@ -673,6 +722,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          _buildBackButton(context, cs),
           Icon(
             Icons.person_off,
             size: 64,
@@ -700,6 +750,7 @@ class EmployeeDetailScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          _buildBackButton(context, cs),
           Icon(
             Icons.error_outline,
             size: 64,
