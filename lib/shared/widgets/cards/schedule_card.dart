@@ -3,7 +3,10 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
 
-/// Card para mostrar una plantilla de horario o un horario personalizado
+/// Card para mostrar una plantilla de horario o un horario personalizado.
+///
+/// Rediseño bento-style con mejor jerarquía visual, badge de horas semanales
+/// en píldora, icono contenedor y footer con empleados/creador.
 ///
 /// Ejemplo de uso:
 /// ```dart
@@ -55,74 +58,65 @@ class ScheduleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      borderRadius: AppSpacing.borderRadiusXl,
       child: Container(
-        padding: AppSpacing.allLg,
+        padding: const EdgeInsets.all(AppSpacing.xl),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.outline,
-          ),
+          color: cs.surface,
+          borderRadius: AppSpacing.borderRadiusXl,
+          border: Border.all(color: cs.outlineVariant),
           boxShadow: [
             BoxShadow(
-              color: AppColors.shadow.withValues(alpha: 0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+              color: AppColors.shadow.withValues(alpha: 0.06),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header: Icono + Nombre
+            // ── TOP ROW: Icon container + weekly hours badge ──
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Icono según tipo
+                // Icon container
                 Container(
-                  padding: AppSpacing.allSm,
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
-                    color: _getIconColor().withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                    color: _getIconColor().withValues(alpha: 0.10),
+                    borderRadius: AppSpacing.borderRadiusMd,
                   ),
                   child: Icon(
                     _getIcon(),
-                    size: AppSpacing.iconMd,
+                    size: AppSpacing.iconLg,
                     color: _getIconColor(),
                   ),
                 ),
 
-                AppSpacing.horizontalSpaceMd,
+                const Spacer(),
 
-                // Nombre
-                Expanded(
-                  child: Text(
-                    name,
-                    style: AppTextStyles.h5,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-
-                // Badge de horas semanales
+                // Weekly hours badge (pill)
                 Container(
-                  padding: AppSpacing.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.md,
                     vertical: AppSpacing.xs,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                    border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.3),
-                    ),
+                    color: cs.primary.withValues(alpha: 0.08),
+                    borderRadius: AppSpacing.borderRadiusCircular,
                   ),
                   child: Text(
                     '${weeklyHours}h/sem',
                     style: AppTextStyles.labelSmall.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
+                      color: cs.primary,
+                      fontWeight: FontWeight.w700,
+                      height: 1.3,
                     ),
                   ),
                 ),
@@ -131,62 +125,101 @@ class ScheduleCard extends StatelessWidget {
 
             AppSpacing.verticalSpaceMd,
 
-            // Descripción
+            // ── NAME ──
             Text(
-              description,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-              maxLines: 2,
+              name,
+              style: AppTextStyles.h5.copyWith(color: cs.onSurface),
               overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
 
-            AppSpacing.verticalSpaceMd,
+            const SizedBox(height: 4),
 
-            // Información adicional
+            // ── DESCRIPTION ──
             Row(
               children: [
-                // Contador de empleados (solo para templates)
+                Icon(
+                  Icons.event_repeat,
+                  size: 16,
+                  color: cs.onSurfaceVariant,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    description,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: cs.onSurfaceVariant,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: AppSpacing.md),
+
+            // ── Divider ──
+            Divider(height: 1, thickness: 1, color: cs.outlineVariant),
+
+            const SizedBox(height: AppSpacing.md),
+
+            // ── FOOTER: employee count + createdBy ──
+            Row(
+              children: [
+                // Employee count (solo para templates)
                 if (isTemplate && usedByCount != null) ...[
                   Icon(
                     Icons.people,
                     size: 16,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    color: cs.onSurfaceVariant,
                   ),
                   const SizedBox(width: 4),
                   Flexible(
                     child: Text(
-                      'Usada por $usedByCount empleados',
+                      'Usada por $usedByCount ${usedByCount == 1 ? 'empleado' : 'empleados'}',
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        color: cs.onSurfaceVariant,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
 
-                // Separador
+                // Separator dot
                 if (isTemplate && usedByCount != null && createdBy != null) ...[
-                  AppSpacing.horizontalSpaceSm,
-                  Text(
-                    '•',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: Theme.of(context).colorScheme.outline,
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 4,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: cs.outline,
+                      shape: BoxShape.circle,
                     ),
                   ),
-                  AppSpacing.horizontalSpaceSm,
+                  const SizedBox(width: 8),
                 ],
 
-                // Info de creación
+                // Created by
                 if (createdBy != null)
                   Flexible(
                     child: Text(
                       'Creada por $createdBy',
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        color: cs.onSurfaceVariant,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
+                  ),
+
+                const Spacer(),
+
+                // Edit hint arrow (subtle, only when tappable)
+                if (onTap != null)
+                  Icon(
+                    Icons.chevron_right,
+                    size: 18,
+                    color: cs.onSurfaceVariant.withValues(alpha: 0.4),
                   ),
               ],
             ),
