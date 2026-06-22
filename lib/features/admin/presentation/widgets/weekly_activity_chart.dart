@@ -62,7 +62,10 @@ class _WeeklyActivityChartState extends State<WeeklyActivityChart> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header con título y selector
+          // Header con título
+          // NOTA: Cuando no hay datos, el selector de período se oculta
+          // porque no tiene efecto real (no-op). Se muestra un badge
+          // "Más adelante" en su lugar.
           Row(
             children: [
               Expanded(
@@ -85,51 +88,84 @@ class _WeeklyActivityChartState extends State<WeeklyActivityChart> {
                   ],
                 ),
               ),
-              // Selector de período
-              Container(
-                padding: AppSpacing.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.sm,
-                ),
-                decoration: BoxDecoration(
-                  border: Border.all(color: cs.outline),
-                  borderRadius: AppSpacing.borderRadiusSm,
-                ),
-                child: DropdownButton<String>(
-                  value: _selectedPeriod,
-                  underline: const SizedBox(),
-                  isDense: true,
-                  icon: Icon(
-                    Icons.arrow_drop_down,
-                    size: AppSpacing.iconMd,
+              if (widget.data.isNotEmpty)
+                // Selector de período — solo visible cuando hay datos reales
+                Container(
+                  padding: AppSpacing.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
                   ),
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: cs.onSurface,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: cs.outline),
+                    borderRadius: AppSpacing.borderRadiusSm,
                   ),
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'Esta semana',
-                      child: Text('Esta semana'),
+                  child: DropdownButton<String>(
+                    value: _selectedPeriod,
+                    underline: const SizedBox(),
+                    isDense: true,
+                    icon: Icon(
+                      Icons.arrow_drop_down,
+                      size: AppSpacing.iconMd,
                     ),
-                    DropdownMenuItem(
-                      value: 'Última semana',
-                      child: Text('Última semana'),
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: cs.onSurface,
                     ),
-                    DropdownMenuItem(
-                      value: 'Últimos 30 días',
-                      child: Text('Últimos 30 días'),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'Esta semana',
+                        child: Text('Esta semana'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Última semana',
+                        child: Text('Última semana'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Últimos 30 días',
+                        child: Text('Últimos 30 días'),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          _selectedPeriod = value;
+                        });
+                        // TODO [FASE-2]: Cargar datos según período
+                      }
+                    },
+                  ),
+                )
+              else
+                // Badge "Más adelante" — no interactivo, solo informativo
+                Container(
+                  padding: AppSpacing.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
+                  decoration: BoxDecoration(
+                    color: cs.surfaceContainerHighest.withValues(alpha: 0.6),
+                    borderRadius: AppSpacing.borderRadiusSm,
+                    border: Border.all(
+                      color: cs.outline.withValues(alpha: 0.4),
                     ),
-                  ],
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _selectedPeriod = value;
-                      });
-                      // TODO [FASE-2]: Cargar datos según período
-                    }
-                  },
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.construction_outlined,
+                        size: 14,
+                        color: cs.onSurfaceVariant.withValues(alpha: 0.7),
+                      ),
+                      SizedBox(width: AppSpacing.sm),
+                      Text(
+                        'Más adelante',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: cs.onSurfaceVariant.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
             ],
           ),
 
@@ -157,7 +193,7 @@ class _WeeklyActivityChartState extends State<WeeklyActivityChart> {
                     ),
                     AppSpacing.verticalSpaceXs,
                     Text(
-                      'Los datos de actividad estarán disponibles próximamente',
+                      'Datos históricos en construcción — disponibles próximamente',
                       style: AppTextStyles.bodySmall.copyWith(
                         color: cs.outline,
                       ),

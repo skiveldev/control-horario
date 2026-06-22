@@ -133,5 +133,38 @@ void main() {
       expect(find.text('Usuario 1'), findsNothing);
       expect(find.text('Fichajes Incompletos'), findsNothing);
     });
+
+    testWidgets('NO muestra campo de búsqueda activo', (tester) async {
+      await pumpAdminDashboard(tester, userId: 'admin-5', displayName: 'Admin');
+
+      // El hint text del campo de búsqueda no debe aparecer
+      expect(find.text('Buscar reportes, empleados...'), findsNothing);
+    });
+
+    testWidgets('Muestra aviso de búsqueda global en construcción', (
+      tester,
+    ) async {
+      await pumpAdminDashboard(tester, userId: 'admin-6', displayName: 'Admin');
+
+      // Debe mostrar el aviso no interactivo
+      expect(
+        find.text('Búsqueda global — Más adelante'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('WeeklyActivityChart no muestra dropdown activo cuando vacío', (
+      tester,
+    ) async {
+      await pumpAdminDashboard(tester, userId: 'admin-7', displayName: 'Admin');
+
+      // Las opciones del dropdown NO deben aparecer
+      expect(find.text('Esta semana'), findsNothing);
+      expect(find.text('Última semana'), findsNothing);
+      expect(find.text('Últimos 30 días'), findsNothing);
+
+      // El badge "Más adelante" debe estar visible
+      expect(find.text('Más adelante'), findsOneWidget);
+    });
   });
 }

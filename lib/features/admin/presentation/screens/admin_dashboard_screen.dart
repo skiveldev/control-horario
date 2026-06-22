@@ -30,15 +30,16 @@ class AdminDashboardScreen extends ConsumerWidget {
 
     return AdminLayout(
       currentRoute: AppRouter.admin,
-      showSearch: true,
-      onSearchChanged: (query) {
-        // TODO [DÍA-4]: Implementar búsqueda global
-      },
+      // showSearch deshabilitado: búsqueda global aún no implementada.
+      // Se muestra un aviso no interactivo en el cuerpo del dashboard.
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header con título
           _buildHeader(context),
+
+          // Aviso honesto: búsqueda global en construcción (no interactivo)
+          _buildConstructionNotice(context, 'Búsqueda global — Más adelante'),
 
           AppSpacing.verticalSpaceXxl,
 
@@ -95,6 +96,45 @@ class AdminDashboardScreen extends ConsumerWidget {
               ),
         ),
       ],
+    );
+  }
+
+  /// Aviso no interactivo para features en construcción.
+  ///
+  /// Muestra un chip sutil indicando que la funcionalidad estará disponible
+  /// en el futuro. No tiene interacción táctil ni callbacks.
+  Widget _buildConstructionNotice(BuildContext context, String text) {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      margin: EdgeInsets.only(top: AppSpacing.md),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerHighest.withValues(alpha: 0.6),
+        borderRadius: AppSpacing.borderRadiusSm,
+        border: Border.all(
+          color: cs.outline.withValues(alpha: 0.4),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.construction_outlined,
+            size: 14,
+            color: cs.onSurfaceVariant.withValues(alpha: 0.7),
+          ),
+          SizedBox(width: AppSpacing.sm),
+          Text(
+            text,
+            style: AppTextStyles.bodySmall.copyWith(
+              color: cs.onSurfaceVariant.withValues(alpha: 0.8),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

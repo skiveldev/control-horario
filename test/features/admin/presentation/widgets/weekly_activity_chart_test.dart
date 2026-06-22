@@ -20,6 +20,31 @@ void main() {
       expect(find.text('Sin datos'), findsOneWidget);
     });
 
+    testWidgets('NO renderiza dropdown activo cuando datos están vacíos', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: WeeklyActivityChart(data: {}),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Las opciones del dropdown NO deben estar visibles
+      expect(find.text('Esta semana'), findsNothing);
+      expect(find.text('Última semana'), findsNothing);
+      expect(find.text('Últimos 30 días'), findsNothing);
+
+      // En su lugar, muestra el badge de construcción "Más adelante"
+      expect(find.text('Más adelante'), findsOneWidget);
+
+      // Y el mensaje de construcción en el área del gráfico
+      expect(find.text('Datos históricos en construcción — disponibles próximamente'),
+          findsOneWidget);
+    });
+
     testWidgets('NO renderiza barras cuando datos están vacíos', (
       tester,
     ) async {
@@ -58,6 +83,23 @@ void main() {
       expect(find.text('200'), findsOneWidget);
       // Con datos, NO debe mostrar "Sin datos"
       expect(find.text('Sin datos'), findsNothing);
+    });
+
+    testWidgets('dropdown visible cuando hay datos reales', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: WeeklyActivityChart(
+              data: {'Lun': 100, 'Mar': 200},
+              maxValue: 300,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // El dropdown con período por defecto debe estar visible
+      expect(find.text('Esta semana'), findsOneWidget);
     });
   });
 }
