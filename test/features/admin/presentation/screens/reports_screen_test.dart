@@ -1047,8 +1047,9 @@ void main() {
       expect(
         find.descendant(
           of: previewCard,
-          matching: find.byWidgetPredicate(
-            (w) => w is Text && (w.data ?? '').contains('María García López'),
+          matching: find.textContaining(
+            'María García López',
+            findRichText: true,
           ),
         ),
         findsOneWidget,
@@ -1058,9 +1059,7 @@ void main() {
       expect(
         find.descendant(
           of: previewCard,
-          matching: find.byWidgetPredicate(
-            (w) => w is Text && (w.data ?? '') == 'Mayo 2026',
-          ),
+          matching: find.textContaining('Mayo 2026', findRichText: true),
         ),
         findsOneWidget,
       );
@@ -1069,7 +1068,7 @@ void main() {
       expect(
         find.descendant(
           of: previewCard,
-          matching: find.text('28.0h'),
+          matching: find.textContaining('28.0h', findRichText: true),
         ),
         findsOneWidget,
       );
@@ -1078,7 +1077,7 @@ void main() {
       expect(
         find.descendant(
           of: previewCard,
-          matching: find.text('1h 30m'),
+          matching: find.textContaining('1h 30m', findRichText: true),
         ),
         findsOneWidget,
       );
@@ -1087,9 +1086,7 @@ void main() {
       expect(
         find.descendant(
           of: previewCard,
-          matching: find.byWidgetPredicate(
-            (w) => w is Text && (w.data ?? '').contains('2 validados'),
-          ),
+          matching: find.textContaining('2 validados', findRichText: true),
         ),
         findsOneWidget,
       );
@@ -1124,6 +1121,30 @@ void main() {
         reason: 'El reporte no incluye horas extra; no debe mostrarlas como '
             'si estuvieran incluidas',
       );
+    });
+
+    testWidgets('ReportsScreen no desborda horizontalmente en ancho mobile',
+        (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(390, 1200);
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final user = _fixtureUser();
+      final records = _fixtureRecords();
+      final container = _containerWithState(
+        selectedUser: user,
+        employees: [user],
+        records: records,
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(_wrapApp(container: container));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('Vista Previa muestra loading mientras se cargan registros',

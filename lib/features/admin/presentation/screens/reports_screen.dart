@@ -291,7 +291,7 @@ class ReportsScreen extends ConsumerWidget {
     final selectedMonth = state.selectedMonth;
     final selectedUser = state.selectedUser;
     final cs = Theme.of(context).colorScheme;
-    final isDesktop = context.isDesktop;
+    final isDesktop = MediaQuery.sizeOf(context).width >= Breakpoints.wide;
 
     // Empleados disponibles para el selector
     final employeesAsync = ref.watch(allEmployeesProvider);
@@ -607,12 +607,16 @@ class _FilterCard extends StatelessWidget {
               children: [
                 Icon(Icons.tune, size: AppSpacing.iconMd, color: cs.primary),
                 AppSpacing.horizontalSpaceSm,
-                Text(
-                  'Filtros de Reporte',
-                  style: AppTextStyles.labelMedium.copyWith(
-                    color: cs.primary,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
+                Expanded(
+                  child: Text(
+                    'Filtros de Reporte',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.labelMedium.copyWith(
+                      color: cs.primary,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                 ),
               ],
@@ -631,6 +635,7 @@ class _FilterCard extends StatelessWidget {
 
             DropdownButtonFormField<String>(
               key: ValueKey(selectedUser?.userId ?? 'no-user'),
+              isExpanded: true,
               initialValue: selectedUser?.userId,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
@@ -654,7 +659,11 @@ class _FilterCard extends StatelessWidget {
                 }
                 return DropdownMenuItem<String>(
                   value: user.userId,
-                  child: Text(label),
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 );
               }).toList(),
               onChanged: (String? userId) {
@@ -683,6 +692,7 @@ class _FilterCard extends StatelessWidget {
             // Dropdown de mes
             DropdownButtonFormField<int>(
               key: ValueKey(selectedMonth.month),
+              isExpanded: true,
               initialValue: selectedMonth.month - 1,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
@@ -814,15 +824,18 @@ class _PreviewCard extends StatelessWidget {
                 Icon(Icons.preview,
                     size: AppSpacing.iconMd, color: cs.onSurface),
                 AppSpacing.horizontalSpaceSm,
-                Text(
-                  'Vista Previa',
-                  style: AppTextStyles.labelMedium.copyWith(
-                    color: cs.onSurface,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
+                Expanded(
+                  child: Text(
+                    'Vista Previa',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.labelMedium.copyWith(
+                      color: cs.onSurface,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                 ),
-                const Spacer(),
                 // Decorative dots (browser-window style)
                 _Dot(color: cs.error.withValues(alpha: 0.4)),
                 AppSpacing.horizontalSpaceXs,
@@ -1056,22 +1069,29 @@ class _DataRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(icon, size: 18, color: cs.onSurfaceVariant),
         AppSpacing.horizontalSpaceSm,
-        Text(
-          '$label: ',
-          style: AppTextStyles.bodySmall.copyWith(
-            color: cs.onSurfaceVariant,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
         Expanded(
-          child: Text(
-            value,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: cs.onSurface,
-              fontWeight: FontWeight.w600,
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: '$label: ',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: cs.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                TextSpan(
+                  text: value,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: cs.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
