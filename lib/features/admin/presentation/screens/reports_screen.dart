@@ -736,18 +736,24 @@ class _FilterCard extends StatelessWidget {
             AppSpacing.verticalSpaceXl,
             Align(
               alignment: Alignment.centerLeft,
-              child: UnconstrainedBox(
-                alignment: Alignment.centerLeft,
-                child: CustomButton(
-                  text: 'Generar Reporte PDF',
-                  icon: Icons.picture_as_pdf,
-                  variant: ButtonVariant.brand,
-                  size: ButtonSize.medium,
-                  isLoading: isGenerating,
-                  onPressed: canGenerate
-                      ? () => notifier.generateReport(records: records)
-                      : null,
-                ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+                    child: IntrinsicWidth(
+                      child: CustomButton(
+                        text: 'Generar Reporte PDF',
+                        icon: Icons.picture_as_pdf,
+                        variant: ButtonVariant.brand,
+                        size: ButtonSize.medium,
+                        isLoading: isGenerating,
+                        onPressed: canGenerate
+                            ? () => notifier.generateReport(records: records)
+                            : null,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -1169,15 +1175,21 @@ class _PdfReadyBanner extends StatelessWidget {
         AppSpacing.verticalSpaceLg,
         Align(
           alignment: Alignment.centerLeft,
-          child: UnconstrainedBox(
-            alignment: Alignment.centerLeft,
-            child: CustomButton(
-              text: 'Descargar PDF',
-              icon: Icons.download,
-              variant: ButtonVariant.brand,
-              size: ButtonSize.medium,
-              onPressed: () => notifier.downloadReport(context: context),
-            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+                child: IntrinsicWidth(
+                  child: CustomButton(
+                    text: 'Descargar PDF',
+                    icon: Icons.download,
+                    variant: ButtonVariant.brand,
+                    size: ButtonSize.medium,
+                    onPressed: () => notifier.downloadReport(context: context),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ],
