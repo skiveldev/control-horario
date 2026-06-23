@@ -38,6 +38,8 @@ class ReportService {
     required double overtimeHours,
     required Map<String, int> anomalyCountByType,
     required String validationSummary,
+    bool anomaliesIncluded = true,
+    bool overtimeIncluded = true,
   }) async {
     final pdf = pw.Document();
 
@@ -79,16 +81,31 @@ class ReportService {
               totalHoursWorked: totalHoursWorked,
               totalBreakMinutes: totalBreakMinutes,
               overtimeHours: overtimeHours,
+              overtimeIncluded: overtimeIncluded,
             ),
+            if (!overtimeIncluded) ...[
+              pw.SizedBox(height: 4),
+              pw.Text(
+                'Horas extra no incluidas en este reporte.',
+                style: pw.TextStyle(
+                  fontSize: 10,
+                  color: PdfColors.grey,
+                  fontStyle: pw.FontStyle.italic,
+                ),
+              ),
+            ],
             pw.SizedBox(height: 20),
 
             // Anomalías
             pw.Header(level: 1, text: 'Anomalías Detectadas'),
             pw.SizedBox(height: 8),
             if (anomalyCountByType.isEmpty)
-              pw.Text('Sin anomalías detectadas en el período.',
-                  style:
-                      const pw.TextStyle(fontSize: 12, color: PdfColors.grey))
+              pw.Text(
+                anomaliesIncluded
+                    ? 'Sin anomalías detectadas en el período.'
+                    : 'Anomalías no incluidas en este reporte.',
+                style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey),
+              )
             else
               _buildAnomalyTable(anomalyCountByType),
             pw.SizedBox(height: 20),
@@ -110,18 +127,22 @@ class ReportService {
     required double totalHoursWorked,
     required int totalBreakMinutes,
     required double overtimeHours,
+    required bool overtimeIncluded,
   }) {
+    final rows = <pw.TableRow>[
+      _summaryRow('Horas Trabajadas', '${totalHoursWorked}h'),
+      _summaryRow('Pausas Totales', _formatMinutes(totalBreakMinutes)),
+    ];
+    if (overtimeIncluded) {
+      rows.add(_summaryRow('Horas Extra', '${overtimeHours}h'));
+    }
     return pw.Table(
       border: pw.TableBorder.all(color: PdfColors.grey300),
       columnWidths: {
         0: const pw.FlexColumnWidth(2),
         1: const pw.FlexColumnWidth(1),
       },
-      children: [
-        _summaryRow('Horas Trabajadas', '${totalHoursWorked}h'),
-        _summaryRow('Pausas Totales', _formatMinutes(totalBreakMinutes)),
-        _summaryRow('Horas Extra', '${overtimeHours}h'),
-      ],
+      children: rows,
     );
   }
 

@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:control_horario/core/theme/app_colors.dart';
 import 'package:control_horario/core/theme/app_theme.dart';
 import 'package:control_horario/features/admin/presentation/screens/anomalies_screen.dart';
 import 'package:control_horario/features/admin/presentation/screens/overtime_review_screen.dart';
 import 'package:control_horario/features/admin/presentation/screens/reports_screen.dart';
+import 'package:control_horario/features/admin/providers/admin_provider.dart';
+import 'package:control_horario/features/auth/models/user_model.dart';
 import 'package:control_horario/features/auth/presentation/widgets/login_footer.dart';
 import 'package:control_horario/features/dashboard/services/anomaly_service.dart';
 import 'package:control_horario/features/dashboard/services/overtime_service.dart';
@@ -193,6 +197,9 @@ void main() {
       await tester.pumpWidget(_darkModeProviderWrap(
         const ReportsScreen(),
         overrides: [
+          allEmployeesProvider.overrideWith(
+            (ref) => Stream.value(<UserModel>[]),
+          ),
           reportsScreenProvider.overrideWith(
             (ref) => ReportsScreenNotifier(
               NoopReportService(),
@@ -212,6 +219,9 @@ void main() {
       await tester.pumpWidget(_darkModeProviderWrap(
         const ReportsScreen(),
         overrides: [
+          allEmployeesProvider.overrideWith(
+            (ref) => Stream.value(<UserModel>[]),
+          ),
           reportsScreenProvider.overrideWith(
             (ref) => ReportsScreenNotifier(
               NoopReportService(),
