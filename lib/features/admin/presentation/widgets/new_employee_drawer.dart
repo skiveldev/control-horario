@@ -98,10 +98,11 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
   final _weeklyHoursController = TextEditingController();
 
   // ============================================================================
-  // VALIDATION STATE
+  // VALIDATION / SUBMISSION STATE
   // ============================================================================
   final Map<String, String?> _errors = {};
   bool _showValidation = false;
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -150,6 +151,17 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
           _dniController.text.trim().length < 8) {
         _errors['dni'] = 'DNI/NIE muy corto';
       }
+
+      // Validación de horas semanales
+      final hoursText = _weeklyHoursController.text.trim();
+      if (hoursText.isNotEmpty) {
+        final hours = double.tryParse(hoursText);
+        if (hours == null) {
+          _errors['weeklyHours'] = 'Ingrese un número válido';
+        } else if (hours <= 0) {
+          _errors['weeklyHours'] = 'Debe ser mayor que 0';
+        }
+      }
     });
 
     return _errors.isEmpty;
@@ -160,6 +172,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
   // ============================================================================
 
   Future<void> _save() async {
+    if (_isSubmitting) return;
     if (!_validateForm()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -170,20 +183,22 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
       return;
     }
 
-    // Llamar al provider de Riverpod para crear usuario
-    final result = await _createEmployeeInFirebase();
+    setState(() => _isSubmitting = true);
+    try {
+      final result = await _createEmployeeInFirebase();
 
-    if (result != null) {
-      if (mounted) {
-        // Mostrar credenciales temporales
+      if (result != null && mounted) {
         _showSuccessDialog(result);
         widget.onEmployeeCreated?.call();
         widget.onClose();
       }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
   Future<void> _saveAndAddAnother() async {
+    if (_isSubmitting) return;
     if (!_validateForm()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -194,14 +209,13 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
       return;
     }
 
-    // Llamar al provider de Riverpod para crear usuario
-    final result = await _createEmployeeInFirebase();
+    setState(() => _isSubmitting = true);
+    try {
+      final result = await _createEmployeeInFirebase();
 
-    if (result != null) {
-      if (mounted) {
+      if (result != null && mounted) {
         final temporaryPassword = result['temporaryPassword'] ?? '';
 
-        // Mostrar credenciales temporales (más breve)
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -222,6 +236,8 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
         widget.onEmployeeCreated?.call();
         _clearForm();
       }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
@@ -246,10 +262,11 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
         role = UserRole.employee;
     }
 
-    // Parsear weeklyHours (default 40.0 si está vacío)
-    final weeklyHours = _weeklyHoursController.text.trim().isEmpty
+    // Parsear weeklyHours: vacío usa default 40.0, validado previamente por _validateForm
+    final hoursText = _weeklyHoursController.text.trim();
+    final weeklyHours = hoursText.isEmpty
         ? 40.0
-        : double.tryParse(_weeklyHoursController.text.trim()) ?? 40.0;
+        : double.parse(hoursText); // Ya validado, no necesita ?? fallback
 
     try {
       final result =
@@ -567,6 +584,31 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
     });
   }
 
+  // ============================================================================
+  // TEST-ONLY SETTERS
+  // ============================================================================
+
+  /// Injects a [date] as the start date, applying the same contract the
+  /// production date-picker callback uses: if [fechaFin] is set and is before
+  /// the new start date, [fechaFin] is cleared to null.
+  @visibleForTesting
+  void debugSetFechaInicio(DateTime date) {
+    setState(() {
+      _fechaInicio = date;
+      if (_fechaFin != null && _fechaFin!.isBefore(_fechaInicio)) {
+        _fechaFin = null;
+      }
+    });
+  }
+
+  /// Injects a [date] as the end date directly, without opening a picker.
+  @visibleForTesting
+  void debugSetFechaFin(DateTime date) {
+    setState(() {
+      _fechaFin = date;
+    });
+  }
+
   // TODO [COMENTADO Sprint 1.3]: Ya no se usa, se genera automáticamente en Firebase
   /*
   void _generateEmployeeId() {
@@ -678,8 +720,35 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
   }
 
   Widget _buildFooter(ThemeData theme) {
+    final providerIsLoading =
+        ref.watch(userManagementProvider.select((s) => s.isLoading));
+    final isProcessing = providerIsLoading || _isSubmitting;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isNarrow = screenWidth < Breakpoints.tablet;
+
+    final buttons = <Widget>[
+      CustomButton(
+        text: 'Cancelar',
+        variant: ButtonVariant.text,
+        onPressed: isProcessing ? null : widget.onClose,
+      ),
+      if (!isNarrow) AppSpacing.horizontalSpaceSm,
+      CustomButton(
+        text: 'Guardar y Añadir',
+        variant: ButtonVariant.outline,
+        isLoading: isProcessing,
+        onPressed: isProcessing ? null : _saveAndAddAnother,
+      ),
+      if (!isNarrow) AppSpacing.horizontalSpaceSm,
+      CustomButton(
+        text: 'Guardar',
+        variant: ButtonVariant.brand,
+        isLoading: isProcessing,
+        onPressed: isProcessing ? null : _save,
+      ),
+    ];
+
     return Container(
-      height: 80,
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         border: Border(
@@ -687,28 +756,17 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
         ),
       ),
       padding: AppSpacing.allLg,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          CustomButton(
-            text: 'Cancelar',
-            variant: ButtonVariant.text,
-            onPressed: widget.onClose,
-          ),
-          AppSpacing.horizontalSpaceSm,
-          CustomButton(
-            text: 'Guardar y Añadir',
-            variant: ButtonVariant.outline,
-            onPressed: _saveAndAddAnother,
-          ),
-          AppSpacing.horizontalSpaceSm,
-          CustomButton(
-            text: 'Guardar',
-            variant: ButtonVariant.brand,
-            onPressed: _save,
-          ),
-        ],
-      ),
+      child: isNarrow
+          ? Wrap(
+              alignment: WrapAlignment.end,
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: buttons,
+            )
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: buttons,
+            ),
     );
   }
 
@@ -975,7 +1033,14 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                         lastDate: DateTime(2030),
                       );
                       if (picked != null) {
-                        setState(() => _fechaInicio = picked);
+                        setState(() {
+                          _fechaInicio = picked;
+                          // Si la fecha de fin queda antes, limpiarla
+                          if (_fechaFin != null &&
+                              _fechaFin!.isBefore(_fechaInicio)) {
+                            _fechaFin = null;
+                          }
+                        });
                       }
                     },
                     child: Container(
@@ -993,9 +1058,11 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                               size: 16,
                               color: theme.colorScheme.onSurfaceVariant),
                           const SizedBox(width: 8),
-                          Text(
-                            '${_fechaInicio.day}/${_fechaInicio.month}/${_fechaInicio.year}',
-                            style: AppTextStyles.bodyMedium,
+                          Flexible(
+                            child: Text(
+                              '${_fechaInicio.day}/${_fechaInicio.month}/${_fechaInicio.year}',
+                              style: AppTextStyles.bodyMedium,
+                            ),
                           ),
                         ],
                       ),
@@ -1249,18 +1316,21 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                               size: 16,
                               color: theme.colorScheme.onSurfaceVariant),
                           const SizedBox(width: 8),
-                          Text(
-                            _fechaFin == null
-                                ? 'Sin definir'
-                                : '${_fechaFin!.day}/${_fechaFin!.month}/${_fechaFin!.year}',
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: _fechaFin == null
-                                  ? theme.colorScheme.onSurfaceVariant
-                                  : theme.colorScheme.onSurface,
+                          Flexible(
+                            child: Text(
+                              key: const Key('fechaFinDisplay'),
+                              _fechaFin == null
+                                  ? 'Sin definir'
+                                  : '${_fechaFin!.day}/${_fechaFin!.month}/${_fechaFin!.year}',
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: _fechaFin == null
+                                    ? theme.colorScheme.onSurfaceVariant
+                                    : theme.colorScheme.onSurface,
+                              ),
                             ),
                           ),
                           if (_fechaFin != null) ...[
-                            const Spacer(),
+                            const SizedBox(width: 4),
                             InkWell(
                               onTap: () => setState(() => _fechaFin = null),
                               child: Icon(Icons.clear,
@@ -1288,11 +1358,18 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                   ),
                   const SizedBox(height: 8),
                   TextFormField(
+                    key: const Key('weeklyHoursField'),
                     controller: _weeklyHoursController,
-                    keyboardType: TextInputType.number,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
+                    ],
                     style: AppTextStyles.bodyMedium,
                     decoration: InputDecoration(
                       hintText: '40',
+                      errorText:
+                          _showValidation ? _errors['weeklyHours'] : null,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 12,
@@ -1321,7 +1398,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
         ),
         AppSpacing.verticalSpaceXs,
         Text(
-          'Dejar vacío para indefinido. Horas se calculan automáticamente del horario.',
+          'Fecha fin vacía = contrato indefinido. Horas vacías = 40h/semana por defecto.',
           style: AppTextStyles.bodySmall.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
