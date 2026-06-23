@@ -736,8 +736,8 @@ class _FilterCard extends StatelessWidget {
             AppSpacing.verticalSpaceXl,
             Align(
               alignment: Alignment.centerLeft,
-              child: SizedBox(
-                width: 220,
+              child: UnconstrainedBox(
+                alignment: Alignment.centerLeft,
                 child: CustomButton(
                   text: 'Generar Reporte PDF',
                   icon: Icons.picture_as_pdf,
@@ -1169,8 +1169,8 @@ class _PdfReadyBanner extends StatelessWidget {
         AppSpacing.verticalSpaceLg,
         Align(
           alignment: Alignment.centerLeft,
-          child: SizedBox(
-            width: 180,
+          child: UnconstrainedBox(
+            alignment: Alignment.centerLeft,
             child: CustomButton(
               text: 'Descargar PDF',
               icon: Icons.download,
