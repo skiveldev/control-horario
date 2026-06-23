@@ -227,15 +227,8 @@ class _AdminHeaderState extends State<_AdminHeader> {
             Icons.notifications_outlined,
             color: Theme.of(context).disabledColor,
           ),
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Próximamente'),
-                duration: Duration(seconds: 2),
-              ),
-            );
-          },
-          tooltip: 'Notificaciones no disponibles',
+          onPressed: null,
+          tooltip: 'Notificaciones en construcción',
         ),
 
         AppSpacing.horizontalSpaceSm,
