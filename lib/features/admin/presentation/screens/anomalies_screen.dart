@@ -32,12 +32,11 @@ class AnomaliesScreenState {
   }
 }
 
-/// Notifier para la pantalla de detección de anomalías.
+/// Notifier para la pantalla de anomalías.
 ///
-/// Expone un método [detectAnomalies] que invoca al [AnomalyService]
-/// real. El botón "Detectar Anomalías" llama a este método con los
-/// parámetros adecuados. En tests se puede override el provider para
-/// inyectar un notifier falso o un servicio falso.
+/// Conserva [detectAnomalies] para pruebas e integración futura, pero la UI
+/// actual no lo invoca porque la detección desde esta pantalla aún está en
+/// construcción.
 class AnomaliesScreenNotifier extends StateNotifier<AnomaliesScreenState> {
   final AnomalyService _service;
 
@@ -79,11 +78,10 @@ final anomaliesScreenProvider =
   return AnomaliesScreenNotifier(service);
 });
 
-/// Pantalla de detección de anomalías (Admin)
+/// Pantalla de anomalías (Admin)
 ///
-/// Muestra la lista de anomalías detectadas en los registros de fichaje
-/// con opción de filtrar por tipo y severidad. Incluye un botón explícito
-/// "Detectar Anomalías" para controlar los costes de lectura de Firestore.
+/// Muestra datos de anomalías inyectados cuando existen y, en el estado por
+/// defecto, comunica que la detección real está planificada/en construcción.
 class AnomaliesScreen extends ConsumerWidget {
   const AnomaliesScreen({super.key});
 
@@ -101,7 +99,7 @@ class AnomaliesScreen extends ConsumerWidget {
         children: [
           Text('Detección de Anomalías', style: AppTextStyles.h3),
           AppSpacing.verticalSpaceMd,
-          _buildDetectButton(ref, isDetecting),
+          _buildPlannedAction(),
           AppSpacing.verticalSpaceLg,
           if (anomalies.isEmpty)
             _buildEmptyState(isDetecting, cs)
@@ -112,27 +110,11 @@ class AnomaliesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDetectButton(WidgetRef ref, bool isDetecting) {
+  Widget _buildPlannedAction() {
     return ElevatedButton.icon(
-      onPressed: isDetecting
-          ? null
-          : () {
-              ref.read(anomaliesScreenProvider.notifier).detectAnomalies(
-                userId: '',
-                month: DateTime.now(),
-                weeklySchedule: const {},
-                records: const [],
-                vacationDates: const {},
-              );
-            },
-      icon: isDetecting
-          ? const SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-          : const Icon(Icons.search),
-      label: Text(isDetecting ? 'Detectando...' : 'Detectar Anomalías'),
+      onPressed: null,
+      icon: const Icon(Icons.construction),
+      label: const Text('Próxima funcionalidad'),
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
@@ -152,16 +134,16 @@ class AnomaliesScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.check_circle_outline,
-              size: 64, color: AppColors.success.withValues(alpha: 0.5)),
+          Icon(Icons.construction,
+              size: 64, color: cs.onSurfaceVariant.withValues(alpha: 0.7)),
           AppSpacing.verticalSpaceMd,
           Text(
-            'No se encontraron anomalías',
+            'Detección de anomalías en construcción',
             style: AppTextStyles.h5.copyWith(color: cs.onSurfaceVariant),
           ),
           AppSpacing.verticalSpaceSm,
           Text(
-            'Todos los registros del período seleccionado son correctos.',
+            'Esta pantalla mostrará alertas cuando la detección real esté integrada con los registros y horarios.',
             style: AppTextStyles.bodyMedium.copyWith(color: cs.outline),
             textAlign: TextAlign.center,
           ),

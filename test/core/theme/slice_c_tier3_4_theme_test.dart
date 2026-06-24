@@ -138,7 +138,8 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('No se encontraron anomalías'), findsOneWidget);
+      expect(
+          find.text('Detección de anomalías en construcción'), findsOneWidget);
     });
   });
 
