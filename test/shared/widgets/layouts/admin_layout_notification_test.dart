@@ -8,7 +8,7 @@ import 'package:go_router/go_router.dart';
 
 void main() {
   group('AdminLayout notification bell triage', () {
-    testWidgets('notification bell shows Coming soon SnackBar on tap',
+    testWidgets('notification bell is disabled and shows no fake SnackBar',
         (tester) async {
       tester.view.physicalSize = const Size(1920, 1080);
       tester.view.devicePixelRatio = 1.0;
@@ -53,16 +53,25 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // The notification bell should exist but be disabled
+      // The notification bell should exist but be disabled.
       final bellIcon = find.byIcon(Icons.notifications_outlined);
       expect(bellIcon, findsOneWidget);
 
-      // Tap the notification bell
+      final bellIconButton = find.ancestor(
+        of: bellIcon,
+        matching: find.byType(IconButton),
+      );
+      expect(
+        (bellIconButton.evaluate().single.widget as IconButton).onPressed,
+        isNull,
+      );
+
+      // Tapping a disabled planned-feature control must not show fake feedback.
       await tester.tap(bellIcon);
       await tester.pumpAndSettle();
 
-      // A SnackBar with "Coming soon" (or "Próximamente") should appear
-      expect(find.text('Próximamente'), findsOneWidget);
+      expect(find.text('Próximamente'), findsNothing);
+      expect(find.byType(SnackBar), findsNothing);
     });
 
     testWidgets('notification bell has no badge', (tester) async {
@@ -210,17 +219,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // The notification bell should have a tooltip indicating unavailability
+      // The notification bell should have a tooltip indicating planned status.
       final bellIconButton = find.ancestor(
         of: find.byIcon(Icons.notifications_outlined),
         matching: find.byType(IconButton),
       );
       final tooltip =
           (bellIconButton.evaluate().single.widget as IconButton).tooltip;
-      expect(
-        tooltip,
-        anyOf(equals('Próximamente'), equals('Notificaciones no disponibles')),
-      );
+      expect(tooltip, equals('Notificaciones en construcción'));
     });
   });
 }
