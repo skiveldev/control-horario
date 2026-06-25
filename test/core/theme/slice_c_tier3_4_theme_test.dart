@@ -185,7 +185,10 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('No hay solicitudes pendientes'), findsOneWidget);
+      expect(
+        find.text('Revisión de horas extra en construcción'),
+        findsOneWidget,
+      );
     });
   });
 

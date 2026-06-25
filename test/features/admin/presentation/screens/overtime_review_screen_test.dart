@@ -10,22 +10,25 @@ import '../../../../helpers/mock_overtime.dart';
 
 void main() {
   group('OvertimeReviewScreen', () {
-    testWidgets('muestra título y lista de solicitudes pendientes',
+    testWidgets('muestra título y estado honesto de próxima funcionalidad',
         (tester) async {
-      final container = _containerWithRequests(mockOvertimeRequests());
+      final container = _containerWithRequests([]);
       addTearDown(container.dispose);
 
       await tester.pumpWidget(_wrapApp(container: container));
       await tester.pumpAndSettle();
 
-      // Debe mostrar el título
       expect(find.text('Revisión de Horas Extra'), findsOneWidget);
-      // Debe mostrar las horas de al menos una solicitud
-      expect(find.textContaining('5.5h'), findsOneWidget);
-      expect(find.textContaining('2.0h'), findsOneWidget);
+      expect(
+        find.text('Revisión de horas extra en construcción'),
+        findsOneWidget,
+      );
+      expect(find.text('Próxima funcionalidad'), findsOneWidget);
+      expect(find.text('No hay solicitudes pendientes'), findsNothing);
     });
 
-    testWidgets('muestra botones aprobar y rechazar para cada solicitud',
+    testWidgets(
+        'mantiene renderizado inyectado de solicitudes sin acciones activas',
         (tester) async {
       final container = _containerWithRequests(mockOvertimeRequests());
       addTearDown(container.dispose);
@@ -33,10 +36,22 @@ void main() {
       await tester.pumpWidget(_wrapApp(container: container));
       await tester.pumpAndSettle();
 
-      // Botones de aprobar
+      expect(find.text('Revisión de Horas Extra'), findsOneWidget);
+      expect(find.textContaining('5.5h'), findsOneWidget);
+      expect(find.textContaining('2.0h'), findsOneWidget);
       expect(find.byIcon(Icons.check), findsWidgets);
-      // Botones de rechazar
       expect(find.byIcon(Icons.close), findsWidgets);
+
+      final actionButtons = tester.widgetList<IconButton>(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is IconButton &&
+              (widget.tooltip == 'Aprobar no disponible todavía' ||
+                  widget.tooltip == 'Rechazar no disponible todavía'),
+        ),
+      );
+      expect(actionButtons, isNotEmpty);
+      expect(actionButtons.every((button) => button.onPressed == null), isTrue);
     });
 
     testWidgets('muestra estado "Pendiente" en cada solicitud', (tester) async {
@@ -49,76 +64,83 @@ void main() {
       expect(find.text('Pendiente'), findsWidgets);
     });
 
-    testWidgets('muestra mensaje cuando no hay solicitudes', (tester) async {
+    testWidgets('no afirma que no hay solicitudes si no cargó datos reales',
+        (tester) async {
       final container = _containerWithRequests([]);
       addTearDown(container.dispose);
 
       await tester.pumpWidget(_wrapApp(container: container));
       await tester.pumpAndSettle();
 
-      expect(find.text('No hay solicitudes pendientes'), findsOneWidget);
+      expect(find.text('No hay solicitudes pendientes'), findsNothing);
+      expect(
+        find.text('Revisión de horas extra en construcción'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('el botón aprobar llama al notifier con approveRequest',
+    testWidgets(
+        'el control aprobar no llama al servicio mientras está planificado',
         (tester) async {
       final fakeService = _FakeOvertimeService();
-      final fakeNotifier = OvertimeReviewNotifier(fakeService);
-      // Precargar una solicitud pendiente
-      fakeService.pendingRequests.add(mockOvertimeRequests().first);
+      final request = mockOvertimeRequests().first;
 
       final container = ProviderContainer(
         overrides: [
-          overtimeReviewScreenProvider.overrideWith((ref) => fakeNotifier),
+          overtimeReviewScreenProvider.overrideWith(
+            (ref) => OvertimeReviewNotifier(
+              fakeService,
+              OvertimeReviewScreenState(pendingRequests: [request]),
+            ),
+          ),
         ],
       );
       addTearDown(container.dispose);
 
-      // Cargar las solicitudes
-      await fakeNotifier.loadPendingRequests();
       await tester.pumpWidget(_wrapApp(container: container));
       await tester.pumpAndSettle();
 
-      // Tap the approve button (primer IconButton con icono check)
       final approveButtons = find.byIcon(Icons.check);
       expect(approveButtons, findsWidgets);
 
       await tester.tap(approveButtons.first);
       await tester.pumpAndSettle();
 
-      expect(fakeService.approvedIds, isNotEmpty,
-          reason: 'El botón aprobar debe llamar al servicio approveRequest');
-      expect(fakeService.approvedIds.first, 'ot-1');
+      expect(fakeService.approvedIds, isEmpty,
+          reason:
+              'El control visible debe estar deshabilitado hasta conectar el flujo real');
     });
 
-    testWidgets('el botón rechazar llama al notifier con rejectRequest',
+    testWidgets(
+        'el control rechazar no llama al servicio mientras está planificado',
         (tester) async {
       final fakeService = _FakeOvertimeService();
-      final fakeNotifier = OvertimeReviewNotifier(fakeService);
-      // Precargar una solicitud pendiente
-      fakeService.pendingRequests.add(mockOvertimeRequests().first);
+      final request = mockOvertimeRequests().first;
 
       final container = ProviderContainer(
         overrides: [
-          overtimeReviewScreenProvider.overrideWith((ref) => fakeNotifier),
+          overtimeReviewScreenProvider.overrideWith(
+            (ref) => OvertimeReviewNotifier(
+              fakeService,
+              OvertimeReviewScreenState(pendingRequests: [request]),
+            ),
+          ),
         ],
       );
       addTearDown(container.dispose);
 
-      // Cargar las solicitudes
-      await fakeNotifier.loadPendingRequests();
       await tester.pumpWidget(_wrapApp(container: container));
       await tester.pumpAndSettle();
 
-      // Tap the reject button (primer IconButton con icono close)
       final rejectButtons = find.byIcon(Icons.close);
       expect(rejectButtons, findsWidgets);
 
       await tester.tap(rejectButtons.first);
       await tester.pumpAndSettle();
 
-      expect(fakeService.rejectedIds, isNotEmpty,
-          reason: 'El botón rechazar debe llamar al servicio rejectRequest');
-      expect(fakeService.rejectedIds.first, 'ot-1');
+      expect(fakeService.rejectedIds, isEmpty,
+          reason:
+              'El control visible debe estar deshabilitado hasta conectar el flujo real');
     });
   });
 }

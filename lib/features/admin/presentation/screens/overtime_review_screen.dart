@@ -33,10 +33,9 @@ class OvertimeReviewScreenState {
 
 /// Notifier para la pantalla de revisión de horas extra.
 ///
-/// Carga las solicitudes pendientes desde [OvertimeService] y expone
-/// métodos [approveRequest] y [rejectRequest] que invocan al servicio
-/// real. Después de aprobar o rechazar, elimina la solicitud de la
-/// lista de pendientes para reflejar el cambio en la UI.
+/// La pantalla productiva está marcada como próxima funcionalidad. El estado
+/// inyectado se mantiene para pruebas y para poder validar el renderizado sin
+/// activar todavía flujos de aprobación/rechazo desde la UI.
 class OvertimeReviewNotifier extends StateNotifier<OvertimeReviewScreenState> {
   final OvertimeService _service;
 
@@ -94,10 +93,10 @@ final overtimeReviewScreenProvider =
   return OvertimeReviewNotifier(service);
 });
 
-/// Pantalla de revisión de horas extra (Admin/Supervisor)
+/// Pantalla de revisión de horas extra (Admin/Supervisor).
 ///
-/// Muestra las solicitudes de horas extra pendientes de aprobación.
-/// El supervisor puede aprobar o rechazar cada solicitud.
+/// Esta sección está planificada y todavía no expone acciones productivas de
+/// aprobación/rechazo.
 class OvertimeReviewScreen extends ConsumerWidget {
   const OvertimeReviewScreen({super.key});
 
@@ -105,8 +104,6 @@ class OvertimeReviewScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(overtimeReviewScreenProvider);
     final requests = state.pendingRequests;
-    final isProcessing = state.isProcessing;
-
     final cs = Theme.of(context).colorScheme;
 
     return AdminLayout(
@@ -117,25 +114,43 @@ class OvertimeReviewScreen extends ConsumerWidget {
           Text('Revisión de Horas Extra', style: AppTextStyles.h3),
           AppSpacing.verticalSpaceMd,
           if (requests.isEmpty)
-            _buildEmptyState(cs)
+            _buildPlannedState(cs)
           else
-            _buildRequestList(context, ref, requests, isProcessing, cs),
+            _buildRequestList(requests, cs),
         ],
       ),
     );
   }
 
-  Widget _buildEmptyState(ColorScheme cs) {
+  Widget _buildPlannedState(ColorScheme cs) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.check_circle_outline,
-              size: 64, color: AppColors.success.withValues(alpha: 0.5)),
+          Icon(
+            Icons.construction_outlined,
+            size: 64,
+            color: cs.primary.withValues(alpha: 0.55),
+          ),
           AppSpacing.verticalSpaceMd,
           Text(
-            'No hay solicitudes pendientes',
-            style: AppTextStyles.h5.copyWith(color: cs.onSurfaceVariant),
+            'Revisión de horas extra en construcción',
+            style: AppTextStyles.h5.copyWith(color: cs.onSurface),
+            textAlign: TextAlign.center,
+          ),
+          AppSpacing.verticalSpaceSm,
+          Text(
+            'Próxima funcionalidad',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: cs.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          AppSpacing.verticalSpaceMd,
+          FilledButton.icon(
+            onPressed: null,
+            icon: const Icon(Icons.hourglass_empty),
+            label: const Text('Gestión no disponible todavía'),
           ),
         ],
       ),
@@ -143,31 +158,27 @@ class OvertimeReviewScreen extends ConsumerWidget {
   }
 
   Widget _buildRequestList(
-    BuildContext context,
-    WidgetRef ref,
     List<OvertimeRequestModel> requests,
-    bool isProcessing,
     ColorScheme cs,
   ) {
-    final notifier = ref.read(overtimeReviewScreenProvider.notifier);
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: requests.length,
-      itemBuilder: (context, index) {
-        final request = requests[index];
-        return _OvertimeRequestCard(
-          request: request,
-          isProcessing: isProcessing,
-          cs: cs,
-          onApprove: () {
-            notifier.approveRequest(request.id, approvedBy: 'admin');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Próxima funcionalidad: las acciones de aprobación y rechazo todavía no están disponibles.',
+          style: AppTextStyles.bodyMedium.copyWith(color: cs.onSurfaceVariant),
+        ),
+        AppSpacing.verticalSpaceMd,
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: requests.length,
+          itemBuilder: (context, index) {
+            final request = requests[index];
+            return _OvertimeRequestCard(request: request, cs: cs);
           },
-          onReject: () {
-            notifier.rejectRequest(request.id, rejectedBy: 'admin');
-          },
-        );
-      },
+        ),
+      ],
     );
   }
 }
@@ -175,17 +186,11 @@ class OvertimeReviewScreen extends ConsumerWidget {
 /// Tarjeta individual de solicitud de horas extra
 class _OvertimeRequestCard extends StatelessWidget {
   final OvertimeRequestModel request;
-  final bool isProcessing;
   final ColorScheme cs;
-  final VoidCallback onApprove;
-  final VoidCallback onReject;
 
   const _OvertimeRequestCard({
     required this.request,
-    required this.isProcessing,
     required this.cs,
-    required this.onApprove,
-    required this.onReject,
   });
 
   @override
@@ -235,20 +240,26 @@ class _OvertimeRequestCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Botones de aprobar/rechazar
+                // Acciones planificadas: visibles como intención futura, no activas.
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.check, color: AppColors.success),
-                      onPressed: isProcessing ? null : onApprove,
-                      tooltip: 'Aprobar',
+                      icon: Icon(
+                        Icons.check,
+                        color: AppColors.success.withValues(alpha: 0.45),
+                      ),
+                      onPressed: null,
+                      tooltip: 'Aprobar no disponible todavía',
                     ),
                     AppSpacing.horizontalSpaceSm,
                     IconButton(
-                      icon: const Icon(Icons.close, color: AppColors.error),
-                      onPressed: isProcessing ? null : onReject,
-                      tooltip: 'Rechazar',
+                      icon: Icon(
+                        Icons.close,
+                        color: AppColors.error.withValues(alpha: 0.45),
+                      ),
+                      onPressed: null,
+                      tooltip: 'Rechazar no disponible todavía',
                     ),
                   ],
                 ),
