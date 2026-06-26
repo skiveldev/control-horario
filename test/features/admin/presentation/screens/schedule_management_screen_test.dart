@@ -1,8 +1,14 @@
+import 'dart:async';
+
 import 'package:control_horario/core/theme/app_colors.dart';
 import 'package:control_horario/core/theme/app_theme.dart';
 import 'package:control_horario/features/admin/models/schedule_model.dart';
 import 'package:control_horario/features/admin/presentation/screens/schedule_management_screen.dart';
+import 'package:control_horario/features/admin/presentation/widgets/schedule_template_modal.dart';
 import 'package:control_horario/features/admin/providers/schedule_management_provider.dart';
+import 'package:control_horario/features/auth/models/user_model.dart';
+import 'package:control_horario/features/auth/providers/auth_provider.dart';
+import 'package:control_horario/core/services/firebase_service.dart';
 import 'package:control_horario/shared/widgets/buttons/custom_button.dart';
 import 'package:control_horario/shared/widgets/cards/schedule_card.dart';
 import 'package:flutter/material.dart';
@@ -86,6 +92,74 @@ final _fakeTemplates = <ScheduleModel>[
 ];
 
 // =============================================================================
+// FAKE PROVIDERS for modal validation tests
+// =============================================================================
+
+/// Fake notifier that counts calls.
+class _CountingScheduleManagement extends ScheduleManagement {
+  int createTemplateCallCount = 0;
+  int updateTemplateCallCount = 0;
+  String? lastName;
+  String? lastScheduleId;
+
+  @override
+  Future<String> createTemplate({
+    required String name,
+    required String description,
+    required Map<String, DaySchedule> weeklySchedule,
+  }) async {
+    createTemplateCallCount++;
+    lastName = name;
+    return 'fake-new-id';
+  }
+
+  @override
+  Future<void> updateTemplate({
+    required String scheduleId,
+    String? name,
+    String? description,
+    Map<String, DaySchedule>? weeklySchedule,
+  }) async {
+    updateTemplateCallCount++;
+    lastScheduleId = scheduleId;
+    lastName = name;
+  }
+
+  // Allow overriding build from parent
+  @override
+  FutureOr<void> build() {}
+}
+
+/// Fake notifier that always throws.
+class _ErrorScheduleManagement extends ScheduleManagement {
+  final Exception error;
+
+  _ErrorScheduleManagement(this.error);
+
+  @override
+  Future<String> createTemplate({
+    required String name,
+    required String description,
+    required Map<String, DaySchedule> weeklySchedule,
+  }) async {
+    throw error;
+  }
+
+  @override
+  Future<void> updateTemplate({
+    required String scheduleId,
+    String? name,
+    String? description,
+    Map<String, DaySchedule>? weeklySchedule,
+  }) async {
+    throw error;
+  }
+
+  @override
+  FutureOr<void> build() {}
+}
+
+// =============================================================================
 // HELPERS
 // =============================================================================
 
@@ -154,7 +228,8 @@ void main() {
       );
     });
 
-    testWidgets('subtitle uses "plantilla activa" for singular', (tester) async {
+    testWidgets('subtitle uses "plantilla activa" for singular',
+        (tester) async {
       final single = [_fakeTemplates.first];
       await tester.pumpWidget(_screenWithTemplates(templates: single));
       await tester.pumpAndSettle();
@@ -174,7 +249,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Find CustomButton with text "Nueva Plantilla"
-      final buttons = tester.widgetList<CustomButton>(find.byType(CustomButton));
+      final buttons =
+          tester.widgetList<CustomButton>(find.byType(CustomButton));
       final nuevaButtons =
           buttons.where((b) => b.text == 'Nueva Plantilla').toList();
 
@@ -220,8 +296,7 @@ void main() {
   // 4. FORBIDDEN FAKE CONTROLS
   // ------------------------------------------------------------------------
   group('No fake/unwired controls', () {
-    testWidgets('does not expose "Próximamente" placeholder',
-        (tester) async {
+    testWidgets('does not expose "Próximamente" placeholder', (tester) async {
       await tester.pumpWidget(_screenWithTemplates(templates: _fakeTemplates));
       await tester.pumpAndSettle();
 
@@ -342,8 +417,7 @@ void main() {
           usedByCount: 1,
         ),
       ];
-      await tester.pumpWidget(
-          _screenWithTemplates(templates: singleEmployee));
+      await tester.pumpWidget(_screenWithTemplates(templates: singleEmployee));
       await tester.pumpAndSettle();
 
       // Only card renders "1 empleado" for count=1
@@ -438,8 +512,8 @@ void main() {
 
     testWidgets('empty state h4 uses theme-aware color (no hardcoded)',
         (tester) async {
-      await tester.pumpWidget(
-          _screenWithTemplates(templates: [], darkMode: true));
+      await tester
+          .pumpWidget(_screenWithTemplates(templates: [], darkMode: true));
       await tester.pumpAndSettle();
 
       final emptyFinder = find.text('No hay plantillas disponibles');
@@ -501,7 +575,8 @@ void main() {
   // 10. LOADING STATE
   // ------------------------------------------------------------------------
   group('Loading state', () {
-    testWidgets('shows CircularProgressIndicator while loading', (tester) async {
+    testWidgets('shows CircularProgressIndicator while loading',
+        (tester) async {
       // Use a stream that never emits
       await tester.pumpWidget(_wrapWithProviders(
         const ScheduleManagementScreen(),
@@ -568,6 +643,201 @@ void main() {
       final divider = tester.widget<Divider>(dividerFinder);
       expect(divider.color, isNotNull,
           reason: 'Divider should use a theme-aware color');
+    });
+  });
+
+  // ------------------------------------------------------------------------
+  // 13. MODAL VALIDATION & SAVE BEHAVIOR
+  // ------------------------------------------------------------------------
+  group('Modal validation and save', () {
+    late _CountingScheduleManagement countingNotifier;
+
+    setUp(() {
+      countingNotifier = _CountingScheduleManagement();
+    });
+
+    Widget modalWithOverrides({
+      ScheduleModel? existingTemplate,
+      required ScheduleManagement notifier,
+      UserModel? currentUser,
+    }) {
+      return _wrapWithProviders(
+        Scaffold(
+          body: Builder(builder: (context) {
+            return ElevatedButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => ScheduleTemplateModal(
+                    existingTemplate: existingTemplate,
+                  ),
+                );
+              },
+              child: const Text('Open Modal'),
+            );
+          }),
+        ),
+        overrides: [
+          scheduleManagementProvider.overrideWith(() => notifier),
+          currentUserProvider.overrideWith(
+            (ref) => Stream.value(
+              currentUser ??
+                  UserModel(
+                    userId: 'admin-1',
+                    employeeId: 'E1',
+                    email: 'a@t.com',
+                    displayName: 'Admin',
+                    role: UserRole.admin,
+                    weeklyHours: 40,
+                    createdAt: DateTime(2026),
+                  ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    testWidgets('create-mode modal shows correct title', (tester) async {
+      await tester.pumpWidget(modalWithOverrides(
+        existingTemplate: null,
+        notifier: countingNotifier,
+      ));
+      await tester.pumpAndSettle();
+
+      // Open modal
+      await tester.tap(find.text('Open Modal'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Nueva Plantilla de Horario'), findsOneWidget);
+      expect(find.text('Crear Plantilla'), findsOneWidget);
+    });
+
+    testWidgets('edit-mode modal shows correct title and prefills data',
+        (tester) async {
+      final existing = _testTemplate(
+        scheduleId: 'sched-1',
+        name: 'Jornada Custom',
+        description: 'Custom desc',
+        totalWeeklyHours: 40,
+      );
+
+      await tester.pumpWidget(modalWithOverrides(
+        existingTemplate: existing,
+        notifier: countingNotifier,
+      ));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Modal'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Editar Plantilla de Horario'), findsOneWidget);
+      expect(find.text('Guardar Cambios'), findsOneWidget);
+
+      // Name field should be prefilled
+      final nameField = tester.widget<TextFormField>(
+        find.widgetWithText(TextFormField, 'Nombre de la plantilla *'),
+      );
+      expect(nameField.controller?.text, 'Jornada Custom');
+    });
+
+    testWidgets('save with provider error shows error in SnackBar (edit mode)',
+        (tester) async {
+      // In create mode _calculatedHours=0 so the modal guard fires first.
+      // Use edit mode with an existing template (hours=40) to bypass the guard
+      // and reach the provider call.
+      final errorNotifier = _ErrorScheduleManagement(
+        Exception('Shift end time must be after start time'),
+      );
+      final existing = _testTemplate(
+        scheduleId: 'sched-err',
+        name: 'Will Error',
+        totalWeeklyHours: 40,
+      );
+
+      await tester.pumpWidget(modalWithOverrides(
+        existingTemplate: existing,
+        notifier: errorNotifier,
+      ));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Modal'));
+      await tester.pumpAndSettle();
+
+      // Tap save — form has valid name (prefilled) and existing hours (40)
+      await tester.tap(find.text('Guardar Cambios'));
+      await tester.pumpAndSettle();
+
+      // Error SnackBar should appear
+      expect(
+        find.textContaining('Shift end time must be after start time'),
+        findsOneWidget,
+      );
+      // Modal still open
+      expect(find.byType(Dialog), findsOneWidget);
+    });
+
+    testWidgets('empty schedule shows warning without calling provider',
+        (tester) async {
+      await tester.pumpWidget(modalWithOverrides(
+        existingTemplate: null,
+        notifier: countingNotifier,
+      ));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Modal'));
+      await tester.pumpAndSettle();
+
+      // Fill name
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Nombre de la plantilla *'),
+        'Empty Schedule',
+      );
+      await tester.pumpAndSettle();
+
+      // Tap save — modal guard: no shifts configured
+      await tester.tap(find.text('Crear Plantilla'));
+      await tester.pumpAndSettle();
+
+      // Provider should NOT have been called (UI guard: calculatedHours <= 0)
+      expect(countingNotifier.createTemplateCallCount, 0,
+          reason: 'Modal UI guard should block saves with 0 hours');
+
+      // SnackBar with warning should appear (may also match the summary badge)
+      expect(
+        find.textContaining('al menos un turno'),
+        findsAtLeastNWidgets(1),
+      );
+    });
+
+    testWidgets(
+        'edit mode with provider error shows error and keeps modal open',
+        (tester) async {
+      final errorNotifier = _ErrorScheduleManagement(
+        Exception('Shifts cannot overlap'),
+      );
+      final existing = _testTemplate(
+        scheduleId: 'sched-1',
+        name: 'To Edit',
+        totalWeeklyHours: 40,
+      );
+
+      await tester.pumpWidget(modalWithOverrides(
+        existingTemplate: existing,
+        notifier: errorNotifier,
+      ));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Modal'));
+      await tester.pumpAndSettle();
+
+      // Tap save — form has valid name (prefilled) and existing hours (40)
+      await tester.tap(find.text('Guardar Cambios'));
+      await tester.pumpAndSettle();
+
+      // Error SnackBar
+      expect(find.textContaining('Shifts cannot overlap'), findsOneWidget);
+      // Modal still open
+      expect(find.byType(Dialog), findsOneWidget);
     });
   });
 }

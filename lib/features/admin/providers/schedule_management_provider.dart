@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../models/schedule_model.dart';
+import '../models/schedule_validator.dart';
 import '../../../core/services/firebase_service.dart';
 import '../../auth/models/user_model.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -76,10 +77,14 @@ class ScheduleManagement extends _$ScheduleManagement {
 
   /// Crear nueva plantilla de horario
   ///
-  /// Validaciones:
+  /// Validaciones (via [ScheduleValidator]):
   /// - Nombre no vacío
-  /// - Al menos un turno configurado (totalHours > 0)
-  /// - Usuario autenticado
+  /// - Al menos un día laborable con turnos
+  /// - Cada turno con endTime > startTime
+  /// - Sin solapamiento de turnos en el mismo día
+  /// - Las horas diarias/semanales se derivan de los turnos (nunca se confía
+  ///   en el valor almacenado)
+  /// - Usuario autenticado con rol admin
   ///
   /// [name]: Nombre descriptivo (ej: "Jornada 40h (9:00-17:00)")
   /// [description]: Descripción breve
@@ -105,25 +110,25 @@ class ScheduleManagement extends _$ScheduleManagement {
             'Sin permisos: solo administradores pueden crear plantillas');
       }
 
-      // Validar nombre
-      if (name.trim().isEmpty) {
-        throw Exception('El nombre es obligatorio');
+      // Validate schedule integrity (name, shifts, overlaps, hours)
+      final validation = ScheduleValidator.validate(
+        weeklySchedule,
+        name: name,
+      );
+      if (!validation.isValid) {
+        throw Exception(validation.errors.join('. '));
       }
 
-      // Calcular horas semanales totales
-      final totalHours = _calculateTotalWeeklyHours(weeklySchedule);
-
-      // Validar que tenga al menos un turno
-      if (totalHours <= 0) {
-        throw Exception('Debe configurar al menos un turno de trabajo');
-      }
+      // Use normalized schedule (dailyHours derived from shifts, never trusted)
+      final normalizedSchedule = validation.normalizedSchedule!;
+      final totalHours = validation.totalWeeklyHours;
 
       // Crear plantilla en Firestore
       final service = ref.read(scheduleServiceProvider);
       final scheduleId = await service.createTemplate(
         name: name,
         description: description,
-        weeklySchedule: weeklySchedule,
+        weeklySchedule: normalizedSchedule,
         totalWeeklyHours: totalHours,
         createdBy: currentUser.userId,
       );
@@ -164,13 +169,24 @@ class ScheduleManagement extends _$ScheduleManagement {
             'Sin permisos: solo administradores pueden actualizar plantillas');
       }
 
-      // Calcular horas si se proporciona weeklySchedule
+      // Validate name if provided (must not be blank)
+      if (name != null && name.trim().isEmpty) {
+        throw Exception('Template name cannot be empty');
+      }
+
+      // Calcular y validar horas si se proporciona weeklySchedule
       int? totalHours;
+      Map<String, DaySchedule>? normalizedSchedule;
       if (weeklySchedule != null) {
-        totalHours = _calculateTotalWeeklyHours(weeklySchedule);
-        if (totalHours <= 0) {
-          throw Exception('Debe configurar al menos un turno de trabajo');
+        final validation = ScheduleValidator.validate(
+          weeklySchedule,
+          name: name,
+        );
+        if (!validation.isValid) {
+          throw Exception(validation.errors.join('. '));
         }
+        normalizedSchedule = validation.normalizedSchedule!;
+        totalHours = validation.totalWeeklyHours;
       }
 
       // Actualizar en Firestore
@@ -180,7 +196,7 @@ class ScheduleManagement extends _$ScheduleManagement {
         lastModifiedBy: currentUser.userId,
         name: name,
         description: description,
-        weeklySchedule: weeklySchedule,
+        weeklySchedule: normalizedSchedule ?? weeklySchedule,
         totalWeeklyHours: totalHours,
       );
 
@@ -236,15 +252,4 @@ class ScheduleManagement extends _$ScheduleManagement {
   // ==========================================================================
   // HELPERS PRIVADOS
   // ==========================================================================
-
-  /// Calcular total de horas semanales
-  ///
-  /// Suma las horas de todos los días laborables.
-  /// Redondea al entero más cercano.
-  int _calculateTotalWeeklyHours(Map<String, DaySchedule> weekSchedule) {
-    return weekSchedule.values
-        .where((day) => day.isWorkDay)
-        .fold(0.0, (sum, day) => sum + day.dailyHours)
-        .round();
-  }
 }
