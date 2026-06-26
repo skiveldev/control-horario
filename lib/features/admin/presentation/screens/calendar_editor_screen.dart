@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -34,11 +35,91 @@ class CalendarEditorScreen extends ConsumerStatefulWidget {
       _CalendarEditorScreenState();
 }
 
+class CalendarEditorRouteScreen extends ConsumerWidget {
+  final String calendarId;
+  final WorkCalendarModel? existingCalendar;
+
+  const CalendarEditorRouteScreen({
+    super.key,
+    required this.calendarId,
+    this.existingCalendar,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (calendarId == 'new') {
+      return const CalendarEditorScreen();
+    }
+
+    final calendar = existingCalendar;
+    if (calendar != null) {
+      return CalendarEditorScreen(existingCalendar: calendar);
+    }
+
+    final calendarAsync = ref.watch(calendarByIdProvider(calendarId));
+    return calendarAsync.when(
+      data: (resolvedCalendar) {
+        if (resolvedCalendar == null) {
+          return const _CalendarEditorRouteError(
+            message: 'Calendario no encontrado',
+          );
+        }
+
+        return CalendarEditorScreen(existingCalendar: resolvedCalendar);
+      },
+      loading: () => const _CalendarEditorRouteLoading(),
+      error: (error, _) => _CalendarEditorRouteError(
+        message: 'Error al cargar el calendario: $error',
+      ),
+    );
+  }
+}
+
+class _CalendarEditorRouteLoading extends StatelessWidget {
+  const _CalendarEditorRouteLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return const AdminLayout(
+      currentRoute: AppRouter.adminCalendars,
+      child: Center(child: CircularProgressIndicator()),
+    );
+  }
+}
+
+class _CalendarEditorRouteError extends StatelessWidget {
+  final String message;
+
+  const _CalendarEditorRouteError({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return AdminLayout(
+      currentRoute: AppRouter.adminCalendars,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(message, style: AppTextStyles.bodyLarge),
+            AppSpacing.verticalSpaceMd,
+            CustomButton(
+              text: 'Volver',
+              variant: ButtonVariant.text,
+              onPressed: () => context.go(AppRouter.adminCalendars),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
   late TextEditingController _nameController;
   late int _selectedYear;
   late bool _isActive;
   late List<CalendarEventModel> _events;
+  bool _isSaving = false;
 
   // Estado del TableCalendar
   DateTime _focusedDay = DateTime.now();
@@ -215,6 +296,8 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
   }
 
   Future<void> _saveCalendar() async {
+    if (_isSaving) return;
+
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -223,6 +306,8 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
       );
       return;
     }
+
+    setState(() => _isSaving = true);
 
     try {
       await ref.read(calendarManagementProvider.notifier).saveCalendar(
@@ -251,6 +336,10 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
             duration: const Duration(seconds: 4),
           ),
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
       }
     }
   }
@@ -361,13 +450,14 @@ class _CalendarEditorScreenState extends ConsumerState<CalendarEditorScreen> {
               CustomButton(
                 text: 'Cancelar',
                 variant: ButtonVariant.text,
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
               ),
               CustomButton(
                 text: 'Guardar Calendario',
                 icon: Icons.save_outlined,
                 variant: ButtonVariant.brand,
-                onPressed: _saveCalendar,
+                isLoading: _isSaving,
+                onPressed: _isSaving ? null : _saveCalendar,
               ),
             ],
           );

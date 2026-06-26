@@ -308,11 +308,16 @@ class AppRouter {
                 path: ':id/edit',
                 name: 'admin-calendar-editor',
                 pageBuilder: (context, state) {
-                  final calendar = state.extra as WorkCalendarModel?;
+                  final id = state.pathParameters['id'] ?? 'new';
+                  final extra = state.extra;
+                  final calendar = extra is WorkCalendarModel ? extra : null;
                   return _buildPageWithTransition(
                     context: context,
                     state: state,
-                    child: CalendarEditorScreen(existingCalendar: calendar),
+                    child: CalendarEditorRouteScreen(
+                      calendarId: id,
+                      existingCalendar: calendar,
+                    ),
                   );
                 },
               ),
