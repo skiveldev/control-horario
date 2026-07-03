@@ -51,7 +51,8 @@ class CalendarEditorRouteScreen extends ConsumerWidget {
       return const CalendarEditorScreen();
     }
 
-    final calendar = existingCalendar;
+    final calendar =
+        existingCalendar?.id == calendarId ? existingCalendar : null;
     if (calendar != null) {
       return CalendarEditorScreen(existingCalendar: calendar);
     }

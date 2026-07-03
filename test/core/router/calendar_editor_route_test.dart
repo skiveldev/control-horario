@@ -189,6 +189,53 @@ void main() {
       expect(find.text('Nuevo Calendario'), findsNothing);
     });
 
+    testWidgets(
+        'CalendarEditorRouteScreen ignora extra si no coincide con el id de ruta',
+        (
+      tester,
+    ) async {
+      final staleCalendar = _FakeWorkCalendar(
+        id: 'cal-001',
+        name: 'Festivos Madrid',
+        year: 2026,
+      );
+      final routeCalendar = _FakeWorkCalendar(
+        id: 'cal-002',
+        name: 'Festivos Barcelona',
+        year: 2026,
+      );
+      final notifier = _FakeCalendarManagement();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            currentUserProvider
+                .overrideWith((ref) => Stream.value(_fakeAdminUser)),
+            calendarManagementProvider.overrideWith(() => notifier),
+            calendarByIdProvider('cal-002')
+                .overrideWith((ref) => Stream.value(routeCalendar)),
+          ],
+          child: MaterialApp(
+            home: CalendarEditorRouteScreen(
+              calendarId: 'cal-002',
+              existingCalendar: staleCalendar,
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('Editar Calendario'), findsOneWidget);
+      expect(find.text('Festivos Barcelona'), findsOneWidget);
+      expect(find.text('Festivos Madrid'), findsNothing);
+
+      await tester.tap(find.text('Guardar Calendario'));
+      await tester.pumpAndSettle();
+
+      expect(notifier.saveCalls, hasLength(1));
+      expect(notifier.saveCalls.single.calendarId, 'cal-002');
+    });
+
     testWidgets('CalendarEditorRouteScreen no crea si el id no existe', (
       tester,
     ) async {
