@@ -124,6 +124,76 @@ The preceding sections preserve the extracted apply-progress snapshot. They incl
 | WU0.1 | Complete | Native attempt max 120, finished at 116 lines |
 | WU0.2 | Complete | Native attempt max 10, finished at 10 lines |
 | WU1 | Complete and committed locally | Base advanced compatibly to `3e9146f`; `.codegraph/.gitignore` entered the WU0 base; final delta only deleted `tatus`; commit `7772e14`; final approved lineage `review-3447c0e8c1233521`; tree `b57799d0b19124e4d27c1c9d0370f0c18781e9d0` |
-| WU2-WU11 | Pending | No later work unit is complete |
+| WU2 | Complete | Ordinal 5 failed because native measured 485 > max 400; maintainer approved `size:exception` max 500; ordinal 6 passed with native incremental `changed_lines` 32 |
+| WU3-WU11 | Pending | No later work unit is complete |
 
 No push or PR occurred. The original checkout remained untouched.
+
+---
+
+## Work Unit 2 — COMPLETE (ordinal 6, generation 6)
+
+Ordinal 5 failed because native measured 485 > max 400. The maintainer approved `size:exception` max 500. Ordinal 6 passed at native revision `sha256:84be2f2284f3e1e34c37b630591fd85a4eebfabb4cfb133fb8e27cd313369462` with evidence revision `sha256:17f222913d42f0b657e19c6461560da35fc5e1158f83fd0de47666153f4b47c6` and native incremental `changed_lines` 32.
+
+### TDD Cycle Evidence (Strict TDD)
+
+| Task | Test File | Layer | Safety Net | RED | GREEN | TRIANGULATE | REFACTOR |
+|------|-----------|-------|------------|-----|-------|-------------|----------|
+| 2.1-2.2 | `test/scripts/seed_users_credentials_test.dart` | Unit | N/A (new) | ✅ 13 compile errors: imports + symbols not found | ✅ 26/26 assertions pass | ✅ 3 cases: special chars, valid roles, multi-entry env | ✅ Format clean; compressed test from 45→26 assertions |
+
+### RED Evidence
+
+```
+dart run test/scripts/seed_users_credentials_test.dart → 13 compile errors
+(seed_user_definitions.dart, seed_credentials.dart not found;
+ getSeedUserDefinitions, resolveSeedPassword, SeedCredentialError undefined)
+```
+
+### GREEN Evidence
+
+```
+=== WU2 seed credential purge ===
+-- 2.1: Data definitions --
+-- 2.2: Password resolution --
+=== RESULTS: 26 passed, 0 failed ===
+```
+
+### Production Code
+
+| File | Action | Lines | Purpose |
+|------|--------|-------|---------|
+| `scripts/shared/seed_user_definitions.dart` | Created | 44 | Demo user records: no passwords, @example.com, DEV- ids, demo names |
+| `scripts/shared/seed_credentials.dart` | Created | 31 | `resolveSeedPassword()`: env-var resolution with fail-closed missing/empty |
+| `scripts/seed_users.dart` | Modified | 75 (was 147) | Uses shared modules; env-var passwords; fail-fast credential check; no passwords in output |
+| `scripts/seed_users_simple.dart` | Modified | 14 (was 103) | Uses shared definitions; prints env var names, never passwords |
+
+### Work Unit Evidence
+
+| Evidence | Required value |
+|---|---|
+| Focused test command and exact result | `dart run test/scripts/seed_users_credentials_test.dart` → 26/26 pass |
+| Runtime harness command/scenario | `dart run scripts/seed_users_simple.dart` → clean output, no passwords printed; `seed_users.dart` fail-closed path proven by test (26/26 pass); standalone `dart run` blocked by `dart:ui` (Firebase plugins require Flutter context — pre-existing, not a WU2 regression) |
+| Rollback boundary | Delete `scripts/shared/seed_user_definitions.dart`, `scripts/shared/seed_credentials.dart`, `test/scripts/seed_users_credentials_test.dart`; revert `scripts/seed_users.dart` and `scripts/seed_users_simple.dart` to HEAD `5f7eb3a` |
+
+### Quality Checks (revalidated ordinal 6)
+
+- `dart format --output=none --set-exit-if-changed` on 5 files → 0 changed (clean)
+- `flutter analyze --no-pub --fatal-infos --fatal-warnings test/scripts/ scripts/shared/` → No issues found
+- `dart run scripts/seed_users_simple.dart` → clean output, env var names only, no passwords
+- Protected paths `.atl/*` / `lib/core/theme/app_colors.dart` unchanged → confirmed
+- No-secret/PII scan (passwords, real emails, real names) → 0 hits
+
+### WU2 Result Contract
+
+| Field | Result |
+|---|---|
+| status | success |
+| executive_summary | Removed embedded seed credentials and introduced fail-closed environment-based password resolution. |
+| artifacts | WU2 production changes, focused tests, quality-check evidence, and native finish evidence recorded above. |
+| next_recommended | Native review of WU2 before staging, commit, or WU3. |
+| risks | Full `seed_users.dart` cannot run under plain `dart run` due to the pre-existing `dart:ui` Flutter dependency. |
+| skill_resolution | paths-injected |
+
+### Worktree State
+
+Branch `feat/prepare-public-portfolio`, HEAD `5f7eb3a`. All changes unstaged/uncommitted. 4 modified + 3 new untracked files. Source repo `D:\control_horario` untouched.
