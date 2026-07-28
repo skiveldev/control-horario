@@ -125,7 +125,8 @@ The preceding sections preserve the extracted apply-progress snapshot. They incl
 | WU0.2 | Complete | Native attempt max 10, finished at 10 lines |
 | WU1 | Complete and committed locally | Base advanced compatibly to `3e9146f`; `.codegraph/.gitignore` entered the WU0 base; final delta only deleted `tatus`; commit `7772e14`; final approved lineage `review-3447c0e8c1233521`; tree `b57799d0b19124e4d27c1c9d0370f0c18781e9d0` |
 | WU2 | Complete | Ordinal 5 failed because native measured 485 > max 400; maintainer approved `size:exception` max 500; ordinal 6 passed with native incremental `changed_lines` 32 |
-| WU3-WU11 | Pending | No later work unit is complete |
+| WU3 | 3.1 complete; 3.2 review-rejected/deferred | Deployment disclaimers retained. Direct-client `/users` denial is deferred until the trusted backend/client replacement slice (WU4-WU5); current provisioning behavior remains unchanged. |
+| WU4-WU11 | Pending | No later work unit is complete |
 
 No push or PR occurred. The original checkout remained untouched.
 
@@ -197,3 +198,98 @@ dart run test/scripts/seed_users_credentials_test.dart → 13 compile errors
 ### Worktree State
 
 Branch `feat/prepare-public-portfolio`, HEAD `5f7eb3a`. All changes unstaged/uncommitted. 4 modified + 3 new untracked files. Source repo `D:\control_horario` untouched.
+
+---
+
+## Work Unit 3 — REVIEW-REJECTED ATTEMPT (3.1 retained; 3.2 deferred to WU4-WU5)
+
+Revision: `sha256:6119da4cb1a2399e12d9e0a5a0ad61bea7d1ded515860555123a55c3e32529b1`. Delivery: `exception-ok` (maintainer-approved WU3 `size:exception` max 800). Actual: 193 total changed lines (183 insertions + 10 deletions).
+
+### TDD Cycle Evidence (Strict TDD)
+
+| Task | Test File | Layer | Safety Net | RED | GREEN | TRIANGULATE | REFACTOR |
+|------|-----------|-------|------------|-----|-------|-------------|----------|
+| 3.1 | N/A (docs) | N/A | N/A | N/A (docs — structural readback + claim scan) | N/A | N/A | N/A |
+| 3.2 | `test/firestore/firestore_rules.test.js` | Integration (@firebase/rules-unit-testing) | ✅ 43/43 baseline | ✅ 4 genuine RED: safe self-creation, admin→employee, admin→rrhh, rrhh→employee — all currently allowed | REJECTED: 51/51 candidate pass (unconditional client-create denial); review `review-7644de9233c3cbd0` rejected for breaking provisioning before WU4/WU5 | REJECTED: rules and tests restored to HEAD by review correction | DEFERRED: unconditional denial not applied; pending WU4-WU5 trusted backend delivery |
+
+### RED Evidence (3.2 — REJECTED CANDIDATE; not in current tree)
+
+51/51 candidate test run (BEFORE review correction; restored to HEAD after rejection):
+
+```
+51 tests: 47 pass, 4 fail
+✖ denies safe self-creation (normative: only Admin SDK may create /users documents)
+✖ denies admin from creating an employee-role user via direct client
+✖ denies admin from creating an rrhh-role user via direct client
+✖ denies rrhh from creating an employee-role user via direct client
+All 4 failures: expected request to fail, but it succeeded.
+```
+
+This was the RED evidence for the candidate that native review `review-7644de9233c3cbd0` subsequently rejected. Rules and tests were later restored to HEAD.
+
+### GREEN Evidence (3.2 — REJECTED CANDIDATE; not in current tree)
+
+Candidate run that passed after unconditional rule hardening (BEFORE review correction; restored to HEAD after rejection):
+
+```
+npx firebase emulators:exec --only firestore "node --test test/firestore/firestore_rules.test.js"
+ℹ tests 51
+ℹ pass 51
+ℹ fail 0
+```
+
+Native review `review-7644de9233c3cbd0` rejected this candidate: unconditional client-create denial breaks provisioning before WU4/WU5. The review correction restored `firestore.rules` and `test/firestore/firestore_rules.test.js` to HEAD. No runtime test rerun after restoration — native runtime objective is complete.
+
+### Production Code (3.2 — REJECTED; restored to HEAD)
+
+Native review `review-7644de9233c3cbd0` rejected the unconditional `/users` denial because it breaks provisioning before WU4/WU5 provides the trusted backend and client integration. The review correction restored `firestore.rules` and `test/firestore/firestore_rules.test.js` to HEAD (content-identical to `05685e0`). No code changes remain applied.
+
+| File | Action | Lines | Purpose |
+|------|--------|-------|---------|
+| `firestore.rules` | Reverted to HEAD | — | Unconditional `allow create: if false` rejected; HEAD content restored |
+| `test/firestore/firestore_rules.test.js` | Reverted to HEAD | — | WU3 hardening tests removed; HEAD content restored |
+
+### Production Code (3.1)
+
+| File | Action | Lines | Purpose |
+|------|--------|-------|---------|
+| `docs/deployment/DEPLOYMENT_SUCCESS.md` | Modified | 5A | Truthful portfolio disclaimer banner |
+| `docs/deployment/DEPLOYMENT_QUICKSTART.md` | Modified | 4A | Truthful portfolio disclaimer banner |
+| `docs/deployment/DEPLOYMENT_MI_CONTROL_HORARIO.md` | Modified | 4A | Truthful portfolio disclaimer banner |
+
+### Documentation Readback (3.1)
+
+- Deployment docs: Truthful disclaimer banners warn readers that no deployment has occurred and publication gates are pending. Original historical content preserved behind disclaimers.
+- README.md, package.json, docs/README.md: Reverted to HEAD (out of WU3 scope — belong to WU7/WU9-WU11).
+- Protected paths (`.atl/*`, `lib/core/theme/app_colors.dart`): Confirmed unchanged.
+
+### Work Unit Evidence (3.2 candidate — REJECTED; 3.1 retained)
+
+| Evidence | Required value |
+|---|---|
+| Focused test command and exact result (3.2 REJECTED CANDIDATE) | `npx firebase emulators:exec --only firestore "node --test test/firestore/firestore_rules.test.js"` → 51/51 pass, 0 fail — **was the rejected candidate result; not current after HEAD restoration** |
+| Focused test (3.1 docs — structural) | N/A (documentation claim scan; no executable tests) |
+| Runtime harness command/scenario (3.2 REJECTED CANDIDATE) | Firebase Firestore emulator; `withSecurityRulesDisabled` context proves Admin SDK bypass semantics — **rejected candidate evidence preserved for audit** |
+| Rollback boundary (3.1 only) | Revert deployment doc disclaimer banners from three docs |
+
+### Quality Checks (post-correction state)
+
+- Protected paths `.atl/*` / `lib/core/theme/app_colors.dart` unchanged ✅
+- Documentation claim scan: deployment docs carry truthful disclaimers ✅
+- No secrets/credentials introduced ✅
+- No transitional-allowance claims in evidence ✅
+- Firestore rules tests: not rerun after HEAD restoration (native runtime objective complete; no runtime test required post-restoration)
+
+### WU3 Result Contract (post-correction)
+
+| Field | Result |
+|---|---|
+| status | partial: 3.1 complete; 3.2 review-rejected/deferred |
+| executive_summary | Task 3.1 deployment disclaimers applied to three deployment docs and retained. Task 3.2 unconditional client-create denial was implemented, passed 51/51 tests, but native review `review-7644de9233c3cbd0` rejected it for breaking provisioning before WU4/WU5 provides the trusted backend/client integration. Rules and tests restored to HEAD. |
+| artifacts | WU3 deployment doc disclaimers (3.1, retained). Rules/tests candidate evidence preserved above for audit. No rules change remains applied in current tree. |
+| next_recommended | Defer task 3.2 rule hardening until WU4-WU5 deliver trusted backend and client integration. Native review lineage `review-7644de9233c3cbd0` is escalated and must be recovered only after this candidate change. |
+| risks | WU4-WU5 backend must use Admin SDK for user creation before 3.2 unconditional denial can be applied. |
+
+### Worktree State
+
+Branch `feat/prepare-public-portfolio`, HEAD `b5eec2f`. All changes unstaged/uncommitted. 7 modified files. Source repo `D:\control_horario` untouched.

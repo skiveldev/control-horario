@@ -1,5 +1,9 @@
 # 🚀 Deployment Quickstart - Control Horario MVP
 
+> ⚠️ **Portfolio codebase.** This document is future reference only. No deployment
+> has occurred. Publication gates (license, history cleanup, Firebase Console
+> hardening) are pending.
+
 ## ✅ Pre-requisitos COMPLETADOS
 
 Todos los pre-requisitos del deployment están implementados y funcionando:

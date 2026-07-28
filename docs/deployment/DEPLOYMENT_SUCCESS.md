@@ -1,5 +1,10 @@
 # 🎉 DEPLOYMENT EXITOSO - Control Horario MVP
 
+> ⚠️ **Portfolio codebase.** This document reflects historical claims that may not
+> represent the current state. This repository is not deployed and not in
+> production. Publication gates (license, history cleanup, Firebase Console
+> hardening) are pending.
+
 **Fecha:** 23 Noviembre 2025  
 **Estado:** ✅ EN PRODUCCIÓN  
 **Plan:** Firebase Hosting Spark (GRATIS)

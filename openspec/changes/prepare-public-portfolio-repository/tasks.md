@@ -34,7 +34,7 @@ Native attempt 2: ordinal 2, generation 2, objective `sha256:4c02a19a...`, revis
 ### WU2+
 
 - [x] WU2 / tasks 2.1-2.2: Seed-script credential purge.
-- [ ] WU3 / tasks 3.1-3.2: Deployment documentation and Firestore rules.
+- [x] WU3 / task 3.1: Deployment documentation. Task 3.2 is pending/deferred until the trusted backend/client replacement slice.
 - [ ] WU4 / task 4.1: Trusted backend provisioning TDD.
 - [ ] WU5 / task 5.1: Admin client provisioning TDD.
 - [ ] WU6 / task 6.1: Android release-signing guard.
@@ -56,4 +56,4 @@ The preceding text is the extracted task snapshot and remains historical evidenc
 - WU1 is complete. Its base advanced compatibly to `3e9146f`; `.codegraph/.gitignore` became part of the WU0 base, so WU1's final delta was only deletion of `tatus`.
 - WU1 was committed locally as `7772e14`; final approved lineage is `review-3447c0e8c1233521`; final tree is `b57799d0b19124e4d27c1c9d0370f0c18781e9d0`.
 - No push or PR occurred. The original checkout remained untouched.
-- WU2 is complete. WU3-WU11 remain pending. The forbidden-operation and native-attempt constraints remain in force.
+- WU2 and WU3 task 3.1 are complete. WU3 task 3.2 is pending/deferred with WU4-WU5; WU4-WU11 remain pending. The forbidden-operation and native-attempt constraints remain in force.
