@@ -12,7 +12,7 @@ REM ---------------------------------------------------------------------------
 echo.
 echo [93mChecking staged Dart formatting...[0m
 
-dart run tool\check_staged_dart_format.dart
+call dart run tool\check_staged_dart_format.dart
 if errorlevel 1 (
     echo.
     echo [91mStaged Dart formatting check failed.[0m

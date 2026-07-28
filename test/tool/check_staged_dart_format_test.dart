@@ -216,7 +216,7 @@ Future<void> main() async {
               stdErr.contains('fatal'),
           'error should mention missing repo, got: ${r.stderr}');
     } finally {
-      if (await d.exists()) await d.delete(recursive: true);
+      if (d.existsSync()) await d.delete(recursive: true);
     }
   });
 
