@@ -126,7 +126,8 @@ The preceding sections preserve the extracted apply-progress snapshot. They incl
 | WU1 | Complete and committed locally | Base advanced compatibly to `3e9146f`; `.codegraph/.gitignore` entered the WU0 base; final delta only deleted `tatus`; commit `7772e14`; final approved lineage `review-3447c0e8c1233521`; tree `b57799d0b19124e4d27c1c9d0370f0c18781e9d0` |
 | WU2 | Complete | Ordinal 5 failed because native measured 485 > max 400; maintainer approved `size:exception` max 500; ordinal 6 passed with native incremental `changed_lines` 32 |
 | WU3 | 3.1 complete; 3.2 review-rejected/deferred | Deployment disclaimers retained. Direct-client `/users` denial is deferred until the trusted backend/client replacement slice (WU4-WU5); current provisioning behavior remains unchanged. |
-| WU4-WU11 | Pending | No later work unit is complete |
+| WU4 | SPLIT — WU4a dependency scaffold complete; WU4b/WU4c pending | Original attempt 8 over-budget at 3520 lines (lockfile 2978 + authored 393 + SDD delta + node_modules leakage). Maintainer approved split: WU4a (dependency scaffold, lockfile exception max 3100), WU4b (semantic implementation, max 1000), WU4c (tests, max 1000). WU4a is atomic lockfile + package/tsconfig + firebase.json functions block only. |
+| WU5-WU11 | Pending | No later work unit is complete |
 
 No push or PR occurred. The original checkout remained untouched.
 
@@ -293,3 +294,78 @@ Native review `review-7644de9233c3cbd0` rejected the unconditional `/users` deni
 ### Worktree State
 
 Branch `feat/prepare-public-portfolio`, HEAD `b5eec2f`. All changes unstaged/uncommitted. 7 modified files. Source repo `D:\control_horario` untouched.
+
+---
+
+## Work Unit 4 — SPLIT: WU4a (dependency scaffold), WU4b (implementation), WU4c (tests)
+
+### WU4a — Dependency Scaffold (ordinal 9, generation 9)
+
+**Status**: Candidate — pending native finish.
+
+Original WU4 attempt 8 (ordinal 8, generation 8) failed at 3520 total candidate lines: lockfile (2978) + authored source (393: 147 index.ts + 204 test + 20 package.json + 14 tsconfig.json + 8 firebase.json) + SDD delta + node_modules leakage. Exceeded the 400 authored-line budget.
+
+Maintainer authorized a WU4a lockfile exception with HARD maximum 3100 changed lines. WU4b and WU4c remain pending under 1000 lines each.
+
+### WU4a Scope
+
+**KEPT** (dependency scaffold only):
+| File | Action | Lines | Purpose |
+|------|--------|-------|---------|
+| `functions/package.json` | Created | 20 | Cloud Functions v2 dependencies (firebase-admin, firebase-functions) |
+| `functions/package-lock.json` | Created | 2978 | Reproducible lockfile for `npm ci` |
+| `functions/tsconfig.json` | Created | 14 | TypeScript config (NodeNext, ES2022, strict) |
+| `functions/src/placeholder.ts` | Created | 2 | Minimal build-safe placeholder (satisfies `include: ["src"]`) |
+| `firebase.json` | Modified | +8 | Functions source/config and functions emulator port block |
+
+**REMOVED** (deferred to WU4b/WU4c):
+- `functions/src/index.ts` (147 lines — semantic implementation)
+- `functions/test/create_user.test.ts` (204 lines — tests)
+
+### WU4a Work Unit Evidence
+
+| Evidence | Required value |
+|---|---|
+| Focused test command and exact result | `npm ci --ignore-scripts` → added 253 packages, audited 254 packages in 21s; lockfile reproduces cleanly from `package.json` |
+| Runtime harness | `npx tsc --noEmit` → no errors (TypeScript config valid; placeholder compiles) |
+| Rollback boundary | Delete `functions/` directory entirely; revert `firebase.json` to HEAD `ea22d22`. No other files touched. |
+
+### Lockfile Reproducibility Validation
+
+```
+npm ci --ignore-scripts
+→ added 253 packages, audited 254 packages in 21s
+→ npm ci summary: 8 moderate; npm audit --json: 9 moderate, 0 high, 0 critical (introduced by WU4a firebase-admin@13.10.0 + firebase-functions@6.6.0; HEAD has no functions/package.json)
+```
+
+### TypeScript Build Validation
+
+```
+npx tsc --noEmit
+→ exit 0, no output — config valid, placeholder compiles cleanly
+```
+
+### Candidate Line Count
+
+| Component | Lines |
+|---|---|
+| `functions/package.json` | 20 |
+| `functions/package-lock.json` | 2978 |
+| `functions/tsconfig.json` | 14 |
+| `functions/src/placeholder.ts` | 2 |
+| `firebase.json` diff | 8 (+8/-0) |
+| `apply-progress.md` delta | 78 (+77/-1) |
+| **Total** | **3100** |
+| Node modules | Excluded (git-ignored) |
+
+### WU4b/WU4c — Pending
+
+- **WU4b**: Semantic implementation of `functions/src/index.ts` (authorizeRequest, validateInput, computeFingerprint, provisionUser, onCall wrapper) — max 1000 authored lines.
+- **WU4c**: Test suite `functions/test/create_user.test.ts` (16 behavior-first tests) — max 1000 authored lines.
+
+### Worktree State
+
+Branch `feat/prepare-public-portfolio`, HEAD `ea22d22`. Changes unstaged/uncommitted:
+- `M firebase.json` (modified)
+- `?? functions/` (new, untracked — lockfile + package.json + tsconfig.json + placeholder.ts; src/index.ts and test/create_user.test.ts removed)
+Source repo `D:\control_horario` untouched.
