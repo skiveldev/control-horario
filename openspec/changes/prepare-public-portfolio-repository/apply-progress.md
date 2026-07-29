@@ -369,3 +369,54 @@ Branch `feat/prepare-public-portfolio`, HEAD `ea22d22`. Changes unstaged/uncommi
 - `M firebase.json` (modified)
 - `?? functions/` (new, untracked — lockfile + package.json + tsconfig.json + placeholder.ts; src/index.ts and test/create_user.test.ts removed)
 Source repo `D:\control_horario` untouched.
+
+---
+
+## Architecture Reset and Superseded Plans
+
+### Design Redesign
+
+The validated design at revision `sha256:6e04cd501986d26986f3caf6cd728c8520009b70b58d3533580ecde5378b6458` replaces the callable-only saga with an **outbox + Cloud Tasks + scheduled-repair** topology. The prior callable-owned saga and compensation design are superseded.
+
+### Superseded Plans (no false completion carried forward)
+
+| Plan | Status |
+|---|---|
+| Original combined-P1 (executable contract + persistence in one slice) | Superseded — failed ordinal 21 (2,273 lines before any tests) |
+| Single-P1a (types + normalization + IDs + reducer + invariants in one slice) | Superseded — failed ordinal 22 (2,679 all-path lines; unauthorized `functions/tsconfig.json`) |
+| Current 6-slice plan (P1a1, P1a2, P1b, P2, P3, P4) | Active — this is the authoritative plan |
+| Stale WU4b/WU4c | Superseded — replaced by P1a1–P4 decomposition |
+
+### Failed Ordinals (historical evidence only)
+
+| Ordinal | Scope | Lines | Stash | Verdict |
+|---|---|---|---|---|
+| 19 | Unknown | Unknown | — | Failed; no completion carried forward |
+| 20 | Unknown | Unknown | — | Failed; no completion carried forward |
+| 21 | Combined P1 | 2,273 before tests | `66424881e1b7b064a61d6bd884daa13f7793fa12` | Failed; over-budget; implementation before tests |
+| 22 | Single P1a | 2,679 all-path (Git numstat) | `3ab7b419f344077b3c3b4667391b155700cfe9fe` | Failed; unauthorized `functions/tsconfig.json`; over STOP+max |
+
+**Both stashes are evidence-only. Never restored, copied, or cherry-picked. No checkbox/completion claims carried forward from them.**
+
+### Preserved Completion (WU0–WU4a)
+
+| Work Unit | Status | Evidence |
+|---|---|---|
+| WU0 | Complete | Commit `4915419`, correction `3e9146f`, lineage `review-3b4a3a0f30245bc4` |
+| WU1 | Complete | Commit `7772e14`, lineage `review-3447c0e8c1233521` |
+| WU2 | Complete | Ordinal 6, generation 6 |
+| WU3.1 | Complete | Deployment disclaimers retained |
+| WU3.2 | Deferred | Review-rejected; re-apply after trusted backend/client (P4) |
+| WU4a | Complete | Commit `a0a79cc` — dependency scaffold |
+
+No false implementation completion from failed ordinals 19/20/21/22. P1a was never complete.
+
+### Current Slice: P1a1 — Types + Normalization + IDs + Canonical Fixtures
+
+**Ordinal 23** (first attempt): failed. STOP violation at 1,700 reforecast threshold; independent measured full candidate was 1,851 lines. Not accepted; no completion carried forward.
+
+**Ordinal 24**: mechanically passed unchanged revalidation (same candidate bytes) but fresh phase-contract validation FAILED against the six CRITICAL groups.
+
+**Ordinal 25** (bounded remediation — FAILED): native measured 1,675 correction lines; independent comparison measured 1,729; both exceed max 1,000. Full candidate independently measured 1,780. Ordinal 25 is NOT accepted; no completion carried forward.
+
+**Ordinal 26** (residual contract remediation — ACCEPTED): native ordinal 26 passed at revision `sha256:2d693675feac2b8a87400a4f019a7b4e9f50f601fb65119d2dfc74d004875af4`. Final candidate `sha256:cbc789d9a27f5fd0df86747a72683ca94fabb2bca171d82adebe1f3fdc3c7aa2`, tree `d4860f7206707c0a91e13fdb79038efbc6bf4134`; full candidate 1,909/2,000 changed lines, ordinal-26 residual 361/400. Fresh independent validation: all five groups PASS. Proof: types 36/36, normalize 36/36, ids 32/32, fixture integrity + recursive immutability pass, explicit source+test tsc pass, source-only tsc pass, and `git diff --check` clean. P1a2 and downstream remain pending.

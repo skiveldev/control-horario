@@ -209,25 +209,26 @@ The apply-progress reconciliation MUST occur in P1a1 after the first RED evidenc
 
 ### Strict TDD order (RED → GREEN)
 
-- [ ] P1a1.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 before every test invocation.
-- [ ] P1a1.1 RED (FIRST AUTHORED MUTATION): author `functions/test/provisioning/types.test.ts` first — the test file is authored before any source. The test asserts type-level rejection of invalid `(status, phase)` pairs: status vocabulary exactly `pending | active | completed | failed | manual_recovery`; phase vocabulary exactly `dispatch_pending | auth_preflight | auth_create | profile_commit | terminal`; only valid pairs allowed. RED evidence is authoritative via explicit `npx tsc` invocation targeting the test file directly (project `tsconfig.json` has `rootDir: src` and `include: ["src"]`, so plain `npx tsc --noEmit` does NOT include test files and cannot provide the planned RED):
+- [x] P1a1.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 before every test invocation. Node v24.11.1 confirmed.
+- [x] P1a1.1 RED (FIRST AUTHORED MUTATION): author `functions/test/provisioning/types.test.ts` first — the test file is authored before any source. TS2307: Cannot find module — genuine RED.
+- [x] P1a1.2 METADATA (after RED evidence captured, before source): reconcile `apply-progress.md` and update `tasks.md`.
+- [x] P1a1.3 GREEN: `types.ts` defined; only valid pairs compile; invalid pairs rejected at type level; `types.test.ts` passes (30/30 runtime + type-check clean). — the test file is authored before any source. The test asserts type-level rejection of invalid `(status, phase)` pairs: status vocabulary exactly `pending | active | completed | failed | manual_recovery`; phase vocabulary exactly `dispatch_pending | auth_preflight | auth_create | profile_commit | terminal`; only valid pairs allowed. RED evidence is authoritative via explicit `npx tsc` invocation targeting the test file directly (project `tsconfig.json` has `rootDir: src` and `include: ["src"]`, so plain `npx tsc --noEmit` does NOT include test files and cannot provide the planned RED):
 
   ```bash
   cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions test/provisioning/types.test.ts
   ```
 
   This command fails because `test/provisioning/types.test.ts` imports from `types.ts` which does not yet exist. Non-zero exit is the RED gate. The runtime `node --experimental-strip-types` invocation of the test is secondary for this row and serves only to prove the test harness is wired. **Recount all-path changed lines after RED evidence is captured.**
-- [ ] P1a1.2 METADATA (after RED evidence captured, before source): reconcile `apply-progress.md` and update `tasks.md` — recording architecture reset, superseded plans (combined-P1, single-P1a), failed ordinals 19/20/21/22, stashes `66424881...` and `3ab7b419...` as evidence-only, preserved WU0–WU4a, no false implementation completion. **Recount after metadata written.**
-- [ ] P1a1.3 GREEN: `types.ts` defined; only valid pairs compile; invalid pairs rejected at type level; `types.test.ts` passes.
-- [ ] P1a1.4 RED: normalization vectors — `normalize.test.ts` authored before `normalize.ts`. Canonical key order (`email,nombre,apellido1,apellido2,employeeId,weeklyHours,dni,telefono,cargo,departamento,empresa,scheduleId,calendarId,fechaInicio,fechaFin,role,isSupervisor,supervisorId,isActive`); NFC; trimmed; email lower-cased; blank optionals null; dates UTC YYYY-MM-DD; defaults exactly `weeklyHours=40`, `employeeId=""`, `isSupervisor=false`, `supervisorId=null`, `isActive=true`; roles exactly `employee | rrhh`; unknown keys rejected; `displayName` derived; non-finite numbers rejected; nested/array/non-plain values rejected; missing `operationId,email,nombre,apellido1` rejected. **Recount.**
-- [ ] P1a1.5 GREEN: `normalize.ts` defined; normalization vectors pass.
-- [ ] P1a1.6 RED: fingerprint stability — same canonical payload produces same lower-case SHA-256 hex; different payload produces different digest; `operationId` excluded.
-- [ ] P1a1.7 GREEN: fingerprint vectors pass.
-- [ ] P1a1.8 RED: deterministic ID vectors — `ids.test.ts` authored before `ids.ts`. `dispatchId`, `taskId`, `auditEventId`, `attemptId`, `ownerToken`, `fingerprint` derivation from canonical inputs with exact domain separators (`provision-dispatch:v1\0`, `provision-audit:v1\0`, etc.). **Recount.**
-- [ ] P1a1.9 GREEN: `ids.ts` defined; deterministic ID vectors pass.
-- [ ] P1a1.10 RED: canonical fixtures — `fixtures.ts` authored with frozen canonical vectors, payloads, identities, expected transitions; test assertions verify fixture integrity. **Recount.**
-- [ ] P1a1.11 GREEN: fixtures pass integrity assertions.
-- [ ] P1a1.12 REFACTOR: freeze types + normalization/fingerprint + deterministic IDs + canonical fixtures. Final type-level GREEN via explicit `npx tsc` invocation targeting all P1a1 source and test files (project `tsconfig.json` does not include tests, so explicit file list is required):
+- [x] P1a1.4 RED: normalization vectors — `normalize.test.ts` authored before `normalize.ts`. TS2307: Cannot find module — genuine RED.
+- [x] P1a1.5 GREEN: `normalize.ts` defined; normalization vectors pass (37/37 runtime + type-check clean).
+- [x] P1a1.6 RED: fingerprint stability — same payload same digest, different payload different digest, operationId excluded.
+- [x] P1a1.7 GREEN: fingerprint vectors pass (37/37 runtime + type-check clean).
+- [x] P1a1.8 RED: deterministic ID vectors — `ids.test.ts` authored before `ids.ts`. TS2307: Cannot find module — genuine RED.
+- [x] P1a1.9 GREEN: `ids.ts` defined; deterministic ID vectors pass (18/18 runtime + type-check clean).
+- [x] P1a1.10 RED: canonical fixtures — `fixtures.ts` authored with frozen canonical vectors, payloads, identities, expected transitions; test assertions verify fixture integrity.
+- [x] P1a1.11 GREEN: fixtures pass integrity assertions (self-validating + type-check clean).
+- [x] P1a1.12 REFACTOR (ordinal 25 — FAILED): bounded remediation of six CRITICAL phase-contract groups. Native measured 1,675 correction lines; independent comparison measured 1,729; both exceed max 1,000. Full candidate independently measured 1,780, not 1,869. Ordinal 25 is NOT accepted; no completion carried forward.
+- [x] P1a1.13 REFACTOR (ordinal 26 — ACCEPTED): native ordinal 26 passed at revision `sha256:2d693675feac2b8a87400a4f019a7b4e9f50f601fb65119d2dfc74d004875af4`. Final candidate `sha256:cbc789d9a27f5fd0df86747a72683ca94fabb2bca171d82adebe1f3fdc3c7aa2`, tree `d4860f7206707c0a91e13fdb79038efbc6bf4134`; full candidate 1,909/2,000 changed lines, ordinal-26 residual 361/400. Fresh independent validation: all five groups PASS. Proof: types 36/36, normalize 36/36, ids 32/32, fixture integrity + recursive immutability pass, explicit source+test tsc pass, source-only tsc pass, and `git diff --check` clean. P1a2 and downstream remain pending.
 
   ```bash
   cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts
@@ -243,6 +244,7 @@ The apply-progress reconciliation MUST occur in P1a1 after the first RED evidenc
 - `cd functions && node --experimental-strip-types test/provisioning/types.test.ts`
 - `cd functions && node --experimental-strip-types test/provisioning/normalize.test.ts`
 - `cd functions && node --experimental-strip-types test/provisioning/ids.test.ts`
+- `cd functions && node --experimental-strip-types test/provisioning/fixtures.ts`
 
 ### Rollback boundary
 
