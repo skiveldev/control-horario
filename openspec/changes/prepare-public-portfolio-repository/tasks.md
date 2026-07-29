@@ -3,64 +3,78 @@
 Decision needed before apply: No
 Chained PRs recommended: Yes
 Chain strategy: feature-branch-chain
-400-line budget risk: Accepted for P1a–P4 via maintainer size:exception
-Delivery strategy: exception-ok (P1a–P4 only)
+400-line budget risk: Accepted for P1a1–P4 via maintainer size:exception
+Delivery strategy: exception-ok (P1a1–P4 only)
 RDD routing: disabled — no automatic review activation. After cumulative backend emulator + TypeScript + independent phase-contract proof and candidate freeze at end of P3, surface explicit maintainer enable decision; no review before then.
 
 ## Review Workload Forecast
 
 | Field | Value |
 |---|---|
-| Estimated aggregate changed lines (tasks-phase validated) | **5,425–7,410** |
+| Estimated aggregate changed lines (tasks-phase validated) | **6,865–8,865** |
 | Aggregate ceiling | **None** — no invented aggregate ceiling; per-slice max governs |
-| 400-line budget risk | Accepted for P1a–P4 via maintainer size:exception |
-| Delivery strategy | exception-ok (P1a–P4 only) |
+| 400-line budget risk | Accepted for P1a1–P4 via maintainer size:exception |
+| Delivery strategy | exception-ok (P1a1–P4 only) |
 | Chain strategy | feature-branch-chain |
-| Decision needed before apply | No (P1a–P4 size/chaining resolved) |
-| Slice count | 5 chained implementation slices (P1a, P1b, P2, P3, P4) |
-| Per-slice reforecast/STOP (P1a–P4 only) | 1,700 |
-| Per-slice absolute max (P1a–P4 only) | 2,000 |
+| Decision needed before apply | No (P1a1–P4 size/chaining resolved) |
+| Slice count | 6 chained implementation slices (P1a1, P1a2, P1b, P2, P3, P4) |
+| Per-slice reforecast/STOP (P1a1–P4 only) | 1,700 |
+| Per-slice absolute max (P1a1–P4 only) | 2,000 |
 | Later independent chain | WU5–WU10 preserved (signing → de-branding → sanitization → README → archive → gates); each max 400, stop at 400; no inherited exception |
 
 ### Phase-Authority Decision
 
-The previous `Decision needed before apply` workload/size question is resolved: maintainer has explicitly approved `size:exception` up to 2,000 lines per slice **for P1a–P4 only**. **No workload decision remains for P1a–P4.** WU5–WU10 retain ordinary max 400 per work unit; any future overrun in those work units requires a separate maintainer decision. Separately, **interactive phase approval + validated planning baseline** are still required before P1a may begin — that gate is about phase sequencing, not about size/chaining, and does not contradict the resolved workload decision.
+The previous `Decision needed before apply` workload/size question is resolved: maintainer has explicitly approved `size:exception` up to 2,000 lines per slice **for P1a1–P4 only**. **No workload decision remains for P1a1–P4.** WU5–WU10 retain ordinary max 400 per work unit; any future overrun in those work units requires a separate maintainer decision. Separately, **interactive phase approval + validated planning baseline** are still required before P1a1 may begin — that gate is about phase sequencing, not about size/chaining, and does not contradict the resolved workload decision.
 
 ### Supersession Notice
 
-This revision **supersedes** the prior 4-slice plan. The combined `P1 — Executable Contract + Persistence Foundation` is replaced by two strictly separated slices: `P1a — Pure Contract + Model` and `P1b — Persistence Ports + Conformance`. The prior combined P1 was invalidated by failed ordinal 21 (see below). All downstream slices (P2–P4) and later work units (WU5–WU10) are preserved architecturally; only their dependency edges and ownership shift where required by the P1 decomposition.
+This revision **supersedes** the prior P1a plan. The single `P1a — Pure Contract + Model + Invariant Vectors` is replaced by two strictly separated slices: `P1a1 — Types + Normalization + IDs` and `P1a2 — Reducer + Invariants`. The prior P1a was invalidated by failed ordinal 22 (see below). All downstream slices (P1b–P4) and later work units (WU5–WU10) are preserved architecturally; only their dependency edges shift where required by the P1a decomposition.
 
 ### Failed Ordinal 21 — Evidence (do NOT restore)
 
 - **Ordinal 21** attempted the combined `P1-executable-contract-persistence` and produced **2,273 changed lines before any tests**: 1,893 source additions plus 380 apply-progress churn. It is invalid: implementation preceded behavior tests in violation of strict TDD, and the combined scope exceeded the reforecast/STOP threshold before the first RED test existed.
 - **Stash**: `66424881e1b7b064a61d6bd884daa13f7793fa12` (visible as `stash@{0}: failed ordinal 21 P1 over-budget before tests`). Preserved as evidence only. **Never restore, copy, or cherry-pick this stash wholesale.** It may be inspected for line-accounting reference only.
 - **Native authority** was explicitly reset after the maintainer decision; next action is `begin`, but this planning phase must not begin it.
-- **Lesson applied here**: the combined slice is decomposed into two independently executable slices, each with its own RED-first proof, rollback boundary, and reforecast/STOP discipline.
+- **Lesson applied here**: the combined slice is decomposed into independently executable slices, each with its own RED-first proof, rollback boundary, and reforecast/STOP discipline.
+
+### Failed Ordinal 22 — Evidence (do NOT restore)
+
+- **Ordinal 22** attempted the combined `P1a` and produced **2,679 all-path changed lines** (independent Git numstat), not the executor-reported 2,323.
+- **Tracked**: 193 lines (`functions/tsconfig.json` 7 — **unauthorized**; apply-progress 116; tasks 70).
+- **Untracked source/tests**: 2,486 lines: ids.ts 99, model.ts 533, normalize.ts 241, types.ts 119, fixtures.ts 121, ids.test.ts 147, model.test.ts 488, normalize.test.ts 381, types.test.ts 357.
+- `functions/tsconfig.json` was **unauthorized** and must NOT be part of either P1a1 or P1a2. Tests must run using existing config/explicit CLI without config mutation.
+- Executor-reported 112 green tests are **inadmissible** because of scope breach and undercount.
+- **Stash**: `3ab7b419f344077b3c3b4667391b155700cfe9fe`. Preserved as evidence only. **Never restore, copy, cherry-pick, or carry completion checkboxes from it wholesale.**
+- **Native authority** was explicitly reset at revision `sha256:6e04cd501986d26986f3caf6cd728c8520009b70b58d3533580ecde5378b6458`; next_action=begin. This planning phase must NOT begin it.
+- **Lesson applied here**: P1a is further decomposed into P1a1 (types + normalization + IDs + fixtures — no reducer/model) and P1a2 (reducer + all invariant vectors — consuming frozen P1a1 contract). Each sub-slice has its own RED-first proof, rollback boundary, reforecast checkpoint at 1,500, mandatory STOP at 1,700, and absolute STOP before 2,000.
 
 ### Tasks-Phase Forecast Refinement
 
-The tasks-phase forecast reflects honest per-slice sizing after the P1 decomposition and downstream ownership correction:
+The tasks-phase forecast reflects honest per-slice sizing after the P1a decomposition into P1a1 + P1a2:
 
 1. **First refinement (3,190–4,080)**: P4 was expanded to include the previously unallocated deferred Firestore rules hardening/proof.
 2. **Second refinement (3,690–5,030)**: P4 expanded to full Flutter + Firestore rules footprint.
-3. **Third refinement (this revision — 5,425–7,410)**: P1 decomposed into P1a (pure contract/model) and P1b (persistence/conformance). The combined P1 was underestimated at 950–1,180; the honest split sizes are P1a 1,010–1,345 + P1b 1,185–1,555 = 2,195–2,900. Downstream ownership correction moves schemas/audit to P2 (+370–495) and profile to P3 (+120–165). The aggregate 5,425–7,410 supersedes all prior aggregates.
+3. **Third refinement (5,425–7,410)**: P1 decomposed into P1a (pure contract/model) and P1b (persistence/conformance). Downstream ownership correction moves schemas/audit to P2 and profile to P3.
+4. **Fourth refinement (this revision — 6,865–8,865)**: P1a further decomposed into P1a1 (types + normalization + IDs + fixtures — no reducer/model) and P1a2 (reducer + all invariant vectors), driven by failed ordinal 22 (2,679 lines, stash `3ab7b419...`). Honest ordinal-22 measured data anchors the P1a1/P1a2 component tables. The aggregate 6,865–8,865 supersedes all prior aggregates.
 
-Per-slice breakdown (validated from design grouping + current-tree inspection + P1 decomposition + downstream ownership correction):
+Per-slice breakdown (validated from ordinal-22 measured data + design grouping + downstream ownership):
 
 | Slice | Focus | Expected |
 |---|---|---:|
-| P1a | Pure domain contract + model + normalization + IDs + invariant vectors (former P1 model half) | 1,010–1,345 |
-| P1b | Persistence port + in-memory reference + Firestore emulator conformance + CAS primitives (former P1 persistence half, narrowed) | 1,185–1,555 |
+| P1a1 | Types + normalization + IDs + canonical fixtures (no reducer/model) | 1,400–1,650 |
+| P1a2 | Pure reducer + all invariant/crash/Auth/result/CAS/terminalization/dispatch vectors (consumes frozen P1a1) | 1,050–1,150 |
+| P1b | Persistence port + in-memory reference + Firestore emulator conformance + CAS primitives (narrowed) | 1,185–1,555 |
 | P2 | Schemas + audit primitives + submission + reliable dispatch (former P1 schemas/audit + S4–S6) | 1,030–1,385 |
 | P3 | Profile provenance + worker + status + full backend proof (former P1 profile + S7–S10) | 1,300–1,625 |
 | P4 | Flutter migration + Firestore rules hardening/proof + dependency/bootstrap | 900–1,500 |
-| **Total P1a–P4** | | **5,425–7,410** |
+| **Total P1a1–P4** | | **6,865–8,865** |
 
-### Per-Slice Exception Boundaries (P1a–P4 only)
+### Per-Slice Exception Boundaries (P1a1–P4 only)
 
 | Slice | Reforecast/STOP | Absolute max |
 |---|---:|---:|
-| P1a | 1,700 | 2,000 |
+| P1a1 | 1,700 | 2,000 |
+| P1a2 | 1,700 | 2,000 |
 | P1b | 1,700 | 2,000 |
 | P2 | 1,700 | 2,000 |
 | P3 | 1,700 | 2,000 |
@@ -70,25 +84,29 @@ WU5–WU10 do **not** inherit these boundaries. Each later work unit has max 400
 
 ### Line-Accounting Rules
 
-- Per-slice expected range is the working budget for P1a–P4.
-- If measured changed lines reach 1,700 within any P1a–P4 slice, **STOP** and reforecast. Continuation requires measured evidence and explicit continuation within the already-approved exception.
-- If measured changed lines reach 2,000 within any P1a–P4 slice, **STOP absolutely** — no further mutation in that slice.
+- Per-slice expected range is the working budget for P1a1–P4.
+- **Recount after every RED/GREEN pair**: measure all-path changed lines (tracked + untracked source + tests + SDD bookkeeping) and compare against thresholds.
+- **Early warning at 1,500**: if measured changed lines reach 1,500 within any P1a1–P4 slice, pause and assess whether the remaining work fits within the slice budget. Document the assessment.
+- If measured changed lines reach 1,700 within any P1a1–P4 slice, **STOP** and reforecast. Continuation requires measured evidence and explicit continuation within the already-approved exception.
+- If measured changed lines reach 2,000 within any P1a1–P4 slice, **STOP absolutely** — no further mutation in that slice.
 - WU5–WU10 each have max 400; if measured changed lines reach 400 within any of them, **STOP** — continuation requires a new, separate maintainer decision (no inherited exception).
-- apply-progress reconciliation lines in P1a count inside P1a's range.
+- apply-progress reconciliation lines in P1a1 count inside P1a1's range. tasks.md update lines count inside the slice that introduces them.
 - Test files count toward the slice they verify (no test-only slice).
 - Tests are authored BEFORE the matching source in every RED→GREEN pair. A slice that has more source than failing tests at any commit boundary is invalid.
 - Per-slice component forecasts MUST sum arithmetically to the headline range. No falsification.
+- `functions/tsconfig.json` is **forbidden** in every slice — tests must run using existing config/explicit CLI without config mutation.
 
 ### Chain Topology (feature-branch-chain)
 
 ```
 main
   └── feature/tracker (draft/no-merge) — accumulates final integration
-        └── P1a branch (base: feature/tracker)
-              └── P1b branch (base: P1a)
-                    └── P2 branch (base: P1b)
-                          └── P3 branch (base: P2)
-                                └── P4 branch (base: P3)
+        └── P1a1 branch (base: feature/tracker)
+              └── P1a2 branch (base: P1a1)
+                    └── P1b branch (base: P1a2)
+                          └── P2 branch (base: P1b)
+                                └── P3 branch (base: P2)
+                                      └── P4 branch (base: P3)
 
 Independent later chain (after P4 merges into tracker, tracker merges into main):
 main ──→ WU5 (signing) ──→ WU6 (de-branding) ──→ WU7 (sanitization) ──→ WU8 (README) ──→ WU9 (archive) ──→ WU10 (gates)
@@ -100,13 +118,14 @@ Each child PR targets its immediate previous slice branch. Only the tracker ulti
 
 ### Architecture Reset
 
-The validated design replaces the callable-only saga with outbox + Cloud Tasks + scheduled-repair topology. Runtime is idle after explicit redesign reset at revision `sha256:47f0f905bafb2546b7d09ed5290d072840247ae3481520b3938b78440978d151`. Each runtime-bearing slice reads `gentle-ai sdd-attempt status`, begins exactly once only when `next_action=begin`, and finishes truthfully.
+The validated design replaces the callable-only saga with outbox + Cloud Tasks + scheduled-repair topology. Runtime is idle after explicit redesign reset at revision `sha256:6e04cd501986d26986f3caf6cd728c8520009b70b58d3533580ecde5378b6458`. Each runtime-bearing slice reads `gentle-ai sdd-attempt status`, begins exactly once only when `next_action=begin`, and finishes truthfully.
 
 ### Failed Ordinals (historical evidence only)
 
 - **Ordinal 19**: failed; no completion carried forward.
 - **Ordinal 20**: failed; no completion carried forward.
 - **Ordinal 21**: failed combined P1; 2,273 lines before tests; stash `66424881e1b7b064a61d6bd884daa13f7793fa12`. Never restore.
+- **Ordinal 22**: failed P1a; 2,679 all-path lines (Git numstat); unauthorized `functions/tsconfig.json`; stash `3ab7b419f344077b3c3b4667391b155700cfe9fe`. Never restore.
 - **Stashes**: recorded as historical evidence only; never restored.
 
 ### Preserved Completion
@@ -120,7 +139,7 @@ The validated design replaces the callable-only saga with outbox + Cloud Tasks +
 | WU3.2 | Deferred | Review-rejected; re-apply only after trusted backend/client (now P4) |
 | WU4a | Complete | Commit `a0a79cc` — dependency scaffold |
 
-No false completion is carried forward from failed ordinals 19/20/21. WU4b/WU4c are fully replaced by P1a–P4.
+No false completion is carried forward from failed ordinals 19/20/21/22. WU4b/WU4c are fully replaced by P1a1–P4. P1a remains incomplete; no checkboxes carried forward from ordinal 22.
 
 ### Planning Baseline
 
@@ -128,135 +147,239 @@ This `tasks.md` revision, the current `spec.md`, and the current `design.md` are
 
 ### apply-progress Reconciliation
 
-The apply-progress reconciliation MUST occur in P1a after the first RED evidence is captured but before the matching GREEN source implementation. It is a metadata-only write to `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` that:
+The apply-progress reconciliation MUST occur in P1a1 after the first RED evidence is captured but before the matching GREEN source implementation. It is a metadata-only write to `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` that:
 
 1. Records the architecture reset (outbox + Cloud Tasks + scheduled-repair design).
-2. Records the stale WU4b/WU4c split and the combined-P1 plan as superseded by the 5-slice plan (P1a, P1b, P2, P3, P4).
-3. Records ordinals 19/20/21 as failed (no false implementation completion).
-4. Records stash `66424881e1b7b064a61d6bd884daa13f7793fa12` as evidence-only; never restored.
+2. Records the stale WU4b/WU4c split, the combined-P1 plan, and the single-P1a plan as superseded by the 6-slice plan (P1a1, P1a2, P1b, P2, P3, P4).
+3. Records ordinals 19/20/21/22 as failed (no false implementation completion).
+4. Records stashes `66424881e1b7b064a61d6bd884daa13f7793fa12` and `3ab7b419f344077b3c3b4667391b155700cfe9fe` as evidence-only; never restored.
 5. Preserves truthful WU0–WU4a completion byte-for-byte.
 6. Does NOT claim any implementation progress.
-7. Lines count inside P1a's range.
+7. Lines count inside P1a1's range.
 
 ## Executable Node Contract (strict TDD local harness)
 
 - **Local Node prerequisite**: Node >= 22.6.0 (for `node --experimental-strip-types`).
 - **Fail-fast version check**: every test/emulator invocation verifies `node --version` satisfies >= 22.6.0 and aborts otherwise.
 - **Direct `.ts` invocation contract**: every direct `.ts` test invocation uses `node --experimental-strip-types` or an npm script routing to it.
-- **TypeScript build separate**: `npx tsc --noEmit` is the type-checking command and is independent of the Node contract.
+- **TypeScript build separate**: `npx tsc --noEmit` is the type-checking command and is independent of the Node contract. **Important**: project `functions/tsconfig.json` has `rootDir: src` and `include: ["src"]`, so plain `npx tsc --noEmit` does NOT include test files. For test-file typechecking, use explicit `npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions <exact files>` targeting source and test files directly. `functions/tsconfig.json` is forbidden and must not be created or modified.
 - **Strict TDD**: every behavior row requires RED before GREEN. No test may be retroactively labeled RED.
 
 ---
 
-## P1a — Pure Domain Contract + Model + Invariant Vectors
+## P1a1 — Types + Normalization + IDs + Canonical Fixtures
 
-**Objective**: author the independent pure domain contract — canonical vocabulary/types, payload normalization + fingerprint, deterministic ID derivation, pure reducer with every valid `(state, event) -> state` row, frozen invariant table, and canonical behavior-first test vectors covering terminal immutability, per-field CAS, pending/active terminalization guards, retry thresholds, Auth create result matrix, crash-point vectors, completion atomicity, and data immutability. **No persistence of any kind.** No Firestore, no in-memory store, no emulator — pure functions over frozen fixtures only.
+**Objective**: author the independent pure domain contract — canonical vocabulary/types, payload normalization + fingerprint, deterministic ID derivation, and canonical frozen vector fixtures. **No reducer, no model, no state transitions, no invariant vectors.** No persistence of any kind. No Firestore, no in-memory store, no emulator — pure functions over frozen fixtures only. The reducer and all invariant vectors belong to P1a2 and consume the frozen P1a1 contract.
 
-**Spec traceability**: Requirement: Operation Invariants; Requirement: Operation Identity and Idempotency; Requirement: Auth Ambiguity and Reconstruction; Requirement: Bounded Retry and Terminal Failure Finalization; Requirement: Completion Atomic Commitment; Requirement: First-Slice Compensation Policy; Requirement: Application Audit and Observability Contract (identity/dedup shape only).
+**Spec traceability**: Requirement: Operation Identity and Idempotency; Requirement: Application Audit and Observability Contract (identity shape only).
 
-**Design traceability**: "Executable Contract Before Production Code"; canonical vocabulary; deterministic IDs; full CAS and lease contract (predicate shape only — no store implementation); retry and exhaustion semantics; Auth create result matrix.
+**Design traceability**: Canonical vocabulary; deterministic IDs.
 
 **Depends on**: — (first slice; base = `feature/tracker`).
 
-**Base / branch**: `slice/p1a-contract-model` branched from `feature/tracker`.
+**Base / branch**: `slice/p1a1-types-normalization-ids` branched from `feature/tracker`.
 
 **Allowed paths** (exact):
 
 - `functions/src/provisioning/types.ts` (new — canonical vocabulary, status/phase/boundary/result/category type literals)
 - `functions/src/provisioning/normalize.ts` (new — canonical payload normalization + fingerprint + derived displayName)
 - `functions/src/provisioning/ids.ts` (new — deterministic dispatchId/taskId/auditEventId/attemptId/ownerToken/fingerprint derivation)
-- `functions/src/provisioning/model.ts` (new — pure reducer: `(state, event) -> state`, invariant table, valid-pair validation, terminalization predicates)
-- `functions/test/provisioning/fixtures.ts` (new — frozen canonical vectors, payloads, identities, expected transitions)
-- `functions/test/provisioning/types.test.ts` (new — type-level rejection of invalid `(status, phase)` pairs; first authored mutation in P1a)
+- `functions/test/provisioning/types.test.ts` (new — type-level rejection of invalid `(status, phase)` pairs; first authored mutation in P1a1)
 - `functions/test/provisioning/normalize.test.ts` (new — normalization + fingerprint vectors)
 - `functions/test/provisioning/ids.test.ts` (new — deterministic ID vectors)
-- `functions/test/provisioning/model.test.ts` (new — invariant table + every RED vector listed below)
-- `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` (metadata-only reconciliation — after first RED evidence, before matching source)
+- `functions/test/provisioning/fixtures.ts` (new — frozen canonical vectors, payloads, identities, expected transitions)
+- `openspec/changes/prepare-public-portfolio-repository/tasks.md` (SDD bookkeeping updates for P1a1 — counted in all-path totals)
+- `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` (metadata-only reconciliation — after first RED evidence, before matching source; counted in all-path totals)
 
-**Forbidden in P1a**: no `store.ts`, no `memory_store.ts`, no `firestore_store.ts`, no `schemas.ts`, no `cas.ts`, no `audit.ts`, no `profile.ts`, no `firebase-admin` import, no emulator dependency, no callable, no dispatch, no worker, no Auth.createUser, no persistence of any kind.
+**Forbidden in P1a1**: no `model.ts`, no `store.ts`, no `memory_store.ts`, no `firestore_store.ts`, no `schemas.ts`, no `cas.ts`, no `audit.ts`, no `profile.ts`, no `firebase-admin` import, no emulator dependency, no callable, no dispatch, no worker, no Auth.createUser, no persistence of any kind, **no `functions/tsconfig.json`** (unauthorized — tests must run using existing config/explicit CLI).
 
 **Native `sdd-attempt` contract**:
-- Work unit: P1a
-- Evidence goal: pure model + invariant vectors + normalization/ID proofs all green
+- Work unit: P1a1
+- Evidence goal: types + normalization + IDs + fixtures all green
 - max = 2,000
 - `status` → begin exactly once only when `next_action=begin` → `finish` truthfully
 - no launch unless `next_action=begin`
 
+### Line-accounting checkpoints
+
+- **Recount after every RED/GREEN pair**: measure all-path changed lines.
+- **Early warning at 1,500**: pause, assess remaining work, document.
+- **Reforecast/STOP at 1,700**: no further mutation without measured evidence and explicit continuation.
+- **Absolute STOP before 2,000**: no further mutation under any circumstance.
+
 ### Strict TDD order (RED → GREEN)
 
-- [ ] P1a.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 before every test invocation.
-- [ ] P1a.1 RED (FIRST AUTHORED MUTATION): author `functions/test/provisioning/types.test.ts` first — the test file is authored before any source. The test asserts type-level rejection of invalid `(status, phase)` pairs: status vocabulary exactly `pending | active | completed | failed | manual_recovery`; phase vocabulary exactly `dispatch_pending | auth_preflight | auth_create | profile_commit | terminal`; only valid pairs allowed. RED evidence is authoritative via `npx tsc --noEmit` failure (Node strip-types alone cannot prove type-level rejection); the test file imports from `types.ts` which does not yet exist, so `tsc` fails. The runtime `node --experimental-strip-types` invocation of the test is secondary for this row and serves only to prove the test harness is wired; `tsc --noEmit` non-zero exit is the RED gate.
-- [ ] P1a.2 METADATA (after RED evidence captured, before source): reconcile `apply-progress.md` recording architecture reset, superseded WU4b/WU4c/combined-P1/11-slice plan, failed ordinals 19/20/21, stash `66424881e1b7b064a61d6bd884daa13f7793fa12` as evidence-only, preserved WU0–WU4a, no false implementation completion.
-- [ ] P1a.3 GREEN: `types.ts` defined; only valid pairs compile; invalid pairs rejected at type level; `types.test.ts` passes.
-- [ ] P1a.4 RED: normalization vectors — canonical key order (`email,nombre,apellido1,apellido2,employeeId,weeklyHours,dni,telefono,cargo,departamento,empresa,scheduleId,calendarId,fechaInicio,fechaFin,role,isSupervisor,supervisorId,isActive`); NFC; trimmed; email lower-cased; blank optionals null; dates UTC YYYY-MM-DD; defaults exactly `weeklyHours=40`, `employeeId=""`, `isSupervisor=false`, `supervisorId=null`, `isActive=true`; roles exactly `employee | rrhh`; unknown keys rejected; `displayName` derived; non-finite numbers rejected; nested/array/non-plain values rejected; missing `operationId,email,nombre,apellido1` rejected.
-- [ ] P1a.5 GREEN: normalization vectors pass.
-- [ ] P1a.6 RED: fingerprint stability — same canonical payload produces same lower-case SHA-256 hex; different payload produces different digest; `operationId` excluded.
-- [ ] P1a.7 GREEN: fingerprint vectors pass.
-- [ ] P1a.8 RED: deterministic ID vectors — `dispatchId`, `taskId`, `auditEventId`, `attemptId`, `ownerToken`, `fingerprint` derivation from canonical inputs with exact domain separators (`provision-dispatch:v1\0`, `provision-audit:v1\0`, etc.).
-- [ ] P1a.9 GREEN: deterministic ID vectors pass.
-- [ ] P1a.10 RED: pure reducer skeleton — every invariant test fails (compile error or assertion).
-- [ ] P1a.11 GREEN: implement pure reducer covering every valid `(state, event) -> state` row; status/phase vocabularies enforced; only valid pairs accepted.
-- [ ] P1a.12 RED: invariant vectors — terminal immutability: every command against each terminal status rejected without mutation.
-- [ ] P1a.13 GREEN: terminal immutability passes.
-- [ ] P1a.14 RED: per-field CAS mutation suite — independently alter fingerprint, status, phase, generation, version, ownerToken, currentDispatchId, lease liveness; each stale mutation fails; exact live tuple succeeds.
-- [ ] P1a.15 GREEN: per-field CAS mutation suite passes.
-- [ ] P1a.16 RED: pending terminalization guard — independently mutate fingerprint, status, phase, generation, version, ownerToken, lease, authAttempted, authAttempt, current dispatch ID, dispatch identity/source tuple, worker ack; every mismatch blocks `failed/unavailable`.
-- [ ] P1a.17 GREEN: pending terminalization guard passes; exact initial state commits failure + audit + ack once.
-- [ ] P1a.18 RED: active terminalization classifier — exact initial pending state; pending predicate mismatch; active with exact current owner + live lease; active with another owner's unexpired lease (no steal); active with expired lease (takeover); terminal operation idempotent.
-- [ ] P1a.19 GREEN: active terminalization classifier passes.
-- [ ] P1a.20 RED: retry threshold vectors — `retryCount` 0–7 may work; 8–11 terminalize only; no fictional exhaustion callback; pre-handler 5xx semantics.
-- [ ] P1a.21 GREEN: retry threshold vectors pass.
-- [ ] P1a.22 RED: Auth create result matrix — exact live intent CAS to `call_started`; exact returned UID + email with both reads agreeing; malformed/ambiguous/timeout/crash -> `manual_recovery`; definite no-effect with both indexes proving absence; foreign UID/email before intent -> `failed/already-exists`.
-- [ ] P1a.23 GREEN: Auth create result matrix passes; no repeated ambiguous create; no automatic deletion.
-- [ ] P1a.24 RED: crash-point vectors around every external effect — before/after Auth intent, Auth call, Auth return, dual reads, proof commit, profile/completion commit.
-- [ ] P1a.25 GREEN: crash-point vectors pass.
-- [ ] P1a.26 RED: completion atomicity vector — profile + completed + success audit + ack appear together or not at all.
-- [ ] P1a.27 GREEN: completion atomicity passes.
-- [ ] P1a.28 RED: data immutability vector — operation identity/payload/UID, audit identity, dispatch identity, provenance, Auth proof cannot change.
-- [ ] P1a.29 GREEN: data immutability passes.
-- [ ] P1a.30 RED: monotonic state — version increments on every mutation; generation only on expired-lease takeover.
-- [ ] P1a.31 GREEN: monotonic state passes.
-- [ ] P1a.32 RED: dispatch safety — duplicate, stale, and out-of-order vectors cause no effect or regression; no orphan dispatch; idempotent enqueue.
-- [ ] P1a.33 GREEN: dispatch safety passes.
-- [ ] P1a.34 REFACTOR: freeze model + invariants + normalization + IDs + fixtures. `npx tsc --noEmit` green.
+- [ ] P1a1.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 before every test invocation.
+- [ ] P1a1.1 RED (FIRST AUTHORED MUTATION): author `functions/test/provisioning/types.test.ts` first — the test file is authored before any source. The test asserts type-level rejection of invalid `(status, phase)` pairs: status vocabulary exactly `pending | active | completed | failed | manual_recovery`; phase vocabulary exactly `dispatch_pending | auth_preflight | auth_create | profile_commit | terminal`; only valid pairs allowed. RED evidence is authoritative via explicit `npx tsc` invocation targeting the test file directly (project `tsconfig.json` has `rootDir: src` and `include: ["src"]`, so plain `npx tsc --noEmit` does NOT include test files and cannot provide the planned RED):
+
+  ```bash
+  cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions test/provisioning/types.test.ts
+  ```
+
+  This command fails because `test/provisioning/types.test.ts` imports from `types.ts` which does not yet exist. Non-zero exit is the RED gate. The runtime `node --experimental-strip-types` invocation of the test is secondary for this row and serves only to prove the test harness is wired. **Recount all-path changed lines after RED evidence is captured.**
+- [ ] P1a1.2 METADATA (after RED evidence captured, before source): reconcile `apply-progress.md` and update `tasks.md` — recording architecture reset, superseded plans (combined-P1, single-P1a), failed ordinals 19/20/21/22, stashes `66424881...` and `3ab7b419...` as evidence-only, preserved WU0–WU4a, no false implementation completion. **Recount after metadata written.**
+- [ ] P1a1.3 GREEN: `types.ts` defined; only valid pairs compile; invalid pairs rejected at type level; `types.test.ts` passes.
+- [ ] P1a1.4 RED: normalization vectors — `normalize.test.ts` authored before `normalize.ts`. Canonical key order (`email,nombre,apellido1,apellido2,employeeId,weeklyHours,dni,telefono,cargo,departamento,empresa,scheduleId,calendarId,fechaInicio,fechaFin,role,isSupervisor,supervisorId,isActive`); NFC; trimmed; email lower-cased; blank optionals null; dates UTC YYYY-MM-DD; defaults exactly `weeklyHours=40`, `employeeId=""`, `isSupervisor=false`, `supervisorId=null`, `isActive=true`; roles exactly `employee | rrhh`; unknown keys rejected; `displayName` derived; non-finite numbers rejected; nested/array/non-plain values rejected; missing `operationId,email,nombre,apellido1` rejected. **Recount.**
+- [ ] P1a1.5 GREEN: `normalize.ts` defined; normalization vectors pass.
+- [ ] P1a1.6 RED: fingerprint stability — same canonical payload produces same lower-case SHA-256 hex; different payload produces different digest; `operationId` excluded.
+- [ ] P1a1.7 GREEN: fingerprint vectors pass.
+- [ ] P1a1.8 RED: deterministic ID vectors — `ids.test.ts` authored before `ids.ts`. `dispatchId`, `taskId`, `auditEventId`, `attemptId`, `ownerToken`, `fingerprint` derivation from canonical inputs with exact domain separators (`provision-dispatch:v1\0`, `provision-audit:v1\0`, etc.). **Recount.**
+- [ ] P1a1.9 GREEN: `ids.ts` defined; deterministic ID vectors pass.
+- [ ] P1a1.10 RED: canonical fixtures — `fixtures.ts` authored with frozen canonical vectors, payloads, identities, expected transitions; test assertions verify fixture integrity. **Recount.**
+- [ ] P1a1.11 GREEN: fixtures pass integrity assertions.
+- [ ] P1a1.12 REFACTOR: freeze types + normalization/fingerprint + deterministic IDs + canonical fixtures. Final type-level GREEN via explicit `npx tsc` invocation targeting all P1a1 source and test files (project `tsconfig.json` does not include tests, so explicit file list is required):
+
+  ```bash
+  cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts
+  ```
+
+  Zero exit = all P1a1 source and test files typecheck. Plain `npx tsc --noEmit` (project default) remains available as a source-only compatibility check but is NOT evidence that tests typechecked.
 
 ### Verification commands
 
+- `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions test/provisioning/types.test.ts` (authoritative for type-level RED at P1a1.1 — fails before `types.ts` exists)
+- `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts` (authoritative for type-level GREEN at P1a1.12 — all P1a1 source + test files)
+- `cd functions && npx tsc --noEmit` (source-only compatibility check — does NOT verify test files; NOT evidence that tests typechecked)
 - `cd functions && node --experimental-strip-types test/provisioning/types.test.ts`
 - `cd functions && node --experimental-strip-types test/provisioning/normalize.test.ts`
 - `cd functions && node --experimental-strip-types test/provisioning/ids.test.ts`
-- `cd functions && node --experimental-strip-types test/provisioning/model.test.ts`
-- `cd functions && npx tsc --noEmit`
 
 ### Rollback boundary
 
-Revert `functions/src/provisioning/{types,normalize,ids,model}.ts`, delete `functions/test/provisioning/{types.test,fixtures,normalize.test,ids.test,model.test}.ts`, revert `apply-progress.md` to pre-P1a state. Pure TypeScript only — fully removable without unrelated rollback. No emulator state, no config change, no dependency change.
+Revert `functions/src/provisioning/{types,normalize,ids}.ts`, delete `functions/test/provisioning/{types.test,normalize.test,ids.test,fixtures}.ts`, revert `apply-progress.md` and `tasks.md` to pre-P1a1 state. Pure TypeScript only — fully removable without unrelated rollback. No emulator state, no config change, no dependency change.
 
 ### Forbidden actions
 
-No `store.ts`, no `memory_store.ts`, no `firestore_store.ts`, no `schemas.ts`, no `cas.ts`, no `audit.ts`, no `profile.ts`. No `firebase-admin` import. No Firestore emulator. No submission callable. No outbox trigger. No scheduled sweeper. No task worker. No status callable. No Auth.createUser call. No push/PR/deploy. No modification of `spec.md` or `design.md`. No modification of `D:\control_horario`.
+No `model.ts`, no `store.ts`, no `memory_store.ts`, no `firestore_store.ts`, no `schemas.ts`, no `cas.ts`, no `audit.ts`, no `profile.ts`. No `firebase-admin` import. No Firestore emulator. No `functions/tsconfig.json` creation or modification. No submission callable. No outbox trigger. No scheduled sweeper. No task worker. No status callable. No Auth.createUser call. No push/PR/deploy. No modification of `spec.md` or `design.md`. No modification of `D:\control_horario`. No restoration of stash `3ab7b419f344077b3c3b4667391b155700cfe9fe` or `66424881e1b7b064a61d6bd884daa13f7793fa12`.
 
-### Handoff contract to P1b
+### Handoff contract to P1a2
 
-Frozen pure types + frozen normalization/fingerprint + frozen deterministic IDs + frozen pure reducer + frozen invariant table + frozen canonical vector fixtures. P1b builds the persistence port and implements the in-memory reference store and the Firestore emulator adapter; both MUST pass every frozen vector from P1a identically.
+Frozen pure types + frozen normalization/fingerprint + frozen deterministic IDs + frozen canonical vector fixtures. P1a2 builds the pure reducer and all invariant/crash/Auth/result/CAS/terminalization/dispatch vectors consuming this frozen P1a1 contract.
 
-### P1a Forecast (component sum verified)
+### P1a1 Forecast (component sum verified)
 
 | Component | Expected lines |
 |---|---:|
-| `types.ts` | 50–70 |
-| `normalize.ts` | 80–110 |
-| `ids.ts` | 60–85 |
-| `model.ts` | 150–200 |
-| `fixtures.ts` | 120–160 |
-| `types.test.ts` | 40–55 |
-| `normalize.test.ts` | 120–160 |
-| `ids.test.ts` | 80–110 |
-| `model.test.ts` | 280–360 |
-| `apply-progress.md` reconciliation | 30–45 |
-| **Total P1a** | **1,010–1,345** |
+| `types.ts` | 105–125 |
+| `normalize.ts` | 220–255 |
+| `ids.ts` | 85–105 |
+| `types.test.ts` | 330–375 |
+| `normalize.test.ts` | 350–395 |
+| `ids.test.ts` | 130–155 |
+| `fixtures.ts` | 105–125 |
+| `tasks.md` + `apply-progress.md` bookkeeping | 75–115 |
+| **Total P1a1** | **1,400–1,650** |
 
-Reforecast/STOP at 1,700; absolute max 2,000. Component sum verified: low 50+80+60+150+120+40+120+80+280+30 = 1,010; high 70+110+85+200+160+55+160+110+360+45 = 1,345.
+Reforecast/STOP at 1,700; absolute max 2,000. Component sum verified: low 105+220+85+330+350+130+105+75 = 1,400; high 125+255+105+375+395+155+125+115 = 1,650.
+
+---
+
+## P1a2 — Reducer + Invariant Vectors
+
+**Objective**: author the pure reducer with every valid `(state, event) -> state` row, frozen invariant table, and all behavior-first test vectors covering terminal immutability, per-field CAS, pending/active terminalization guards, retry thresholds, Auth create result matrix, crash-point vectors, completion atomicity, data immutability, monotonic state, and dispatch safety. **Consumes the frozen P1a1 contract** (types, normalization, IDs, fixtures). No persistence of any kind. No Firestore, no in-memory store, no emulator — pure functions over frozen P1a1 fixtures only.
+
+**Spec traceability**: Requirement: Operation Invariants; Requirement: Operation Identity and Idempotency; Requirement: Auth Ambiguity and Reconstruction; Requirement: Bounded Retry and Terminal Failure Finalization; Requirement: Completion Atomic Commitment; Requirement: First-Slice Compensation Policy.
+
+**Design traceability**: "Executable Contract Before Production Code"; full CAS and lease contract (predicate shape only — no store implementation); retry and exhaustion semantics; Auth create result matrix.
+
+**Depends on**: P1a1 (frozen types + normalization + IDs + fixtures).
+
+**Base / branch**: `slice/p1a2-reducer-invariants` branched from `slice/p1a1-types-normalization-ids`.
+
+**Allowed paths** (exact):
+
+- `functions/src/provisioning/model.ts` (new — pure reducer: `(state, event) -> state`, invariant table, valid-pair validation, terminalization predicates)
+- `functions/test/provisioning/model.test.ts` (new — invariant table + every RED vector listed below; first authored mutation in P1a2)
+- `openspec/changes/prepare-public-portfolio-repository/tasks.md` (SDD bookkeeping updates for P1a2 — counted in all-path totals)
+- `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` (metadata updates for P1a2 — counted in all-path totals)
+
+**Forbidden in P1a2**: no `types.ts`, no `normalize.ts`, no `ids.ts`, no `fixtures.ts` modification (frozen from P1a1), no `store.ts`, no `memory_store.ts`, no `firestore_store.ts`, no `schemas.ts`, no `cas.ts`, no `audit.ts`, no `profile.ts`, no `firebase-admin` import, no emulator dependency, no callable, no dispatch, no worker, no Auth.createUser, no persistence of any kind, **no `functions/tsconfig.json`**.
+
+**Native `sdd-attempt` contract**:
+- Work unit: P1a2
+- Evidence goal: reducer + all invariant vectors green
+- max = 2,000
+- `status` → begin exactly once only when `next_action=begin` → `finish` truthfully
+- no launch unless `next_action=begin`
+
+### Line-accounting checkpoints
+
+- **Recount after every RED/GREEN pair**: measure all-path changed lines.
+- **Early warning at 1,500**: pause, assess remaining work, document.
+- **Reforecast/STOP at 1,700**: no further mutation without measured evidence and explicit continuation.
+- **Absolute STOP before 2,000**: no further mutation under any circumstance.
+
+### Strict TDD order (RED → GREEN)
+
+- [ ] P1a2.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 before every test invocation.
+- [ ] P1a2.1 RED (FIRST AUTHORED MUTATION): author `functions/test/provisioning/model.test.ts` first — the test file is authored before `model.ts`. Pure reducer skeleton: every invariant test fails (compile error or assertion) because `model.ts` does not yet exist. Tests import from P1a1 frozen types/normalize/ids/fixtures. RED evidence via explicit `npx tsc` invocation targeting the test file plus frozen P1a1 dependencies (project `tsconfig.json` has `rootDir: src` and `include: ["src"]`, so plain `npx tsc --noEmit` does NOT include test files):
+
+  ```bash
+  cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts
+  ```
+
+  This command fails because `test/provisioning/model.test.ts` imports from `model.ts` which does not yet exist. Non-zero exit is the RED gate. Runtime test failure is secondary evidence. **Recount all-path changed lines after RED evidence is captured.**
+- [ ] P1a2.2 METADATA (after RED evidence captured, before source): update `tasks.md` and `apply-progress.md` for P1a2 progress. **Recount.**
+- [ ] P1a2.3 GREEN: implement pure reducer covering every valid `(state, event) -> state` row; status/phase vocabularies enforced (from P1a1 frozen types); only valid pairs accepted; `model.test.ts` initial reducer tests pass.
+- [ ] P1a2.4 RED: invariant vectors — terminal immutability: every command against each terminal status rejected without mutation.
+- [ ] P1a2.5 GREEN: terminal immutability passes.
+- [ ] P1a2.6 RED: per-field CAS mutation suite — independently alter fingerprint, status, phase, generation, version, ownerToken, currentDispatchId, lease liveness; each stale mutation fails; exact live tuple succeeds.
+- [ ] P1a2.7 GREEN: per-field CAS mutation suite passes.
+- [ ] P1a2.8 RED: pending terminalization guard — independently mutate fingerprint, status, phase, generation, version, ownerToken, lease, authAttempted, authAttempt, current dispatch ID, dispatch identity/source tuple, worker ack; every mismatch blocks `failed/unavailable`.
+- [ ] P1a2.9 GREEN: pending terminalization guard passes; exact initial state commits failure + audit + ack once.
+- [ ] P1a2.10 RED: active terminalization classifier — exact initial pending state; pending predicate mismatch; active with exact current owner + live lease; active with another owner's unexpired lease (no steal); active with expired lease (takeover); terminal operation idempotent.
+- [ ] P1a2.11 GREEN: active terminalization classifier passes.
+- [ ] P1a2.12 RED: retry threshold vectors — `retryCount` 0–7 may work; 8–11 terminalize only; no fictional exhaustion callback; pre-handler 5xx semantics.
+- [ ] P1a2.13 GREEN: retry threshold vectors pass.
+- [ ] P1a2.14 RED: Auth create result matrix — exact live intent CAS to `call_started`; exact returned UID + email with both reads agreeing; malformed/ambiguous/timeout/crash -> `manual_recovery`; definite no-effect with both indexes proving absence; foreign UID/email before intent -> `failed/already-exists`.
+- [ ] P1a2.15 GREEN: Auth create result matrix passes; no repeated ambiguous create; no automatic deletion.
+- [ ] P1a2.16 RED: crash-point vectors around every external effect — before/after Auth intent, Auth call, Auth return, dual reads, proof commit, profile/completion commit.
+- [ ] P1a2.17 GREEN: crash-point vectors pass.
+- [ ] P1a2.18 RED: completion atomicity vector — profile + completed + success audit + ack appear together or not at all.
+- [ ] P1a2.19 GREEN: completion atomicity passes.
+- [ ] P1a2.20 RED: data immutability vector — operation identity/payload/UID, audit identity, dispatch identity, provenance, Auth proof cannot change.
+- [ ] P1a2.21 GREEN: data immutability passes.
+- [ ] P1a2.22 RED: monotonic state — version increments on every mutation; generation only on expired-lease takeover.
+- [ ] P1a2.23 GREEN: monotonic state passes.
+- [ ] P1a2.24 RED: dispatch safety — duplicate, stale, and out-of-order vectors cause no effect or regression; no orphan dispatch; idempotent enqueue.
+- [ ] P1a2.25 GREEN: dispatch safety passes.
+- [ ] P1a2.26 REFACTOR: freeze model + invariants. Final type-level GREEN via explicit `npx tsc` invocation targeting all P1a1+P1a2 source and test files (project `tsconfig.json` does not include tests, so explicit file list is required):
+
+  ```bash
+  cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts src/provisioning/model.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts
+  ```
+
+  Zero exit = all P1a1+P1a2 source and test files typecheck. Plain `npx tsc --noEmit` (project default) remains available as a source-only compatibility check but is NOT evidence that tests typechecked.
+
+### Verification commands
+
+- `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts` (authoritative for type-level RED at P1a2.1 — fails before `model.ts` exists)
+- `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts src/provisioning/model.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts` (authoritative for type-level GREEN at P1a2.26 — all P1a1+P1a2 source + test files)
+- `cd functions && npx tsc --noEmit` (source-only compatibility check — does NOT verify test files; NOT evidence that tests typechecked)
+- `cd functions && node --experimental-strip-types test/provisioning/model.test.ts`
+
+### Rollback boundary
+
+Revert `functions/src/provisioning/model.ts`, delete `functions/test/provisioning/model.test.ts`, revert `apply-progress.md` and `tasks.md` to pre-P1a2 state. P1a1 foundation intact. Pure TypeScript only — fully removable without unrelated rollback.
+
+### Forbidden actions
+
+No modification of P1a1 frozen artifacts. No `types.ts`, `normalize.ts`, `ids.ts`, `fixtures.ts` changes. No `store.ts`, no `memory_store.ts`, no `firestore_store.ts`, no `schemas.ts`, no `cas.ts`, no `audit.ts`, no `profile.ts`. No `firebase-admin` import. No Firestore emulator. No `functions/tsconfig.json` creation or modification. No submission callable. No outbox trigger. No scheduled sweeper. No task worker. No status callable. No Auth.createUser call. No push/PR/deploy. No modification of `spec.md` or `design.md`. No modification of `D:\control_horario`. No restoration of stash `3ab7b419f344077b3c3b4667391b155700cfe9fe` or `66424881e1b7b064a61d6bd884daa13f7793fa12`.
+
+### Handoff contract to P1b
+
+Frozen pure types + frozen normalization/fingerprint + frozen deterministic IDs + frozen canonical vector fixtures + frozen pure reducer + frozen invariant table. P1b builds the persistence port and implements the in-memory reference store and the Firestore emulator adapter; both MUST pass every frozen vector from P1a1+P1a2 identically.
+
+### P1a2 Forecast (component sum verified)
+
+| Component | Expected lines |
+|---|---:|
+| `model.ts` | 515–545 |
+| `model.test.ts` | 470–510 |
+| `tasks.md` + `apply-progress.md` bookkeeping | 65–95 |
+| **Total P1a2** | **1,050–1,150** |
+
+Reforecast/STOP at 1,700; absolute max 2,000. Component sum verified: low 515+470+65 = 1,050; high 545+510+95 = 1,150. Anchored to ordinal-22 measured data: model.ts 533, model.test.ts 488.
 
 ---
 
@@ -268,9 +391,9 @@ Reforecast/STOP at 1,700; absolute max 2,000. Component sum verified: low 50+80+
 
 **Design traceability**: Persistence contracts (`/provisioningOperations`, `/provisioningDispatch`); indexes; full CAS and lease contract; "Executable Contract Before Production Code" (independent pure model + identical conformance vectors against both stores).
 
-**Depends on**: P1a (frozen pure contract + fixtures).
+**Depends on**: P1a2 (frozen reducer + invariants; P1a2 transitively includes frozen P1a1 types + normalization + IDs + fixtures).
 
-**Base / branch**: `slice/p1b-persistence-conformance` branched from `slice/p1a-contract-model`.
+**Base / branch**: `slice/p1b-persistence-conformance` branched from `slice/p1a2-reducer-invariants`.
 
 **Allowed paths** (exact):
 
@@ -997,6 +1120,8 @@ P4 completes the trusted provisioning chain and Firestore rules hardening. After
 - No secondary Firebase app in backend after P3.
 - No direct client Auth/profile/compensation/temp-password path after P4.
 - No restoration of stash `66424881e1b7b064a61d6bd884daa13f7793fa12` (ordinal 21 evidence).
+- No restoration of stash `3ab7b419f344077b3c3b4667391b155700cfe9fe` (ordinal 22 evidence).
+- No creation or modification of `functions/tsconfig.json` in any slice.
 
 ## Global Verification Contract (per slice)
 
@@ -1009,5 +1134,5 @@ Every slice MUST deliver:
 
 **Exception scope**:
 
-- P1a–P4: max 2,000 changed lines per slice; reforecast/stop at 1,700; absolute stop at 2,000. Maintainer-approved `size:exception`.
+- P1a1–P4: max 2,000 changed lines per slice; reforecast/stop at 1,700; absolute stop at 2,000. Maintainer-approved `size:exception`.
 - WU5–WU10: max 400 changed lines per work unit; stop at 400. **No inherited exception** — any overrun requires a new, separate maintainer decision.
