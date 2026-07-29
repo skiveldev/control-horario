@@ -1,205 +1,330 @@
-# Design: Recoverable Admin User-Provisioning Saga
+# Design: Durable Trusted Admin Provisioning and Portfolio Preparation
 
 ## Outcome and Scope
 
-WU4b delivers one Firebase Functions v2 callable and a recoverable Firestore-coordinated saga. The callable uses a server-generated UID reserved before Auth creation, profile-only non-admin roles, stable operation-scoped idempotency, CAS leases, durable audit events, and PII-safe Cloud Logging. All backend behavior, unit proof, callable/emulator integration, deployment-metadata proof, and evidence remain one work unit. Because the revised spec requires the Flutter admin panel to use the endpoint and forbids direct client creation, the client migration and its focused Dart proof form a separate WU4c.
+The trusted provisioning root is a **transactional Firestore outbox plus Cloud Tasks durable saga**. `submitProvisioning` accepts work but performs no Auth or profile side effect; a created-only outbox trigger is the enqueue fast path; a scheduled stale-outbox sweeper repairs exhausted/missed Eventarc delivery; `onTaskDispatched` advances at most one external-effect boundary; and `getProvisioningStatus` observes immutable terminal state and issues a fresh reset link only after completed-resource integrity checks. The Flutter client observes progress but never drives it.
 
-This design removes deterministic/HMAC UIDs, key rotation, handler-owned App Check-denial audits, blanket existing-identity success, and any behavior/test work-unit split.
+This planning revision replaces the stale callable-owned saga and compensation design. It retains valid decisions: canonical `(operationId,fingerprint)` identity, server-generated `intendedUid`, `employee|rrhh` roles without custom claims, full transactional CAS leases, durable PII-safe audit, atomic profile/completion/success, Riverpod-only client state, WU4a's existing Functions scaffold, and the unrelated sanitization/signing/docs boundaries. First-slice code performs **no Auth deletion**. Deployment, publication, history rewrite, and runtime execution remain out of scope.
+
+## Architecture at a Glance
+
+```text
+Flutter admin
+  -> submitProvisioning [App Check -> auth -> admin -> schema]
+       -> Firestore transaction(operation + initial dispatch)
+  -> poll getProvisioningStatus with bounded backoff/cancellation
+
+provisioningDispatch/{dispatchId} created
+  +-> retry-enabled onDocumentCreated fast path ---------+
+  |                                                       |
+  +-> scheduled stale enqueued=false repair scan --------+-> same enqueue adapter
+                                                           -> Cloud Task(taskId = dispatchId)
+                                                           -> guarded enqueued=true acknowledgement
+
+Cloud Task
+  -> onTaskDispatched
+       -> transaction: acquire/take over lease and persist intent
+       -> at most one external effect
+       -> transaction: state + audit + next dispatch + current worker ack
+```
+
+`onDocumentCreated` is deliberate: enqueue acknowledgement updates cannot retrigger it. A crash after enqueue but before acknowledgement redelivers the Firestore event; deterministic task identity turns Cloud Tasks `ALREADY_EXISTS` into accepted success. If created-event retries exhaust before any task exists, the first-slice scheduled sweeper finds the durable stale dispatch and uses the same task identity and adapter. The callable never enqueues directly, so there is no state-written/task-missing gap.
 
 ## Decisions
 
-| Topic | Choice | Rejected alternative / rationale |
+| Topic | Decision | Rejected alternative / rationale |
 |---|---|---|
-| Identity | The client creates a UUID-v4 `operationId` once per intentional submission and reuses it only for transport retries. The server generates a random Firebase-valid `intendedUid` before the acquisition transaction; the transaction persists the winning UID atomically with the reservation. | HMAC/deterministic UID and key rotation are unnecessary. A losing concurrent caller discards its candidate and uses the winner's persisted UID. |
-| Idempotency | Identity is `(operationId, fingerprint)`. Same pair may resume or replay success. Before `authAttempted=true` commits, an unrelated email/UID/profile is an ordinary `already-exists` conflict with no identity/profile mutation. From that commit onward, identity mismatch or ambiguous ownership is `manual_recovery/internal`. | Existing email, matching UID/email, and generated-UID collision improbability are never ownership evidence. |
-| Saga | `active/auth_pending`, `active/profile_pending`, `active/compensating`; immutable terminal `completed`, `failed`, and `manual_recovery`. Auth deletion additionally requires a persisted `authOwnershipProof` created only after an unambiguous `createUser` success. | Inferring ownership from `authAttempted` plus current UID/email equality could delete a foreign user after an ambiguous result. |
-| Role | Accept only `employee` or `rrhh`; store `role` and `isSupervisor` in `/users/{uid}`. Never set Auth custom claims. | Provisioning must not create admin authority. |
-| App Check | Export `onCall({enforceAppCheck:true}, handler)`. Firebase rejects invalid tokens before handler entry; platform/edge Functions logs are the denial evidence. | `.run()`-only proof and handler audits for pre-handler denials are impossible evidence. |
+| Liveness | Transactional outbox -> created-only trigger fast path plus scheduled stale-outbox repair -> Cloud Tasks worker. | Callable-only/client retry strands work; trigger-only liveness can fail when Eventarc retries exhaust before task creation. |
+| Enqueue boundary | Submission atomically creates operation and initial dispatch; only the shared trigger/sweeper adapter enqueues. | Direct callable enqueue cannot be atomic with Firestore. |
+| Sweeper | First-slice bounded repair of stale `enqueued=false` dispatches; it never executes saga work. Validator evidence explicitly supersedes the earlier exclusion of scheduled repair because Eventarc delivery can exhaust before task creation. | A scheduler as the primary driver adds latency; trigger-only delivery leaves a durable outbox without an independent repair path. |
+| Effect protocol | One dispatch represents one boundary; worker persists intent before an external mutation and writes result, audit, next dispatch, and current ack atomically where Firestore permits. | A multi-effect invocation enlarges ambiguous crash windows. |
+| Auth ambiguity | Exact create return plus mandatory UID/email reads can establish proof; timeout, ambiguous return, crash, or missing persisted proof goes `manual_recovery`. | Equality after uncertainty is not ownership and cannot justify retry or deletion. |
+| Compensation | No Auth deletion in the first slice; safe failures fix forward, unsafe/post-attempt failures go `manual_recovery`. | Automatic deletion risks deleting a foreign identity. |
+| Retry | `maxAttempts=12`; normal work only for `retryCount < 8`; `retryCount >= 8` is terminalization-only. | One threshold leaves no attempts to durably record terminal state. |
+| Contract proof | Independent pure reducer, frozen vectors, strict in-memory reference store, and Firestore-emulator adapter conformance precede production adapters. | An implementation-authored fake can repeat the implementation's defect. |
+| Reset onboarding | Status query generates and returns a fresh reset link after integrity checks; it never stores, logs, audits, or emails the link. | Temporary passwords and implied email delivery violate the approved product contract. |
 
-## Request, Operation, and Fingerprint Contract
+Rejected alternatives remain: callable-only provisioning, direct enqueue from the callable, client-owned liveness, automatic Auth deletion, and fake-only proof. Trigger-only outbox delivery is newly rejected; the trigger remains the fast path and the scheduled sweeper is only the repair path.
 
-`operationId` is a canonical lower-case UUID-v4 string. Unknown keys, nested values, arrays, non-plain objects, non-finite numbers, and missing required values are rejected before reservation. Strings are NFC-normalized and trimmed; email is additionally lower-cased; blank optionals become `null`; dates are UTC `YYYY-MM-DD`; `weeklyHours` defaults to `40`; booleans default to the current UI defaults; `employeeId` defaults to `""`. `displayName` is derived from normalized names and is not an input.
+## Canonical Vocabulary and Identity
 
-The fingerprint is the 64-character lower-case hexadecimal SHA-256 digest of this UTF-8 fixed-key-order JSON (JSON primitive escaping, no whitespace):
+Statuses are exactly `pending | active | completed | failed | manual_recovery`. Phases are `dispatch_pending | auth_preflight | auth_create | profile_commit | terminal`; only `pending/dispatch_pending`, `active/{auth_preflight,auth_create,profile_commit}`, and terminal-status/`terminal` combinations are valid.
 
-```text
-{"email", "nombre", "apellido1", "apellido2", "employeeId", "weeklyHours",
- "dni", "telefono", "cargo", "departamento", "empresa", "scheduleId",
- "calendarId", "fechaInicio", "fechaFin", "role", "isSupervisor",
- "supervisorId", "isActive"}
-```
-
-The quoted order above is normative. `operationId` is excluded. The reservation stores the normalized payload and fingerprint, so retries never recompute profile data from changed defaults. Required fields are `operationId,email,nombre,apellido1`; allowed roles are exactly `employee|rrhh`.
-
-## Persistence and CAS Contract
-
-Reservation path: `/provisioningOperations/{operationId}`. Required fields are `operationId,fingerprint,normalizedPayload,intendedUid,status,phase,generation,version,ownerToken,leaseExpiresAt,authAttempted,authOwned,authOwnershipProof,terminalCode,recoveryReason,createdAt,updatedAt`. `authOwnershipProof` is null initially and becomes immutable `{attemptGeneration,attemptVersion,confirmedAt}` only through CAS after `createUser` returns unambiguous success to the current owner; lookup equality cannot create it. Failure evidence contains PII-safe `{boundary,code,class}` arrays for `primary`, `persistence`, `compensation`, and `observability`; no SDK message is stored.
-
-Let `E=(status,phase,generation,version,ownerToken,leaseExpiresAt)`. Each active mutation is one transaction requiring exact stored `fingerprint`, exact expected `E`, current owner, and `leaseExpiresAt>serverNow`; it increments `version`. Acquisition/takeover alone increments `generation`; takeover requires `leaseExpiresAt<=serverNow`, replaces owner/lease, and increments version. Terminal transitions clear owner/lease. Terminal documents and `intendedUid`, operation identity, fingerprint, normalized payload, and creation timestamps are immutable. No worker performs Auth/Profile mutation after losing CAS.
-
-### Acquisition and Transition Matrix
-
-`o` is a fresh cryptographic owner token and `L=serverNow+leaseDuration`. “Audit” names the event committed by that transaction; a Cloud log is also emitted for every failure.
-
-| State / event | Exact CAS precondition | Writes and next state | Response / retry or takeover | Audit |
-|---|---|---|---|---|
-| Pre-handler App Check denial | Firebase wrapper; handler not entered | None | Wrapper error; retry with valid token | Platform/edge log only |
-| Handler: unauthenticated | No saga read; valid `operationId` may be parsed only for correlation | Authorization-denial event transaction; no saga/resource mutation | `unauthenticated`; if audit persistence fails, same outward denial plus Cloud failure evidence | `authorization.denied` |
-| Handler: caller profile absent/inactive/not admin | Caller `/users/{callerUid}` read; no lease | Denial event transaction only | `permission-denied`; no reservation/Auth/profile mutation | `authorization.denied` |
-| Authorization read/audit write fails | No lease | No saga/resource mutation | `unavailable` for dependency failure, `internal` for invariant/setup; retry | `failure.authorization` when writable, otherwise Cloud log |
-| Validation fails after authorization | No reservation exists/read | None | `invalid-argument`; correct request/new operation | structured validation log |
-| No reservation | Document absent | Persist candidate `intendedUid`, payload, fingerprint; `active/auth_pending,g=1,v=1,o,L,authAttempted=false,authOwned=false,authOwnershipProof=null` | Continue | none |
-| Same operation, different fingerprint | Existing operation, unequal fingerprint | None | `already-exists`; never mutate | `failure.operation_conflict` create-if-absent |
-| Active, live lease | Same fingerprint; lease unexpired and owner differs | None | `aborted`; retry after expiry | none |
-| Active, expired lease | Exact `E`, expired lease | `g+1,v+1,o,L`; same phase | Reconstruct phase from persisted UID; never trust prior worker outcome | `recovery.takeover` |
-| `completed` retry | Same fingerprint; terminal exact | No reservation mutation; run completed reconstruction | Matching resources: fresh reset link then `{userId,resetLink,idempotent:true}`; otherwise `internal` | Existing `success.completed`; integrity failure event |
-| `failed` retry | Same fingerprint; terminal exact | None | Replay stored stable `terminalCode`; new intent requires new operationId | Existing failure event |
-| `manual_recovery` retry | Same fingerprint; terminal exact | None | `internal`; operator investigation required | Existing `failure.manual_recovery` |
-| `auth_pending`, before create | Exact owned live `E`; UID and email reconstruction says both absent | Set `authAttempted=true,v+1`, retaining phase/lease | Only after commit call `createUser({uid:intendedUid,email,displayName})` | `progress.auth_attempt` |
-| Auth create returns unambiguous success | Exact owned live `E`; `authAttempted=true`; returned UID/email exactly match the request | CAS persists immutable `authOwnershipProof`, sets `authOwned=true,active/profile_pending,v+1` | Continue only after committed proof is authoritatively read; an ambiguous proof-CAS outcome is reconstructed | `progress.auth_confirmed` |
-| Auth create result is ambiguous, or proof is absent after authoritative proof-CAS reconstruction | Exact owned live `E`, or exact reacquired/takeover `E`; `authAttempted=true`; no persisted proof | CAS `manual_recovery,v+1,terminalCode=internal,recoveryReason=auth-ownership-ambiguous`, clear lease; never set `authOwned` | Stable `internal` / `Provisioning requires manual recovery.`; terminal retries replay it; no further takeover | `failure.manual_recovery` in the CAS plus PII-safe Cloud record `{boundary:auth-create,code:ambiguous-result,class:ownership}` |
-| Foreign identity before operation-owned create | Exact owned live `E`; `authAttempted=false`; reconstruction finds any UID/email/profile conflict | CAS `failed,v+1,terminalCode=already-exists`, clear lease; no identity/profile mutation | Stable `already-exists`; terminal retry replays; no takeover | `failure.identity_conflict` |
-| Identity mismatch after partial creation is possible | Exact owned live `E`; `authAttempted=true` or phase is `profile_pending|compensating`; no positive ownership proof sufficient for the observed identity | CAS `manual_recovery,v+1,terminalCode=internal`, clear lease | Stable manual-recovery `internal`; never delete | `failure.manual_recovery` plus PII-safe mismatch log |
-| Auth create definite no-side-effect failure | Exact owned live `E`; SDK classification proves no side effect and both Auth indexes confirm absence | Retryable: append evidence and CAS `authAttempted=false,v+1`; non-retryable validation/invariant: CAS `failed` | `unavailable` then retry/takeover may make a new attempt; mapped terminal error otherwise | `failure.auth_create` |
-| `profile_pending`, resources reconstruct safely | Exact owned live `E`; immutable ownership proof exists; Auth matches and profile absent or operation-matching | Generate reset link; then one transaction creates profile if absent and CASes `completed,v+1`, clears lease, writes success event | Success only after transaction commit | `success.completed` in same transaction |
-| Reset-link transient failure | Exact owned live `E`; immutable ownership proof exists; Auth matching | Append primary evidence, remain `profile_pending,v+1` | `unavailable`; retry/takeover regenerates | `failure.reset_link` in same transaction |
-| Reset-link non-retryable/invariant or profile conflict | Exact owned live `E`; immutable ownership proof exists and Auth exactly matches | CAS `active/compensating,v+1` with primary evidence | Continue compensation; caller ultimately receives stable error | `failure.profile_or_link` |
-| Final transaction ambiguous/fails | Attempted exact owned live `E` | Authoritative reread: committed `completed` is success; otherwise no assumed write and remain/reacquire `profile_pending` | `unavailable` for unresolved Firestore outcome; never delete before reconstruction | Cloud failure; durable event if transaction committed |
-| Any owner loses CAS | Exact predicate fails | None | `aborted` if CAS is sole failure; `internal` if combined with primary/persistence/compensation defect | Cloud failure for compound case |
-| `compensating`, Auth absent | Exact owned live `E`; exact UID absence confirmed | CAS `failed,v+1`, clear lease | Replay mapped primary error | `failure.compensated` same transaction |
-| `compensating`, Auth matching | Exact owned live `E`; `authOwned=true`; immutable proof exists; re-read exact UID immediately after lease confirms normalized email | Call `deleteUser(intendedUid)` only; then confirm UID absent | On confirmed absence, terminal `failed`; otherwise remain active | progress Cloud log, then `failure.compensated` |
-| Compensation delete/read fails | Exact owned live `E` if Firestore writable | Append compensation evidence, remain `compensating,v+1,o,L` | `internal`; stale takeover retries | `failure.compensation` same transaction |
-| Compensation sees mismatched UID/email | Exact owned live `E` | CAS `manual_recovery,v+1`, clear lease; never delete | `internal`; no automated mutation | `failure.manual_recovery` |
-| Terminal transition persistence fails | No successful CAS | No terminal state assumed | `internal`; active lease expiry enables reconstruction/takeover | Cloud log with primary+persistence evidence |
-
-### Reconstruction Matrix
-
-Every takeover and continuation queries both Auth indexes and the profile. `M` means UID exists with normalized intended email and email lookup returns that UID; `X` means inconsistent/foreign/mismatched; `P` means immutable positive ownership proof exists. `PM` is a full operation-tagged profile match. Rows are evaluated top-down. Every active CAS requires exact fingerprint and live `E`; terminal checks require exact immutable operation/fingerprint. Auth read failure never implies absence.
-
-| State and observations | CAS predicate and writes / next state | Response and retry/takeover | Delete? | Audit/log |
-|---|---|---|---|---|
-| `auth_pending`; `authAttempted=false`; Auth absent/absent; profile absent | Exact active `E`; CAS `authAttempted=true,v+1`; remain `auth_pending`, then create | Continue; stale takeover reconstructs | No | `progress.auth_attempt` |
-| Same, profile `PM` | Exact active `E`; CAS `failed/already-exists`, clear lease | Stable conflict; terminal replay | No | `failure.identity_conflict` |
-| Same, profile conflicting | Same as preceding row | Stable conflict; terminal replay | No | `failure.identity_conflict` |
-| `auth_pending`; `authAttempted=false`; Auth `M` or UID absent/email foreign | Exact active `E`; CAS `failed/already-exists`, clear lease | Stable conflict; terminal replay | No | `failure.identity_conflict` |
-| `auth_pending`; `authAttempted=false`; intended UID contains mismatched email or Auth indexes are otherwise `X` | Exact active `E`; CAS `failed/already-exists`, clear lease | Stable conflict; terminal replay | No | `failure.identity_conflict` + mismatch log |
-| `auth_pending`; `authAttempted=true`; Auth `M`; no `P`; profile absent, `PM`, or conflicting | Exact active `E`; CAS `manual_recovery/internal`, reason `auth-ownership-ambiguous`, clear lease | Stable recovery error; terminal replay, no takeover | No | `failure.manual_recovery` + ownership log |
-| `auth_pending`; `authAttempted=true`; Auth absent/absent; no `P`; any profile | Exact active `E`; CAS `manual_recovery/internal`, reason `auth-ownership-ambiguous`, clear lease | Stable recovery error; terminal replay, no takeover | No | `failure.manual_recovery` + ownership log |
-| `auth_pending`; `authAttempted=true`; Auth `M`; `P`; profile absent or `PM` | Exact active `E` including proof; CAS `profile_pending,v+1` | Continue; stale takeover may resume | No | `progress.auth_confirmed` |
-| `auth_pending`; `authAttempted=true`; Auth `M`; `P`; profile conflicting | Exact active `E` including proof; CAS `compensating,v+1` | Stable `internal` after compensation; takeover may resume | Only later compensation row | `failure.profile_or_link` |
-| `auth_pending` after `authAttempted=true`, `profile_pending`, or `compensating`; intended UID contains mismatched email or Auth indexes are `X` | Exact active `E`; CAS `manual_recovery/internal`, clear lease | Stable recovery error; terminal replay | No | `failure.manual_recovery` + mismatch log |
-| Any active phase; Auth/profile read fails | Exact active `E`; append PII-safe evidence, `v+1`, same phase | `unavailable`; retry or stale takeover | No | phase-specific failure event/log |
-| `profile_pending`; Auth absent/absent; any profile | Exact active `E`; CAS `compensating,v+1`; compensation confirms absence then CAS `failed/internal` | `internal`; retry/takeover until terminal | No | `failure.auth_missing`, then `failure.compensated` |
-| `profile_pending`; Auth `M`; no `P`; any profile | Exact active `E`; CAS `manual_recovery/internal`, clear lease | Stable recovery error; terminal replay | No | `failure.manual_recovery` + ownership log |
-| `profile_pending`; Auth `M`; `P`; profile absent | Exact active `E`; reset link, then transaction creates tagged profile + `completed` | Success after commit; ambiguous commit reread | No | `success.completed` atomically |
-| `profile_pending`; Auth `M`; `P`; profile `PM` | Exact active `E`; preserve profile, reset link, CAS `completed` | Success; retry replays | No | `success.completed` atomically |
-| `profile_pending`; Auth `M`; `P`; profile conflicting | Exact active `E`; CAS `compensating,v+1` | Primary stable error after compensation; takeover may resume | Only with `P` below | `failure.profile_or_link` |
-| `compensating`; Auth absent/absent; any profile | Exact active `E`; CAS `failed`, mapped primary code, clear lease | Terminal replay; no takeover | No | `failure.compensated` |
-| `compensating`; Auth `M`; `P`; any profile | Exact active `E`; immediate Auth recheck, delete exact UID, confirm absent, CAS `failed` | `internal` while unresolved; stale takeover resumes | Yes, only here | progress log + `failure.compensated` |
-| `compensating`; Auth `M`; no `P` | Exact active `E`; CAS `manual_recovery/internal`, clear lease | Stable recovery error; terminal replay | No | `failure.manual_recovery` |
-| `completed`; Auth `M`; profile `PM` | Exact terminal identity; no write except fresh-link side effect | Success `{idempotent:true}`; retries repeat link issuance | No | Existing `success.completed` |
-| `completed`; Auth missing, conflicting, mismatched, or either Auth read fails | Exact terminal identity; reservation remains immutable; create integrity event only | Stable `internal`; retry rechecks, never takeover | No | `failure.completed_integrity` + PII-safe log |
-| `completed`; Auth `M`; profile missing, conflicting, or unreadable | Same terminal predicate and no resource write | Stable `internal`; retry rechecks, never takeover | No | `failure.completed_integrity` + PII-safe log |
-
-`PM` requires `provisioningOperationId`, fingerprint, UID, normalized email, and full normalized payload. It proves profile provenance, not Auth ownership. Only `authOwnershipProof` permits Auth deletion. Generated-UID collision improbability, `authAttempted`, and current UID/email equality are explicitly insufficient. `completed`, `failed`, and `manual_recovery` never recreate, overwrite, compensate, or take over.
-
-## Sequence
-
-```text
-Client(operationId) -> v2 callable/App Check -> handler
-handler -> caller profile read -> authorization audit if denied
-handler -> reservation transaction(candidate intendedUid)
-handler -> Auth reads(intendedUid + email)
-handler -> CAS authAttempted -> Auth.createUser(exact intendedUid)
-handler -> unambiguous Auth result -> CAS ownership proof + profile_pending
-ambiguous Auth result or missing proof -> CAS manual_recovery -> stable internal
-handler -> Auth.generatePasswordResetLink
-handler -> Firestore transaction(profile + success audit + completed CAS)
-handler -> client {userId, resetLink, idempotent}
-
-non-retryable post-Auth failure -> compensating CAS/lease
-  -> re-read exact UID/email -> delete exact intendedUid -> confirm absent
-  -> failed CAS + failure audit -> stable HttpsError
-```
-
-## Authorization, Audit, and Logs
-
-Order is wrapper App Check gate → authentication → Admin SDK caller `/users/{uid}` read requiring `role=admin && isActive=true` → denial audit if needed → validation → reservation/lease. No raw email, display name, request body, token, DNI, telephone, or names appear in application logs/audit.
-
-Audit path is `/provisioningAudit/{eventId}`. `eventId=lowerHex(SHA-256("provision:v1\0"+operationKey+"\0"+actorKey+"\0"+category+"\0"+stage+"\0"+attempt))`, where `operationKey` is valid `operationId`, or `correlationId` only when operationId is absent/invalid; `actorKey` is the caller UID digest or literal `anonymous`; `attempt` is `0` for authorization, terminal success, and terminal failure, otherwise the reservation generation. Required fields: `eventId,operationId|null,category(success|failure|authorization),stage,outcome,code,correlationId,actorUidDigest|null,intendedUidDigest|null,generation|null,createdAt`. Digests use one-way SHA-256 with a fixed domain prefix, not a UID-generation secret.
-
-Events are create-if-absent. A retry reads an existing event, verifies immutable identity fields, and performs no write; mismatch is `internal`. Authorization events commit before lease/resource mutation. Success commits in the profile/completion transaction. Transition failures commit in the transaction that records the failure/phase change. App Check denials are the sole application-audit exception. Cloud logs use the same correlation fields plus `version,status,phase` and all failure triples.
-
-## Failure Mapping and Precedence
-
-Every synchronous constructor/getter/logger error and every rejected SDK read, transaction callback/commit, batch/write, Auth lookup/create/delete, reset-link, audit, and compensation promise reaches one mapper; no empty or best-effort catch exists.
-
-| Condition | Stable `HttpsError` |
+| Identity | Canonical form |
 |---|---|
-| Missing auth | `unauthenticated` |
-| Authenticated inactive/non-admin | `permission-denied` |
-| Invalid schema/email/role/date/range | `invalid-argument` |
-| Foreign operation/fingerprint, or foreign UID/email/profile observed while `authAttempted=false` | `already-exists` |
-| Any identity mismatch or ownership ambiguity after `authAttempted=true`, including matching UID/email without `authOwnershipProof` | `internal` after CAS to `manual_recovery` |
-| Live lease or CAS loss alone | `aborted` |
-| Retryable Auth/Firestore/reset-link `aborted|deadline-exceeded|resource-exhausted|too-many-requests|unavailable` | `unavailable` |
-| Invariant, malformed SDK response, setup, unknown SDK code, audit/persistence/logger defect, unsafe ownership, compensation failure | `internal` |
+| `operationId` | Client-created lower-case UUID-v4, reused only for the same intentional submission and persisted for restart. |
+| `fingerprint` | Lower-case SHA-256 of UTF-8 fixed-key-order canonical JSON; `operationId` excluded. |
+| `intendedUid` | Server-generated Firebase-valid random UID, immutable after submission wins. |
+| `dispatchId` / `taskId` | `hexSha256("provision-dispatch:v1\0" + operationId + "\0" + boundary + "\0" + generation + "\0" + sourceVersion)`. |
+| `attemptId` | Dispatch ID for the Auth intent; never reused for a second create call. |
+| `auditEventId` | `hexSha256("provision-audit:v1\0" + operationIdOrCorrelation + "\0" + category + "\0" + stage + "\0" + generation + "\0" + sourceVersion)`. |
+| `ownerToken` | Fencing digest derived from dispatch ID and generation; opaque outside the worker. |
 
-The phase boundary is the successful CAS that sets `authAttempted=true`, immediately before `createUser`. Before it, an observed foreign identity is ordinary conflict: CAS may record the reservation failure and audit, but no Auth/profile/claim/delete mutation occurs, and `already-exists` wins. At or after it, the operation may have created a partial resource: mismatch, an ambiguous create result, or matching Auth without persisted proof MUST CAS to `manual_recovery` and return the stable `internal` recovery error; it never falls back to `already-exists` and never deletes.
+Canonical payload keys, in order, are `email,nombre,apellido1,apellido2,employeeId,weeklyHours,dni,telefono,cargo,departamento,empresa,scheduleId,calendarId,fechaInicio,fechaFin,role,isSupervisor,supervisorId,isActive`. Strings are NFC-normalized and trimmed; email is lower-case; blank optionals are `null`; dates are UTC `YYYY-MM-DD`; defaults are exactly `weeklyHours=40`, `employeeId=""`, `isSupervisor=false`, `supervisorId=null`, and `isActive=true`. Unknown keys, nested/array/non-plain values, non-finite numbers, invalid ranges, and missing `operationId,email,nombre,apellido1` are rejected. `displayName` is derived. Roles are only `employee|rrhh`.
 
-Overall precedence is security decision → post-attempt ownership/integrity → compound integrity → pre-attempt conflict → retryable dependency → CAS-only loss → primary mapping. `unauthenticated`/`permission-denied` remain outwardly stable if denial-audit persistence fails, with Cloud/stderr evidence for both. For authorized work, persistence, compensation, or observability defects return `internal`. All failures remain separate triples. If the structured logger throws, emit the same PII-safe record to `process.stderr`; stderr is fallback evidence, not durable application audit.
+## Persistence Contracts
 
-## Files and Work-Unit Verification
+### `/provisioningOperations/{operationId}`
 
-| Path | Planned change |
+| Field | Contract |
 |---|---|
-| `functions/src/index.ts` | Export v2 callable with `enforceAppCheck:true`; initialize Admin SDK. |
-| `functions/src/provisioning.ts` | Validation, normalization, fingerprint, state machine, CAS, reconstruction, compensation, mapping, audit/log contracts. |
-| `functions/test/provisioning.unit.test.ts` | Deterministic unit/fault-injection coverage for every matrix row and compound precedence. |
-| `functions/test/provisioning.emulator.test.ts` | Callable-client Auth/Firestore/Functions emulator coverage, true concurrent clients, stale takeover, shared-state reconstruction. |
-| `functions/test/export-metadata.test.ts` | Structural assertion that exported v2 endpoint metadata binds `enforceAppCheck:true`; `.run()` only supplements handler tests. |
-| `functions/package.json`, `firebase.json` | Minimal same-WU4b scripts/emulator wiring. |
-| `lib/core/services/firebase_service.dart`, generated provider file if required | WU4c: replace secondary client Auth flow with callable client; preserve Riverpod boundary and operationId across transport retries. |
-| Existing focused Dart service/provider/widget tests | WU4c proof: callable payload/result/error behavior and absence of direct client Auth creation. |
+| `schemaVersion` | Integer `1`; immutable. |
+| `operationId`, `fingerprint`, `normalizedPayload`, `intendedUid` | Canonical values above; immutable. |
+| `submittedByDigest` | Domain-separated SHA-256 caller UID digest; immutable, never a raw UID. |
+| `status`, `phase` | Valid vocabulary pair; terminal pair immutable. |
+| `generation`, `version` | Initially `0,0`; generation changes only on takeover, version on every operation mutation. |
+| `ownerToken`, `leaseExpiresAt`, `currentDispatchId` | Current fencing owner, server-time lease, and only dispatch allowed to advance; owner/lease null in `pending` and terminal states. |
+| `authAttempted` | Initially false; flips monotonically to true in the transaction that persists the first Auth intent and never resets. Pending terminalization requires false. |
+| `authAttempt` | Null or `{attemptId,intentAt,callStartedAt,result,returnedUid,returnedEmail,proof}`. `result` is `intent|call_started|confirmed|definite_no_effect|ambiguous`; returned values are exact create response fields; `proof={attemptId,confirmedAt,uidRead,emailRead}` only after exact return and both reads agree. `call_started` is committed immediately before the call, so a redelivery never calls again. Confirmed proof is immutable. |
+| `failureEvidence` | Append-only bounded entries `{eventId,boundary,code,class,generation,version,recordedAt}`; no SDK message or PII. Overflow rolls into counts/digests, never silent deletion. |
+| `retryEvidence` | `{committedFailureCount,maxRetryCountSeen,maxExecutionCountSeen,lastRetryReasonCode}`; Firestore values are authoritative, TaskContext values advisory. |
+| `terminalCode`, `recoveryCode` | Stable allowlisted codes or null; no free-text SDK detail. |
+| `createdAt`, `updatedAt` | Server timestamps; `createdAt` immutable. |
 
-Local test-harness prerequisites: Node >=22.6.0 because direct `.ts` execution uses `--experimental-strip-types`, installed existing function dependencies, Firebase CLI already authenticated only if required locally, Java for Firestore emulator, ports 5001/8080/9099 free, a disposable emulator project ID, and no production credentials. Firebase deployment runtime compatibility remains Node 20+ for Cloud Functions v2; production does not require Node 22.6. Tests use Functions/Auth/Firestore emulators with isolated namespaces and cleanup. Callable-client tests prove protocol and shared emulator state, not production App Check cryptography.
+### `/provisioningDispatch/{dispatchId}`
 
-| Proof layer | Required cases |
+| Field | Contract |
 |---|---|
-| Unit | Exact normalization/fingerprint; schema/role denial; all CAS predicates; every transition/reconstruction row; stable event IDs; all single and primary+persistence+compensation+logger failures. |
-| Concurrency | Two actual parallel callable clients for one operation choose one persisted UID; loser uses winner UID; same-op mismatch conflicts; live lease aborts; stale owner takeover; lost CAS cannot mutate. Sequential mock calls are insufficient. |
-| Emulator integration | Success; retry; foreign email/UID; ambiguous create reconstruction; UID absent/matching/mismatched/read failure; profile absent/matching/conflicting; reset failure; compensation/delete failure; completed missing/conflicting resources; audit dedup and authorization-before-mutation. |
-| Boundary | Export metadata has `enforceAppCheck:true`; platform/edge logs are documented production denial evidence; no handler audit is expected pre-handler. `.run()` is not App Check proof. |
-| Client | Admin flow calls backend, reuses operationId for retry, maps stable errors, never directly creates Auth/profile. |
+| `schemaVersion`, `dispatchId`, `taskId`, `operationId`, `fingerprint` | Immutable identity; task ID equals dispatch ID. |
+| `boundary`, `generation`, `sourceVersion` | Immutable expected work tuple. Boundaries: `acquire`, `auth_preflight`, `auth_create`, `profile_commit`. |
+| `ownerSeed` | Opaque material used to derive the generation fencing token; immutable. |
+| `enqueued`, `enqueuedAt`, `enqueueSource`, `enqueueEventId` | Initially `false,null,null,null`; guarded acknowledgement sets `true`, server time, `trigger|sweeper`, and the source event/run digest. Trigger and sweeper own these fields through the same transaction helper. |
+| `workerAck`, `workerAckAt` | Initially null; only worker-owned terminal dispatch result: `processed|stale|terminalized`. |
+| `createdAt` | Immutable server timestamp. |
 
-## Rollback, Gates, and Forecast
+Identity fields never change. Enqueue acknowledgement and worker acknowledgement are the only legal updates. A transition creates exactly one next dispatch with deterministic create-if-absent semantics.
 
-Rollback disables/removes the callable export and restores only paths enumerated by the applicable WU4b backend or WU4c client unit; it never mutates existing reservations/resources automatically. Before rollback, active operations are allowed to expire and are assessed through the same reconstruction matrix. No deployment occurs in this phase.
+### `/provisioningAudit/{eventId}`
 
-WU4 remains incomplete after green unit tests. WU4b completion requires backend behavior plus every unit, emulator/concurrency, export-metadata, build, and evidence obligation in the matrices; none may move to a proof-only work unit. WU4c is required separately because the revised spec mandates the Flutter endpoint migration, and it carries its focused Dart proof. Only after both are complete may the candidate proceed to the later validation policy. RDD remains disabled in this design correction; no review runs here.
+Required immutable fields are `schemaVersion,eventId,operationId|null,correlationId,category,stage,outcome,code,actorUidDigest|null,intendedUidDigest|null,dispatchId|null,generation|null,sourceVersion|null,createdAt`. Categories are exactly `authorization | progress | success | failure`; required families are denial, state transition, Auth intent/result, terminal success, terminal failure/manual recovery, stale delivery, and completed-integrity failure. Events are create-if-absent and immutable; an existing ID must match all identity fields. App Check rejection before handler entry is the sole application-audit exception.
 
-Recalculated combined forecast (changed lines): backend/state machine **520–600**; function unit tests **390–460**; emulator/concurrency/metadata proof **360–430**; wiring **30–45**; Flutter callable migration and proof **170–210**. Combined expected total is **1,470–1,745** and credible contingency is **1,920**. Reforecast remains **1,500**, stop remains **1,850**, and **2,000** remains the absolute ceiling. Because the contingency exceeds the stop, a combined WU4b is blocked.
+### `/users/{intendedUid}` provisioning provenance
 
-Required internal split: **WU4b** is the complete backend capability plus all unit, emulator/concurrency, export-metadata, wiring/build, and evidence proof (**1,300–1,535 expected; 1,690 contingency**). **WU4c** is the spec-required Flutter callable migration plus its focused service/provider/widget proof (**170–210 expected; 250 contingency**). Each behavior stays with its proof; no backend test-only slice is permitted.
+The existing employee fields remain, but backend-created profiles also require immutable `userId,email,provisioningOperationId,provisioningFingerprint,provisioningSchemaVersion,provisionedBy:"trusted-backend",provisionedAt`. `email` is normalized; `userId` equals the document ID and intended UID. A profile is operation-matching only when UID, normalized email, operation ID, fingerprint, schema version, and every normalized profile field match. Provenance proves profile origin, not Auth ownership.
 
-### Deferred Tasks Reconciliation
+### Indexes
 
-The current WU4b/WU4c/WU5 continuation metadata is stale relative to this authoritative design. The subsequent `sdd-tasks` phase MUST reconcile `tasks.md`, apply-progress continuation metadata, work-unit labels, dependencies, forecasts, and completion gates to the WU4b backend-proof / WU4c client-proof split above, without moving any backend unit/emulator/metadata proof out of WU4b. This design phase intentionally does not edit those files.
+Saga phase correctness uses direct document reads. `firestore.indexes.json` adds operations `(status ASC, updatedAt ASC)`, operations `(status ASC, phase ASC, leaseExpiresAt ASC)`, dispatches `(operationId ASC, createdAt ASC)`, audit `(operationId ASC, createdAt ASC)`, and the correctness-critical sweeper query index `(enqueued ASC, createdAt ASC, __name__ ASC)`. The sweeper queries exactly `enqueued == false AND createdAt <= serverNow-10m`, ordered by `createdAt,__name__`, with cursor pagination.
 
-Threat matrix: N/A — no routing, shell, subprocess, VCS/PR automation, executable-file classification, or process-integration boundary is introduced.
+## Full CAS and Lease Contract
 
-## Explicitly Invalid Implementations
+For every active mutation, the transaction reads server time and requires equality of `fingerprint,status,phase,generation,version,ownerToken,currentDispatchId` plus `leaseExpiresAt > serverNow`. It also verifies the current dispatch's immutable `operationId,fingerprint,boundary,generation,sourceVersion` as the issuance identity; after acquisition/takeover, the operation's freshly read full tuple is the mutation CAS while `currentDispatchId` fences stale dispatches. The write increments `version` exactly once. No Auth/profile mutation starts after this predicate fails.
 
-Non-CAS terminal writes; swallowed/best-effort failures; sequential mocks labeled concurrency; `.run()`-only App Check proof; handler audit for pre-handler rejection; foreign identity as idempotent success; deriving Auth ownership from `authAttempted`, UID/email equality, or collision improbability; Auth deletion without immutable positive proof, current compensation lease, and exact UID/email re-verification; Auth admin claims; and declaring WU4 complete from green unit tests alone are rejected.
+Initial acquisition requires `pending/dispatch_pending`, exact fingerprint, `generation=0`, `version=0`, `ownerToken=null`, `leaseExpiresAt=null`, `authAttempted=false`, and the exact unacknowledged initial `acquire` dispatch. One transaction sets `active/auth_preflight`, owner token, lease `serverNow+60s`, increments version, creates the matching `auth_preflight` dispatch, audits the transition, and acknowledges the `acquire` dispatch; that invocation yields. Same-dispatch continuation requires the full live tuple. Takeover requires the full observed tuple, same current dispatch, and `leaseExpiresAt <= serverNow`; it increments generation and version, derives a new fencing token from dispatch ID plus new generation, and sets a 60-second lease. The invocation then must reread and use that exact new full active tuple before any transition. A stale generation/version, wrong owner, wrong dispatch, terminal status, or expired lease on a non-takeover mutation produces no write or side effect. Terminalization clears owner/lease, sets phase `terminal`, and preserves immutable/failure fields.
 
-## Requirements Traceability
+## Boundary and Crash Protocol
 
-| Normative requirement | Design evidence |
+### Submission transaction
+
+After App Check, authentication, admin lookup, and schema normalization, one Firestore transaction creates the operation in `pending/dispatch_pending` and initial `acquire` dispatch. Same `(operationId,fingerprint)` returns its current safe status; a different fingerprint returns `already-exists` without mutation. Firestore can make these two documents atomic. Submission cannot be atomic with Auth or Cloud Tasks and intentionally calls neither.
+
+### Outbox enqueue
+
+The retry-enabled `onDocumentCreated` handler validates immutable dispatch shape and calls `enqueueDispatch(dispatch)`. Enqueue and Firestore acknowledgement cannot share a transaction. Crash before enqueue causes event retry; crash after enqueue causes `ALREADY_EXISTS`, which is accepted. Success or `ALREADY_EXISTS` is followed by one guarded transaction requiring exact dispatch identity and `enqueued=false`; it sets `enqueued=true`, `enqueuedAt=serverNow`, source/event digest, and nothing else. If a race already committed the same acknowledgement, the handler succeeds; identity mismatch fails closed. Other errors emit only PII-safe operation/dispatch digests and throw.
+
+### Scheduled outbox repair
+
+`repairProvisioningOutbox` is a first-slice `onSchedule` function running every 5 minutes with scheduler retries `retryCount=3`, `minBackoffSeconds=30`, `maxBackoffSeconds=300`, and `maxDoublings=2`. Each run computes `cutoff=serverNow-10m` and scans only `enqueued=false AND createdAt<=cutoff`, ordered by `createdAt,__name__`, in pages of 100, at most five pages/500 dispatches per run. It uses at most 10 concurrent enqueue calls and a 25-enqueues/second limiter; `maxInstances=1` and `timeoutSeconds=240` bound overlap and cost.
+
+For every record it validates immutable identity and calls the **same** `enqueueDispatch` adapter with the **same** deterministic task ID as the trigger. Enqueue success or `ALREADY_EXISTS` uses the same guarded acknowledgement transaction. Trigger+sweeper races are harmless: one enqueue wins, the other observes `ALREADY_EXISTS`, and either acknowledgement wins while the other verifies `enqueued=true`. Per-record failures log PII-safe operation/dispatch digests; the run processes its bounded page, then throws if any failed so Scheduler retry and the next regular schedule repair them.
+
+The sweeper does not execute or classify saga phases, mutate Auth/profile/operation state, acknowledge worker completion, create dispatches, or invent alternate task identities. Trigger delivery remains the fast path; scheduled scanning is only repair. If Eventarc, Scheduler, and Cloud Tasks are simultaneously unavailable beyond their retry windows, autonomy is not claimed: Monitoring alerts and the operator runbook restore dependencies, query the same stale index, and re-run the same repair handler/adapter. Operators never call a saga phase directly.
+
+### Worker acquisition and intent
+
+Each delivery reads dispatch and operation, then uses the CAS rules to acquire, continue, or take over. Duplicate/out-of-order/terminal deliveries atomically mark only their dispatch stale where legal and return 2xx; they never advance operation state. Before Auth create, the worker performs mandatory UID and email reads. If both are absent, one transaction flips `authAttempted=true`, persists `authAttempt.result=intent`, Auth-attempt audit, version, a deterministic `auth_create` dispatch, and current dispatch acknowledgement. The current invocation yields; the next dispatch owns the external create boundary.
+
+### Auth create result matrix
+
+The `auth_create` dispatch first CASes the full live tuple from `intent` to `call_started`, records `callStartedAt`, and increments version. Only that successful invocation may call Auth, once. Any delivery observing `call_started` without proof reconstructs and terminalizes; it never calls create again for that `attemptId`.
+
+| Observation | Required action |
 |---|---|
-| App Check pre-handler enforcement | Decision, transition first row, boundary test, platform-log exception |
-| Recoverable idempotent saga | Request identity, CAS contract, both exhaustive matrices, sequence |
-| Foreign identity conflict/no mutation | Identity decision and reconstruction conflict rows |
-| Constrained profile roles/no claims | Role decision and validation contract |
-| Authorization/audit/PII safety | Authorization order and mechanical audit schema |
-| Compound failure observability | Failure mapping, precedence, fault matrix |
-| Backend proof kept in WU4b; required client migration in WU4c | Files, test matrix, completion gates |
+| Exact live intent; CAS to `call_started` succeeds in this execution | Call `createUser({uid:intendedUid,email,displayName})` once. |
+| Exact returned UID and email, then mandatory UID lookup and email lookup both resolve to that pair | Transactionally persist exact return, immutable proof, `active/profile_commit`, result audit, next dispatch, and current ack. |
+| Returned UID/email differs, either read differs/fails, return is malformed/ambiguous, timeout occurs, or execution crashes after `call_started` and before proof commits | On retry/reconstruction, run both reads; without independently persisted proof, atomically set `manual_recovery`, failure evidence/audit, and current ack. This includes a crash after `call_started` but before the SDK call: safety deliberately favors manual review. Never retry or delete Auth. |
+| SDK reports a definite no-effect error and both post-error indexes independently prove absence | Transactionally record `definite_no_effect`, evidence/audit, return to `auth_preflight`, create a new dispatch/attempt identity, and ack current dispatch. Retry policy decides whether normal work remains. |
+| Foreign UID/email exists before any intent | Atomically set `failed/terminal` with `already-exists`, audit, and ack; mutate no identity/profile/claim. |
+
+Current UID/email equality after timeout is not proof: another actor may own that identity. The design claims neither exactly-once nor at-most-once Auth behavior after uncertainty.
+
+### Profile and completion
+
+The `profile_commit` dispatch first requires persisted Auth proof and mandatory matching UID/email reads. One Firestore transaction then creates or verifies the operation-matching profile and atomically writes `completed/terminal`, the `success.completed` audit event, and current dispatch acknowledgement. This success transaction is all-or-nothing: success audit cannot fail independently. A conflicting profile, missing/mismatched Auth, absent proof, or unsafe post-attempt condition terminalizes as `manual_recovery`; no deletion occurs. A transient transaction failure leaves the operation nonterminal and throws for retry.
+
+### Failed/manual terminalization and outbox acknowledgement
+
+All safe terminal transitions atomically write operation terminal state, stable evidence, terminal audit, and current worker ack. When a transition creates more work, operation state, transition audit, next dispatch, and current worker ack are one transaction. Enqueue acknowledgement remains a separate shared trigger/sweeper update because Cloud Tasks cannot participate in Firestore transactions.
+
+## Retry and Exhaustion Semantics
+
+`onTaskDispatched` uses `retryConfig.maxAttempts=12`, `minBackoffSeconds=5`, `maxBackoffSeconds=300`, and `maxDoublings=5`; queue rate limits are repository configuration reviewed before deployment. Official TaskContext semantics are normative: initial `retryCount=0`; `retryCount` includes retry-causing 5xx attempts that may never reach handler execution; `executionCount` is separately available.
+
+Normal boundary work is allowed only when `retryCount < 8` (values 0-7). At `retryCount >= 8`, values 8-11 are four reserved terminalization opportunities. They perform no external Auth/profile effect and follow this exact classifier:
+
+| Stored state at reserved attempt | Mechanically executable action |
+|---|---|
+| Exact initial pending state | One transaction requires operation fingerprint, `status=pending`, `phase=dispatch_pending`, `generation=0`, `version=0`, `ownerToken=null`, `leaseExpiresAt=null`, `authAttempted=false`, `authAttempt=null`, and `currentDispatchId` equal to the task's initial dispatch. It also requires that dispatch's exact `operationId,fingerprint,boundary=acquire,generation=0,sourceVersion=0,workerAck=null`. It writes `failed/terminal`, `version=1`, `terminalCode=unavailable`, retry evidence, `failure.retry_exhausted_before_entry`, its deterministic failure audit, and current dispatch `workerAck=terminalized/workerAckAt=serverNow` atomically; no next dispatch. |
+| Pending predicate mismatch | Do not infer safety or write. Reread operation+dispatch and reclassify as exact pending, active, or terminal; a second mismatch/CAS loss returns success with no mutation because another worker changed ownership/progress. |
+| Active with exact current owner and live lease | Require the complete active CAS tuple and current dispatch identity. If durable evidence proves no Auth intent/effect (`authAttempted=false`, `authAttempt=null`, safe phase), atomically write `failed/unavailable`; otherwise atomically write `manual_recovery/internal`. In either case evidence, failure audit, owner/lease clear, and current ack commit together. |
+| Active with another owner's unexpired lease | Do not steal or mutate. CAS loss/ownership classification returns success because that owner is responsible for progress. |
+| Active with expired lease | First transaction requires the exact full observed expired tuple/current dispatch, increments generation+version, installs the deterministic new owner token and live lease. The same invocation (or its retry after authoritative reread) then applies the complete active terminalization guard above using the exact new tuple. If takeover or terminalization persistence is uncertain, reread; throw only when the guarded terminalization still belongs to this owner and did not commit. |
+| Terminal operation | Return success without operation mutation or new audit. Existing dispatch acknowledgement is idempotent; no terminal state changes. |
+
+The pending path is safe `failed/unavailable`, not `manual_recovery`, because every predicate proves no Auth intent/effect exists. Any missing/mismatched pending field destroys that proof. Active terminalization never steals an unexpired lease and never relies on TaskContext as ownership evidence.
+
+Any terminalization CAS loss is success with no mutation: authoritative reread classifies it as another worker owning progress or an already-terminal operation. Dependency/commit failure is distinct from CAS loss and throws only while this task still satisfies the exact guarded owner/current-dispatch predicate.
+
+On every entered execution, advisory TaskContext maxima and any failure evidence are committed with the guarded state mutation. Firestore state, not headers, decides whether an effect intent/proof exists. Because pre-handler 5xx can increment `retryCount` without execution, a task's first handler entry can already have `retryCount>=8`; it immediately uses the pending classifier rather than attempting acquisition. Reserved values 8, 9, 10, and 11 repeat only these guarded terminalization paths. A failed terminalization transaction throws so the next reserved attempt retries it; a committed terminal state returns success.
+
+If Firestore is permanently unavailable, no handler can guarantee terminalization. There is no fictional post-exhaustion callback: Cloud Tasks/Functions failed-execution and queue-attempt-exhaustion metrics must alert, correlated with the PII-safe operation/dispatch digest emitted by any entered invocation. The runbook inspects and explicitly recovers the nonterminal operation. Exhaustion itself does not write `manual_recovery`; terminalization remains best effort under permanent durable-store outage.
+
+## Callable Contracts and Security
+
+Both callables export `onCall({enforceAppCheck:true})`. Handler order is: wrapper App Check -> authentication -> `/users/{callerUid}` admin and `isActive=true` authorization -> denial audit when handler was entered -> schema/normalization -> operation access. App Check denial has platform/edge evidence only. An entered unauthenticated or unauthorized request writes one PII-safe denial event before any reservation/resource mutation; if that write is unavailable, outward denial remains stable and a PII-safe platform error is emitted.
+
+`submitProvisioning` returns only `{operationId,status}` where status is `pending` for a new operation or the current canonical status for an idempotent replay. `getProvisioningStatus` requires `operationId`, accepts optional fingerprint, returns `not-found` for unknown ID and `already-exists` for mismatch, and never mutates the operation on either path.
+
+Safe status DTOs are discriminated:
+
+| Status | Safe fields |
+|---|---|
+| `pending` | `operationId,status,retryAfterSeconds` |
+| `active` | `operationId,status,phase,retryAfterSeconds` |
+| `completed` | `operationId,status,userId,resetLink,idempotent:true` |
+| `failed` | `operationId,status,terminalCode` |
+| `manual_recovery` | `operationId,status,terminalCode,recoveryCode` |
+
+Internal payload, owner, lease, generation/version, raw evidence, audit identity, and email are never returned. For `completed`, the callable re-reads both Auth indexes and the full provenance-tagged profile. Failure or inconsistency returns a stable integrity error without changing the terminal operation or generating a link; a separate deduplicated integrity audit may be created. Only after integrity passes does Auth generate a fresh reset link. The link is returned to the admin for manual delivery; it is never stored, logged, audited, or emailed. Transient link failure returns a stable retryable error and leaves `completed` unchanged.
+
+Dedicated service accounts enforce least privilege: callables read caller/profile/operation data; submission writes operation/dispatch/audit; worker reads/writes saga/profile/audit and uses only required Auth user administration; outbox trigger has one-dispatch read/update plus Cloud Tasks enqueuer; sweeper has query/read/update on dispatch only plus the same Cloud Tasks enqueuer; Scheduler may invoke only the sweeper; the queue's OIDC identity may invoke only the private task function. The sweeper has no Auth permission and no operation/profile write permission. Application logs contain only allowlisted codes and domain-separated digests—never raw email, names, display name, DNI, telephone, request body, token, reset link, or SDK message.
+
+Cloud Monitoring defines: (1) `outbox_stale_age_seconds`, emitted from the oldest matching repair query and alerting above 900 seconds for two consecutive 5-minute periods; (2) Eventarc outbox-trigger error/delivery-failure alerts; (3) sweeper execution-error alert and a missing-successful-execution alert after 10 minutes; and (4) Cloud Tasks enqueue/attempt-exhaustion alerts. Trigger and sweeper failure logs carry only dispatch/operation digests. The runbook first restores Eventarc/Scheduler/Tasks, then invokes the same repair handler or waits for schedule, verifies deterministic enqueue acknowledgement, and finally inventories any still-stale dispatches—never mutating Auth/profile/operation directly.
+
+## Flutter Product Flow
+
+The Riverpod service replaces secondary `FirebaseApp`, direct client Auth/profile writes, temporary passwords, and client compensation. It creates and durably stores one operation ID before submission, submits once, and polls status with delays `1s,2s,4s,8s`, then capped `15s` with jitter. Polling cancels on drawer disposal/logout, pauses offline/backgrounded, and resumes from the persisted operation ID after restart by querying status—never by resubmitting. `retryAfterSeconds` may lengthen but not shorten local backoff. Completed UI presents a copyable reset link and states that the admin must deliver it; failed/manual recovery UI shows stable actionable copy and preserves the operation ID for support.
+
+## Executable Contract Before Production Code
+
+Slice 1 authors and independently reviews a pure TypeScript reducer/reference model, invariant table, and conformance vectors before any production Firebase adapter. Commands/events describe domain observations and intended transitions only; they cannot call, import, encode, or assume Firebase adapters. The model is frozen for adapter conformance review.
+
+| Invariant | Required proof |
+|---|---|
+| Terminal immutability | Every command against each terminal status is rejected without mutation. |
+| Full CAS | Per-field mutation tests independently alter fingerprint, status, phase, generation, version, ownerToken, currentDispatchId, and lease liveness; each stale mutation fails, while the exact live tuple succeeds. |
+| Monotonic state | Version increments on every mutation; generation only on expired-lease takeover. |
+| Intent before effect | No create command is emitted without a committed unique intent. |
+| Ambiguity safety | Crash/timeout/malformed return/missing proof never emits create retry or delete. |
+| Dispatch safety | Duplicate, stale, and out-of-order vectors cause no effect or regression. |
+| Completion atomicity | Profile + completed + success audit + ack appear together or not at all. |
+| Data immutability | Operation identity/payload/UID, audit identity, dispatch identity, provenance, and Auth proof cannot change. |
+| Retry thresholds | 0-7 may work; 8-11 terminalize only; exhaustion never fabricates a terminal write. |
+| Pending terminalization | Independently mutate fingerprint, status, phase, generation, version, ownerToken, lease, authAttempted, authAttempt, current dispatch ID, dispatch identity/source tuple, and worker ack; every mismatch blocks `failed/unavailable`. Exact initial state commits failure+audit+ack once. |
+
+Crash-point vectors surround every external effect: before/after enqueue, Auth intent, Auth call, Auth return, each dual read, proof commit, profile/completion commit, completed integrity reads, and reset-link generation. The same vectors run against (1) a strict independently reviewed in-memory reference store and (2) the Firestore emulator transaction adapter. Divergence fails the build. A production-implementation-authored fake alone is inadmissible.
+
+## Emulator and Verification Strategy
+
+| Layer | Required proof |
+|---|---|
+| Pure unit/property | Normalization/fingerprint, reducer transitions, invariant/per-field guard mutations, deterministic IDs, retry threshold, failure precedence, safe DTO projection. |
+| Strict reference conformance | Frozen vectors and crash schedules against independent store, then identical vectors against Firestore emulator adapter. |
+| Auth + Firestore emulators | Foreign pre-attempt identity; exact create result; both UID/email reads; ambiguity; provenance conflict; all-or-nothing completion; completed integrity. |
+| Functions emulator | Both callable HTTP/callable protocols, metadata `enforceAppCheck:true`, task queue function exercised as its HTTP endpoint, stable errors, PII-safe logs. |
+| Outbox integration | Firestore created event -> injectable enqueue adapter; duplicate event, enqueue success/crash-before-ack, `ALREADY_EXISTS`, invalid dispatch, guarded ack, and trigger+sweeper race. Production adapter receives a contract test against verified task construction. |
+| Scheduled repair | Invoke the pure sweeper handler directly with Firestore-emulator records and shared enqueue adapter: 10-minute grace edge, `(enqueued,createdAt,__name__)` ordering/cursors, 100x5 bounds, rate/concurrency limits, partial failure/throw, already-enqueued race, and forbidden operation/Auth/profile writes. This proves handler behavior, not a fake scheduler or Scheduler delivery. Export/config metadata proves the real schedule/retry limits. |
+| Concurrency/faults | True parallel emulator clients/workers, lease expiry/takeover, duplicate/out-of-order delivery, crash injection around every effect, first entry after pre-handler retries, retryCount 7/8/9/10/11, exact pending guard per-field mutations, pending mismatch reclassification, active live owner, foreign live owner, expired takeover, terminal idempotency, and failed reserved terminalization. Sequential mocks do not qualify. |
+| Client | Fake callable transport only for Dart boundary tests; polling/backoff/jitter/cancel/restart persistence, DTO/error mapping, reset-link UX, and structural absence of direct provisioning. |
+
+There is no supported `emulators.tasks` or Scheduler emulator assumption. Local task-worker proof sends authenticated test HTTP requests to the Functions emulator's task endpoint with controlled TaskContext headers. The enqueue boundary is injectable: a strict fake proves outbox idempotency, while a production adapter contract verifies deterministic queue/task construction. The scheduled handler is invoked directly; tests never claim that a fake timer proves Cloud Scheduler delivery. Auth, Firestore, and Functions emulators remain the integration substrate; metadata tests prove App Check and schedule/retry options because emulator tokens/timers do not prove production platform metadata.
+
+## Repository Files and Deployment Metadata
+
+| Path | Planned action |
+|---|---|
+| `functions/src/provisioning/model.ts`, `functions/test/provisioning/model.test.ts`, vector fixtures | Add independent pure model/invariants first. |
+| `functions/src/provisioning/store.ts`, `functions/src/provisioning/firestore_store.ts` | Add domain port and transactional Firestore adapter. |
+| `functions/src/provisioning/submit.ts`, `outbox.ts`, `outbox_repair.ts`, `worker.ts`, `status.ts` | Add separated callable, shared enqueue/ack adapter, created-trigger fast path, bounded scheduled repair, task worker, and status handlers. |
+| `functions/src/index.ts` | Export both App-Check callables, created-only trigger with retry, 5-minute scheduled repair with bounded retry, and private task function with retry/rate/service-account metadata. |
+| `functions/test/provisioning/**` | Add unit, conformance, adapter, emulator, concurrency, crash, threshold, and export-metadata proof. |
+| `functions/package.json`, lockfile, `firebase.json` | Extend WU4a scaffold minimally for scripts and Functions wiring; do not add a tasks emulator block. |
+| `firestore.indexes.json`, `firestore.rules`, `test/firestore/**` | Add reporting indexes and, after trusted client migration, deny direct `/users` creation/privileged writes with Admin SDK emulator proof. |
+| `lib/core/services/firebase_service.dart`, provider/UI state and focused tests | Replace direct provisioning with callable submission, persisted observation, polling, and reset-link result while retaining Riverpod. |
+| Existing signing/sanitization/README/docs paths | Continue only in their later already-defined work units; no architectural change here. |
+
+Repository preparation records region, queue name, task retry/rate limits, Scheduler cadence/retry/timeouts, runtime and per-function service accounts, task OIDC identity, Scheduler invoker, Eventarc trigger metadata, Cloud Tasks enqueuer role, required Firestore/Auth permissions, stale-outbox index, environment/project placeholders, alert names/thresholds, and PII-safe outbox/manual-recovery runbooks. The deployer needs documented Cloud Functions/Eventarc/Cloud Tasks/Cloud Scheduler/IAM permissions, but no production project ID, secret, role binding, queue, scheduler job, alert, or deployment is created in this change phase.
+
+## Rollback and Recovery
+
+Deployment rollback, if later authorized, first stops new submissions (feature flag/export), keeps outbox trigger, scheduled repair, worker, and status available while accepted operations drain, then inventories every nonterminal/`manual_recovery` operation and every `enqueued=false` dispatch by digest. Never delete Auth automatically. Revert slices only through their enumerated files and keep schema readers backward-compatible until no stored operation needs them. Client rollback precedes callable removal; rules allowing no direct creation must not be relaxed merely to restore the legacy unsafe flow. Scheduler/trigger/queue removal occurs last, after stale-outbox age is zero and operations drain or explicit operator ownership is recorded. Planning rollback is simply reverting this design file; it does not touch WU4a, the updated spec, runtime, or stashes.
+
+The scheduled repair is not a general reconciler, phase executor, archival sweep, or substitute queue. It does not change the non-goals: no production deployment, automatic Auth deletion, email provider, exactly-once/at-most-once Auth claim after uncertainty, or client-owned liveness. Autonomous progress is expected while at least one configured enqueue path and durable dependencies recover within their retry windows; permanent simultaneous Eventarc, Scheduler, Cloud Tasks, or Firestore outage is the spec-defined alert-and-operator exception, not silent success.
+
+## Eleven Review Slices and Forecast
+
+The former 1,500-line WU4b allowance is not sufficient. The next `sdd-tasks` phase must replace stale WU4b budgets/checkmarks before any apply work.
+
+| Slice | Reviewable outcome | Forecast |
+|---|---|---:|
+| S1 | Independent pure model, invariant table, vectors, model review/freeze | 330-400 |
+| S2 | Strict reference store + Firestore adapter conformance | 300-380 |
+| S3 | Canonical schemas, IDs, CAS/lease store primitives | 320-400 |
+| S4 | Submission, authorization/denial audit, safe DTO contracts | 260-340 |
+| S5 | Shared enqueue adapter + created-trigger fast path | 200-270 |
+| S6 | Scheduled stale-outbox repair, index, limits, alerts/runbook proof | 200-280 |
+| S7 | Task worker Auth/profile boundaries and crash matrix | 340-400 |
+| S8 | Pending/active reserved terminalization guards and threshold proof | 240-320 |
+| S9 | Status/reset link, exports, IAM/deployment metadata | 260-340 |
+| S10 | Full emulator, true concurrency, outbox race/retry conformance | 340-400 |
+| S11 | Flutter migration, persistence/polling UX, Dart proof | 260-350 |
+| **Total** | Feature-branch chain; every slice remains at or below 400 forecast lines | **3,050-3,880** |
+
+Each slice carries its own RED/GREEN proof and rollback boundary. S1 is explicitly a model-authoring/review slice; production adapter work cannot begin before its vectors are accepted. The prior nine-slice forecast is superseded because adding durable scheduled repair and exact pending/active terminalization proof would make its infrastructure/worker slices unreviewable. Tasks must reconcile current completed-work metadata honestly: WU4a remains complete, failed implementation checkmarks are not evidence for this replacement design, and no old 1,500/1,690/2,000 guard is forwarded as sufficient authorization.
+
+## Threat Matrix
+
+N/A — this design introduces no routing, shell, subprocess, VCS/PR automation, executable-file classification, or general process-integration boundary. Firebase event/task integration is covered by the distributed-systems threat and crash matrices above.
+
+## Requirement and Scenario Traceability
+
+| Updated spec requirement | Design component | Scenario-family proof level |
+|---|---|---|
+| App Check Pre-Handler Enforcement | Callable exports; security order; metadata | Structural export metadata + Functions emulator protocol; platform denial evidence documented. |
+| Asynchronous Provisioning Submission | Submission transaction; canonical payload | Unit schema/fingerprint + Firestore/Functions emulator; assert no Auth/profile side effect. |
+| Operation Identity and Idempotency | Deterministic IDs; full CAS; stale delivery | Model vectors + emulator duplicate submission/fingerprint conflict/out-of-order dispatch. |
+| Autonomous Backend Liveness | Trigger fast path + scheduled stale-outbox repair + Cloud Tasks boundary protocol | No-client emulator drive, created-event exhaustion repair, trigger+sweeper race, schedule metadata, Monitoring/runbook outage exception. |
+| Protected Status Query | Safe DTOs; authorization; optional fingerprint | Unit projection + callable emulator authorization/not-found/conflict. |
+| Completion Atomic Commitment | Profile completion transaction | Emulator transaction fault injection and completed-integrity query; success tuple all-or-nothing. |
+| Password Reset Link Issuance | Completed-only status behavior | Auth/Functions emulator: fresh returned link, failure retry, no storage/log/email. |
+| Auth Ambiguity and Reconstruction | Auth create matrix; dual reads; proof | Pure crash vectors + Auth emulator ambiguity/foreign/mismatch cases. |
+| First-Slice Compensation Policy | No-delete decision and terminal matrix | Structural no-delete assertion + all post-Auth failure vectors -> `manual_recovery`. |
+| Bounded Retry and Terminal Failure Finalization | 12/8 protocol; exact pending/active classifier; alerts/runbook | First entry at >=8 after pre-handler retries; every pending guard field/mismatch; live owner; expired takeover; terminal idempotency; 8-11 failed/committed terminalization. |
+| Operation Invariants | Full tuple CAS and invariant table | Per-field mutation/property tests + true concurrency/takeover emulator. |
+| Application Audit and Observability Contract | Audit schema; atomic transition writes; PII policy | Dedup/atomicity emulator + denial-before-mutation + log/audit forbidden-field scans. |
+| Client Provisioning Migration | Riverpod polling/persistence flow | Dart unit/widget restart/cancel/backoff/terminal UX + structural direct-flow absence. |
+| Explicit Non-Goals and Compatibility | Scope, sweeper limits, rollback/outage boundary | Structural review: sweeper only repairs enqueue; no deploy/delete/email/exactly-once/client-liveness or permanent-multi-service-autonomy claim. |
+| Client-Side Write Denial | Rules after backend/client slices | Firestore rules emulator: client create/privileged mutation denied, Admin SDK succeeds. |
+| Current-Tree Credential and PII Removal | Existing later sanitization units | Repository secret/PII/claim scan. |
+| Generic Organization Data | Existing de-branding unit | Structural metadata scan retaining `controlhorario-rega`. |
+| Release Signing Enforcement | Existing signing unit | Release fail-fast test + ignore-rule inspection. |
+| Protected Path Immutability | Existing path guards | Before/after byte hashes for all three protected paths. |
+| Repository-Only Portfolio Presentation | Existing README/archive unit | Claim scan + `docs/archive/` absence. |
+| Publication Gate Visibility | Existing final docs unit | Structural documentation proof for all three gates; local test commands remain independent. |
+
+## Risks and Operational Controls
+
+| Risk | Control |
+|---|---|
+| Auth returned success but proof commit is lost | Dual reads inform diagnosis only; missing durable proof terminalizes `manual_recovery`, never create retry/delete. |
+| Firestore unavailable through all task attempts | Reserved attempts retry terminalization; platform metrics alert; runbook owns nonterminal recovery. |
+| Eventarc exhausts before task creation | Five-minute bounded repair scans `enqueued=false` after 10-minute grace; stale-age/trigger/sweeper alerts and operator runbook cover multi-service outage. |
+| Trigger/sweeper/task duplicate or reordering | Shared deterministic task ID, guarded acknowledgement, `ALREADY_EXISTS` acceptance, current-dispatch/full-CAS fencing. |
+| Lease overlap or clock skew | Firestore server time only, 60-second leases, generation fencing, true concurrency tests. |
+| Reset link exposure | Generate after integrity, return only over protected callable, never persist/log/audit/email. |
+| Complexity and reviewer fatigue | Independent model first, eleven <=400-line chained slices, 3,050-3,880 honest forecast, tasks reconciliation gate. |
+| IAM or queue metadata drift | Structural export/config tests, least-privilege service accounts, no production action in repository preparation. |
+
+## Open Questions
+
+None block task planning. Queue rate limits and exact region names are deployment-environment values to be recorded as reviewed metadata, not guessed or provisioned during repository preparation.
