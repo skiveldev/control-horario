@@ -1,9 +1,9 @@
 # Tasks: Prepare Public Portfolio Repository
 
-Decision needed before apply: No
+Decision needed before apply: Yes
 Chained PRs recommended: Yes
 Chain strategy: feature-branch-chain
-400-line budget risk: Accepted for P1a1 + P1b–P4 via maintainer size:exception; P1a2 sub-slices have NO size:exception
+400-line budget risk: High
 Delivery strategy: exception-ok (P1a1 + P1b–P4 only; P1a2 sub-slices use their own declared lower limits)
 RDD routing: disabled — no automatic review activation. After cumulative backend emulator + TypeScript + independent phase-contract proof and candidate freeze at end of P3, surface explicit maintainer enable decision; no review before then.
 
@@ -11,16 +11,16 @@ RDD routing: disabled — no automatic review activation. After cumulative backe
 
 | Field | Value |
 |---|---|
-| Estimated aggregate changed lines (tasks-phase validated) | **8,115–10,735** |
+| Estimated aggregate changed lines (tasks-phase validated) | **8,655–11,485** |
 | Aggregate ceiling | **None** — no invented aggregate ceiling; per-slice max governs |
-| 400-line budget risk | Accepted for P1a1 + P1b–P4 via maintainer size:exception; P1a2 sub-slices have NO size:exception |
+| 400-line budget risk | High |
 | Delivery strategy | exception-ok (P1a1 + P1b–P4 only; P1a2 sub-slices use their own declared lower limits) |
 | Chain strategy | feature-branch-chain |
-| Decision needed before apply | No (P1a1 + P1b–P4 size/chaining resolved; P1a2 sub-slices have explicit lower maxima) |
-| Slice count | 10 chained implementation slices (P1a1, P1a2-i-A-1, P1a2-i-A-2, P1a2-i-B, P1a2-ii, P1a2-iii, P1b, P2, P3, P4) |
+| Decision needed before apply | Yes (interactive execution mode requires phase-scoped approval before each apply slice) |
+| Slice count | 13 chained implementation slices (P1a1, P1a2-i-A-1a, P1a2-i-A-1b, P1a2-i-A-1c, P1a2-i-A-1d, P1a2-i-A-2, P1a2-i-B, P1a2-ii, P1a2-iii, P1b, P2, P3, P4) |
 | Per-slice reforecast/STOP (P1a1 + P1b–P4 only) | 1,700 |
 | Per-slice absolute max (P1a1 + P1b–P4 only) | 2,000 |
-| P1a2-i-A absolute max | 600 (no size:exception) |
+| P1a2-i-A absolute max | 1,900 (no size:exception) |
 | P1a2-i-B absolute max | 600 (no size:exception) |
 | P1a2-ii absolute max | 1,200 (no size:exception) |
 | P1a2-iii absolute max | 1,200 (no size:exception) |
@@ -28,11 +28,11 @@ RDD routing: disabled — no automatic review activation. After cumulative backe
 
 ### Phase-Authority Decision
 
-The previous `Decision needed before apply` workload/size question is resolved for P1a1 + P1b–P4: maintainer has explicitly approved `size:exception` up to 2,000 lines per slice for P1a1 and P1b–P4 only. **P1a2 sub-slices (i-A-1, i-A-2, i-B, ii, iii) do NOT have size:exception.** Each P1a2 sub-slice has its own declared lower maximum: P1a2-i-A-1 max 400, P1a2-i-A-2 max 300, P1a2-i-A combined max 600, P1a2-i-B max 600, P1a2-ii max 1,200, P1a2-iii max 1,200. WU5–WU10 retain ordinary max 400 per work unit; any future overrun in those work units requires a separate maintainer decision. Separately, **interactive phase approval + validated planning baseline** are still required before P1a1 may begin — that gate is about phase sequencing, not about size/chaining, and does not contradict the resolved workload decision.
+The previous `Decision needed before apply` workload/size question is resolved for P1a1 + P1b–P4: maintainer has explicitly approved `size:exception` up to 2,000 lines per slice for P1a1 and P1b–P4 only. **P1a2 sub-slices (i-A-1a, i-A-1b, i-A-1c, i-A-1d, i-A-2, i-B, ii, iii) do NOT have size:exception.** Each P1a2-i-A-1 child has max 400; combined P1a2-i-A-1 max 1,600; P1a2-i-A-2 max 300; combined P1a2-i-A max 1,900; P1a2-i-B max 600; combined P1a2-i max 2,500; P1a2-ii max 1,200; P1a2-iii max 1,200. WU5–WU10 retain ordinary max 400 per work unit; any future overrun in those work units requires a separate maintainer decision. Separately, **interactive phase approval + validated planning baseline** are still required before P1a1 may begin — that gate is about phase sequencing, not about size/chaining, and does not contradict the resolved workload decision.
 
 ### Supersession Notice
 
-This revision **supersedes** the prior P1a plan. The single `P1a — Pure Contract + Model + Invariant Vectors` is replaced by two strictly separated slices: `P1a1 — Types + Normalization + IDs` and P1a2 (reducer + invariants). The prior P1a was invalidated by failed ordinal 22 (see below). P1a2 is further decomposed into five contract-complete sub-slices: `P1a2-i-A-1 — Immutable Vocabulary + Deep Freeze + Strict Guards`, `P1a2-i-A-2 — Validated Constructors + TypeScript Compatibility`, `P1a2-i-B — CAS Fence + Reducer Skeleton + Terminal/State/Data Immutability`, `P1a2-ii — Boundary Transitions + Auth Matrix + Crash Vectors`, `P1a2-iii — Terminalization Guards + Retry Thresholds`. The prior single P1a2 was invalidated by failed ordinals 27–28 (13 deterministic contract gaps, 2,178 lines). P1a2-i was further split into P1a2-i-A and P1a2-i-B after failed ordinal 29 (8 deterministic contract failures, 969 lines). P1a2-i-A was further split into P1a2-i-A-1 and P1a2-i-A-2 after failed ordinal 30 (8 deterministic contract failures, 529 lines). All downstream slices (P1b–P4) and later work units (WU5–WU10) are preserved architecturally; only their dependency edges shift where required by the P1a decomposition.
+This revision **supersedes** the prior P1a plan. The single `P1a — Pure Contract + Model + Invariant Vectors` is replaced by two strictly separated slices: `P1a1 — Types + Normalization + IDs` and P1a2 (reducer + invariants). The prior P1a was invalidated by failed ordinal 22 (see below). P1a2 is further decomposed into five contract-complete sub-slices: `P1a2-i-A-1 — Immutable Vocabulary + Deep Freeze + Strict Guards`, `P1a2-i-A-2 — Validated Constructors + TypeScript Compatibility`, `P1a2-i-B — CAS Fence + Reducer Skeleton + Terminal/State/Data Immutability`, `P1a2-ii — Boundary Transitions + Auth Matrix + Crash Vectors`, `P1a2-iii — Terminalization Guards + Retry Thresholds`. The prior single P1a2 was invalidated by failed ordinals 27–28 (13 deterministic contract gaps, 2,178 lines). P1a2-i was further split into P1a2-i-A and P1a2-i-B after failed ordinal 29 (8 deterministic contract failures, 969 lines). P1a2-i-A was further split into P1a2-i-A-1 and P1a2-i-A-2 after failed ordinal 30 (8 deterministic contract failures, 529 lines). P1a2-i-A-1 was further split into P1a2-i-A-1a (Immutable Vocabulary + Genuine Type Proof), P1a2-i-A-1b (Descriptor-Safe Cycle-Safe Deep Freeze), P1a2-i-A-1c (Strict State Guard), P1a2-i-A-1d (Strict Event Guard) after failed ordinal 34 (6 deterministic blockers: Set mutability, _Eq/Extract type-proof weakness, getter-invoking deepFreeze, guard laxity on null/NaN/class/polluted roots, missing adversarial probes, over-budget compaction; 566 lines, stash `6425de640274d1990b824869b96535068ab450a5`). All downstream slices (P1b–P4) and later work units (WU5–WU10) are preserved architecturally; only their dependency edges shift where required by the P1a decomposition.
 
 ### Failed Ordinal 21 — Evidence (do NOT restore)
 
@@ -63,13 +63,17 @@ The tasks-phase forecast reflects honest per-slice sizing after the P1a decompos
 5. **Fifth refinement (8,075–10,595)**: P1a2 further decomposed into P1a2-i (vocabulary + CAS fence + terminal immutability + state/data immutability + type guards), P1a2-ii (boundary transitions + Auth matrix + crash vectors + completion + dispatch safety), and P1a2-iii (terminalization guards + retry thresholds + negative probes), driven by failed ordinals 27–28 (2,178/2,182 lines, stash `213ff2fdf123bfa9c7b3b0ea0f83026a3b1f0306`, 13 deterministic contract gaps). Each sub-slice is independently contract-complete, targets <=1,200, and has no size:exception.
 6. **Sixth refinement (8,145–10,785)**: P1a2-i further decomposed into P1a2-i-A (immutable vocabulary + runtime guards + TypeScript compatibility — no transitions) and P1a2-i-B (CAS fence + reducer skeleton + terminal/state/data immutability — only `reduce()` as public API), driven by failed ordinal 29 (969/1,200 lines, stash `527d4dfb2fd0bd30eacd7b09116bec3bda79250d`, 8 deterministic contract failures). Each sub-slice targets <=600 with combined max 1,200 and no size:exception.
 7. **Seventh refinement (8,115–10,735)**: P1a2-i-A further decomposed into P1a2-i-A-1 (immutable vocabulary + deep freeze + strict guards — foundation consuming canonical P1a1 via `import type` only, no constructors, `Reflect.ownKeys`-based deep freeze) and P1a2-i-A-2 (validated constructors + TypeScript compatibility), driven by failed ordinal 30 (529/600 lines, stash `012c41516831e1579cd7162c378c123f503ee633`, 8 deterministic contract failures). P1a2-i-A-1 max 400 (STOP 350, expected 260–330), P1a2-i-A-2 max 300 (STOP 250, expected 120–170), combined P1a2-i-A max 600. No size:exception.
+8. **Eighth refinement (8,655–11,485)**: P1a2-i-A-1 further decomposed into four contract-complete child slices — P1a2-i-A-1a (Immutable Vocabulary + Genuine Type Proof, ~200–270), P1a2-i-A-1b (Descriptor-Safe Cycle-Safe Deep Freeze, ~200–270), P1a2-i-A-1c (Strict State Guard, ~200–270), P1a2-i-A-1d (Strict Event Guard, ~200–270) — driven by failed ordinal 34 (566 lines, stash `6425de640274d1990b824869b96535068ab450a5`, 6 deterministic blockers: Set mutability, _Eq/Extract type-proof weakness, getter-invoking deepFreeze, guard laxity on null/NaN/class/polluted roots, missing adversarial probes, over-budget compaction). Each child max 400 (STOP 350), combined P1a2-i-A-1 max 1,600. Corrective pass reconciled canonical arithmetic across all tables. No size:exception.
 
 Per-slice breakdown (validated from ordinal-22 measured data + design grouping + downstream ownership):
 
 | Slice | Focus | Expected |
 |---|---|---:|
 | P1a1 | Types + normalization + IDs + canonical fixtures (no reducer/model) | 1,400–1,650 |
-| P1a2-i-A-1 | Immutable vocabulary + deep freeze + strict guards (foundation, consumes P1a1) | 260–330 |
+| P1a2-i-A-1a | Immutable vocabulary + genuine type proof (consumes P1a1) | 200–270 |
+| P1a2-i-A-1b | Descriptor-safe cycle-safe deep freeze | 200–270 |
+| P1a2-i-A-1c | Strict state guard | 200–270 |
+| P1a2-i-A-1d | Strict event guard | 200–270 |
 | P1a2-i-A-2 | Validated constructors + TypeScript compatibility | 120–170 |
 | P1a2-i-B | CAS fence + reducer skeleton + terminal/state/data immutability | 440–590 |
 | P1a2-ii | Boundary transitions + Auth matrix + crash vectors + completion + dispatch safety | 850–1,100 |
@@ -78,18 +82,22 @@ Per-slice breakdown (validated from ordinal-22 measured data + design grouping +
 | P2 | Schemas + audit primitives + submission + reliable dispatch (former P1 schemas/audit + S4–S6) | 1,030–1,385 |
 | P3 | Profile provenance + worker + status + full backend proof (former P1 profile + S7–S10) | 1,300–1,625 |
 | P4 | Flutter migration + Firestore rules hardening/proof + dependency/bootstrap | 900–1,500 |
-| **Total P1a1–P4** | | **8,115–10,735** |
+| **Total P1a1–P4** | | **8,655–11,485** |
 
 ### Per-Slice Exception Boundaries
 
 | Slice | Early warning | STOP/reforecast | Absolute max | size:exception |
 |---|---:|---:|---:|---|
 | P1a1 | 1,500 | 1,700 | 2,000 | Accepted (committed 9167929) |
-| P1a2-i-A-1 | 300 | 350 | 400 | **No** |
+| P1a2-i-A-1a | 300 | 350 | 400 | **No** |
+| P1a2-i-A-1b | 300 | 350 | 400 | **No** |
+| P1a2-i-A-1c | 300 | 350 | 400 | **No** |
+| P1a2-i-A-1d | 300 | 350 | 400 | **No** |
+| P1a2-i-A-1 combined | — | — | 1,600 | **No** |
 | P1a2-i-A-2 | 200 | 250 | 300 | **No** |
-| P1a2-i-A combined | — | — | 600 | **No** |
+| P1a2-i-A combined | — | — | 1,900 | **No** |
 | P1a2-i-B | 500 | 560 | 600 | **No** |
-| P1a2-i combined | — | — | 1,200 | **No** |
+| P1a2-i combined | — | — | 2,500 | **No** |
 | P1a2-ii | 1,100 | 1,200 | 1,200 | **No** |
 | P1a2-iii | 1,100 | 1,200 | 1,200 | **No** |
 | P1b | 1,500 | 1,700 | 2,000 | Accepted |
@@ -102,11 +110,11 @@ WU5–WU10 do **not** inherit these boundaries. Each later work unit has max 400
 ### Line-Accounting Rules
 
 - Per-slice expected range is the working budget for P1a1–P4.
-- **P1a2-i-A-1, P1a2-i-A-2, P1a2-i-B, P1a2-ii, P1a2-iii do NOT inherit the P1a1/P1b–P4 size:exception.** P1a2-i-A-1 has early warning 300, STOP at 350, absolute max 400. P1a2-i-A-2 has early warning 200, STOP at 250, absolute max 300. Combined P1a2-i-A max 600. P1a2-i-B has early warning 500, STOP at 560, absolute max 600; combined P1a2-i (A-1+A-2+B) max 1,200. P1a2-ii and P1a2-iii each have early warning 1,100, STOP at 1,200, absolute max 1,200. If a coherent contract-complete slice cannot fit within its max, split it further — do NOT use size:exception.
+- **P1a2-i-A-1a, P1a2-i-A-1b, P1a2-i-A-1c, P1a2-i-A-1d, P1a2-i-A-2, P1a2-i-B, P1a2-ii, P1a2-iii do NOT inherit the P1a1/P1b–P4 size:exception.** Each P1a2-i-A-1 child has early warning 300, STOP at 350, absolute max 400; combined P1a2-i-A-1 max 1,600 (4 × 400). P1a2-i-A-2 has early warning 200, STOP at 250, absolute max 300. Combined P1a2-i-A max 1,900 (1,600 + 300). P1a2-i-B has early warning 500, STOP at 560, absolute max 600; combined P1a2-i (A-1+A-2+B) max 2,500. P1a2-ii and P1a2-iii each have early warning 1,100, STOP at 1,200, absolute max 1,200. If a coherent contract-complete slice cannot fit within its max, split it further — do NOT use size:exception.
 - **Recount after every RED/GREEN pair**: measure all-path changed lines via Git-native counting only. **Tracked files**: `git diff --numstat <slice-baseline> -- <tracked paths>` (sum additions + deletions; no net accounting). **Untracked files (Windows PowerShell)**: `git diff --no-index --numstat -- NUL "<path>"` — exit code 1 is expected when differences exist; parse the numstat output for additions + deletions. **POSIX alternative**: `git diff --no-index --numstat -- /dev/null "<path>"`. Never use `Measure-Object -Line`.
-- **Early warning**: P1a1/P1b–P4 at 1,500; P1a2-i-A-1 at 300; P1a2-i-A-2 at 200; P1a2-i-B at 500; P1a2-ii/iii at 1,100 — pause, assess remaining work, document.
-- **STOP/reforecast**: P1a1/P1b–P4 at 1,700; P1a2-i-A-1 at 350; P1a2-i-A-2 at 250; P1a2-i-B at 560; P1a2-ii/iii at 1,200 — no further mutation without measured evidence and explicit continuation.
-- **Absolute STOP**: P1a1/P1b–P4 before 2,000; P1a2-i-A-1 before 400 (STOP/reforecast at 350); P1a2-i-A-2 before 300 (STOP/reforecast at 250); combined P1a2-i-A before 600; P1a2-i-B before 600 (STOP/reforecast at 560); combined P1a2-i before 1,200; P1a2-ii/iii before 1,200 (STOP/reforecast at 1,200; hard max, no exception).
+- **Early warning**: P1a1/P1b–P4 at 1,500; each P1a2-i-A-1 child at 300; P1a2-i-A-2 at 200; P1a2-i-B at 500; P1a2-ii/iii at 1,100 — pause, assess remaining work, document.
+- **STOP/reforecast**: P1a1/P1b–P4 at 1,700; each P1a2-i-A-1 child at 350; P1a2-i-A-2 at 250; P1a2-i-B at 560; P1a2-ii/iii at 1,200 — no further mutation without measured evidence and explicit continuation.
+- **Absolute STOP**: P1a1/P1b–P4 before 2,000; each P1a2-i-A-1 child before 400 (STOP/reforecast at 350); combined P1a2-i-A-1 before 1,600; P1a2-i-A-2 before 300 (STOP/reforecast at 250); combined P1a2-i-A before 1,900; P1a2-i-B before 600 (STOP/reforecast at 560); combined P1a2-i before 2,500; P1a2-ii/iii before 1,200 (STOP/reforecast at 1,200; hard max, no exception).
 - WU5–WU10 each have max 400; if measured changed lines reach 400 within any of them, **STOP** — continuation requires a new, separate maintainer decision (no inherited exception).
 - apply-progress reconciliation lines in P1a1 count inside P1a1's range. tasks.md update lines count inside the slice that introduces them.
 - Test files count toward the slice they verify (no test-only slice).
@@ -120,15 +128,18 @@ WU5–WU10 do **not** inherit these boundaries. Each later work unit has max 400
 main
   └── feature/tracker (draft/no-merge) — accumulates final integration
         └── P1a1 branch (base: feature/tracker) — COMMITTED 9167929
-              └── P1a2-i-A-1 branch (base: P1a1)
-                    └── P1a2-i-A-2 branch (base: P1a2-i-A-1)
-                          └── P1a2-i-B branch (base: P1a2-i-A-2)
-                                └── P1a2-ii branch (base: P1a2-i-B)
-                                      └── P1a2-iii branch (base: P1a2-ii)
-                                            └── P1b branch (base: P1a2-iii)
-                                                  └── P2 branch (base: P1b)
-                                                        └── P3 branch (base: P2)
-                                                              └── P4 branch (base: P3)
+              └── P1a2-i-A-1a branch (base: P1a1)
+                    └── P1a2-i-A-1b branch (base: P1a2-i-A-1a)
+                          └── P1a2-i-A-1c branch (base: P1a2-i-A-1b)
+                                └── P1a2-i-A-1d branch (base: P1a2-i-A-1c)
+                                      └── P1a2-i-A-2 branch (base: P1a2-i-A-1d)
+                                            └── P1a2-i-B branch (base: P1a2-i-A-2)
+                                                  └── P1a2-ii branch (base: P1a2-i-B)
+                                                        └── P1a2-iii branch (base: P1a2-ii)
+                                                              └── P1b branch (base: P1a2-iii)
+                                                                    └── P2 branch (base: P1b)
+                                                                          └── P3 branch (base: P2)
+                                                                                └── P4 branch (base: P3)
 
 Independent later chain (after P4 merges into tracker, tracker merges into main):
 main ──→ WU5 (signing) ──→ WU6 (de-branding) ──→ WU7 (sanitization) ──→ WU8 (README) ──→ WU9 (archive) ──→ WU10 (gates)
@@ -140,16 +151,19 @@ Each child PR targets its immediate previous slice branch. Only the tracker ulti
 
 | Order | Slice | Commit message (conventional) | PR target | Rollback order |
 |---|---|---|---|---|
-| 1 | P1a1 | `feat(provisioning): add canonical types, normalization, IDs, fixtures` | feature/tracker | 10 (last to revert) |
-| 2 | P1a2-i-A-1 | `feat(provisioning): add immutable vocabulary, deep freeze, strict guards` | P1a1 branch | 9 |
-| 3 | P1a2-i-A-2 | `feat(provisioning): add validated constructors, TypeScript compatibility` | P1a2-i-A-1 branch | 8 |
-| 4 | P1a2-i-B | `feat(provisioning): add CAS fence, reducer skeleton, terminal/state/data immutability` | P1a2-i-A-2 branch | 7 |
-| 5 | P1a2-ii | `feat(provisioning): add boundary transitions, Auth matrix, crash vectors, completion, dispatch safety` | P1a2-i-B branch | 6 |
-| 6 | P1a2-iii | `feat(provisioning): add terminalization guards, retry thresholds, negative probes` | P1a2-ii branch | 5 |
-| 7 | P1b | `feat(provisioning): add persistence port, memory/Firestore stores, CAS primitives` | P1a2-iii branch | 4 |
-| 8 | P2 | `feat(provisioning): add schemas, audit, submission, dispatch, outbox, metadata` | P1b branch | 3 |
-| 9 | P3 | `feat(provisioning): add profile, worker, status, full backend proof` | P2 branch | 2 |
-| 10 | P4 | `feat(client): migrate provisioning to trusted backend; harden Firestore rules` | P3 branch | 1 (first to revert) |
+| 1 | P1a1 | `feat(provisioning): add canonical types, normalization, IDs, fixtures` | feature/tracker | 13 (last to revert) |
+| 2 | P1a2-i-A-1a | `feat(provisioning): add immutable vocabulary and genuine type proof` | P1a1 branch | 12 |
+| 3 | P1a2-i-A-1b | `feat(provisioning): add descriptor-safe cycle-safe deep freeze` | P1a2-i-A-1a branch | 11 |
+| 4 | P1a2-i-A-1c | `feat(provisioning): add strict state guard` | P1a2-i-A-1b branch | 10 |
+| 5 | P1a2-i-A-1d | `feat(provisioning): add strict event guard` | P1a2-i-A-1c branch | 9 |
+| 6 | P1a2-i-A-2 | `feat(provisioning): add validated constructors, TypeScript compatibility` | P1a2-i-A-1d branch | 8 |
+| 7 | P1a2-i-B | `feat(provisioning): add CAS fence, reducer skeleton, terminal/state/data immutability` | P1a2-i-A-2 branch | 7 |
+| 8 | P1a2-ii | `feat(provisioning): add boundary transitions, Auth matrix, crash vectors, completion, dispatch safety` | P1a2-i-B branch | 6 |
+| 9 | P1a2-iii | `feat(provisioning): add terminalization guards, retry thresholds, negative probes` | P1a2-ii branch | 5 |
+| 10 | P1b | `feat(provisioning): add persistence port, memory/Firestore stores, CAS primitives` | P1a2-iii branch | 4 |
+| 11 | P2 | `feat(provisioning): add schemas, audit, submission, dispatch, outbox, metadata` | P1b branch | 3 |
+| 12 | P3 | `feat(provisioning): add profile, worker, status, full backend proof` | P2 branch | 2 |
+| 13 | P4 | `feat(client): migrate provisioning to trusted backend; harden Firestore rules` | P3 branch | 1 (first to revert) |
 
 Rollback order is reverse of commit order. Each rollback removes only the enumerated files/behavior for that slice. P1a1 is the last to revert because all other slices depend on its frozen contract.
 
@@ -169,6 +183,7 @@ The validated design replaces the callable-only saga with outbox + Cloud Tasks +
 - **Ordinal 28**: failed P1a2 candidate; used maintainer-approved size:exception max 2,300 and mechanically revalidated 2,182 lines, but fresh independent validation failed every contract group despite 76 green tests. 13 deterministic contract gaps identified. Same stash `213ff2fdf123bfa9c7b3b0ea0f83026a3b1f0306`. Never restore.
 - **Ordinal 29**: failed P1a2-i; 969/1,200 lines; 8 deterministic contract failures. Stash `527d4dfb2fd0bd30eacd7b09116bec3bda79250d`. Never restore.
 - **Ordinal 30**: failed P1a2-i-A; 529/600 lines; 8 deterministic contract failures. Stash `012c41516831e1579cd7162c378c123f503ee633`. Never restore.
+- **Ordinal 34**: failed P1a2-i-A-1; 566/400 lines (exceeded absolute max); 6 deterministic blockers: (1) `Object.freeze(new Set(...))` leaves Set internal slots mutable via `add/delete/clear`; (2) `_Eq` plus `Extract<..., true>` accepts missing and extra canonical `StatusPhasePair` members; (3) `deepFreeze` reads properties and executes getters — throwing accessors abort traversal; (4) state/event guards accept null required identifiers/numbers, NaN, mismatched status-phase pairs, class/polluted roots, non-plain normalized payloads, event-specific missing/extra payload fields; (5) tests omitted those adversarial probes and bookkeeping falsely marked acceptance; (6) compaction transaction changed 491 lines versus 200-line native correction budget. Stash `6425de640274d1990b824869b96535068ab450a5`. Never restore.
 - **Stashes**: recorded as historical evidence only; never restored.
 
 ### Preserved Completion
@@ -319,9 +334,9 @@ Reforecast/STOP at 1,700; absolute max 2,000. Component sum verified: low 105+22
 
 ---
 
-## P1a2 — Reducer + Invariant Vectors (four sub-slices)
+## P1a2 — Reducer + Invariant Vectors (i-A, i-B, ii, iii — A-1 has 4 children)
 
-The prior single P1a2 block is replaced by four contract-complete sub-slices driven by 13 deterministic contract gaps found in failed ordinals 27–28 (stash `213ff2fdf123bfa9c7b3b0ea0f83026a3b1f0306`, evidence only — never restore) and 8 deterministic contract failures found in failed ordinal 29 (stash `527d4dfb2fd0bd30eacd7b09116bec3bda79250d`, evidence only — never restore). Each sub-slice is independently reviewable, has its own RED→GREEN cycle, and has no size:exception.
+The prior single P1a2 block is replaced by five major contract-complete sub-slices; P1a2-i-A-1 is further divided into four independently reviewable child slices. This decomposition addresses 13 deterministic contract gaps found in failed ordinals 27–28 (stash `213ff2fdf123bfa9c7b3b0ea0f83026a3b1f0306`, evidence only — never restore) and 8 deterministic contract failures found in failed ordinal 29 (stash `527d4dfb2fd0bd30eacd7b09116bec3bda79250d`, evidence only — never restore). Each slice has its own RED→GREEN cycle and no P1a2 child has a size:exception.
 
 ### Failed Ordinals 27–28 — Evidence (do NOT restore)
 
@@ -385,8 +400,8 @@ The prior single P1a2 block is replaced by four contract-complete sub-slices dri
 | Gap | Sub-slice | Explicit task(s) | Explicit test probe(s) |
 |---|---|---|---|
 | 1 — validateCAS detached | P1a2-i-B | P1a2-i-B.1 (CAS via reduce black-box), P1a2-i-B.4 (every transition requires CAS via reduce) | Per-field CAS mutation suite via `reduce()` — each of 8 CAS fields independently altered; stale mutation rejected by reduce; live tuple accepted by reduce. No exported CAS helper. |
-| 2 — Pending terminalization incomplete | P1a2-iii | P1a2-iii.5 (full pending predicate) | Exhaustively mutate fingerprint, dispatch source, worker ack; every mismatch blocks `failed/unavailable` |
-| 3 — Active terminalization classifier | P1a2-iii | P1a2-iii.7 (4-path classifier), P1a2-iii.8 (failed vs manual_recovery) | Exact-owner-live, foreign-owner-unexpired, expired-takeover, terminal-idempotent; correct outcome per path |
+| 2 — Pending terminalization incomplete | P1a2-iii | P1a2-iii.2 (full pending predicate), P1a2-iii.8 (negative probe) | Exhaustively mutate fingerprint, dispatch source, worker ack; every mismatch blocks `failed/unavailable` |
+| 3 — Active terminalization classifier | P1a2-iii | P1a2-iii.4 (exact-owner 4-path classifier), P1a2-iii.5 (foreign-owner no-steal), P1a2-iii.6 (expired-lease takeover), P1a2-iii.9 (negative probe) | Exact-owner-live, foreign-owner-unexpired, expired-takeover, terminal-idempotent; correct outcome per path |
 | 4 — Retry thresholds | P1a2-iii | P1a2-iii.1 (gate every normal-work event; exact domain 0–7 normal, 8–11 terminalize, non-integer/negative/>11 fail-closed), P1a2-iii.10 (boundary probes at -1, 0, 7, 8, 11, 12, malformed) | retryCount 0–7 allowed; 8–11 terminalize only; -1/negative/non-integer/>11 fail-closed; exact boundary at 7/8 and 11/12 |
 | 5 — Auth confirmation from intent | P1a2-ii | P1a2-ii.7 (Auth result matrix), P1a2-ii.8 (dual-read proof) | Intent alone cannot confirm; must have exact UID+email reads+proof; definite-no-effect requires two-index absence |
 | 6 — Crash vectors as comments | P1a2-ii | P1a2-ii.9 (real crash transitions) | Each crash point modeled as explicit event; reducer produces correct terminal/continuation state |
@@ -395,101 +410,284 @@ The prior single P1a2 block is replaced by four contract-complete sub-slices dri
 | 9 — Acquisition generation | P1a2-ii | P1a2-ii.3 (acquisition: no generation change), P1a2-ii.4 (takeover: exact +1) | Acquire with generation!=0 rejected; takeover with generation jump > +1 rejected |
 | 10 — Dispatch safety | P1a2-ii | P1a2-ii.11 (dispatch ack, orphan, idempotent enqueue) | Duplicate/stale/out-of-order dispatches cause no regression; orphan dispatch rejected |
 | 11 — Terminal immutability 6/12 | P1a2-i-B | P1a2-i-B.4 (all 11 state-transition event types × 3 terminal statuses + ack_dispatch × 3) | 11 state-transition types × 3 terminal statuses = 33 negative rejection vectors; ack_dispatch × 3 terminal statuses = 3 positive idempotency vectors; 36 total terminal vectors |
-| 12 — Type guards bypass | P1a2-i-A-1 + P1a2-i-A-2 | P1a2-i-A-1.5 (strict guards), P1a2-i-A-2.3–5 (constructor input validation) | Malformed state/event rejected at type level and runtime with exact-field-set validation; deep freeze prevents mutation; constructors reject invalid state/extra fields/malformed values |
+| 12 — Type guards bypass | P1a2-i-A-1a + P1a2-i-A-1b + P1a2-i-A-1c + P1a2-i-A-1d + P1a2-i-A-2 | P1a2-i-A-1c (strict state guard), P1a2-i-A-1d (strict event guard), P1a2-i-A-2.3–5 (constructor input validation) | Malformed state/event rejected at type level and runtime with exact-field-set validation; deep freeze prevents mutation; constructors reject invalid state/extra fields/malformed values |
 | 13 — Bookkeeping understated | P1a2-i-A-1/A-2/i-B/ii/iii | Each sub-slice has component-sum-verified forecast | Each sub-slice recount after every RED/GREEN pair |
 
 ---
 
-## P1a2-i-A-1 — Immutable Vocabulary + Deep Freeze + Strict Guards (Foundation)
+## P1a2-i-A-1a — Immutable Vocabulary + Genuine Type Proof
 
-**Objective**: create `model.ts` with the complete state/event/output vocabulary consuming canonical P1a1 types (no duplication), deep runtime immutability via `Object.freeze` that correctly traverses ALL nested children including arrays even when a parent is already frozen, immutable vocabulary constants (no mutable `Set`), and strict type guards that reject malformed states/events with exact-field-set validation (no missing fields, no extra fields, no weak-typed values). This sub-slice creates the vocabulary skeleton, deep-freeze primitive, and strict guards WITHOUT any constructors, transitions, CAS, or reducer logic.
+**Objective**: create `model.ts` with the complete state/event/output vocabulary consuming canonical P1a1 types via `import type` only. Immutable vocabulary constants as deeply frozen `as const` arrays (NOT mutable `Set` — `Object.freeze(new Set(...))` leaves `add/delete/clear` mutable). Genuine bidirectional type-level proof that the status→phase mapping covers every `StatusPhasePair` member with no missing and no extra pairs (NOT `_Eq<Extract<..., true>>` — that trick accepts missing and extra members). `TransitionResult` discriminated union. State shape interfaces. **No constructors, no deep freeze, no guards, no transitions, no CAS.**
 
-**Ordinal-30 failures addressed**: 1 (nested arrays/Sets mutable), 2 (vocabulary duplication of P1a1), 5 (deepFreeze skipped nested when parent frozen), 6 (tests lacked comprehensive mutation probes), 7 (guards accepted missing/extra/weak fields), and partially 8 (honest counting).
+**Ordinal-34 failures addressed**: 1 (no `Set` — use frozen `as const` arrays), 2 (genuine bidirectional type proof, not `_Eq`/`Extract` trick).
 
-**Spec traceability**: Requirement: Operation Invariants (vocabulary shape); Requirement: Operation Identity and Idempotency (identity shape only).
+**Spec traceability**: Requirement: Operation Invariants (vocabulary shape).
 
 **Design traceability**: "Executable Contract Before Production Code"; canonical vocabulary; invariant table (vocabulary shape only).
 
 **Depends on**: P1a1 (frozen types + normalization + IDs + fixtures).
 
-**Base / branch**: `slice/p1a2-i-a-1-immutable-vocabulary` branched from `slice/p1a1-types-normalization-ids` (commit `860f3c3`).
+**Base / branch**: `slice/p1a2-i-a-1a-vocabulary-type-proof` branched from `slice/p1a1-types-normalization-ids`.
 
-**Allowed paths** (exact):
+**Authorized paths**: `functions/src/provisioning/model.ts` (new — vocabulary ONLY), `functions/test/provisioning/model.test.ts` (new — vocabulary completeness + type proof), `openspec/changes/prepare-public-portfolio-repository/tasks.md`, `openspec/changes/prepare-public-portfolio-repository/apply-progress.md`.
 
-- `functions/src/provisioning/model.ts` (new — vocabulary ONLY: re-exports/consumption of P1a1 types via `import type`, state shape interfaces, complete event type union with all 12 event types, output type union, `deepFreeze` utility, strict type guards, vocabulary constants as frozen arrays)
-- `functions/test/provisioning/model.test.ts` (new — vocabulary completeness, deep freeze traversal probes, strict guard probes; FIRST AUTHORED MUTATION in P1a2-i-A-1)
-- `openspec/changes/prepare-public-portfolio-repository/tasks.md` (SDD bookkeeping)
-- `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` (metadata updates)
+**Immutable protected paths**: `functions/src/provisioning/types.ts` read-only; `functions/tsconfig.json`, `.atl/skill-registry.md`, `.atl/.skill-registry.cache.json`, and `lib/core/theme/app_colors.dart` byte-identical.
 
-**Forbidden in P1a2-i-A-1**: no constructors (`createInitialState`, `createEvent`, `createSuccessResult`, `createFailureResult` — those are P1a2-i-A-2), no `reduce()` function, no CAS predicate, no transition logic, no acquisition, no takeover, no auth transitions, no completion, no terminalization, no dispatch safety transitions. No `types.ts`/`normalize.ts`/`ids.ts`/`fixtures.ts` modification (frozen from P1a1). No `store.ts`, no `memory_store.ts`, no `firestore_store.ts`, no `schemas.ts`, no `cas.ts`, no `audit.ts`, no `profile.ts`, no `firebase-admin` import, no emulator dependency, no callable, no dispatch handler, no worker, no Auth.createUser, no persistence, **no `functions/tsconfig.json`**. No semantic duplication of P1a1 Status/Phase/AuthResult/valid-pair types — consume via `import type` only. No regular runtime import from `./types.js` (no built `types.js` exists; `node --experimental-strip-types` does not remap `.js` to `.ts`). No consumption of P1a1's mutable `Set` exports (`STATUS_VALUES`, `PHASE_VALUES`, etc.).
+**Forbidden**: no constructors, no `reduce()`, no CAS, no transitions, no deep freeze, no guards. No `types.ts`/`normalize.ts`/`ids.ts`/`fixtures.ts` modification. No `store.ts`/`memory_store.ts`/`firestore_store.ts`/`schemas.ts`/`cas.ts`/`audit.ts`/`profile.ts`. No `firebase-admin`. No `Set`. No `_Eq`/`Extract` type-proof trick. No runtime import from `./types.js` — only `import type { ... } from './types.js'`.
 
-**Type-only import mechanism**: P1a2-i-A-1 consumes P1a1 canonical types via `import type { ProvisioningStatus, ProvisioningPhase, TerminalStatus, AuthAttemptResult, AuditCategory, StatusPhasePair } from './types.js'` — `import type` only, erased at runtime, NodeNext-compatible `.js` specifier, works with `node --experimental-strip-types` and `npx tsc --noEmit` without TS5097. No regular `import` from `./types.js` — there is no built output; the runtime uses raw `.ts` files. Model-owned runtime vocabulary constants (event type arrays, status/phase mapping tables) are defined locally in `model.ts` and compile-time constrained against imported P1a1 aliases using `satisfies` plus explicit type-level completeness/equality checks (no missing or extra union members). Valid status→phase mapping is a deeply frozen model-owned table constrained as `Record<ProvisioningStatus, readonly ProvisioningPhase[]>`, with independent literal tests and type-level compatibility with `StatusPhasePair`. Compile-time canonical type consumption and model-owned runtime constants are explicitly distinguished.
+**Type-only import**: `import type { ProvisioningStatus, ProvisioningPhase, TerminalStatus, AuthAttemptResult, AuditCategory, StatusPhasePair } from './types.js'` — erased at runtime. Model-owned runtime constants (event type array, status→phase mapping) defined locally and compile-time constrained via `satisfies` against imported P1a1 aliases.
 
 ### Strict TDD order (RED → GREEN)
 
-- [ ] P1a2-i-A-1.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0.
-- [ ] P1a2-i-A-1.1 RED (FIRST AUTHORED MUTATION): author `functions/test/provisioning/model.test.ts` first — vocabulary completeness tests, deep freeze traversal tests (including array push/index/delete, pre-frozen-parent nested mutation, deep nested object mutation at every level), strict guard tests (missing fields, extra fields, weak-typed values all rejected with independent literal expectations). All fail because `model.ts` does not yet exist. RED via explicit `npx tsc` invocation:
+- [ ] P1a2-i-A-1a.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0.
+- [ ] P1a2-i-A-1a.1 RED (FIRST AUTHORED MUTATION): author `functions/test/provisioning/model.test.ts` — vocabulary completeness (12 event types as frozen array), compile-negative bidirectional proof fixtures, independent literal tests for status→phase mapping. **Compile-negative fixtures (all must produce TS errors at type level)**: (a) deliberately omit one canonical `StatusPhasePair` member from the model's mapping — the test asserts this omission is detected; (b) deliberately add one extra `StatusPhasePair` member not in P1a1's canonical set — the test asserts this extra is detected. All fail because `model.ts` does not exist. RED via explicit `npx tsc` invocation:
 
   ```bash
   cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts
   ```
-
-- [ ] P1a2-i-A-1.2 METADATA: update `tasks.md` and `apply-progress.md`. Recount all four paths.
-- [ ] P1a2-i-A-1.3 GREEN — Immutable vocabulary consuming P1a1: define all 12 event types as a frozen array (`as const`), not a mutable `Set`. Consume Status/Phase/AuthAttemptResult/AuditCategory types from P1a1 via `import type { ... } from './types.js'` — no semantic duplication, no runtime import of P1a1 values. Define model-owned runtime constants (event type array, status→phase mapping) locally in `model.ts`, compile-time constrained via `satisfies Record<ProvisioningStatus, readonly ProvisioningPhase[]>` against imported P1a1 aliases. Define `TransitionResult` discriminated union. Define state shape interfaces (`OperationState`, `AuthAttempt`, `FailureEvidence`, `RetryEvidence`). All vocabulary constants deeply frozen. Tests pass: vocabulary completeness (12 types), no duplication of P1a1 types, status→phase mapping type-compatible with `StatusPhasePair`, independent literal tests for mapping completeness.
-- [ ] P1a2-i-A-1.4 RED → GREEN — Deep runtime immutability: `deepFreeze<T>(obj: T): Readonly<T>` utility that recursively freezes ALL levels. Critical: uses `Reflect.ownKeys()` to enumerate ALL own properties (string-keyed AND symbol-keyed, including non-enumerable), recurses into each value BEFORE freezing the parent, handles arrays (freeze each element first, then the array), handles nested objects at every depth. Even if a parent is already frozen, children that were added before freezing must still be traversed and frozen. Strict guards explicitly reject symbol-keyed extras on guarded plain records (guarded data constrained to exact plain string-keyed records; any symbol-keyed property causes rejection). Tests: comprehensive probe suite — array push rejected, array index assignment rejected, array delete rejected, nested object mutation at every level rejected, pre-frozen-parent with unfrozen nested children → after deepFreeze ALL levels frozen, symbol-keyed property on guarded record → guard rejects. NOT just `readonly` type annotations — actual runtime `Object.freeze` at every level via `Reflect.ownKeys` traversal.
-- [ ] P1a2-i-A-1.5 RED → GREEN — Strict type guards: `isEventType(value)`, `isStatus(value)`, `isPhase(value)`, `isValidState(value)`, `isValidEvent(value)`. Strict validation: exact field set (no missing required fields, no extra fields), correct types for every field (no weak-typed values like `any` or overly broad unions). Tests use independent literal expectations — each test constructs a specific malformed shape and asserts rejection. Probes: missing required field → false; extra unknown field → false; wrong type for known field → false; null where object expected → false; undefined where string expected → false.
-- [ ] P1a2-i-A-1.6 REFACTOR: freeze P1a2-i-A-1. Final type-level GREEN via explicit `npx tsc`:
-
-  ```bash
-  cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts src/provisioning/model.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts
-  ```
-
-  ```bash
-  cd functions && npx tsc --noEmit
-  ```
-
-  Both commands pass. Second is source-only compatibility proof (no TS5097).
+- [ ] P1a2-i-A-1a.2 METADATA: update `tasks.md` and `apply-progress.md`. Recount.
+- [ ] P1a2-i-A-1a.3 GREEN: define 12 event types as `as const` frozen array. Consume P1a1 via `import type` only. Define model-owned status→phase mapping constrained as `Record<ProvisioningStatus, readonly ProvisioningPhase[]>` via `satisfies`. **Genuine bidirectional type proof** (NOT `_Eq<Extract<..., true>>` which accepts missing and extra members): use a non-distributive technique such as bidirectional assignability — assert `StatusPhasePair extends ModelStatusPhaseMap[keyof ModelStatusPhaseMap]` (no missing: every canonical pair is in the model map) AND `ModelStatusPhaseMap[keyof ModelStatusPhaseMap] extends StatusPhasePair` (no extra: every model map entry is canonical). Both directions must hold. The RED fixtures from step 1 verify that removing a pair breaks direction 1 and adding an extra pair breaks direction 2. Define `TransitionResult` discriminated union. Define state shape interfaces. All vocabulary constants deeply frozen. Tests pass.
+- [ ] P1a2-i-A-1a.4 REFACTOR: freeze. Type-level GREEN via explicit `npx tsc` on all P1a1 + `model.test.ts`.
 
 ### Verification commands
 
-- `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts` (type-level RED — fails before `model.ts`)
-- `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts src/provisioning/model.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts` (type-level GREEN — all P1a1+P1a2-i-A-1 files)
-- `cd functions && npx tsc --noEmit` (source-only compatibility — no TS5097)
-- `cd functions && node --experimental-strip-types test/provisioning/model.test.ts` (runtime GREEN)
-- Git-native count (Windows PowerShell): **tracked bookkeeping** — `git diff --numstat <P1a1-baseline> -- openspec/changes/prepare-public-portfolio-repository/tasks.md openspec/changes/prepare-public-portfolio-repository/apply-progress.md`. **Untracked files** (both created new by P1a2-i-A-1; exit code 1 expected for each):
-  - `git diff --no-index --numstat -- NUL "functions/src/provisioning/model.ts"`
-  - `git diff --no-index --numstat -- NUL "functions/test/provisioning/model.test.ts"`
-  Parse each numstat output for additions + deletions; sum across all four paths (2 tracked + 2 untracked).
+- `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts` (type-level RED before `model.ts`)
+- `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts src/provisioning/model.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts` (type-level GREEN — all P1a1 + A-1a files)
+- `cd functions && npx tsc --noEmit` (source-only compatibility)
+- `cd functions && node --experimental-strip-types test/provisioning/model.test.ts` (runtime)
+- Git-native count (Windows PowerShell): tracked — `git diff --numstat <P1a1-baseline> -- openspec/changes/prepare-public-portfolio-repository/tasks.md openspec/changes/prepare-public-portfolio-repository/apply-progress.md`; untracked — `git diff --no-index --numstat -- NUL "functions/src/provisioning/model.ts"` and `git diff --no-index --numstat -- NUL "functions/test/provisioning/model.test.ts"` (exit code 1 expected). Sum additions + deletions across all four paths.
 
-### Independent phase-contract acceptance (UNCHECKED — fresh context)
+### Independent phase-contract acceptance (UNCHECKED)
 
-- [ ] All 12 event types defined and frozen (no mutable Set)
-- [ ] P1a1 types consumed ONLY via `import type { ... } from './types.js'` — no runtime import, no `Set` consumption, no semantic duplication
-- [ ] Model-owned runtime constants compile-time constrained via `satisfies` against imported P1a1 aliases; status→phase mapping type-compatible with `StatusPhasePair`
-- [ ] Deep freeze uses `Reflect.ownKeys()` — covers string-keyed AND symbol-keyed own properties; recurses into ALL children including arrays, even when parent already frozen
-- [ ] Comprehensive mutation probes: array push/index/delete, pre-frozen-parent nested, deep nested at every level, symbol-keyed extras rejected by guards
-- [ ] Strict guards: no missing fields, no extra fields, no weak-typed values, no symbol-keyed extras; independent literal expectations
-- [ ] No constructors, no `reduce()`, no CAS predicate, no transition logic, no boundary behavior
+- [ ] All 12 event types defined as frozen `as const` array (no `Set`)
+- [ ] P1a1 types consumed ONLY via `import type` — no runtime import, no `Set`, no semantic duplication
+- [ ] Bidirectional type proof: no missing and no extra `StatusPhasePair` members (NOT `_Eq`/`Extract`)
+- [ ] No constructors, no `reduce()`, no CAS, no transitions, no deep freeze, no guards
 - [ ] No `functions/tsconfig.json` modification
 
 ### Rollback boundary
 
-Revert `functions/src/provisioning/model.ts`, delete `functions/test/provisioning/model.test.ts`, revert `tasks.md` and `apply-progress.md` to pre-P1a2-i-A-1 state. P1a1 intact. Pure TypeScript only.
+Revert `functions/src/provisioning/model.ts`, delete `functions/test/provisioning/model.test.ts`, revert `openspec/changes/prepare-public-portfolio-repository/tasks.md` and `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` to pre-P1a2-i-A-1a state. P1a1 intact.
 
-### P1a2-i-A-1 Forecast (component sum verified)
+### P1a2-i-A-1a Forecast
 
 | Component | Expected lines |
 |---|---:|
-| `model.ts` (vocabulary + deepFreeze via Reflect.ownKeys + strict guards + state shapes, consuming P1a1 via import type) | 140–170 |
-| `model.test.ts` (vocabulary + deep freeze traversal probes + strict guard probes + symbol-key rejection) | 100–130 |
-| `tasks.md` + `apply-progress.md` bookkeeping | 20–30 |
-| **Total P1a2-i-A-1** | **260–330** |
+| `model.ts` (vocabulary + type proof) | 90–110 |
+| `model.test.ts` (vocabulary + type proof probes) | 90–130 |
+| `tasks.md` + `apply-progress.md` | 20–30 |
+| **Total** | **200–270** |
 
-Early warning at 300; STOP/reforecast at 350; absolute max 400. No size:exception. Component sum verified: low 140+100+20 = 260; high 170+130+30 = 330. High 330 is below STOP 350.
+Warning at 300; STOP at 350; absolute max 400. No size:exception.
+
+### Handoff to P1a2-i-A-1b
+
+Frozen vocabulary (12 event types, state shape interfaces, output types, bidirectional type proof). P1a2-i-A-1b builds the deep freeze primitive on top.
+
+---
+
+## P1a2-i-A-1b — Descriptor-Safe Cycle-Safe Deep Freeze
+
+**Objective**: implement `deepFreeze<T>(obj: T): Readonly<T>` in `model.ts` that safely traverses ALL nested children using descriptor-based enumeration (NOT direct property access — which invokes getters). Cycle-safe via `WeakSet`. Handles throwing accessors by detecting `get` descriptors. Covers string-keyed AND symbol-keyed own properties via `Reflect.ownKeys()`. **No constructors, no guards, no transitions, no vocabulary changes.**
+
+**Ordinal-34 failures addressed**: 3 (descriptor-safe — no getter invocation, throwing accessors detected and skipped), cycle-safe (circular references do not abort), pre-frozen parent with unfrozen children still traversed.
+
+**Depends on**: P1a2-i-A-1a (frozen vocabulary).
+
+**Base / branch**: `slice/p1a2-i-a-1b-deep-freeze` branched from `slice/p1a2-i-a-1a-vocabulary-type-proof`.
+
+**Authorized paths**: `functions/src/provisioning/model.ts` (extend — add `deepFreeze`), `functions/test/provisioning/model.test.ts` (extend — add freeze probes), `openspec/changes/prepare-public-portfolio-repository/tasks.md` (SDD bookkeeping), `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` (metadata updates).
+
+**Immutable protected paths**: `functions/src/provisioning/types.ts` read-only; `functions/tsconfig.json`, `.atl/skill-registry.md`, `.atl/.skill-registry.cache.json`, and `lib/core/theme/app_colors.dart` byte-identical.
+
+**Forbidden**: no constructors, no guards, no transitions, no CAS. No vocabulary changes. No P1a1 file modification.
+
+### Strict TDD order (RED → GREEN)
+
+- [ ] P1a2-i-A-1b.0 ENTRY/FAIL-FAST.
+- [ ] P1a2-i-A-1b.1 RED: author freeze probes — array push/index/delete rejected, pre-frozen-parent nested mutation, deep nested at every level, symbol-keyed properties, throwing getter does not abort traversal, circular reference handled, non-enumerable properties covered. All fail because `deepFreeze` does not exist.
+- [ ] P1a2-i-A-1b.2 METADATA: recount.
+- [ ] P1a2-i-A-1b.3 GREEN: `deepFreeze` uses `Object.getOwnPropertyDescriptors()` to enumerate properties (NOT `obj[key]` which invokes getters). Detects `get` descriptors and skips/handles throwing accessors safely. Uses `Reflect.ownKeys()` for coverage (string + symbol). Cycle-safe via `WeakSet`. Recurses into children BEFORE freezing parent. Even if parent already frozen, unfrozen children are still traversed. Tests pass.
+- [ ] P1a2-i-A-1b.4 REFACTOR: freeze. Type-level GREEN.
+
+### Verification commands
+
+- `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/model.ts test/provisioning/model.test.ts`
+- `cd functions && npx tsc --noEmit`
+- `cd functions && node --experimental-strip-types test/provisioning/model.test.ts`
+- Git-native count (Windows PowerShell): `git diff --numstat <A-1a-baseline> -- functions/src/provisioning/model.ts functions/test/provisioning/model.test.ts openspec/changes/prepare-public-portfolio-repository/tasks.md openspec/changes/prepare-public-portfolio-repository/apply-progress.md`; sum additions + deletions.
+
+### Independent phase-contract acceptance (UNCHECKED)
+
+- [ ] Descriptor-based enumeration (no getter invocation)
+- [ ] Throwing getter does not abort traversal
+- [ ] Cycle-safe (circular reference handled)
+- [ ] Pre-frozen parent with unfrozen children → all levels frozen after deepFreeze
+- [ ] Symbol-keyed + non-enumerable properties covered
+- [ ] Array push/index/delete rejected after freeze
+- [ ] No constructors, no guards, no transitions
+
+### Rollback boundary
+
+Revert `functions/src/provisioning/model.ts` to P1a2-i-A-1a frozen state, revert `functions/test/provisioning/model.test.ts` to P1a2-i-A-1a frozen state, revert `openspec/changes/prepare-public-portfolio-repository/tasks.md` and `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` to pre-P1a2-i-A-1b state. P1a1 + A-1a intact.
+
+### P1a2-i-A-1b Forecast
+
+| Component | Expected lines |
+|---|---:|
+| `model.ts` extensions (`deepFreeze`) | 60–80 |
+| `model.test.ts` extensions (freeze probes) | 120–160 |
+| `tasks.md` + `apply-progress.md` | 20–30 |
+| **Total** | **200–270** |
+
+Warning at 300; STOP at 350; absolute max 400. No size:exception.
+
+### Handoff to P1a2-i-A-1c
+
+Frozen deep freeze primitive. P1a2-i-A-1c builds the strict state guard.
+
+---
+
+## P1a2-i-A-1c — Strict State Guard
+
+**Objective**: implement `isValidState(value)`, `isStatus(value)`, `isPhase(value)` in `model.ts` with strict exact-field-set validation. Rejects null required identifiers, NaN, mismatched status-phase pairs, class/polluted roots, non-plain normalized payloads. **No constructors, no event guard, no transitions, no CAS.**
+
+**Ordinal-34 failures addressed**: 4 (state guard side — null ids, NaN, mismatched pairs, class/polluted roots, non-plain payloads).
+
+**Depends on**: P1a2-i-A-1b (frozen deep freeze).
+
+**Base / branch**: `slice/p1a2-i-a-1c-state-guard` branched from `slice/p1a2-i-a-1b-deep-freeze`.
+
+**Authorized paths**: `functions/src/provisioning/model.ts` (extend — add state guards), `functions/test/provisioning/model.test.ts` (extend — add state guard probes), `openspec/changes/prepare-public-portfolio-repository/tasks.md` (SDD bookkeeping), `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` (metadata updates).
+
+**Immutable protected paths**: `functions/src/provisioning/types.ts` read-only; `functions/tsconfig.json`, `.atl/skill-registry.md`, `.atl/.skill-registry.cache.json`, and `lib/core/theme/app_colors.dart` byte-identical.
+
+**Forbidden**: no constructors, no event guard, no transitions, no CAS. No P1a1 file modification.
+
+### Strict TDD order (RED → GREEN)
+
+- [ ] P1a2-i-A-1c.0 ENTRY/FAIL-FAST.
+- [ ] P1a2-i-A-1c.1 RED: author state guard probes — null `operationId` rejected, NaN `retryCount` rejected, mismatched status-phase pair rejected, class instance as root rejected, polluted prototype rejected, non-plain normalized payload rejected, missing required field rejected, extra field rejected, symbol-keyed property rejected. All fail because guards do not exist.
+- [ ] P1a2-i-A-1c.2 METADATA: recount.
+- [ ] P1a2-i-A-1c.3 GREEN: `isValidState` checks exact field set (no missing, no extra), plain object (not class instance, not polluted prototype), no null required identifiers, no NaN numbers, valid status-phase pair, no symbol-keyed extras. `isStatus` and `isPhase` validate against frozen vocabulary. Tests pass.
+- [ ] P1a2-i-A-1c.4 REFACTOR: freeze. Type-level GREEN.
+
+### Verification commands
+
+- `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts src/provisioning/model.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts` (type-level GREEN — all P1a1 + A-1a + A-1b + A-1c files)
+- `cd functions && npx tsc --noEmit` (source-only compatibility — no TS5097)
+- `cd functions && node --experimental-strip-types test/provisioning/model.test.ts` (runtime GREEN — includes all A-1a + A-1b + A-1c tests)
+- Git-native count (Windows PowerShell): `git diff --numstat <A-1b-baseline> -- functions/src/provisioning/model.ts functions/test/provisioning/model.test.ts openspec/changes/prepare-public-portfolio-repository/tasks.md openspec/changes/prepare-public-portfolio-repository/apply-progress.md`; sum additions + deletions.
+
+### Independent phase-contract acceptance (UNCHECKED)
+
+- [ ] Null required identifiers rejected
+- [ ] NaN rejected
+- [ ] Mismatched status-phase pair rejected
+- [ ] Class instance root rejected
+- [ ] Polluted prototype rejected
+- [ ] Non-plain normalized payload rejected
+- [ ] Missing/extra fields rejected
+- [ ] Symbol-keyed extras rejected
+- [ ] No constructors, no event guard, no transitions
+
+### Rollback boundary
+
+Revert `functions/src/provisioning/model.ts` to P1a2-i-A-1b frozen state, revert `functions/test/provisioning/model.test.ts` to P1a2-i-A-1b frozen state, revert `openspec/changes/prepare-public-portfolio-repository/tasks.md` and `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` to pre-P1a2-i-A-1c state. P1a1 + A-1a + A-1b intact.
+
+### P1a2-i-A-1c Forecast
+
+| Component | Expected lines |
+|---|---:|
+| `model.ts` extensions (state guards) | 50–70 |
+| `model.test.ts` extensions (state guard probes) | 130–170 |
+| `tasks.md` + `apply-progress.md` | 20–30 |
+| **Total** | **200–270** |
+
+Warning at 300; STOP at 350; absolute max 400. No size:exception.
+
+### Handoff to P1a2-i-A-1d
+
+Frozen state guards. P1a2-i-A-1d builds the strict event guard.
+
+---
+
+## P1a2-i-A-1d — Strict Event Guard
+
+**Objective**: implement `isEventType(value)`, `isValidEvent(value)` in `model.ts` with strict per-event-type payload validation. Rejects missing payload fields, extra payload fields, null event identifiers, NaN numeric fields. **No constructors, no state guard changes, no transitions, no CAS.**
+
+**Ordinal-34 failures addressed**: 4 (event guard side — missing/extra payload fields per event type, null ids, NaN).
+
+**Depends on**: P1a2-i-A-1c (frozen state guard).
+
+**Base / branch**: `slice/p1a2-i-a-1d-event-guard` branched from `slice/p1a2-i-a-1c-state-guard`.
+
+**Authorized paths**: `functions/src/provisioning/model.ts` (extend — add event guards), `functions/test/provisioning/model.test.ts` (extend — add event guard probes), `openspec/changes/prepare-public-portfolio-repository/tasks.md` (SDD bookkeeping), `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` (metadata updates).
+
+**Immutable protected paths**: `functions/src/provisioning/types.ts` read-only; `functions/tsconfig.json`, `.atl/skill-registry.md`, `.atl/.skill-registry.cache.json`, and `lib/core/theme/app_colors.dart` byte-identical.
+
+**Forbidden**: no constructors, no state guard changes, no transitions, no CAS. No P1a1 file modification.
+
+### Strict TDD order (RED → GREEN)
+
+- [ ] P1a2-i-A-1d.0 ENTRY/FAIL-FAST.
+- [ ] P1a2-i-A-1d.1 RED: author event guard probes — unknown event type rejected, missing payload field for specific event type rejected, extra payload field rejected, null `eventId` rejected, NaN numeric fields rejected, non-finite (`Infinity`, `-Infinity`) rejected, **class-instance root rejected** (not a plain object), **polluted-prototype root rejected** (`Object.create(null)`-violating), **non-plain payloads rejected** (Date instance, class instance, polluted prototype as payload), **symbol-keyed extras on event root rejected**, event-specific missing/extra fields rejected. All fail because guards do not exist.
+- [ ] P1a2-i-A-1d.2 METADATA: recount.
+- [ ] P1a2-i-A-1d.3 GREEN: `isEventType` validates against frozen 12-type array. `isValidEvent` checks: (a) root is plain object (not class instance, not null, not array, not Date, not polluted prototype); (b) exact field set per event type (no missing, no extra payload fields); (c) correct types for every field (no null required identifiers, no NaN, no non-finite numbers); (d) no symbol-keyed extras on event root. Payload sub-objects are also checked for plain-object-ness (reject Date, class instances, polluted prototypes). Tests use independent literal expectations per event type. Tests pass.
+- [ ] P1a2-i-A-1d.4 REFACTOR: freeze P1a2-i-A-1. Final type-level GREEN via explicit `npx tsc` on all P1a1 + `model.ts` + `model.test.ts`. Source-only `npx tsc --noEmit` compatibility proof.
+
+### Verification commands
+
+- `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts src/provisioning/model.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts`
+- `cd functions && npx tsc --noEmit`
+- `cd functions && node --experimental-strip-types test/provisioning/model.test.ts`
+- Git-native count (Windows PowerShell): `git diff --numstat <A-1c-baseline> -- functions/src/provisioning/model.ts functions/test/provisioning/model.test.ts openspec/changes/prepare-public-portfolio-repository/tasks.md openspec/changes/prepare-public-portfolio-repository/apply-progress.md`; sum additions + deletions.
+
+### Independent phase-contract acceptance (UNCHECKED)
+
+- [ ] Unknown event type rejected
+- [ ] Missing payload field per event type rejected
+- [ ] Extra payload field per event type rejected
+- [ ] Null event identifiers rejected
+- [ ] NaN / non-finite numeric fields rejected
+- [ ] Class-instance event root rejected
+- [ ] Polluted-prototype event root rejected
+- [ ] Non-plain payloads rejected (Date, class instance, polluted prototype)
+- [ ] Symbol-keyed extras on event root rejected
+- [ ] Independent literal expectations per event type
+- [ ] No constructors, no state guard changes, no transitions
+- [ ] Full P1a2-i-A-1 (all 4 children) type-level GREEN
+
+### Rollback boundary
+
+Revert `functions/src/provisioning/model.ts` to P1a2-i-A-1c frozen state, revert `functions/test/provisioning/model.test.ts` to P1a2-i-A-1c frozen state, revert `openspec/changes/prepare-public-portfolio-repository/tasks.md` and `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` to pre-P1a2-i-A-1d state. P1a1 + A-1a + A-1b + A-1c intact.
+
+### P1a2-i-A-1d Forecast
+
+| Component | Expected lines |
+|---|---:|
+| `model.ts` extensions (event guards) | 50–70 |
+| `model.test.ts` extensions (event guard probes) | 130–170 |
+| `tasks.md` + `apply-progress.md` | 20–30 |
+| **Total** | **200–270** |
+
+Warning at 300; STOP at 350; absolute max 400. No size:exception.
+
+### P1a2-i-A-1 Combined Forecast (4 children)
+
+| Child | Expected |
+|---|---:|
+| P1a2-i-A-1a | 200–270 |
+| P1a2-i-A-1b | 200–270 |
+| P1a2-i-A-1c | 200–270 |
+| P1a2-i-A-1d | 200–270 |
+| **Total P1a2-i-A-1** | **800–1,080** |
+
+Combined absolute max: 1,600 (4 × 400). Expected range: 800–1,080. No size:exception. Each child has its own warning 300, STOP 350, max 400.
 
 ### Handoff contract to P1a2-i-A-2
 
-Frozen vocabulary (12 event types, state shape interfaces, output types), deep freeze primitive (correctly traverses all nested children including arrays even when parent already frozen), strict type guards (exact field set, no missing/extra/weak fields), source-only TypeScript compatibility. P1a2-i-A-2 builds the four validated constructors on top of this frozen foundation.
+Frozen vocabulary (12 event types, state shape interfaces, output types, bidirectional type proof) + frozen deep freeze primitive (descriptor-safe, cycle-safe, getter-safe) + frozen strict state guard (exact field set, no null/NaN/class/polluted/non-plain) + frozen strict event guard (exact per-event payload validation). P1a2-i-A-2 builds the four validated constructors on top of this frozen foundation.
 
 ---
 
@@ -503,9 +701,9 @@ Frozen vocabulary (12 event types, state shape interfaces, output types), deep f
 
 **Design traceability**: "Executable Contract Before Production Code"; canonical vocabulary.
 
-**Depends on**: P1a2-i-A-1 (frozen vocabulary + deep freeze + strict guards).
+**Depends on**: P1a2-i-A-1d (frozen vocabulary + deep freeze + strict state guard + strict event guard).
 
-**Base / branch**: `slice/p1a2-i-a-2-validated-constructors` branched from `slice/p1a2-i-a-1-immutable-vocabulary`.
+**Base / branch**: `slice/p1a2-i-a-2-validated-constructors` branched from `slice/p1a2-i-a-1d-event-guard`.
 
 **Allowed paths** (exact):
 
@@ -544,7 +742,7 @@ Frozen vocabulary (12 event types, state shape interfaces, output types), deep f
 - `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts src/provisioning/model.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts` (type-level GREEN — all P1a1+P1a2-i-A-1+P1a2-i-A-2 files)
 - `cd functions && npx tsc --noEmit` (source-only compatibility — no TS5097)
 - `cd functions && node --experimental-strip-types test/provisioning/model.test.ts` (runtime GREEN)
-- Git-native count (Windows PowerShell): all paths tracked after P1a2-i-A-1 commit — `git diff --numstat <P1a2-i-A-1-baseline> -- functions/src/provisioning/model.ts functions/test/provisioning/model.test.ts openspec/changes/prepare-public-portfolio-repository/tasks.md openspec/changes/prepare-public-portfolio-repository/apply-progress.md`; sum additions + deletions.
+- Git-native count (Windows PowerShell): all paths tracked after P1a2-i-A-1d commit — `git diff --numstat <P1a2-i-A-1d-baseline> -- functions/src/provisioning/model.ts functions/test/provisioning/model.test.ts openspec/changes/prepare-public-portfolio-repository/tasks.md openspec/changes/prepare-public-portfolio-repository/apply-progress.md`; sum additions + deletions.
 
 ### Independent phase-contract acceptance (UNCHECKED — fresh context)
 
@@ -558,7 +756,7 @@ Frozen vocabulary (12 event types, state shape interfaces, output types), deep f
 
 ### Rollback boundary
 
-Revert `functions/src/provisioning/model.ts` to P1a2-i-A-1 frozen state, revert `functions/test/provisioning/model.test.ts` to P1a2-i-A-1 frozen state, revert `tasks.md` and `apply-progress.md` to pre-P1a2-i-A-2 state. P1a1 + P1a2-i-A-1 intact.
+Revert `functions/src/provisioning/model.ts` to P1a2-i-A-1d frozen state, revert `functions/test/provisioning/model.test.ts` to P1a2-i-A-1d frozen state, revert `tasks.md` and `apply-progress.md` to pre-P1a2-i-A-2 state. P1a1 + P1a2-i-A-1 (all 4 children) intact.
 
 ### P1a2-i-A-2 Forecast (component sum verified)
 
@@ -575,11 +773,14 @@ Early warning at 200; STOP/reforecast at 250; absolute max 300. No size:exceptio
 
 | Sub-slice | Expected |
 |---|---:|
-| P1a2-i-A-1 | 260–330 |
+| P1a2-i-A-1a | 200–270 |
+| P1a2-i-A-1b | 200–270 |
+| P1a2-i-A-1c | 200–270 |
+| P1a2-i-A-1d | 200–270 |
 | P1a2-i-A-2 | 120–170 |
-| **Total P1a2-i-A** | **380–500** |
+| **Total P1a2-i-A** | **920–1,250** |
 
-Combined absolute max: 600. No size:exception. No combined early warning or STOP — only explicit per-sub-slice limits (A-1: EW 300, STOP 350, max 400; A-2: EW 200, STOP 250, max 300).
+Combined absolute max: 1,900 (1,600 + 300). No size:exception. Per-child limits: each A-1 child EW 300, STOP 350, max 400; A-2 EW 200, STOP 250, max 300.
 
 ---
 
@@ -668,12 +869,15 @@ Early warning at 500; STOP/reforecast at 560; absolute max 600. No size:exceptio
 
 | Sub-slice | Expected |
 |---|---:|
-| P1a2-i-A-1 | 260–330 |
+| P1a2-i-A-1a | 200–270 |
+| P1a2-i-A-1b | 200–270 |
+| P1a2-i-A-1c | 200–270 |
+| P1a2-i-A-1d | 200–270 |
 | P1a2-i-A-2 | 120–170 |
 | P1a2-i-B | 440–590 |
-| **Total P1a2-i** | **820–1,090** |
+| **Total P1a2-i** | **1,360–1,840** |
 
-Combined absolute max: 1,200. No size:exception.
+Combined absolute max: 2,500 (1,600 + 300 + 600). No size:exception.
 
 ### Handoff contract to P1a2-ii
 
@@ -739,7 +943,7 @@ Frozen immutable vocabulary + frozen deep runtime immutability + frozen type gua
 
 ### Rollback boundary
 
-Revert `functions/src/provisioning/model.ts` to P1a2-i-B frozen state, revert `functions/test/provisioning/model.test.ts` to P1a2-i-B frozen state, revert `tasks.md` and `apply-progress.md` to pre-P1a2-ii state. P1a1 + P1a2-i-A-1 + P1a2-i-A-2 + P1a2-i-B intact.
+Revert `functions/src/provisioning/model.ts` to P1a2-i-B frozen state, revert `functions/test/provisioning/model.test.ts` to P1a2-i-B frozen state, revert `tasks.md` and `apply-progress.md` to pre-P1a2-ii state. P1a1 + P1a2-i-A-1 (all 4 children) + P1a2-i-A-2 + P1a2-i-B intact.
 
 ### P1a2-ii Forecast (component sum verified)
 
@@ -834,16 +1038,21 @@ Revert `functions/src/provisioning/model.ts` to P1a2-ii frozen state, revert `fu
 
 Early warning at 1,100; STOP/reforecast at 1,200; absolute max 1,200. No size:exception. Component sum verified: low 280+300+50 = 630; high 350+400+80 = 830.
 
-### P1a2 Aggregate (five sub-slices)
+### P1a2 Aggregate (five sub-slices, A-1 has 4 children)
 
 | Sub-slice | Expected |
 |---|---:|
-| P1a2-i-A-1 | 260–330 |
+| P1a2-i-A-1a | 200–270 |
+| P1a2-i-A-1b | 200–270 |
+| P1a2-i-A-1c | 200–270 |
+| P1a2-i-A-1d | 200–270 |
 | P1a2-i-A-2 | 120–170 |
 | P1a2-i-B | 440–590 |
 | P1a2-ii | 850–1,100 |
 | P1a2-iii | 630–830 |
-| **Total P1a2** | **2,300–3,020** |
+| **Total P1a2** | **2,840–3,770** |
+
+P1a2 aggregate hard maximum: **4,900** (1,600 + 300 + 600 + 1,200 + 1,200). No size:exception for any P1a2 sub-slice.
 
 ### Handoff contract to P1b
 
@@ -1592,6 +1801,7 @@ P4 completes the trusted provisioning chain and Firestore rules hardening. After
 - No restoration of stash `213ff2fdf123bfa9c7b3b0ea0f83026a3b1f0306` (ordinals 27–28 evidence).
 - No restoration of stash `527d4dfb2fd0bd30eacd7b09116bec3bda79250d` (ordinal 29 evidence).
 - No restoration of stash `012c41516831e1579cd7162c378c123f503ee633` (ordinal 30 evidence).
+- No restoration of stash `6425de640274d1990b824869b96535068ab450a5` (ordinal 34 evidence).
 - No creation or modification of `functions/tsconfig.json` in any slice.
 
 ## Global Verification Contract (per slice)
@@ -1606,8 +1816,8 @@ Every slice MUST deliver:
 **Exception scope**:
 
 - P1a1, P1b–P4: max 2,000 changed lines per slice; reforecast/stop at 1,700; absolute stop at 2,000. Maintainer-approved `size:exception`.
-- P1a2-i-A-1: early warning 300; STOP/reforecast 350; absolute max 400. **No size:exception.**
-- P1a2-i-A-2: early warning 200; STOP/reforecast 250; absolute max 300. Combined P1a2-i-A absolute max 600. **No size:exception.**
-- P1a2-i-B: early warning 500; STOP/reforecast 560; absolute max 600. Combined P1a2-i (A-1+A-2+B) max 1,200. **No size:exception.**
+- P1a2-i-A-1a, P1a2-i-A-1b, P1a2-i-A-1c, P1a2-i-A-1d: early warning 300; STOP/reforecast 350; absolute max 400 each. Combined P1a2-i-A-1 max 1,600. **No size:exception.**
+- P1a2-i-A-2: early warning 200; STOP/reforecast 250; absolute max 300. Combined P1a2-i-A absolute max 1,900. **No size:exception.**
+- P1a2-i-B: early warning 500; STOP/reforecast 560; absolute max 600. Combined P1a2-i (A-1+A-2+B) max 2,500. **No size:exception.**
 - P1a2-ii, P1a2-iii: early warning 1,100; STOP/reforecast 1,200; absolute max 1,200. **No size:exception** — if a contract-complete sub-slice cannot fit within 1,200, split it further.
 - WU5–WU10: max 400 changed lines per work unit; stop at 400. **No inherited exception** — any overrun requires a new, separate maintainer decision.
