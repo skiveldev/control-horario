@@ -439,15 +439,15 @@ The prior single P1a2 block is replaced by five major contract-complete sub-slic
 
 ### Strict TDD order (RED → GREEN)
 
-- [ ] P1a2-i-A-1a.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0.
-- [ ] P1a2-i-A-1a.1 RED (FIRST AUTHORED MUTATION): author `functions/test/provisioning/model.test.ts` — vocabulary completeness (12 event types as frozen array), compile-negative bidirectional proof fixtures, independent literal tests for status→phase mapping. **Compile-negative fixtures (all must produce TS errors at type level)**: (a) deliberately omit one canonical `StatusPhasePair` member from the model's mapping — the test asserts this omission is detected; (b) deliberately add one extra `StatusPhasePair` member not in P1a1's canonical set — the test asserts this extra is detected. All fail because `model.ts` does not exist. RED via explicit `npx tsc` invocation:
+- [x] P1a2-i-A-1a.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0. Node v24.11.1 confirmed.
+- [x] P1a2-i-A-1a.1 RED (FIRST AUTHORED MUTATION): author `functions/test/provisioning/model.test.ts` — vocabulary completeness (12 event types as frozen array), compile-negative bidirectional proof fixtures, independent literal tests for status→phase mapping. **Compile-negative fixtures (all must produce TS errors at type level)**: (a) deliberately omit one canonical `StatusPhasePair` member from the model's mapping — the test asserts this omission is detected; (b) deliberately add one extra `StatusPhasePair` member not in P1a1's canonical set — the test asserts this extra is detected. All fail because `model.ts` does not exist. RED via explicit `npx tsc` invocation:
 
   ```bash
   cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts
   ```
-- [ ] P1a2-i-A-1a.2 METADATA: update `tasks.md` and `apply-progress.md`. Recount.
-- [ ] P1a2-i-A-1a.3 GREEN: define 12 event types as `as const` frozen array. Consume P1a1 via `import type` only. Define model-owned status→phase mapping constrained as `Record<ProvisioningStatus, readonly ProvisioningPhase[]>` via `satisfies`. **Genuine bidirectional type proof** (NOT `_Eq<Extract<..., true>>` which accepts missing and extra members): use a non-distributive technique such as bidirectional assignability — assert `StatusPhasePair extends ModelStatusPhaseMap[keyof ModelStatusPhaseMap]` (no missing: every canonical pair is in the model map) AND `ModelStatusPhaseMap[keyof ModelStatusPhaseMap] extends StatusPhasePair` (no extra: every model map entry is canonical). Both directions must hold. The RED fixtures from step 1 verify that removing a pair breaks direction 1 and adding an extra pair breaks direction 2. Define `TransitionResult` discriminated union. Define state shape interfaces. All vocabulary constants deeply frozen. Tests pass.
-- [ ] P1a2-i-A-1a.4 REFACTOR: freeze. Type-level GREEN via explicit `npx tsc` on all P1a1 + `model.test.ts`.
+- [x] P1a2-i-A-1a.2 METADATA: update `tasks.md` and `apply-progress.md`. Recount.
+- [x] P1a2-i-A-1a.3 GREEN: define 12 event types as `as const` frozen array. Consume P1a1 via `import type` only. Define model-owned status→phase mapping constrained as `Record<ProvisioningStatus, readonly ProvisioningPhase[]>` via `satisfies`. **Genuine bidirectional type proof** (NOT `_Eq<Extract<..., true>>` which accepts missing and extra members): use a non-distributive technique such as bidirectional assignability — assert `StatusPhasePair extends ModelStatusPhaseMap[keyof ModelStatusPhaseMap]` (no missing: every canonical pair is in the model map) AND `ModelStatusPhaseMap[keyof ModelStatusPhaseMap] extends StatusPhasePair` (no extra: every model map entry is canonical). Both directions must hold. The RED fixtures from step 1 verify that removing a pair breaks direction 1 and adding an extra pair breaks direction 2. Define `TransitionResult` discriminated union. Define state shape interfaces. All vocabulary constants deeply frozen. Tests pass.
+- [x] P1a2-i-A-1a.4 REFACTOR: freeze. Type-level GREEN via explicit `npx tsc` on all P1a1 + `model.test.ts`.
 
 ### Verification commands
 
@@ -457,13 +457,18 @@ The prior single P1a2 block is replaced by five major contract-complete sub-slic
 - `cd functions && node --experimental-strip-types test/provisioning/model.test.ts` (runtime)
 - Git-native count (Windows PowerShell): tracked — `git diff --numstat <P1a1-baseline> -- openspec/changes/prepare-public-portfolio-repository/tasks.md openspec/changes/prepare-public-portfolio-repository/apply-progress.md`; untracked — `git diff --no-index --numstat -- NUL "functions/src/provisioning/model.ts"` and `git diff --no-index --numstat -- NUL "functions/test/provisioning/model.test.ts"` (exit code 1 expected). Sum additions + deletions across all four paths.
 
-### Independent phase-contract acceptance (UNCHECKED)
+### Independent phase-contract acceptance (ordinal 35 FAILED; 36 FAILED; 37 FAILED; 38 INTERRUPTED; 39 FAILED; 40 FAILED; 41 INTERRUPTED; 42 FAILED; 43 FAILED)
 
-- [ ] All 12 event types defined as frozen `as const` array (no `Set`)
-- [ ] P1a1 types consumed ONLY via `import type` — no runtime import, no `Set`, no semantic duplication
-- [ ] Bidirectional type proof: no missing and no extra `StatusPhasePair` members (NOT `_Eq`/`Extract`)
-- [ ] No constructors, no `reduce()`, no CAS, no transitions, no deep freeze, no guards
-- [ ] No `functions/tsconfig.json` modification
+- [x] All 12 event types defined as frozen `as const` array (no `Set`)
+- [x] P1a1 types consumed ONLY via `import type` — no runtime import, no `Set`, no semantic duplication
+- [x] Bidirectional type proof: no missing and no extra `StatusPhasePair` members (NOT `_Eq`/`Extract`) — compile-negative fixtures consume production `_ProofNoMissing`/`_ProofNoExtra` generics with direction-specific anti-vacuity (ordinal 42 fix, corrected by ordinal 43)
+- [x] No constructors, no `reduce()`, no CAS, no transitions, no deep freeze, no guards
+- [x] No `functions/tsconfig.json` modification
+- [x] **Deep nested-array immutability** — `Object.freeze` per nested array (ordinal 36 fix, carried forward)
+- [x] **Direction-specific generic anti-vacuity proof** — `_ProofNoMissing<M>` and `_ProofNoExtra<M>` are exported parameterized generics; compile-negative fixtures instantiate each with modified maps; weakening either generic alone to unconditional `true` triggers TS2578 on only its corresponding `@ts-expect-error` directive (ordinal 42+43)
+- [ ] **Constraint domain correction** (ordinal 43) — `_FlatFromMap` and `_ProofNoMissing` constraints relaxed to `Record<string, readonly ProvisioningPhase[]>`, admitting missing-key maps as type arguments so only the proof body triggers TS2578; `_ProofNoExtra` keeps tight `Record<ProvisioningStatus,...>` domain since extra-map always has full key set. PENDING independent validation.
+
+Ordinal 36 FAILED (120-line STOP breach). Ordinal 37 FAILED (anti-vacuity/bookkeeping). Ordinal 38 INTERRUPTED (zero changes). Ordinal 39 FAILED (direction anti-vacuity/stale records) at native 177. Ordinal 40 FAILED (unchanged). Ordinal 41 INTERRUPTED (zero-change/empty result). Ordinal 42 FAILED — `_ProofNoMissing<M extends Record<ProvisioningStatus,...>>` vacuous because the generic constraint itself consumed `@ts-expect-error` on `_MissMap`; weakening to `true` left compilation green; full candidate 289 lines, preserved with maintainer size exception. Ordinal 43 PENDING independent validation — relaxed constraint domain so missing-key map is admissible as type argument and failure comes only from proof body.
 
 ### Rollback boundary
 
@@ -504,11 +509,11 @@ Frozen vocabulary (12 event types, state shape interfaces, output types, bidirec
 
 ### Strict TDD order (RED → GREEN)
 
-- [ ] P1a2-i-A-1b.0 ENTRY/FAIL-FAST.
-- [ ] P1a2-i-A-1b.1 RED: author freeze probes — array push/index/delete rejected, pre-frozen-parent nested mutation, deep nested at every level, symbol-keyed properties, throwing getter does not abort traversal, circular reference handled, non-enumerable properties covered. All fail because `deepFreeze` does not exist.
-- [ ] P1a2-i-A-1b.2 METADATA: recount.
-- [ ] P1a2-i-A-1b.3 GREEN: `deepFreeze` uses `Object.getOwnPropertyDescriptors()` to enumerate properties (NOT `obj[key]` which invokes getters). Detects `get` descriptors and skips/handles throwing accessors safely. Uses `Reflect.ownKeys()` for coverage (string + symbol). Cycle-safe via `WeakSet`. Recurses into children BEFORE freezing parent. Even if parent already frozen, unfrozen children are still traversed. Tests pass.
-- [ ] P1a2-i-A-1b.4 REFACTOR: freeze. Type-level GREEN.
+- [x] P1a2-i-A-1b.0 ENTRY/FAIL-FAST.
+- [x] P1a2-i-A-1b.1 RED: author freeze probes — array push/index/delete rejected, pre-frozen-parent nested mutation, deep nested at every level, symbol-keyed properties, throwing getter does not abort traversal, circular reference handled, non-enumerable properties covered. All fail because `deepFreeze` does not exist.
+- [x] P1a2-i-A-1b.2 METADATA: recount.
+- [x] P1a2-i-A-1b.3 GREEN: `deepFreeze` uses `Object.getOwnPropertyDescriptors()` to enumerate properties (NOT `obj[key]` which invokes getters). Detects `get` descriptors and skips/handles throwing accessors safely. Uses `Reflect.ownKeys()` for coverage (string + symbol). Cycle-safe via `WeakSet`. Recurses into children BEFORE freezing parent. Even if parent already frozen, unfrozen children are still traversed. Tests pass.
+- [x] P1a2-i-A-1b.4 REFACTOR: freeze. Type-level GREEN.
 
 ### Verification commands
 
@@ -550,9 +555,25 @@ Frozen deep freeze primitive. P1a2-i-A-1c builds the strict state guard.
 
 ## P1a2-i-A-1c — Strict State Guard
 
-**Objective**: implement `isValidState(value)`, `isStatus(value)`, `isPhase(value)` in `model.ts` with strict exact-field-set validation. Rejects null required identifiers, NaN, mismatched status-phase pairs, class/polluted roots, non-plain normalized payloads. **No constructors, no event guard, no transitions, no CAS.**
+**Objective**: implement `isValidState(value)`, `isStatus(value)`, `isPhase(value)` in `model.ts` with strict exact-field-set validation, canonical lower-case UUID/SHA identifiers, non-negative integer counters, finite non-negative timestamps, exact recursive `NormalizedPayload`/Auth shapes, Firebase UID length bounds, and exact `Object.prototype` roots. **No constructors, no event guard, no transitions, no CAS.**
 
 **Ordinal-34 failures addressed**: 4 (state guard side — null ids, NaN, mismatched pairs, class/polluted roots, non-plain payloads).
+
+### A-1c-R field-to-validator matrix (derived contract)
+
+| Field / location | Spec/design/types source | Required validator | Exact nullability |
+|---|---|---|---|
+| `operationId` / `OperationState.operationId` | `design.md` Canonical Vocabulary and Identity; `types.ts` `OperationState` | Lower-case UUID-v4; reject malformed, upper-case, empty, or non-string values | Required, never `null` |
+| `fingerprint` / `OperationState.fingerprint` | `design.md` identity and `(operationId,fingerprint)` idempotency; `types.ts` `OperationState` | Lower-case 64-hex SHA-256; `operationId` is excluded from the digest input | Required, never `null` |
+| `ownerToken` / `OperationState.ownerToken` | `design.md` Full CAS and Lease Contract; `types.ts` `string | null` | `null` outside an owned active lease; active value must be a lower-case 64-hex fencing digest; reject empty/malformed/upper-case values | `null` in pending and terminal states; non-`null` for active ownership |
+| `intendedUid` / `OperationState.intendedUid` | `design.md` canonical `intendedUid`; `types.ts` `string | null` | `null` or a non-empty Firebase UID of length 1–128; immutable after submission wins | Nullable in the model shape; lifecycle requires the generated UID after submission wins |
+| `returnedUid` / `AuthAttempt.returnedUid` | `design.md` Auth attempt persistence; `types.ts` `AuthAttempt` | `null` or a non-empty Firebase UID of length 1–128; validate exact returned value, never coerce | Nullable |
+| `authAttempt.attemptId` | `design.md` `attemptId` is the Auth-intent dispatch ID; `types.ts` `AuthAttempt` | Required lower-case 64-hex dispatch digest; must identify the single Auth intent | `authAttempt` may be `null`; field is non-`null` when the object exists |
+| `authAttempt.proof.attemptId` | `design.md` Auth proof; `types.ts` `AuthProof` | Required lower-case 64-hex digest and exact equality with the parent `authAttempt.attemptId` | `proof` may be `null`; field is non-`null` when proof exists |
+| `authAttempt.proof.uidRead` | `design.md` mandatory UID/email dual-read proof; `types.ts` `AuthProof` | Required non-empty Firebase UID of length 1–128; 128 accepted and 129 rejected | `proof` may be `null`; field is non-`null` when proof exists |
+| `dispatchId` / `OperationState.currentDispatchId` | `design.md` dispatch identity and `/provisioningDispatch/{dispatchId}`; `types.ts` `currentDispatchId` | Lower-case 64-hex deterministic dispatch digest; dispatch record identity itself is required | Dispatch record `dispatchId` is required; `currentDispatchId` is `null` in pending/terminal and non-`null` while active |
+
+Nested contract: `authAttempt` is `null | AuthAttempt`, `proof` is `null | AuthProof`, `callStartedAt` is `number | null`, and `returnedUid`/`returnedEmail` are `string | null`. These nullability rules come from `types.ts`; lifecycle-state restrictions come from `design.md` and are not broadened by the guard.
 
 **Depends on**: P1a2-i-A-1b (frozen deep freeze).
 
@@ -566,11 +587,14 @@ Frozen deep freeze primitive. P1a2-i-A-1c builds the strict state guard.
 
 ### Strict TDD order (RED → GREEN)
 
-- [ ] P1a2-i-A-1c.0 ENTRY/FAIL-FAST.
-- [ ] P1a2-i-A-1c.1 RED: author state guard probes — null `operationId` rejected, NaN `retryCount` rejected, mismatched status-phase pair rejected, class instance as root rejected, polluted prototype rejected, non-plain normalized payload rejected, missing required field rejected, extra field rejected, symbol-keyed property rejected. All fail because guards do not exist.
-- [ ] P1a2-i-A-1c.2 METADATA: recount.
-- [ ] P1a2-i-A-1c.3 GREEN: `isValidState` checks exact field set (no missing, no extra), plain object (not class instance, not polluted prototype), no null required identifiers, no NaN numbers, valid status-phase pair, no symbol-keyed extras. `isStatus` and `isPhase` validate against frozen vocabulary. Tests pass.
-- [ ] P1a2-i-A-1c.4 REFACTOR: freeze. Type-level GREEN.
+- [x] P1a2-i-A-1c.0 ENTRY/FAIL-FAST.
+- [x] P1a2-i-A-1c.1 RED: author state guard probes — null `operationId` rejected, NaN `generation` rejected, mismatched status-phase pair rejected, class instance as root rejected, polluted prototype rejected, non-plain normalized payload rejected, missing required field rejected, extra field rejected, symbol-keyed property rejected. All fail because guards do not exist.
+- [x] P1a2-i-A-1c.2 METADATA: recount.
+- [x] P1a2-i-A-1c.3 GREEN: `isValidState` checks exact field set (no missing, no extra), plain object (not class instance, not polluted prototype), no null required identifiers, no NaN numbers, valid status-phase pair, no symbol-keyed extras. `isStatus` and `isPhase` validate against frozen vocabulary. Tests pass.
+- [x] P1a2-i-A-1c.4 REFACTOR: freeze. Type-level GREEN.
+
+Ordinal 53 FAILED fresh validation (`22/135`, evidence `sha256:fd128f77c161abc45a01ecd4de4b72e586fa2d6efeddfe47c532163aac4c01a8`). Ordinal 54 also FAILED (`192/183` correction; evidence `sha256:941715c1d228e00b94f63e8f220b026a07d578b5747ca922104fc8cc862bf5cb`) with seven semantic assertions still failing. A-1c.0–.4 remain historical implementation evidence only; independent acceptance stays unchecked. The earlier wording `NaN retryCount` is superseded: the ordinal-53 probe mutated `generation`; `retryCount` belongs to P1a2-iii and is not an A-1c field.
+Ordinal 60 FAILED: six fractional timestamps were accepted (`sha256:021a5ea4c83ac511b90e87d6547657af3a8c8ac19f8ce7edabb12ba1d178f815`). Ordinal 61 corrects the shared timestamp predicate only; A-1c independent acceptance remains unchecked.
 
 ### Verification commands
 
@@ -595,7 +619,7 @@ Frozen deep freeze primitive. P1a2-i-A-1c builds the strict state guard.
 
 Revert `functions/src/provisioning/model.ts` to P1a2-i-A-1b frozen state, revert `functions/test/provisioning/model.test.ts` to P1a2-i-A-1b frozen state, revert `openspec/changes/prepare-public-portfolio-repository/tasks.md` and `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` to pre-P1a2-i-A-1c state. P1a1 + A-1a + A-1b intact.
 
-### P1a2-i-A-1c Forecast
+### P1a2-i-A-1c Forecast (historical implementation forecast)
 
 | Component | Expected lines |
 |---|---:|
@@ -606,9 +630,54 @@ Revert `functions/src/provisioning/model.ts` to P1a2-i-A-1b frozen state, revert
 
 Warning at 300; STOP at 350; absolute max 400. No size:exception.
 
+This `200–270` forecast belongs to the original implementation attempt; the recovery slice is governed only by the compaction-first A-1c-R forecast below.
+
+### A-1c recovery replan — pending explicit native reset
+
+The ordinal-54 correction budget is exhausted. The preserved candidate is not accepted: pre-recovery final A-1c scope is `333/350`, and the remaining proven blockers are malformed non-SHA `ownerToken` acceptance and Firebase UID values longer than 128 characters. No further correction may be attached to ordinal 54 or started without a new explicit native reset and declared budget.
+
+A-1c-R is a recovery subplan under the existing A-1c slice, not a new downstream slice; the top-level 13-slice forecast and chain topology remain unchanged.
+
+### Review Workload Forecast — A-1c-R
+
+| Field | Decision |
+|---|---|
+| Recovery shape | One bounded recovery slice only |
+| Chained PRs recommended | No; one slice is reviewable if the final `<350` proof remains valid |
+| Size exception | None; the final STOP is binding |
+| Pre-recovery final scope | `333/350`; compaction must reach `<=315` before additions |
+| Fallback | If the complete root fix cannot fit below 350, stop without editing and replan; do not compress the truth afterward |
+
+### Compaction-first changed-line forecast (mandatory preflight)
+
+This is a conditional forecast, not authorization. The preflight MUST measure the complete root fix blob-aware from the new reset tree and original `ba061e5438d59c7494fc198ccb530eed7f15b0c5` before the first mutation. If the measured complete fix cannot remain `<350`, stop without editing.
+
+| Step | Forecasted edit churn (additions + deletions) | Effect on final baseline scope | Projected final |
+|---|---:|---:|---:|
+| Test compaction/deletions first | `0A + 18D = 18` | `-18` | `315` |
+| RED ownerToken/UID boundary probes | `12A + 0D = 12` | `+12` | `327` |
+| Canonical predicates with helper reuse | `7A + 4D = 11` | `+3` | `330` |
+| Truthful records (`tasks.md` now; `apply-progress.md` after GREEN) | `4A + 14D = 18` | `+4` | `334` |
+| **Measured total** | **`<=67` correction churn** | **`+1`** | **`334/350`** |
+
+The arithmetic leaves a conditional 37-line final margin, but the mandatory preflight overrides this estimate. No exception or safe-budget claim is valid until the measured complete root fix confirms `<350`.
+
+- [x] Recovery assessment: preserve the four-path candidate and record ordinal 53/54 as failed; do not carry implementation checkmarks as acceptance.
+- [ ] A-1c-R.0 ENTRY: after a maintainer-authorized reset, verify `next_action=begin`; do not modify `apply-progress.md`, code/tests, or the native ledger during planning.
+- [x] A-1c-R.1 RED: compact redundant test scaffolding first, then add immutable causal probes for lowercase 64-hex `ownerToken`, exact nullability, and every UID-bearing field at lengths 128 and 129; reproduce the ordinal-54 RED before production edits.
+- [x] A-1c-R.2 GREEN: implement only the minimum canonical owner-token and UID-length predicates in `model.ts`, reusing existing pure helpers; extend `model.test.ts` only for the proven failures.
+- [x] A-1c-R.3 REFACTOR/ACCEPTANCE: native ordinal 64 passed the fresh 405/405 semantic matrix, all six fractional timestamp checks, and exact four-path scope 350/350.
+- [x] A-1c-R.4 RECORDS: accepted at candidate tree `8bbf37438a41379a6214482a9571051d55a050a6`, evidence `sha256:0113ec2afd80162e4ef0b6524ae16843626b053cf870a0ce4addcea0aa53f738`.
+
+### A-1c-R independent acceptance requirements (ACCEPTED)
+
+- [x] Ordinal 64 proves the full semantic/type/runtime/identity/nullability/UID contract, exact 350/350 endpoint, zero validation-time repository changes, and deleted external harness.
+
+Recovery boundary: `functions/src/provisioning/model.ts`, `functions/test/provisioning/model.test.ts`, and the two SDD records only after reset; no size exception is implied. A-1d remains blocked until A-1c is independently accepted.
+
 ### Handoff to P1a2-i-A-1d
 
-Frozen state guards. P1a2-i-A-1d builds the strict event guard.
+A-1c is accepted on ordinal-64 evidence; A-1d remains pending and untouched.
 
 ---
 
@@ -630,11 +699,12 @@ Frozen state guards. P1a2-i-A-1d builds the strict event guard.
 
 ### Strict TDD order (RED → GREEN)
 
-- [ ] P1a2-i-A-1d.0 ENTRY/FAIL-FAST.
-- [ ] P1a2-i-A-1d.1 RED: author event guard probes — unknown event type rejected, missing payload field for specific event type rejected, extra payload field rejected, null `eventId` rejected, NaN numeric fields rejected, non-finite (`Infinity`, `-Infinity`) rejected, **class-instance root rejected** (not a plain object), **polluted-prototype root rejected** (`Object.create(null)`-violating), **non-plain payloads rejected** (Date instance, class instance, polluted prototype as payload), **symbol-keyed extras on event root rejected**, event-specific missing/extra fields rejected. All fail because guards do not exist.
-- [ ] P1a2-i-A-1d.2 METADATA: recount.
-- [ ] P1a2-i-A-1d.3 GREEN: `isEventType` validates against frozen 12-type array. `isValidEvent` checks: (a) root is plain object (not class instance, not null, not array, not Date, not polluted prototype); (b) exact field set per event type (no missing, no extra payload fields); (c) correct types for every field (no null required identifiers, no NaN, no non-finite numbers); (d) no symbol-keyed extras on event root. Payload sub-objects are also checked for plain-object-ness (reject Date, class instances, polluted prototypes). Tests use independent literal expectations per event type. Tests pass.
-- [ ] P1a2-i-A-1d.4 REFACTOR: freeze P1a2-i-A-1. Final type-level GREEN via explicit `npx tsc` on all P1a1 + `model.ts` + `model.test.ts`. Source-only `npx tsc --noEmit` compatibility proof.
+- [x] P1a2-i-A-1d.0 ENTRY/FAIL-FAST.
+- [x] P1a2-i-A-1d.1 RED: author event guard probes — unknown event type rejected, missing payload field for specific event type rejected, extra payload field rejected, null `eventId` rejected, NaN numeric fields rejected, non-finite (`Infinity`, `-Infinity`) rejected, **class-instance root rejected** (not a plain object), **polluted-prototype root rejected** (`Object.create(null)`-violating), **non-plain payloads rejected** (Date instance, class instance, polluted prototype as payload), **symbol-keyed extras on event root rejected**, event-specific missing/extra fields rejected. All fail because guards do not exist.
+- [x] P1a2-i-A-1d.2 METADATA: recount.
+- [x] P1a2-i-A-1d.3 GREEN: `isEventType` validates against frozen 12-type array. `isValidEvent` checks: (a) root is plain object (not class instance, not null, not array, not Date, not polluted prototype); (b) exact field set per event type (no missing, no extra payload fields); (c) correct types for every field (no null required identifiers, no NaN, no non-finite numbers); (d) no symbol-keyed extras on event root. Payload sub-objects are also checked for plain-object-ness (reject Date, class instances, polluted prototypes). Tests use independent literal expectations per event type. Tests pass.
+- [x] P1a2-i-A-1d.4 REFACTOR: freeze P1a2-i-A-1. Final type-level GREEN via explicit `npx tsc` on all P1a1 + `model.ts` + `model.test.ts`. Source-only `npx tsc --noEmit` compatibility proof.
+- [x] A-1d ordinal-69 bounded correction (implementation evidence only): reject root, payload, and nested-proof accessors and reflection-trapping proxies fail-closed through own-data descriptor inspection. Schema-equivalent `acquire`/`takeover` and `auth_no_effect`/`auth_ambiguous` payloads remain valid by shape; no absent provenance discriminant was invented. Independent acceptance remains unchecked.
 
 ### Verification commands
 
@@ -645,18 +715,7 @@ Frozen state guards. P1a2-i-A-1d builds the strict event guard.
 
 ### Independent phase-contract acceptance (UNCHECKED)
 
-- [ ] Unknown event type rejected
-- [ ] Missing payload field per event type rejected
-- [ ] Extra payload field per event type rejected
-- [ ] Null event identifiers rejected
-- [ ] NaN / non-finite numeric fields rejected
-- [ ] Class-instance event root rejected
-- [ ] Polluted-prototype event root rejected
-- [ ] Non-plain payloads rejected (Date, class instance, polluted prototype)
-- [ ] Symbol-keyed extras on event root rejected
-- [ ] Independent literal expectations per event type
-- [ ] No constructors, no state guard changes, no transitions
-- [ ] Full P1a2-i-A-1 (all 4 children) type-level GREEN
+- [x] Ordinal 73 independent acceptance: all 12 event-guard criteria passed.
 
 ### Rollback boundary
 
@@ -716,14 +775,14 @@ Frozen vocabulary (12 event types, state shape interfaces, output types, bidirec
 
 ### Strict TDD order (RED → GREEN)
 
-- [ ] P1a2-i-A-2.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0.
-- [ ] P1a2-i-A-2.1 RED — Constructor input validation: tests for all four constructors with invalid inputs. `createInitialState` with extra fields → rejected; with malformed createdAt → rejected; with missing required fields → rejected. `createSuccessResult` with invalid state (wrong status/phase pair, missing fields) → rejected. `createEvent` with unknown event type → rejected; with missing payload fields → rejected. `createFailureResult` with empty reason → rejected. Tests fail because constructors don't exist yet.
-- [ ] P1a2-i-A-2.2 METADATA: update `tasks.md` and `apply-progress.md`. Recount.
-- [ ] P1a2-i-A-2.3 GREEN — `createInitialState(params)`: validates exact input shape (no extra keys, all required fields present, createdAt is valid Date/number, status is valid, phase matches status). Rejects extra fields, malformed createdAt, invalid status/phase pairs. Returns deeply frozen `OperationState`. No transition behavior.
-- [ ] P1a2-i-A-2.4 RED → GREEN — `createEvent(type, payload)`: validates event type (must be one of 12), validates payload shape per event type. Rejects unknown types, missing payload fields, extra payload fields. Returns deeply frozen event object. No transition behavior.
-- [ ] P1a2-i-A-2.5 RED → GREEN — `createSuccessResult(state)` and `createFailureResult(reason)`: `createSuccessResult` validates state via `isValidState()` guard (from P1a2-i-A-1) before freezing; rejects invalid state. `createFailureResult` validates non-empty reason string. Both return deeply frozen `TransitionResult`. No transition behavior.
-- [ ] P1a2-i-A-2.6 RED → GREEN — Source-only TypeScript compatibility: `npx tsc --noEmit` passes. No TS5097.
-- [ ] P1a2-i-A-2.7 REFACTOR: freeze P1a2-i-A-2. Final type-level GREEN via explicit `npx tsc`:
+- [x] P1a2-i-A-2.0 ENTRY/FAIL-FAST: `node --version` confirmed v24.11.1 (>= 22.6.0).
+- [x] P1a2-i-A-2.1 RED — Constructor input validation tests for all four constructors were authored before source; native strip-types harness exits 1 because `createEvent` (and the other constructors) are not exported.
+- [x] P1a2-i-A-2.2 METADATA: updated `tasks.md` and `apply-progress.md`; Git-native begin-tree recount after RED is 46 lines.
+- [x] P1a2-i-A-2.3 GREEN — `createInitialState(params)` validates via the strict state guard after valid-Date timestamp canonicalization; extra/missing fields, malformed dates, invalid pairs, identifiers, counters, and nested payloads reject; valid result is deeply frozen.
+- [x] P1a2-i-A-2.4 RED → GREEN — `createEvent(type, payload)` validates through the strict event guard; all 12 valid payload shapes deep-freeze, while unknown/missing/extra/proxy/malformed-proof inputs reject.
+- [x] P1a2-i-A-2.5 RED → GREEN — `createSuccessResult(state)` calls `isValidState` before deep-freezing; `createFailureResult(reason)` uses the existing length-based non-empty-string predicate (whitespace-only strings remain valid); invalid values reject.
+- [x] P1a2-i-A-2.6 RED → GREEN — Explicit source+test noEmit and source-only `tsc --noEmit -p functions/tsconfig.json` both pass without TS5097.
+- [x] P1a2-i-A-2.7 REFACTOR: no further refactor needed; final runtime and TypeScript GREEN checks pass. Final type-level GREEN via explicit `npx tsc`:
 
   ```bash
   cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts src/provisioning/model.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts
