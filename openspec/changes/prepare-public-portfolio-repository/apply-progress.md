@@ -851,3 +851,32 @@ Define an allowed, guardable expected-CAS carrier while preserving the intended 
 - At this blocked attempt, B-1a checkboxes and independent acceptance remained unchecked; the source/test delta before this record was 102 changed lines.
 ## Native Ordinal 82 — B-1a Acceptance Record
 - Independently accepted unchanged B-1a: candidate/evidence diff `sha256:986fa44d1e30b7725699544e0447c797347a049090c03902b6a62e039ee9557e`; 105/105 adversarial assertions; explicit/source-only TypeScript, model harness, inherited 36/36 + 36/36 + 32/32, fixtures, and diff checks PASS; exact scope 111 lines across `model.ts`, `model.test.ts`, and `apply-progress.md`; zero validation mutation, temporary harness deleted, source/test bytes and modes preserved, B-1b/later behavior absent.
+
+## P1a2-i-B-1b — Blocked at Entry
+- Node v24.11.1 and the inherited B-1a/A model harness passed before mutation.
+- The required explicit TypeScript command cannot run: `npm ls typescript --depth=0` reports an empty dependency tree, `npx tsc` reports no compiler installed, and no global `tsc` exists.
+- No B-1b RED test or production mutation was made; B-1b.1–.5 and all independent acceptance items remain unchecked.
+
+## P1a2-i-B-1b — Strict-TDD Continuation
+- Maintainer-authorized dependency recovery supplied Functions-local TypeScript 5.9.3 without tracked changes.
+- RED: test-only vectors failed with `cas_mismatch` and `unsupported_event` missing from the B-1a reducer.
+- GREEN: module-private eight-field CAS comparison, active-lease liveness, and `unsupported_event` dispatch passed; no transition or terminal policy was added.
+
+| Task | RED | GREEN | REFACTOR |
+|---|---|---|---|
+| B-1b.1–.5 | 8 CAS, 2 lease, 14 dispatch vectors failed before production | Model/runtime, explicit TypeScript, source-only TypeScript, inherited fixtures all passed | No further refactor needed |
+
+| Evidence | Result |
+|---|---|
+| Focused/runtime harness | `node --experimental-strip-types test/provisioning/model.test.ts` → exit 0; 70 B-1b assertions exercised. |
+| Type checks | Explicit source+test `npx tsc --noEmit ...` and source-only `npx tsc --noEmit` → exit 0. |
+| Rollback boundary | Revert B-1b changes in `model.ts`, `model.test.ts`, and these two SDD records only. |
+
+- B-1b.0–.5 are locally proved. Independent acceptance remains unchecked. Native authority was not called.
+- Bounded evidence revision: `sha256:6538f7c4b269de9ee9ffb0c6558349e5698a3c1ec0ed42e6289e7d4b75e34a7c`.
+
+## Native Ordinal 88 — B-1b Acceptance Record
+- PASS; evidence `sha256:817fb6dac5ebaa9e3d05e9d24974a01c097f50bb30b64a37f59bb462e9d9ddb3`; independent oracle 74/74.
+- All eight CAS fields, including owner fencing, precede lease liveness and dispatch; exact live/inactive tuples return `unsupported_event`; stale/dead-lease precedence and fail-closed ordering pass. No B-2/B-3 behavior exists.
+- Explicit/source-only TypeScript, model, inherited 36/36 + 36/36 + 32/32, fixtures, and diff check PASS; pre-acceptance candidate is 67 additions + 9 deletions = 76 lines (<120/<170/<200).
+- Validation made zero repository mutation; temporary files/processes were removed; source/test blobs and modes were preserved.

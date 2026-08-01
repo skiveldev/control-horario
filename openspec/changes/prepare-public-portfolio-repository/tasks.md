@@ -937,12 +937,12 @@ Early warning is 120; STOP/reforecast is 170; absolute max is 200. No size:excep
 
 **Strict TDD order (RED → GREEN → REFACTOR)**
 
-- [ ] P1a2-i-B-1b.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 and the accepted B-1a baseline before mutation.
-- [ ] P1a2-i-B-1b.1 RED: author independent `reduce()` vectors that alter each of `fingerprint,status,phase,generation,version,ownerToken,currentDispatchId,leaseExpiresAt` separately and expect literal `cas_mismatch`; canonical snapshots plus direct reference/deep-field checks prove the complete state/request/event inputs remain unchanged.
-- [ ] P1a2-i-B-1b.2 RED: author lease vectors showing equality is checked separately from liveness: equal-but-expired and active-null leases return literal `lease_not_live` using caller `observedAt`, while non-active/null-lease cases do not claim active lease liveness.
-- [ ] P1a2-i-B-1b.3 RED: author exact-live dispatch vectors for boundary and terminalization events and assert literal `unsupported_event` with no mutation; direct reference/deep-field checks cover state, request, and event inputs. Exact terminal tuples may reach this outcome because B-1a/B-1b do not install terminal policy. Keep all transition behavior absent.
-- [ ] P1a2-i-B-1b.4 GREEN: implement the module-private eight-field equality predicate, separate `observedAt` lease predicate, and non-mutating unsupported dispatch behind the validated B-1a request surface; never derive expectations, read a clock, retain a request, or mutate inputs.
-- [ ] P1a2-i-B-1b.5 REFACTOR: freeze B-1b, rerun B-1a/A request, event, state, and TypeScript regressions, source-only `npx tsc --noEmit`, and the focused model harness.
+- [x] P1a2-i-B-1b.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 and the accepted B-1a baseline before mutation.
+- [x] P1a2-i-B-1b.1 RED: author independent `reduce()` vectors that alter each of `fingerprint,status,phase,generation,version,ownerToken,currentDispatchId,leaseExpiresAt` separately and expect literal `cas_mismatch`; canonical snapshots plus direct reference/deep-field checks prove the complete state/request/event inputs remain unchanged.
+- [x] P1a2-i-B-1b.2 RED: author lease vectors showing equality is checked separately from liveness: equal-but-expired and active-null leases return literal `lease_not_live` using caller `observedAt`, while non-active/null-lease cases do not claim active lease liveness.
+- [x] P1a2-i-B-1b.3 RED: author exact-live dispatch vectors for boundary and terminalization events and assert literal `unsupported_event` with no mutation; direct reference/deep-field checks cover state, request, and event inputs. Exact terminal tuples may reach this outcome because B-1a/B-1b do not install terminal policy. Keep all transition behavior absent.
+- [x] P1a2-i-B-1b.4 GREEN: implement the module-private eight-field equality predicate, separate `observedAt` lease predicate, and non-mutating unsupported dispatch behind the validated B-1a request surface; never derive expectations, read a clock, retain a request, or mutate inputs.
+- [x] P1a2-i-B-1b.5 REFACTOR: freeze B-1b, rerun B-1a/A request, event, state, and TypeScript regressions, source-only `npx tsc --noEmit`, and the focused model harness.
 
 **Independent expected outcomes**: each of the eight altered fields returns `cas_mismatch`; equal lease plus expired/active-null state returns `lease_not_live` from `observedAt`; an exact-live tuple reaches `unsupported_event`, including exact terminal tuples until B-2; every result is proven non-mutating for state, request, and event by canonical snapshot plus direct reference/deep-field checks; only `reduce()` is public and no transition/terminalization behavior exists.
 
@@ -1034,7 +1034,7 @@ Each child stops at its own absolute 200-line cap; the parent cannot borrow unus
 ### Aggregate independent phase-contract gates
 
 - [x] B-1a: exact request/ExpectedCAS records, observedAt, failure precedence through `invalid_event`, unchanged nested event guards, old-call rejection, and canonical/direct non-mutation proof are accepted through `reduce()` without CAS equality/liveness or terminal policy.
-- [ ] B-1b: all eight CAS fields, separate lease equality/liveness, exact-live unsupported behavior, exact-terminal unsupported behavior before B-2, and canonical/direct non-mutation proof are accepted through `reduce()` without implementing a boundary transition.
+- [x] B-1b: all eight CAS fields, separate lease equality/liveness, exact-live unsupported behavior, exact-terminal unsupported behavior before B-2, and canonical/direct non-mutation proof are accepted through `reduce()` without implementing a boundary transition.
 - [ ] B-2: 33 non-ack terminal rejection vectors, exact version monotonicity, and unchanged generation pass with independent expected states.
 - [ ] B-3: five immutable data classes, 3/3 terminal acknowledgements, and both nonterminal acknowledgement expectations pass.
 - [ ] Aggregate: 36 terminal vectors are present; only `reduce()` is public; P1a2-i-A is byte/foundation-frozen; P1a2-ii boundary transitions and P1a2-iii terminalization remain absent.

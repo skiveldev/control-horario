@@ -523,7 +523,7 @@ assertRejected(requestFor(malformedEvent), "invalid_event");
 const extraEvent = { ...eventCases[0].event, payload: { ...(eventCases[0].event.payload as object), extra: true } };
 assertRejected(requestFor(extraEvent), "invalid_event");
 assertRejected({ ...requestFor(), expected: { ...expectedFor(), status: "not-a-status" } } as unknown as ReducerRequest, "invalid_expected");
-const validRequest = requestFor(); failureReason(reduce(validState(), validRequest), "invalid_event");
+const validRequest = requestFor(); failureReason(reduce(validState(), validRequest), "unsupported_event");
 reduce(validState(), validRequest);
 // @ts-expect-error B-1a replaces reduce(state, event) with a request envelope.
 reduce(validState(), validRequest.event);
@@ -532,3 +532,26 @@ const missingExpected: ExpectedCAS = { fingerprint: "a".repeat(64), status: "pen
 // @ts-expect-error ExpectedCAS object literals reject extra fields.
 const extraExpected: ExpectedCAS = { ...expectedFor(), extra: true };
 void missingExpected; void extraExpected;
+
+// ---- P1a2-i-B-1b CAS, lease, and dispatch fence (RED) --------------------
+const activeState = (): OperationState => ({ ...validState(), status: "active", phase: "auth_preflight", ownerToken: "b".repeat(64), leaseExpiresAt: 10, currentDispatchId: "c".repeat(64) });
+const b1bRequest = (state: OperationState, event: unknown = eventCases[0].event, observedAt = 5): ReducerRequest => ({ expected: expectedFor(state), observedAt, event: event as never });
+const b1bFailure = (state: OperationState, request: ReducerRequest, reason: string, label: string): void => {
+  const stateJson = JSON.stringify(state), requestJson = JSON.stringify(request), statePayload = state.normalizedPayload, expected = request.expected, event = request.event, payload = event.payload;
+  const result = reduce(state, request); failureReason(result, reason);
+  ok(JSON.stringify(state) === stateJson && JSON.stringify(request) === requestJson, `B-1b ${label} snapshots unchanged`);
+  ok(state.normalizedPayload === statePayload && request.expected === expected && request.event === event && event.payload === payload && !containsReference(result, state) && !containsReference(result, request), `B-1b ${label} references unchanged`);
+};
+const live = activeState(), exact = expectedFor(live);
+const casMismatches: readonly [string, ExpectedCAS][] = [
+  ["fingerprint", { ...exact, fingerprint: "d".repeat(64) }], ["status", { ...exact, status: "pending" }],
+  ["phase", { ...exact, phase: "auth_create" }], ["generation", { ...exact, generation: 1 }],
+  ["version", { ...exact, version: 1 }], ["ownerToken", { ...exact, ownerToken: "d".repeat(64) }],
+  ["currentDispatchId", { ...exact, currentDispatchId: "d".repeat(64) }], ["leaseExpiresAt", { ...exact, leaseExpiresAt: 11 }],
+];
+casMismatches.forEach(([field, expected]) => b1bFailure(live, { ...b1bRequest(live), expected }, "cas_mismatch", `${field} mismatch`));
+b1bFailure({ ...live, leaseExpiresAt: 5 }, b1bRequest({ ...live, leaseExpiresAt: 5 }, eventCases[1].event, 5), "lease_not_live", "expired lease");
+b1bFailure({ ...live, leaseExpiresAt: null }, b1bRequest({ ...live, leaseExpiresAt: null }, eventCases[1].event), "lease_not_live", "active null lease");
+eventCases.forEach(({ type, event }) => b1bFailure(live, b1bRequest(live, event), "unsupported_event", `${type} dispatch`));
+const terminal = { ...validState(), status: "completed" as const, phase: "terminal" as const };
+b1bFailure(terminal, b1bRequest(terminal), "unsupported_event", "terminal dispatch");

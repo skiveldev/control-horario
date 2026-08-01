@@ -346,14 +346,26 @@ function isExpectedCAS(value: unknown): boolean {
     && (expected.leaseExpiresAt === null || isTimestamp(expected.leaseExpiresAt));
 }
 
-/** Validates a request envelope only; CAS, leases, and dispatch are deferred to B-1b. */
+function matchesExpectedCAS(state: OperationState, expected: ExpectedCAS): boolean {
+  return state.fingerprint === expected.fingerprint && state.status === expected.status && state.phase === expected.phase
+    && state.generation === expected.generation && state.version === expected.version && state.ownerToken === expected.ownerToken
+    && state.currentDispatchId === expected.currentDispatchId && state.leaseExpiresAt === expected.leaseExpiresAt;
+}
+
+function isActiveLeaseLive(state: OperationState, observedAt: number): boolean {
+  return state.status !== "active" || (state.leaseExpiresAt !== null && state.leaseExpiresAt > observedAt);
+}
+
+/** Validates the request, fences stale ownership, then dispatches supported behavior. */
 export function reduce(state: OperationState, request: ReducerRequest): TransitionResult {
   if (!isValidState(state)) return createFailureResult("invalid_state");
   const envelope = readPlainOwnDataFields(request, REQUEST_KEYS);
   if (envelope === null || !isTimestamp(envelope.observedAt)) return createFailureResult("invalid_request");
   if (!isExpectedCAS(envelope.expected)) return createFailureResult("invalid_expected");
   if (!isValidEvent(envelope.event)) return createFailureResult("invalid_event");
-  return createFailureResult("invalid_event");
+  if (!matchesExpectedCAS(state, envelope.expected as ExpectedCAS)) return createFailureResult("cas_mismatch");
+  if (!isActiveLeaseLive(state, envelope.observedAt as number)) return createFailureResult("lease_not_live");
+  return createFailureResult("unsupported_event");
 }
 
 const CONSTRUCTOR_EVENT_ID = "0".repeat(64);
