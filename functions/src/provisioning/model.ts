@@ -322,6 +322,40 @@ export interface ModelEvent {
   readonly payload: Readonly<Record<string, unknown>>;
 }
 
+export interface ExpectedCAS {
+  readonly fingerprint: OperationState["fingerprint"]; readonly status: OperationState["status"]; readonly phase: OperationState["phase"];
+  readonly generation: number; readonly version: number; readonly ownerToken: string | null;
+  readonly currentDispatchId: string | null; readonly leaseExpiresAt: number | null;
+}
+
+export interface ReducerRequest {
+  readonly expected: ExpectedCAS;
+  readonly observedAt: number;
+  readonly event: ModelEvent;
+}
+
+const REQUEST_KEYS = Object.freeze(["expected", "observedAt", "event"] as const);
+const EXPECTED_CAS_KEYS = Object.freeze(["fingerprint", "status", "phase", "generation", "version", "ownerToken", "currentDispatchId", "leaseExpiresAt"] as const);
+
+function isExpectedCAS(value: unknown): boolean {
+  const expected = readPlainOwnDataFields(value, EXPECTED_CAS_KEYS);
+  return expected !== null && isSha256(expected.fingerprint) && isStatus(expected.status) && isPhase(expected.phase)
+    && isCounter(expected.generation) && isCounter(expected.version)
+    && (expected.ownerToken === null || isSha256(expected.ownerToken))
+    && (expected.currentDispatchId === null || isSha256(expected.currentDispatchId))
+    && (expected.leaseExpiresAt === null || isTimestamp(expected.leaseExpiresAt));
+}
+
+/** Validates a request envelope only; CAS, leases, and dispatch are deferred to B-1b. */
+export function reduce(state: OperationState, request: ReducerRequest): TransitionResult {
+  if (!isValidState(state)) return createFailureResult("invalid_state");
+  const envelope = readPlainOwnDataFields(request, REQUEST_KEYS);
+  if (envelope === null || !isTimestamp(envelope.observedAt)) return createFailureResult("invalid_request");
+  if (!isExpectedCAS(envelope.expected)) return createFailureResult("invalid_expected");
+  if (!isValidEvent(envelope.event)) return createFailureResult("invalid_event");
+  return createFailureResult("invalid_event");
+}
+
 const CONSTRUCTOR_EVENT_ID = "0".repeat(64);
 
 function canonicalizeInitialCreatedAt(params: unknown): unknown {

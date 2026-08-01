@@ -898,13 +898,13 @@ Combined absolute max: 1,900 (1,600 + 300). No size:exception. Per-child limits:
 
 **Strict TDD order (RED → GREEN → REFACTOR)**
 
-- [ ] P1a2-i-B-1a.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 against the accepted A-2 baseline before focused tests and type checks.
-- [ ] P1a2-i-B-1a.1 RED: author black-box request/ExpectedCAS tests before reducer source. Missing/extra/symbol/accessor/class/polluted-prototype/proxy-trap/malformed envelopes fail closed as `invalid_request`/`invalid_expected`; getter counters, canonical snapshots, direct references, and deep-field checks prove no getter execution, input mutation, or request mutation (JSON is supplementary only).
-- [ ] P1a2-i-B-1a.2 RED: author `observedAt` vectors for fractional, negative, non-finite, and malformed values, plus independent failure-precedence vectors through `invalid_event`; retain nested missing/extra strict event-payload probes without adding CAS fields to the event.
-- [ ] P1a2-i-B-1a.3 RED: add explicit TypeScript probes proving the new request signature compiles while old `reduce(state,event)` calls and missing/extra ExpectedCAS fields fail with `@ts-expect-error`; assert the readonly request carrier is not mutated or retained.
-- [ ] P1a2-i-B-1a.4 GREEN: define `ExpectedCAS`/`ReducerRequest` and descriptor-read exact-record validators; validate `observedAt`; keep the accepted `isValidState` and `isValidEvent` behavior unchanged.
-- [ ] P1a2-i-B-1a.5 GREEN: wire `reduce()` through `state → request → expected → event` validation and literal `invalid_state`/`invalid_request`/`invalid_expected`/`invalid_event` outcomes only. Do not compare CAS fields, evaluate lease liveness, or claim `unsupported_event` here.
-- [ ] P1a2-i-B-1a.6 REFACTOR: freeze B-1a, rerun the inherited A checks, explicit source+test TypeScript plus old-call probes, source-only `npx tsc --noEmit`, and the model harness.
+- [x] P1a2-i-B-1a.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 against the accepted A-2 baseline before focused tests and type checks.
+- [x] P1a2-i-B-1a.1 RED: author black-box request/ExpectedCAS tests before reducer source. Missing/extra/symbol/accessor/class/polluted-prototype/proxy-trap/malformed envelopes fail closed as `invalid_request`/`invalid_expected`; getter counters, canonical snapshots, direct references, and deep-field checks prove no getter execution, input mutation, or request mutation (JSON is supplementary only).
+- [x] P1a2-i-B-1a.2 RED: author `observedAt` vectors for fractional, negative, non-finite, and malformed values, plus independent failure-precedence vectors through `invalid_event`; retain nested missing/extra strict event-payload probes without adding CAS fields to the event.
+- [x] P1a2-i-B-1a.3 RED: add explicit TypeScript probes proving the new request signature compiles while old `reduce(state,event)` calls and missing/extra ExpectedCAS fields fail with `@ts-expect-error`; assert the readonly request carrier is not mutated or retained.
+- [x] P1a2-i-B-1a.4 GREEN: define `ExpectedCAS`/`ReducerRequest` and descriptor-read exact-record validators; validate `observedAt`; keep the accepted `isValidState` and `isValidEvent` behavior unchanged.
+- [x] P1a2-i-B-1a.5 GREEN: wire `reduce()` through `state → request → expected → event` validation and literal `invalid_state`/`invalid_request`/`invalid_expected`/`invalid_event` outcomes only. Do not compare CAS fields, evaluate lease liveness, or claim `unsupported_event` here.
+- [x] P1a2-i-B-1a.6 REFACTOR: freeze B-1a, rerun the inherited A checks, explicit source+test TypeScript plus old-call probes, source-only `npx tsc --noEmit`, and the model harness.
 
 **Independent expected outcomes**: malformed request/ExpectedCAS records fail closed with the correct literal outcome; `observedAt` is exact and descriptor-safe; failure precedence reaches `invalid_event`; nested event guards remain unchanged; the new signature compiles and the old signature is rejected; canonical snapshots plus direct reference/deep-field checks prove every rejection is non-mutating. No CAS equality/liveness, unsupported dispatch, terminal policy, or transition behavior is accepted in B-1a.
 
@@ -1033,7 +1033,7 @@ Each child stops at its own absolute 200-line cap; the parent cannot borrow unus
 
 ### Aggregate independent phase-contract gates
 
-- [ ] B-1a: exact request/ExpectedCAS records, observedAt, failure precedence through `invalid_event`, unchanged nested event guards, old-call rejection, and canonical/direct non-mutation proof are accepted through `reduce()` without CAS equality/liveness or terminal policy.
+- [x] B-1a: exact request/ExpectedCAS records, observedAt, failure precedence through `invalid_event`, unchanged nested event guards, old-call rejection, and canonical/direct non-mutation proof are accepted through `reduce()` without CAS equality/liveness or terminal policy.
 - [ ] B-1b: all eight CAS fields, separate lease equality/liveness, exact-live unsupported behavior, exact-terminal unsupported behavior before B-2, and canonical/direct non-mutation proof are accepted through `reduce()` without implementing a boundary transition.
 - [ ] B-2: 33 non-ack terminal rejection vectors, exact version monotonicity, and unchanged generation pass with independent expected states.
 - [ ] B-3: five immutable data classes, 3/3 terminal acknowledgements, and both nonterminal acknowledgement expectations pass.

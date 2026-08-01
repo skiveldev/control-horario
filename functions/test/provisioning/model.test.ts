@@ -3,7 +3,7 @@
  * RED: model.ts absent → TS2307. GREEN: type-check pass + runtime pass.
  */
 import type { ProvisioningStatus, ProvisioningPhase, StatusPhasePair } from "../../src/provisioning/types.ts";
-import { EVENT_TYPES, STATUS_PHASE_MAP, createEvent, createFailureResult, createInitialState, createSuccessResult, isEventType, isPhase, isStatus, isValidEvent, isValidState, type EventType, type OperationState, type TransitionResult } from "../../src/provisioning/model.ts";
+import { EVENT_TYPES, STATUS_PHASE_MAP, createEvent, createFailureResult, createInitialState, createSuccessResult, isEventType, isPhase, isStatus, isValidEvent, isValidState, reduce, type EventType, type ExpectedCAS, type OperationState, type ReducerRequest, type TransitionResult } from "../../src/provisioning/model.ts";
 import type { _ProofNoMissing, _ProofNoExtra, _StatusPhaseMap } from "../../src/provisioning/model.ts";
 
 const ok = (c: boolean, m: string) => { if (!c) throw new Error(`FAIL: ${m}`); };
@@ -466,3 +466,69 @@ ok(whitespaceFailure.type === "failure" && whitespaceFailure.reason === " ", "A-
 ok(Object.isFrozen(whitespaceFailure), "A-2 failure result is frozen");
 ok(throws(() => createFailureResult("")), "A-2 empty reason rejected");
 ok(throws(() => createFailureResult(null)), "A-2 non-string reason rejected");
+
+// ---- P1a2-i-B-1a request contract and reducer surface (RED) ---------------
+const expectedFor = (state: OperationState = validState()): ExpectedCAS => ({
+  fingerprint: state.fingerprint, status: state.status, phase: state.phase,
+  generation: state.generation, version: state.version, ownerToken: state.ownerToken,
+  currentDispatchId: state.currentDispatchId, leaseExpiresAt: state.leaseExpiresAt,
+});
+const requestFor = (event: unknown = eventCases[0].event): ReducerRequest => ({ expected: expectedFor(), observedAt: 0, event: event as never });
+const failureReason = (result: TransitionResult, reason: string): void => ok(result.type === "failure" && result.reason === reason, `B-1a ${reason}`);
+const containsReference = (root: unknown, needle: object, seen = new WeakSet<object>()): boolean => {
+  if (root === needle) return true;
+  if (root === null || typeof root !== "object" || seen.has(root)) return false;
+  seen.add(root);
+  for (const descriptor of Object.values(Object.getOwnPropertyDescriptors(root))) {
+    if ("value" in descriptor && containsReference(descriptor.value, needle, seen)) return true;
+  }
+  return false;
+};
+const ownData = (value: unknown, field: string): unknown => {
+  try { const descriptor = Object.getOwnPropertyDescriptor(value as object, field); return descriptor && "value" in descriptor ? descriptor.value : undefined; } catch { return undefined; }
+};
+const unchanged = (state: OperationState, request: ReducerRequest, stateJson: string, expected: unknown, event: unknown): void => {
+  ok(JSON.stringify(state) === stateJson, "B-1a canonical state snapshot unchanged");
+  ok(ownData(request, "expected") === expected && ownData(request, "event") === event && (event === undefined || ownData(ownData(request, "event"), "payload") === ownData(event, "payload")), "B-1a direct and deep references unchanged");
+};
+const assertRejected = (request: ReducerRequest, reason: "invalid_request" | "invalid_expected" | "invalid_event"): void => {
+  const state = validState(), expected = ownData(request, "expected"), event = ownData(request, "event");
+  const stateJson = JSON.stringify(state);
+  const result = reduce(state, request);
+  failureReason(result, reason); unchanged(state, request, stateJson, expected, event);
+  ok(!containsReference(result, request) && !(event instanceof Object && containsReference(result, event)), "B-1a result retains no request/event graph reference");
+};
+const requestBad = [
+  () => ({ ...requestFor(), extra: true }), () => { const r = requestFor() as unknown as Record<PropertyKey, unknown>; delete r.event; return r; },
+  () => Object.assign(new (class Request {})(), requestFor()), () => { const r = requestFor(); Object.setPrototypeOf(r, { polluted: true }); return r; },
+  () => { const r = requestFor() as unknown as Record<PropertyKey, unknown>; r[Symbol("extra")] = true; return r; },
+  () => new Proxy(requestFor(), { ownKeys: () => { throw new Error("trap"); } }),
+] as const;
+requestBad.forEach(make => assertRejected(make() as ReducerRequest, "invalid_request"));
+const expectedBad = [
+  () => ({ ...requestFor(), expected: { ...expectedFor(), extra: true } }), () => { const r = requestFor(); delete (r.expected as unknown as Record<string, unknown>).version; return r; },
+  () => ({ ...requestFor(), expected: Object.assign(new (class Expected {})(), expectedFor()) }), () => { const r = requestFor(); Object.setPrototypeOf(r.expected, { polluted: true }); return r; },
+  () => ({ ...requestFor(), expected: new Proxy(expectedFor(), { ownKeys: () => { throw new Error("trap"); } }) }),
+] as const;
+expectedBad.forEach(make => assertRejected(make() as ReducerRequest, "invalid_expected"));
+[0.5, -1, Number.NaN, Infinity, "0"].forEach(observedAt => assertRejected({ ...requestFor(), observedAt } as ReducerRequest, "invalid_request"));
+const accessorRequest = requestFor() as unknown as Record<string, unknown>; let requestGetterRead = false;
+Object.defineProperty(accessorRequest, "observedAt", { enumerable: true, get: () => { requestGetterRead = true; return 0; } });
+assertRejected(accessorRequest as unknown as ReducerRequest, "invalid_request"); ok(!requestGetterRead, "B-1a request getter was not executed");
+const accessorExpected = requestFor(); let expectedGetterRead = false;
+Object.defineProperty(accessorExpected.expected, "fingerprint", { enumerable: true, get: () => { expectedGetterRead = true; return "a".repeat(64); } });
+assertRejected(accessorExpected, "invalid_expected"); ok(!expectedGetterRead, "B-1a expected getter was not executed");
+const malformedEvent = { ...eventCases[0].event, payload: {} };
+assertRejected(requestFor(malformedEvent), "invalid_event");
+const extraEvent = { ...eventCases[0].event, payload: { ...(eventCases[0].event.payload as object), extra: true } };
+assertRejected(requestFor(extraEvent), "invalid_event");
+assertRejected({ ...requestFor(), expected: { ...expectedFor(), status: "not-a-status" } } as unknown as ReducerRequest, "invalid_expected");
+const validRequest = requestFor(); failureReason(reduce(validState(), validRequest), "invalid_event");
+reduce(validState(), validRequest);
+// @ts-expect-error B-1a replaces reduce(state, event) with a request envelope.
+reduce(validState(), validRequest.event);
+// @ts-expect-error ExpectedCAS object literals require all eight fields.
+const missingExpected: ExpectedCAS = { fingerprint: "a".repeat(64), status: "pending", phase: "dispatch_pending", generation: 0, version: 0, ownerToken: null, currentDispatchId: null };
+// @ts-expect-error ExpectedCAS object literals reject extra fields.
+const extraExpected: ExpectedCAS = { ...expectedFor(), extra: true };
+void missingExpected; void extraExpected;

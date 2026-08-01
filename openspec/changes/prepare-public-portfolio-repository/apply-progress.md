@@ -840,3 +840,14 @@ The RED probes cover valid frozen outputs and malformed initial-state fields, al
 ### Required planning decision
 
 Define an allowed, guardable expected-CAS carrier while preserving the intended public reducer surface, or explicitly revise the frozen A contract. Until then, B-1.1–B-1.5 remain unchecked and no boundary/terminalization behavior is implemented.
+
+---
+
+## P1a2-i-B-1a — Local TDD Attempt (blocked)
+
+- RED: the new request-surface tests failed before source because `reduce` was not exported (Node strip-types exit 1).
+- Runtime GREEN: descriptor-safe request/ExpectedCAS validation and the reducer surface pass the model harness (exit 0); no CAS, lease, dispatch, terminal, or transition behavior was added.
+- Required explicit source+test and source-only `npx tsc --noEmit` both exit 1 because this clean worktree has no TypeScript compiler installed. No install or fallback was used.
+- At this blocked attempt, B-1a checkboxes and independent acceptance remained unchecked; the source/test delta before this record was 102 changed lines.
+## Native Ordinal 82 — B-1a Acceptance Record
+- Independently accepted unchanged B-1a: candidate/evidence diff `sha256:986fa44d1e30b7725699544e0447c797347a049090c03902b6a62e039ee9557e`; 105/105 adversarial assertions; explicit/source-only TypeScript, model harness, inherited 36/36 + 36/36 + 32/32, fixtures, and diff checks PASS; exact scope 111 lines across `model.ts`, `model.test.ts`, and `apply-progress.md`; zero validation mutation, temporary harness deleted, source/test bytes and modes preserved, B-1b/later behavior absent.
