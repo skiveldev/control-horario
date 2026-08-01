@@ -1,38 +1,40 @@
 # Tasks: Prepare Public Portfolio Repository
 
-Decision needed before apply: Yes
+Decision needed before apply: No
 Chained PRs recommended: Yes
 Chain strategy: feature-branch-chain
 400-line budget risk: High
-Delivery strategy: exception-ok (P1a1 + P1b–P4 only; P1a2 sub-slices use their own declared lower limits)
+Delivery strategy: auto-chain (P1a2 child slices retain their own lower limits)
 RDD routing: disabled — no automatic review activation. After cumulative backend emulator + TypeScript + independent phase-contract proof and candidate freeze at end of P3, surface explicit maintainer enable decision; no review before then.
 
 ## Review Workload Forecast
 
 | Field | Value |
 |---|---|
-| Estimated aggregate changed lines (tasks-phase validated) | **8,655–11,485** |
+| Estimated aggregate changed lines (tasks-phase validated) | **8,710–11,535** |
 | Aggregate ceiling | **None** — no invented aggregate ceiling; per-slice max governs |
 | 400-line budget risk | High |
-| Delivery strategy | exception-ok (P1a1 + P1b–P4 only; P1a2 sub-slices use their own declared lower limits) |
+| Delivery strategy | auto-chain (P1a2 child slices retain their own lower limits) |
 | Chain strategy | feature-branch-chain |
-| Decision needed before apply | Yes (interactive execution mode requires phase-scoped approval before each apply slice) |
-| Slice count | 13 chained implementation slices (P1a1, P1a2-i-A-1a, P1a2-i-A-1b, P1a2-i-A-1c, P1a2-i-A-1d, P1a2-i-A-2, P1a2-i-B, P1a2-ii, P1a2-iii, P1b, P2, P3, P4) |
+| Decision needed before apply | No (auto-chain is already selected; each child still requires its independent acceptance gate) |
+| Slice count | 16 chained implementation slices; P1a2-i-B is four ordered children |
 | Per-slice reforecast/STOP (P1a1 + P1b–P4 only) | 1,700 |
 | Per-slice absolute max (P1a1 + P1b–P4 only) | 2,000 |
 | P1a2-i-A absolute max | 1,900 (no size:exception) |
-| P1a2-i-B absolute max | 600 (no size:exception) |
+| P1a2-i-B aggregate absolute max | 600 across B-1a/B-1b/B-2/B-3 (no size:exception) |
 | P1a2-ii absolute max | 1,200 (no size:exception) |
 | P1a2-iii absolute max | 1,200 (no size:exception) |
 | Later independent chain | WU5–WU10 preserved (signing → de-branding → sanitization → README → archive → gates); each max 400, stop at 400; no inherited exception |
 
 ### Phase-Authority Decision
 
-The previous `Decision needed before apply` workload/size question is resolved for P1a1 + P1b–P4: maintainer has explicitly approved `size:exception` up to 2,000 lines per slice for P1a1 and P1b–P4 only. **P1a2 sub-slices (i-A-1a, i-A-1b, i-A-1c, i-A-1d, i-A-2, i-B, ii, iii) do NOT have size:exception.** Each P1a2-i-A-1 child has max 400; combined P1a2-i-A-1 max 1,600; P1a2-i-A-2 max 300; combined P1a2-i-A max 1,900; P1a2-i-B max 600; combined P1a2-i max 2,500; P1a2-ii max 1,200; P1a2-iii max 1,200. WU5–WU10 retain ordinary max 400 per work unit; any future overrun in those work units requires a separate maintainer decision. Separately, **interactive phase approval + validated planning baseline** are still required before P1a1 may begin — that gate is about phase sequencing, not about size/chaining, and does not contradict the resolved workload decision.
+The previous `Decision needed before apply` workload/size question is resolved for P1a1 + P1b–P4: maintainer has explicitly approved `size:exception` up to 2,000 lines per slice for P1a1 and P1b–P4 only. **P1a2 sub-slices (i-A-1a, i-A-1b, i-A-1c, i-A-1d, i-A-2, i-B-1a, i-B-1b, i-B-2, i-B-3, ii, iii) do NOT have size:exception.** Each P1a2-i-A-1 child has max 400; combined P1a2-i-A-1 max 1,600; P1a2-i-A-2 max 300; combined P1a2-i-A max 1,900; P1a2-i-B-1a/B-1b/B-2/B-3 each max 200 with a 600 aggregate; combined P1a2-i max 2,500; P1a2-ii max 1,200; P1a2-iii max 1,200. WU5–WU10 retain ordinary max 400 per work unit; any future overrun in those work units requires a separate maintainer decision. Separately, **interactive phase approval + validated planning baseline** are still required before P1a1 may begin — that gate is about phase sequencing, not about size/chaining, and does not contradict the resolved workload decision.
 
 ### Supersession Notice
 
 This revision **supersedes** the prior P1a plan. The single `P1a — Pure Contract + Model + Invariant Vectors` is replaced by two strictly separated slices: `P1a1 — Types + Normalization + IDs` and P1a2 (reducer + invariants). The prior P1a was invalidated by failed ordinal 22 (see below). P1a2 is further decomposed into five contract-complete sub-slices: `P1a2-i-A-1 — Immutable Vocabulary + Deep Freeze + Strict Guards`, `P1a2-i-A-2 — Validated Constructors + TypeScript Compatibility`, `P1a2-i-B — CAS Fence + Reducer Skeleton + Terminal/State/Data Immutability`, `P1a2-ii — Boundary Transitions + Auth Matrix + Crash Vectors`, `P1a2-iii — Terminalization Guards + Retry Thresholds`. The prior single P1a2 was invalidated by failed ordinals 27–28 (13 deterministic contract gaps, 2,178 lines). P1a2-i was further split into P1a2-i-A and P1a2-i-B after failed ordinal 29 (8 deterministic contract failures, 969 lines). P1a2-i-A was further split into P1a2-i-A-1 and P1a2-i-A-2 after failed ordinal 30 (8 deterministic contract failures, 529 lines). P1a2-i-A-1 was further split into P1a2-i-A-1a (Immutable Vocabulary + Genuine Type Proof), P1a2-i-A-1b (Descriptor-Safe Cycle-Safe Deep Freeze), P1a2-i-A-1c (Strict State Guard), P1a2-i-A-1d (Strict Event Guard) after failed ordinal 34 (6 deterministic blockers: Set mutability, _Eq/Extract type-proof weakness, getter-invoking deepFreeze, guard laxity on null/NaN/class/polluted roots, missing adversarial probes, over-budget compaction; 566 lines, stash `6425de640274d1990b824869b96535068ab450a5`). All downstream slices (P1b–P4) and later work units (WU5–WU10) are preserved architecturally; only their dependency edges shift where required by the P1a decomposition.
+
+**Current surgical amendment**: the unstarted P1a2-i-B monolith in this historical notice is superseded only by B-1a (request contract + reducer surface), B-1b (CAS + lease + unsupported dispatch), B-2 (terminal immutability + monotonic state), and B-3 (five-class data immutability + `ack_dispatch` idempotency). P1a2-i-A-2 acceptance is preserved; no completed history or unrelated task is reopened.
 
 ### Failed Ordinal 21 — Evidence (do NOT restore)
 
@@ -64,6 +66,7 @@ The tasks-phase forecast reflects honest per-slice sizing after the P1a decompos
 6. **Sixth refinement (8,145–10,785)**: P1a2-i further decomposed into P1a2-i-A (immutable vocabulary + runtime guards + TypeScript compatibility — no transitions) and P1a2-i-B (CAS fence + reducer skeleton + terminal/state/data immutability — only `reduce()` as public API), driven by failed ordinal 29 (969/1,200 lines, stash `527d4dfb2fd0bd30eacd7b09116bec3bda79250d`, 8 deterministic contract failures). Each sub-slice targets <=600 with combined max 1,200 and no size:exception.
 7. **Seventh refinement (8,115–10,735)**: P1a2-i-A further decomposed into P1a2-i-A-1 (immutable vocabulary + deep freeze + strict guards — foundation consuming canonical P1a1 via `import type` only, no constructors, `Reflect.ownKeys`-based deep freeze) and P1a2-i-A-2 (validated constructors + TypeScript compatibility), driven by failed ordinal 30 (529/600 lines, stash `012c41516831e1579cd7162c378c123f503ee633`, 8 deterministic contract failures). P1a2-i-A-1 max 400 (STOP 350, expected 260–330), P1a2-i-A-2 max 300 (STOP 250, expected 120–170), combined P1a2-i-A max 600. No size:exception.
 8. **Eighth refinement (8,655–11,485)**: P1a2-i-A-1 further decomposed into four contract-complete child slices — P1a2-i-A-1a (Immutable Vocabulary + Genuine Type Proof, ~200–270), P1a2-i-A-1b (Descriptor-Safe Cycle-Safe Deep Freeze, ~200–270), P1a2-i-A-1c (Strict State Guard, ~200–270), P1a2-i-A-1d (Strict Event Guard, ~200–270) — driven by failed ordinal 34 (566 lines, stash `6425de640274d1990b824869b96535068ab450a5`, 6 deterministic blockers: Set mutability, _Eq/Extract type-proof weakness, getter-invoking deepFreeze, guard laxity on null/NaN/class/polluted roots, missing adversarial probes, over-budget compaction). Each child max 400 (STOP 350), combined P1a2-i-A-1 max 1,600. Corrective pass reconciled canonical arithmetic across all tables. No size:exception.
+9. **Current B-1 refinement (8,710–11,535)**: fresh planning validation rejected the monolithic B-1 forecast of 215–260 lines against its STOP 190/absolute max 200 and found that targeting the tracker would pollute the child diff. The maintainer approved two ordered children: B-1a (Request Contract + Reducer Surface, 105–135) targets accepted P1a2-i-A-2; B-1b (CAS + Lease + Unsupported Dispatch, 105–130) targets B-1a. B-2/B-3 and the parent 600-line maximum remain unchanged; no implementation or acceptance is carried forward by this planning correction.
 
 Per-slice breakdown (validated from ordinal-22 measured data + design grouping + downstream ownership):
 
@@ -75,14 +78,17 @@ Per-slice breakdown (validated from ordinal-22 measured data + design grouping +
 | P1a2-i-A-1c | Strict state guard | 200–270 |
 | P1a2-i-A-1d | Strict event guard | 200–270 |
 | P1a2-i-A-2 | Validated constructors + TypeScript compatibility | 120–170 |
-| P1a2-i-B | CAS fence + reducer skeleton + terminal/state/data immutability | 440–590 |
+| P1a2-i-B-1a | Request contract + reducer surface | 105–135 |
+| P1a2-i-B-1b | CAS + lease + unsupported dispatch | 105–130 |
+| P1a2-i-B-2 | Terminal immutability + monotonic state | 140–180 |
+| P1a2-i-B-3 | Data immutability + `ack_dispatch` idempotency | 145–195 |
 | P1a2-ii | Boundary transitions + Auth matrix + crash vectors + completion + dispatch safety | 850–1,100 |
 | P1a2-iii | Terminalization guards + retry thresholds + negative probes | 630–830 |
 | P1b | Persistence port + in-memory reference + Firestore emulator conformance + CAS primitives (narrowed) | 1,185–1,555 |
 | P2 | Schemas + audit primitives + submission + reliable dispatch (former P1 schemas/audit + S4–S6) | 1,030–1,385 |
 | P3 | Profile provenance + worker + status + full backend proof (former P1 profile + S7–S10) | 1,300–1,625 |
 | P4 | Flutter migration + Firestore rules hardening/proof + dependency/bootstrap | 900–1,500 |
-| **Total P1a1–P4** | | **8,655–11,485** |
+| **Total P1a1–P4** | | **8,710–11,535** |
 
 ### Per-Slice Exception Boundaries
 
@@ -96,7 +102,11 @@ Per-slice breakdown (validated from ordinal-22 measured data + design grouping +
 | P1a2-i-A-1 combined | — | — | 1,600 | **No** |
 | P1a2-i-A-2 | 200 | 250 | 300 | **No** |
 | P1a2-i-A combined | — | — | 1,900 | **No** |
-| P1a2-i-B | 500 | 560 | 600 | **No** |
+| P1a2-i-B-1a | 120 | 170 | 200 | **No** |
+| P1a2-i-B-1b | 120 | 170 | 200 | **No** |
+| P1a2-i-B-2 | 155 | 180 | 200 | **No** |
+| P1a2-i-B-3 | 160 | 180 | 200 | **No** |
+| P1a2-i-B aggregate | — | — | 600 parent cap (four children; no borrowing) | **No** |
 | P1a2-i combined | — | — | 2,500 | **No** |
 | P1a2-ii | 1,100 | 1,200 | 1,200 | **No** |
 | P1a2-iii | 1,100 | 1,200 | 1,200 | **No** |
@@ -110,11 +120,11 @@ WU5–WU10 do **not** inherit these boundaries. Each later work unit has max 400
 ### Line-Accounting Rules
 
 - Per-slice expected range is the working budget for P1a1–P4.
-- **P1a2-i-A-1a, P1a2-i-A-1b, P1a2-i-A-1c, P1a2-i-A-1d, P1a2-i-A-2, P1a2-i-B, P1a2-ii, P1a2-iii do NOT inherit the P1a1/P1b–P4 size:exception.** Each P1a2-i-A-1 child has early warning 300, STOP at 350, absolute max 400; combined P1a2-i-A-1 max 1,600 (4 × 400). P1a2-i-A-2 has early warning 200, STOP at 250, absolute max 300. Combined P1a2-i-A max 1,900 (1,600 + 300). P1a2-i-B has early warning 500, STOP at 560, absolute max 600; combined P1a2-i (A-1+A-2+B) max 2,500. P1a2-ii and P1a2-iii each have early warning 1,100, STOP at 1,200, absolute max 1,200. If a coherent contract-complete slice cannot fit within its max, split it further — do NOT use size:exception.
+- **P1a2-i-A-1a, P1a2-i-A-1b, P1a2-i-A-1c, P1a2-i-A-1d, P1a2-i-A-2, P1a2-i-B-1a, P1a2-i-B-1b, P1a2-i-B-2, P1a2-i-B-3, P1a2-ii, P1a2-iii do NOT inherit the P1a1/P1b–P4 size:exception.** Each P1a2-i-A-1 child has early warning 300, STOP at 350, absolute max 400; combined P1a2-i-A-1 max 1,600 (4 × 400). P1a2-i-A-2 has early warning 200, STOP at 250, absolute max 300. Combined P1a2-i-A max 1,900 (1,600 + 300). P1a2-i-B-1a/B-1b each have early warning 120, STOP at 170, absolute max 200; B-2/B-3 retain early warning 155/160 and STOP at 180, each with absolute max 200; the parent aggregate is capped at 600 and is not the sum of borrowable child budgets. P1a2-ii and P1a2-iii each have early warning 1,100, STOP at 1,200, absolute max 1,200. If a coherent contract-complete slice cannot fit within its max, split it further — do NOT use size:exception.
 - **Recount after every RED/GREEN pair**: measure all-path changed lines via Git-native counting only. **Tracked files**: `git diff --numstat <slice-baseline> -- <tracked paths>` (sum additions + deletions; no net accounting). **Untracked files (Windows PowerShell)**: `git diff --no-index --numstat -- NUL "<path>"` — exit code 1 is expected when differences exist; parse the numstat output for additions + deletions. **POSIX alternative**: `git diff --no-index --numstat -- /dev/null "<path>"`. Never use `Measure-Object -Line`.
-- **Early warning**: P1a1/P1b–P4 at 1,500; each P1a2-i-A-1 child at 300; P1a2-i-A-2 at 200; P1a2-i-B at 500; P1a2-ii/iii at 1,100 — pause, assess remaining work, document.
-- **STOP/reforecast**: P1a1/P1b–P4 at 1,700; each P1a2-i-A-1 child at 350; P1a2-i-A-2 at 250; P1a2-i-B at 560; P1a2-ii/iii at 1,200 — no further mutation without measured evidence and explicit continuation.
-- **Absolute STOP**: P1a1/P1b–P4 before 2,000; each P1a2-i-A-1 child before 400 (STOP/reforecast at 350); combined P1a2-i-A-1 before 1,600; P1a2-i-A-2 before 300 (STOP/reforecast at 250); combined P1a2-i-A before 1,900; P1a2-i-B before 600 (STOP/reforecast at 560); combined P1a2-i before 2,500; P1a2-ii/iii before 1,200 (STOP/reforecast at 1,200; hard max, no exception).
+- **Early warning**: P1a1/P1b–P4 at 1,500; each P1a2-i-A-1 child at 300; P1a2-i-A-2 at 200; P1a2-i-B-1a/1b at 120 and B-2/B-3 at 155/160; P1a2-ii/iii at 1,100 — pause, assess remaining work, document.
+- **STOP/reforecast**: P1a1/P1b–P4 at 1,700; each P1a2-i-A-1 child at 350; P1a2-i-A-2 at 250; P1a2-i-B-1a/1b at 170 and B-2/B-3 at 180; P1a2-ii/iii at 1,200 — no further mutation without measured evidence and explicit continuation.
+- **Absolute STOP**: P1a1/P1b–P4 before 2,000; each P1a2-i-A-1 child before 400 (STOP/reforecast at 350); combined P1a2-i-A-1 before 1,600; P1a2-i-A-2 before 300 (STOP/reforecast at 250); combined P1a2-i-A before 1,900; each P1a2-i-B-1a/B-1b/B-2/B-3 child before 200, with B-1a/B-1b STOP/reforecast at 170 and B-2/B-3 at 180, and the parent aggregate before 600; combined P1a2-i before 2,500; P1a2-ii/iii before 1,200 (STOP/reforecast at 1,200; hard max, no exception).
 - WU5–WU10 each have max 400; if measured changed lines reach 400 within any of them, **STOP** — continuation requires a new, separate maintainer decision (no inherited exception).
 - apply-progress reconciliation lines in P1a1 count inside P1a1's range. tasks.md update lines count inside the slice that introduces them.
 - Test files count toward the slice they verify (no test-only slice).
@@ -133,37 +143,43 @@ main
                           └── P1a2-i-A-1c branch (base: P1a2-i-A-1b)
                                 └── P1a2-i-A-1d branch (base: P1a2-i-A-1c)
                                       └── P1a2-i-A-2 branch (base: P1a2-i-A-1d)
-                                            └── P1a2-i-B branch (base: P1a2-i-A-2)
-                                                  └── P1a2-ii branch (base: P1a2-i-B)
-                                                        └── P1a2-iii branch (base: P1a2-ii)
-                                                              └── P1b branch (base: P1a2-iii)
-                                                                    └── P2 branch (base: P1b)
-                                                                          └── P3 branch (base: P2)
-                                                                                └── P4 branch (base: P3)
+                                       └── 📍 P1a2-i-B-1a branch (base: P1a2-i-A-2)
+                                             └── P1a2-i-B-1b branch (base: P1a2-i-B-1a)
+                                                   └── P1a2-i-B-2 branch (base: P1a2-i-B-1b)
+                                                         └── P1a2-i-B-3 branch (base: P1a2-i-B-2)
+                                                               └── P1a2-ii branch (base: P1a2-i-B-3)
+                                                                    └── P1a2-iii branch (base: P1a2-ii)
+                                                                          └── P1b branch (base: P1a2-iii)
+                                                                                └── P2 branch (base: P1b)
+                                                                                      └── P3 branch (base: P2)
+                                                                                            └── P4 branch (base: P3)
 
 Independent later chain (after P4 merges into tracker, tracker merges into main):
 main ──→ WU5 (signing) ──→ WU6 (de-branding) ──→ WU7 (sanitization) ──→ WU8 (README) ──→ WU9 (archive) ──→ WU10 (gates)
 ```
 
-Each child PR targets its immediate previous slice branch. Only the tracker ultimately targets `main`. No branch, commit, or PR is created in this planning phase.
+Each child PR targets its immediate previous slice branch. The tracker target remains the integration boundary for P1a1; the current B chain starts from the accepted P1a2-i-A-2 branch: B-1a targets A-2 (not the tracker), B-1b targets B-1a, B-2 targets B-1b, and B-3 targets B-2. Only the tracker ultimately targets `main`. The current first-slice boundary is `📍 P1a2-i-B-1a`; each child diff contains only its own model/test/bookkeeping work unit. No branch, commit, or PR is created in this planning phase.
 
 ### Commit / Work-Unit Mapping and Rollback Order
 
 | Order | Slice | Commit message (conventional) | PR target | Rollback order |
 |---|---|---|---|---|
-| 1 | P1a1 | `feat(provisioning): add canonical types, normalization, IDs, fixtures` | feature/tracker | 13 (last to revert) |
-| 2 | P1a2-i-A-1a | `feat(provisioning): add immutable vocabulary and genuine type proof` | P1a1 branch | 12 |
-| 3 | P1a2-i-A-1b | `feat(provisioning): add descriptor-safe cycle-safe deep freeze` | P1a2-i-A-1a branch | 11 |
-| 4 | P1a2-i-A-1c | `feat(provisioning): add strict state guard` | P1a2-i-A-1b branch | 10 |
-| 5 | P1a2-i-A-1d | `feat(provisioning): add strict event guard` | P1a2-i-A-1c branch | 9 |
-| 6 | P1a2-i-A-2 | `feat(provisioning): add validated constructors, TypeScript compatibility` | P1a2-i-A-1d branch | 8 |
-| 7 | P1a2-i-B | `feat(provisioning): add CAS fence, reducer skeleton, terminal/state/data immutability` | P1a2-i-A-2 branch | 7 |
-| 8 | P1a2-ii | `feat(provisioning): add boundary transitions, Auth matrix, crash vectors, completion, dispatch safety` | P1a2-i-B branch | 6 |
-| 9 | P1a2-iii | `feat(provisioning): add terminalization guards, retry thresholds, negative probes` | P1a2-ii branch | 5 |
-| 10 | P1b | `feat(provisioning): add persistence port, memory/Firestore stores, CAS primitives` | P1a2-iii branch | 4 |
-| 11 | P2 | `feat(provisioning): add schemas, audit, submission, dispatch, outbox, metadata` | P1b branch | 3 |
-| 12 | P3 | `feat(provisioning): add profile, worker, status, full backend proof` | P2 branch | 2 |
-| 13 | P4 | `feat(client): migrate provisioning to trusted backend; harden Firestore rules` | P3 branch | 1 (first to revert) |
+| 1 | P1a1 | `feat(provisioning): add canonical types, normalization, IDs, fixtures` | feature/tracker | 16 (last to revert) |
+| 2 | P1a2-i-A-1a | `feat(provisioning): add immutable vocabulary and genuine type proof` | P1a1 branch | 15 |
+| 3 | P1a2-i-A-1b | `feat(provisioning): add descriptor-safe cycle-safe deep freeze` | P1a2-i-A-1a branch | 14 |
+| 4 | P1a2-i-A-1c | `feat(provisioning): add strict state guard` | P1a2-i-A-1b branch | 13 |
+| 5 | P1a2-i-A-1d | `feat(provisioning): add strict event guard` | P1a2-i-A-1c branch | 12 |
+| 6 | P1a2-i-A-2 | `feat(provisioning): add validated constructors, TypeScript compatibility` | P1a2-i-A-1d branch | 11 |
+| 7 | P1a2-i-B-1a | `feat(provisioning): add reducer request contract and validation surface` | P1a2-i-A-2 branch | 10 |
+| 8 | P1a2-i-B-1b | `feat(provisioning): add CAS lease fence and unsupported dispatch` | P1a2-i-B-1a branch | 9 |
+| 9 | P1a2-i-B-2 | `feat(provisioning): add terminal immutability and monotonic state` | P1a2-i-B-1b branch | 8 |
+| 10 | P1a2-i-B-3 | `feat(provisioning): add data immutability and dispatch ack idempotency` | P1a2-i-B-2 branch | 7 |
+| 11 | P1a2-ii | `feat(provisioning): add boundary transitions, Auth matrix, crash vectors, completion, dispatch safety` | P1a2-i-B-3 branch | 6 |
+| 12 | P1a2-iii | `feat(provisioning): add terminalization guards, retry thresholds, negative probes` | P1a2-ii branch | 5 |
+| 13 | P1b | `feat(provisioning): add persistence port, memory/Firestore stores, CAS primitives` | P1a2-iii branch | 4 |
+| 14 | P2 | `feat(provisioning): add schemas, audit, submission, dispatch, outbox, metadata` | P1b branch | 3 |
+| 15 | P3 | `feat(provisioning): add profile, worker, status, full backend proof` | P2 branch | 2 |
+| 16 | P4 | `feat(client): migrate provisioning to trusted backend; harden Firestore rules` | P3 branch | 1 (first to revert) |
 
 Rollback order is reverse of commit order. Each rollback removes only the enumerated files/behavior for that slice. P1a1 is the last to revert because all other slices depend on its frozen contract.
 
@@ -399,19 +415,19 @@ The prior single P1a2 block is replaced by five major contract-complete sub-slic
 
 | Gap | Sub-slice | Explicit task(s) | Explicit test probe(s) |
 |---|---|---|---|
-| 1 — validateCAS detached | P1a2-i-B | P1a2-i-B.1 (CAS via reduce black-box), P1a2-i-B.4 (every transition requires CAS via reduce) | Per-field CAS mutation suite via `reduce()` — each of 8 CAS fields independently altered; stale mutation rejected by reduce; live tuple accepted by reduce. No exported CAS helper. |
+| 1 — validateCAS detached | P1a2-i-B-1a/B-1b | B-1a.1–1a.6 (request/reducer surface) and B-1b.1–1b.5 (CAS/lease/dispatch) through `reduce()` | B-1a proves exact plain-record request/ExpectedCAS validation, observedAt checks, failure precedence, unchanged nested event guards, and type compatibility; B-1b independently alters each of 8 CAS fields, proves lease equality/liveness, and reaches the non-mutating unsupported outcome. No exported CAS helper. |
 | 2 — Pending terminalization incomplete | P1a2-iii | P1a2-iii.2 (full pending predicate), P1a2-iii.8 (negative probe) | Exhaustively mutate fingerprint, dispatch source, worker ack; every mismatch blocks `failed/unavailable` |
 | 3 — Active terminalization classifier | P1a2-iii | P1a2-iii.4 (exact-owner 4-path classifier), P1a2-iii.5 (foreign-owner no-steal), P1a2-iii.6 (expired-lease takeover), P1a2-iii.9 (negative probe) | Exact-owner-live, foreign-owner-unexpired, expired-takeover, terminal-idempotent; correct outcome per path |
 | 4 — Retry thresholds | P1a2-iii | P1a2-iii.1 (gate every normal-work event; exact domain 0–7 normal, 8–11 terminalize, non-integer/negative/>11 fail-closed), P1a2-iii.10 (boundary probes at -1, 0, 7, 8, 11, 12, malformed) | retryCount 0–7 allowed; 8–11 terminalize only; -1/negative/non-integer/>11 fail-closed; exact boundary at 7/8 and 11/12 |
 | 5 — Auth confirmation from intent | P1a2-ii | P1a2-ii.7 (Auth result matrix), P1a2-ii.8 (dual-read proof) | Intent alone cannot confirm; must have exact UID+email reads+proof; definite-no-effect requires two-index absence |
 | 6 — Crash vectors as comments | P1a2-ii | P1a2-ii.9 (real crash transitions) | Each crash point modeled as explicit event; reducer produces correct terminal/continuation state |
 | 7 — Completion not atomic | P1a2-ii | P1a2-ii.10 (one pure transition) | Profile+completed+audit+ack appear together; partial commit rejected |
-| 8 — Immutability missing | P1a2-i-B | P1a2-i-B.6 (data immutability) | Operation identity/payload/UID, audit identity, dispatch identity, provenance, Auth proof — every mutation rejected |
+| 8 — Immutability missing | P1a2-i-B-3 | P1a2-i-B-3.1–3.2 (five data classes) | Operation identity/payload/UID, audit identity, dispatch identity, provenance, Auth proof — every mutation rejected |
 | 9 — Acquisition generation | P1a2-ii | P1a2-ii.3 (acquisition: no generation change), P1a2-ii.4 (takeover: exact +1) | Acquire with generation!=0 rejected; takeover with generation jump > +1 rejected |
 | 10 — Dispatch safety | P1a2-ii | P1a2-ii.11 (dispatch ack, orphan, idempotent enqueue) | Duplicate/stale/out-of-order dispatches cause no regression; orphan dispatch rejected |
-| 11 — Terminal immutability 6/12 | P1a2-i-B | P1a2-i-B.4 (all 11 state-transition event types × 3 terminal statuses + ack_dispatch × 3) | 11 state-transition types × 3 terminal statuses = 33 negative rejection vectors; ack_dispatch × 3 terminal statuses = 3 positive idempotency vectors; 36 total terminal vectors |
+| 11 — Terminal immutability 6/12 | P1a2-i-B-2/B-3 | P1a2-i-B-2.1–2.2 (33 negative vectors), P1a2-i-B-3.1–3.4 (3 positive terminal acknowledgements) | 11 state-transition types × 3 terminal statuses = 33 negative rejection vectors; ack_dispatch × 3 terminal statuses = 3 positive idempotency vectors; 36 total terminal vectors |
 | 12 — Type guards bypass | P1a2-i-A-1a + P1a2-i-A-1b + P1a2-i-A-1c + P1a2-i-A-1d + P1a2-i-A-2 | P1a2-i-A-1c (strict state guard), P1a2-i-A-1d (strict event guard), P1a2-i-A-2.3–5 (constructor input validation) | Malformed state/event rejected at type level and runtime with exact-field-set validation; deep freeze prevents mutation; constructors reject invalid state/extra fields/malformed values |
-| 13 — Bookkeeping understated | P1a2-i-A-1/A-2/i-B/ii/iii | Each sub-slice has component-sum-verified forecast | Each sub-slice recount after every RED/GREEN pair |
+| 13 — Bookkeeping understated | P1a2-i-A-1/A-2/i-B-1a/i-B-1b/B-2/B-3/ii/iii | Each sub-slice has component-sum-verified forecast | Each sub-slice recount after every RED/GREEN pair |
 
 ---
 
@@ -805,13 +821,13 @@ Frozen vocabulary (12 event types, state shape interfaces, output types, bidirec
 
 ### Independent phase-contract acceptance (UNCHECKED — fresh context)
 
-- [ ] `createInitialState` rejects extra fields, malformed createdAt, missing required fields
-- [ ] `createSuccessResult` rejects invalid state (wrong status/phase pair, missing fields)
-- [ ] `createEvent` rejects unknown types, missing/extra payload fields
-- [ ] `createFailureResult` rejects empty reason
-- [ ] All constructors deep-freeze their outputs using P1a2-i-A-1's `deepFreeze`
-- [ ] No constructors perform transitions, CAS, acquisition, or reducer behavior
-- [ ] Source-only `npx tsc --noEmit` passes (no TS5097)
+- [x] `createInitialState` rejects extra fields, malformed createdAt, missing required fields
+- [x] `createSuccessResult` rejects invalid state (wrong status/phase pair, missing fields)
+- [x] `createEvent` rejects unknown types, missing/extra payload fields
+- [x] `createFailureResult` rejects empty reason
+- [x] All constructors deep-freeze their outputs using P1a2-i-A-1's `deepFreeze`
+- [x] No constructors perform transitions, CAS, acquisition, or reducer behavior
+- [x] Source-only `npx tsc --noEmit` passes (no TS5097)
 
 ### Rollback boundary
 
@@ -843,86 +859,185 @@ Combined absolute max: 1,900 (1,600 + 300). No size:exception. Per-child limits:
 
 ---
 
-## P1a2-i-B — CAS Fence + Reducer Skeleton + Terminal/State/Data Immutability
+## P1a2-i-B — CAS, Reducer, and Immutability (four ordered children)
 
-**Objective**: build the pure reducer with module-private CAS predicate integrated into every transition, terminal immutability for 11 state-transition event types × 3 terminal statuses = 33 negative rejection vectors (with `ack_dispatch` × 3 terminal statuses = 3 positive idempotency vectors separated), monotonic state invariants (version on every mutation), and data immutability (5 classes). The ONLY public transition API is `reduce(state, event)` — no named transition functions, no public `applyAcquire`, no public `applyTakeover`, no public classifiers, no exported CAS helper.
+**Surgical replan**: P1a2-i-A-2 is independently accepted and frozen; P1a2-i-B has not started. This section replaces only the unstarted monolithic implementation plan with two ordered B-1 children followed by the preserved B-2 and B-3 children. Completed history, the P1a2-i-A foundation, and unrelated tasks remain unchanged. The current edit does not modify `apply-progress.md`.
 
-**Ordinal-29 failures addressed**: 1 (no public bypass — only `reduce()`), 2 (reduce enforces guards), 3 (null-lease fails CAS), 5 (no acquisition drift — acquisition is P1a2-ii), 6 (ack_dispatch separated from state transitions), 8+11 (terminal immutability covers all 12 types).
+**Parent contract**: all four children remain pure-model work. B-1a establishes the request contract and reducer surface; B-1b adds the module-private CAS/lease fence and unsupported dispatch; B-2 installs terminal immutability and monotonic state; B-3 completes data immutability and acknowledgement semantics. They consume the frozen P1a2-i-A vocabulary, guards, deep freeze, and constructors; expose only `reduce(state, request)` as the public transition API; implement no boundary transitions from P1a2-ii and no terminalization from P1a2-iii. The 800-line session review budget is not a size exception: the parent aggregate remains capped at 600 changed lines with no exception.
+
+**Terminal-policy boundary**: B-1a and B-1b do not install terminal policy. Until B-2 is accepted, even an exact terminal tuple may pass request/CAS checks and reach the non-mutating `unsupported_event` outcome; B-2 is the first child allowed to reject state-transition events for terminal statuses. No child in this parent implements a boundary transition or terminalization.
 
 **Spec traceability**: Requirement: Operation Invariants (terminal immutability, CAS, monotonic state, data immutability).
 
-**Design traceability**: Full CAS and lease contract; invariant table.
+**Design traceability**: Full CAS and lease contract; invariant table; executable pure reducer contract.
 
-**Depends on**: P1a2-i-A-2 (frozen vocabulary + deep freeze + strict guards + validated constructors).
+**Parent dependency**: P1a2-i-A-2 (frozen vocabulary + deep freeze + strict guards + validated constructors).
 
-**Base / branch**: `slice/p1a2-i-b-cas-reducer` branched from `slice/p1a2-i-a-2-validated-constructors`.
+**Shared allowed paths** (each child may touch only its own behavior plus its own bookkeeping):
 
-**Allowed paths** (exact):
+- `functions/src/provisioning/model.ts`
+- `functions/test/provisioning/model.test.ts`
+- `openspec/changes/prepare-public-portfolio-repository/tasks.md`
+- `openspec/changes/prepare-public-portfolio-repository/apply-progress.md`
 
-- `functions/src/provisioning/model.ts` (extend — add `validateCAS`, `reduce()`, terminal immutability, monotonic state, data immutability, dispatch acknowledgement)
-- `functions/test/provisioning/model.test.ts` (extend — add CAS per-field suite, terminal 12×3, monotonic, data immutability, dispatch ack idempotency)
-- `openspec/changes/prepare-public-portfolio-repository/tasks.md` (SDD bookkeeping)
-- `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` (metadata updates)
+**Shared forbidden paths/behavior**: no modification of the P1a2-i-A foundation or `functions/tsconfig.json`; no Firebase/Auth/Firestore/Cloud Tasks/emulator code; no boundary transition implementations (`acquire`, `takeover`, `auth_*`, `profile_commit`); no terminalization implementation; no terminal-policy installation in B-1a/B-1b; no public CAS helper, classifier, or named transition function.
 
-**Forbidden in P1a2-i-B**: all P1a2-i-A forbidden paths remain. Additionally: no boundary transition implementations (acquire/takeover/auth/create/complete — those are P1a2-ii), no terminalization implementations (those are P1a2-iii). No modification of P1a2-i-A frozen vocabulary, deep freeze, or type guards. No named public transition functions (only `reduce()`).
+### Preserved B-1 history (parent-level; not child acceptance)
 
-### Strict TDD order (RED → GREEN)
+- [x] P1a2-i-B.0 HISTORY: inherited entry evidence verified `node --version` >= 22.6.0; local evidence was Node v24.11.1. This is preserved Node evidence only, not B-1a or B-1b acceptance.
+- [x] P1a2-i-B.HISTORY (BLOCKED BEFORE RED): the inherited harness passed, but no B-1 test or production mutation was made because the old `reduce(state, event)` shape could not carry an independent expected tuple. This is historical evidence, not acceptance; no B-1a/B-1b completion is carried forward and `apply-progress.md` remains unchanged by this amendment.
+- [x] P1a2-i-B.REPLAN: fresh planning validation rejected the monolithic B-1 budget and tracker target; the maintainer approved the ordered B-1a/B-1b split below. This records planning history only.
 
-- [ ] P1a2-i-B.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0.
-- [ ] P1a2-i-B.1 RED — CAS fence (black-box via reduce): tests exercise `reduce(state, event)` with each of 8 CAS fields (fingerprint, status, phase, generation, version, ownerToken, currentDispatchId, leaseExpiresAt) independently altered from the expected live tuple. Tests also verify lease liveness (leaseExpiresAt=null fails for active mutations). `reduce()` rejects every stale mutation. Tests fail because `reduce()` does not yet enforce CAS.
-- [ ] P1a2-i-B.2 GREEN — CAS fence: `reduce()` enforces all 8 CAS fields + lease liveness via module-private `validateCAS` (not exported). Explicit: `leaseExpiresAt=null` fails CAS for active mutations. Every field mismatch fails via `reduce()`. Exact live tuple passes via `reduce()`. No exported CAS function; CAS behavior proven only through `reduce()` black-box outcomes. Tests pass.
-- [ ] P1a2-i-B.3 RED → GREEN — Terminal immutability (11 state-transition event types): every state-transition event (all 12 event types EXCEPT `ack_dispatch`) against each of 3 terminal statuses (`completed`, `failed`, `manual_recovery`) is rejected without mutation. 11 × 3 = 33 negative rejection vectors. `ack_dispatch` is NOT a state-transition event — it is idempotent and allowed against all 3 terminal statuses (3 positive idempotency vectors, not negative). Total terminal vectors: 33 negative + 3 positive = 36. Tests use independent expected outcomes.
-- [ ] P1a2-i-B.4 RED → GREEN — Reducer skeleton: `reduce(state, event)` is the ONLY public transition API. It validates event type (type guard), validates state (type guard), checks terminal immutability for non-ack events, calls `validateCAS` before any non-terminal mutation. No named transition functions. No public `applyAcquire`, `applyTakeover`, etc. Tests: every mutation path goes through `reduce()`; no bypass exists.
-- [ ] P1a2-i-B.5 RED → GREEN — Monotonic state: version increments on every successful mutation available in P1a2-i-B; no event available in i-B changes generation (boundary events like acquire/takeover are not implemented in i-B and are rejected as unsupported without mutation). Tests: version increments on every successful i-B transition; no i-B event changes generation. Exact takeover +1 generation success is proven solely in P1a2-ii.
-- [ ] P1a2-i-B.6 RED → GREEN — Data immutability: operation identity (operationId, fingerprint, intendedUid), normalized payload, audit identity (eventId fields), dispatch identity (dispatchId, taskId, boundary, generation, sourceVersion), provisioning provenance fields, and Auth proof (once confirmed) cannot change after creation. Tests: every mutation attempt on immutable fields rejected.
-- [ ] P1a2-i-B.7 RED → GREEN — Dispatch acknowledgement idempotency: `ack_dispatch` event against terminal state succeeds without mutation (idempotent). `ack_dispatch` against non-terminal state succeeds with guarded update. Tests: terminal ack idempotent; non-terminal ack guarded.
-- [ ] P1a2-i-B.8 REFACTOR: freeze P1a2-i-B. Final type-level GREEN via explicit `npx tsc`:
+### P1a2-i-B-1a — Request Contract + Reducer Surface
 
-  ```bash
-  cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts src/provisioning/model.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts
-  ```
+**Objective**: add `ExpectedCAS`, `ReducerRequest`, and the exact `reduce(state: OperationState, request: ReducerRequest): TransitionResult` surface. Validate the exact descriptor-safe plain-record envelopes (`expected,observedAt,event` and the eight ExpectedCAS fields), including finite non-negative integral `observedAt`, without getter execution or mutation. Preserve `ModelEvent` payload shape and the nested strict event guard unchanged. This child stops after failure precedence through `invalid_event`; it does not implement CAS equality, lease liveness, unsupported dispatch, terminal policy, or any transition.
 
-  ```bash
-  cd functions && npx tsc --noEmit
-  ```
+**Depends on / branch**: accepted P1a2-i-A-2; `slice/p1a2-i-b-1a-request-reducer` branched from `slice/p1a2-i-a-2-validated-constructors`; PR target is the accepted P1a2-i-A-2 branch, not `feature/tracker`.
 
-  ```bash
-  cd functions && node --experimental-strip-types test/provisioning/model.test.ts
-  ```
+**Diff boundary**: request types, descriptor-safe request/ExpectedCAS validation, reducer-surface tests, and B-1a bookkeeping only. Existing `isValidState` behavior is preserved; B-1a tests MUST NOT claim new accessor/proxy fail-closed state validation. Do not carry B-1b CAS/lease/dispatch behavior or B-2/B-3 behavior into this child.
 
-### Verification commands
+**Strict TDD order (RED → GREEN → REFACTOR)**
 
-- `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts src/provisioning/model.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts` (type-level GREEN — all P1a1+P1a2-i-A+P1a2-i-B files)
-- `cd functions && npx tsc --noEmit` (source-only compatibility — no TS5097)
-- `cd functions && node --experimental-strip-types test/provisioning/model.test.ts` (runtime GREEN)
-- Git-native count (Windows PowerShell): all paths tracked after P1a2-i-A commit — `git diff --numstat <P1a2-i-A-baseline> -- functions/src/provisioning/model.ts functions/test/provisioning/model.test.ts openspec/changes/prepare-public-portfolio-repository/tasks.md openspec/changes/prepare-public-portfolio-repository/apply-progress.md`; sum additions + deletions.
+- [ ] P1a2-i-B-1a.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 against the accepted A-2 baseline before focused tests and type checks.
+- [ ] P1a2-i-B-1a.1 RED: author black-box request/ExpectedCAS tests before reducer source. Missing/extra/symbol/accessor/class/polluted-prototype/proxy-trap/malformed envelopes fail closed as `invalid_request`/`invalid_expected`; getter counters, canonical snapshots, direct references, and deep-field checks prove no getter execution, input mutation, or request mutation (JSON is supplementary only).
+- [ ] P1a2-i-B-1a.2 RED: author `observedAt` vectors for fractional, negative, non-finite, and malformed values, plus independent failure-precedence vectors through `invalid_event`; retain nested missing/extra strict event-payload probes without adding CAS fields to the event.
+- [ ] P1a2-i-B-1a.3 RED: add explicit TypeScript probes proving the new request signature compiles while old `reduce(state,event)` calls and missing/extra ExpectedCAS fields fail with `@ts-expect-error`; assert the readonly request carrier is not mutated or retained.
+- [ ] P1a2-i-B-1a.4 GREEN: define `ExpectedCAS`/`ReducerRequest` and descriptor-read exact-record validators; validate `observedAt`; keep the accepted `isValidState` and `isValidEvent` behavior unchanged.
+- [ ] P1a2-i-B-1a.5 GREEN: wire `reduce()` through `state → request → expected → event` validation and literal `invalid_state`/`invalid_request`/`invalid_expected`/`invalid_event` outcomes only. Do not compare CAS fields, evaluate lease liveness, or claim `unsupported_event` here.
+- [ ] P1a2-i-B-1a.6 REFACTOR: freeze B-1a, rerun the inherited A checks, explicit source+test TypeScript plus old-call probes, source-only `npx tsc --noEmit`, and the model harness.
 
-### Independent phase-contract acceptance (UNCHECKED — fresh context)
+**Independent expected outcomes**: malformed request/ExpectedCAS records fail closed with the correct literal outcome; `observedAt` is exact and descriptor-safe; failure precedence reaches `invalid_event`; nested event guards remain unchanged; the new signature compiles and the old signature is rejected; canonical snapshots plus direct reference/deep-field checks prove every rejection is non-mutating. No CAS equality/liveness, unsupported dispatch, terminal policy, or transition behavior is accepted in B-1a.
 
-- [ ] `reduce()` enforces all 8 CAS fields + lease liveness via module-private CAS predicate (not exported); `leaseExpiresAt=null` fails
-- [ ] All 11 state-transition event types × 3 terminal statuses = 33 negative rejection vectors pass; `ack_dispatch` × 3 terminal statuses = 3 positive idempotency vectors pass (36 total terminal vectors)
-- [ ] `ack_dispatch` is separated from state transitions; idempotent against terminal states
-- [ ] `reduce()` is the ONLY public transition API; no bypass functions exist
-- [ ] Monotonic state: version on every successful i-B mutation; no i-B event changes generation; boundary events rejected as unsupported
-- [ ] Data immutability: 5 classes all reject mutation
-- [ ] No boundary transition implementations (those are P1a2-ii)
-- [ ] No terminalization implementations (those are P1a2-iii)
-- [ ] All expected states in tests are independent (not derived from production helpers)
+**Focused test command**: `cd functions && node --experimental-strip-types test/provisioning/model.test.ts` — B-1a request/reducer-surface assertions plus the frozen A baseline.
 
-### Rollback boundary
+**Runtime harness**: the same Node strip-types command drives independent in-memory state/request/event fixtures through `reduce()`; no Firebase, Auth, Firestore, Cloud Tasks, or emulator runtime is claimed for this pure contract slice.
 
-Revert `functions/src/provisioning/model.ts` to P1a2-i-A frozen state, revert `functions/test/provisioning/model.test.ts` to P1a2-i-A frozen state, revert `tasks.md` and `apply-progress.md` to pre-P1a2-i-B state. P1a1 + P1a2-i-A intact.
+**Acceptance gate**: exact descriptor-safe request and ExpectedCAS records, `observedAt`, failure precedence through `invalid_event`, unchanged nested event validation, new-signature TypeScript acceptance, old-call rejection, and complete canonical-snapshot/direct-reference/deep-field non-mutation evidence pass; existing `isValidState` behavior is consumed without any new accessor/proxy state-validation claim; B-1b/B-2 behavior remains absent.
 
-### P1a2-i-B Forecast (component sum verified)
+**Rollback boundary**: revert only B-1a additions in `functions/src/provisioning/model.ts`, `functions/test/provisioning/model.test.ts`, and the B-1a bookkeeping entries to the accepted P1a2-i-A-2 baseline. P1a1 and all P1a2-i-A behavior remain intact.
+
+### P1a2-i-B-1a Forecast
 
 | Component | Expected lines |
 |---|---:|
-| `model.ts` extensions (module-private CAS + reduce + terminal 11×3 + ack 3 + monotonic + data immutability + dispatch ack) | 200–260 |
-| `model.test.ts` extensions (CAS per-field via reduce + terminal 11×3 + ack 3 + monotonic + data immutability + dispatch ack) | 220–290 |
-| `tasks.md` + `apply-progress.md` bookkeeping | 20–40 |
-| **Total P1a2-i-B** | **440–590** |
+| `model.ts` request types, validation, and reducer surface | 30–40 |
+| `model.test.ts` request/precedence/type/non-mutation probes | 55–70 |
+| B-1a bookkeeping | 20–25 |
+| **Total P1a2-i-B-1a** | **105–135** |
 
-Early warning at 500; STOP/reforecast at 560; absolute max 600. No size:exception. Component sum verified: low 200+220+20 = 440; high 260+290+40 = 590.
+Early warning is 120; STOP/reforecast is 170; absolute max is 200. No size:exception and no borrowing from B-1b/B-2/B-3. If this child cannot fit within 200 after an honest Git-native recount, stop and return `blocked` rather than exceeding its independent cap.
+
+### P1a2-i-B-1b — CAS + Lease + Unsupported Dispatch
+
+**Objective**: add the module-private eight-field equality predicate and authoritative lease liveness using `observedAt` on top of the accepted B-1a request surface. Prove eight independent mismatch vectors, keep lease equality separate from active lease liveness, and route an exact-live expected tuple to non-mutating `unsupported_event`. No boundary transition, terminalization, or public CAS helper is implemented.
+
+**Depends on / branch**: accepted P1a2-i-B-1a; `slice/p1a2-i-b-1b-cas-lease` branched from `slice/p1a2-i-b-1a-request-reducer`; PR target is the B-1a branch.
+
+**Diff boundary**: module-private CAS equality/liveness, unsupported dispatch, their tests, and B-1b bookkeeping only. Do not change B-1a request validation or add B-2/B-3 behavior.
+
+**Strict TDD order (RED → GREEN → REFACTOR)**
+
+- [ ] P1a2-i-B-1b.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 and the accepted B-1a baseline before mutation.
+- [ ] P1a2-i-B-1b.1 RED: author independent `reduce()` vectors that alter each of `fingerprint,status,phase,generation,version,ownerToken,currentDispatchId,leaseExpiresAt` separately and expect literal `cas_mismatch`; canonical snapshots plus direct reference/deep-field checks prove the complete state/request/event inputs remain unchanged.
+- [ ] P1a2-i-B-1b.2 RED: author lease vectors showing equality is checked separately from liveness: equal-but-expired and active-null leases return literal `lease_not_live` using caller `observedAt`, while non-active/null-lease cases do not claim active lease liveness.
+- [ ] P1a2-i-B-1b.3 RED: author exact-live dispatch vectors for boundary and terminalization events and assert literal `unsupported_event` with no mutation; direct reference/deep-field checks cover state, request, and event inputs. Exact terminal tuples may reach this outcome because B-1a/B-1b do not install terminal policy. Keep all transition behavior absent.
+- [ ] P1a2-i-B-1b.4 GREEN: implement the module-private eight-field equality predicate, separate `observedAt` lease predicate, and non-mutating unsupported dispatch behind the validated B-1a request surface; never derive expectations, read a clock, retain a request, or mutate inputs.
+- [ ] P1a2-i-B-1b.5 REFACTOR: freeze B-1b, rerun B-1a/A request, event, state, and TypeScript regressions, source-only `npx tsc --noEmit`, and the focused model harness.
+
+**Independent expected outcomes**: each of the eight altered fields returns `cas_mismatch`; equal lease plus expired/active-null state returns `lease_not_live` from `observedAt`; an exact-live tuple reaches `unsupported_event`, including exact terminal tuples until B-2; every result is proven non-mutating for state, request, and event by canonical snapshot plus direct reference/deep-field checks; only `reduce()` is public and no transition/terminalization behavior exists.
+
+**Focused test command**: `cd functions && node --experimental-strip-types test/provisioning/model.test.ts` — B-1b CAS/lease/dispatch assertions plus the frozen B-1a/A baseline.
+
+**Runtime harness**: the Node strip-types model harness drives independent in-memory state/request/event fixtures through `reduce()`; no Firebase, Auth, Firestore, Cloud Tasks, or emulator runtime is claimed for this pure slice.
+
+**Acceptance gate**: module-private eight-field CAS equality, eight independent mismatch vectors, separate lease equality/liveness with authoritative `observedAt`, exact-live `unsupported_event`, exact terminal tuple behavior before B-2, complete canonical-snapshot/direct-reference/deep-field non-mutation proof, inherited B-1a/A regressions, and absence of transitions/terminalization/public CAS helpers all pass.
+
+**Rollback boundary**: revert only B-1b additions in `functions/src/provisioning/model.ts`, `functions/test/provisioning/model.test.ts`, and the B-1b bookkeeping entries to the accepted B-1a baseline. P1a1, P1a2-i-A, and B-1a remain intact.
+
+### P1a2-i-B-1b Forecast
+
+| Component | Expected lines |
+|---|---:|
+| `model.ts` module-private CAS, lease, and unsupported dispatch | 35–45 |
+| `model.test.ts` mismatch/lease/dispatch/non-mutation probes | 50–65 |
+| B-1b bookkeeping | 20–20 |
+| **Total P1a2-i-B-1b** | **105–130** |
+
+Early warning is 120; STOP/reforecast is 170; absolute max is 200. No size:exception and no borrowing from B-1a/B-2/B-3. If this child cannot fit within 200 after an honest Git-native recount, stop and return `blocked` rather than exceeding its independent cap.
+
+### P1a2-i-B-2 — Terminal Immutability + Monotonic State
+
+**Objective**: install terminal-state rejection and the version/generation monotonicity invariant on top of B-1b. B-1a/B-1b deliberately leave terminal policy uninstalled; this child is the first point where the 11 non-`ack_dispatch` event types are rejected for each terminal status. The existing nonterminal acknowledgement path is the only i-B mutation used to prove version advancement. Terminal acknowledgement idempotency remains B-3.
+
+**Depends on / branch**: P1a2-i-B-1b accepted; `slice/p1a2-i-b-2-terminal-monotonic` from `slice/p1a2-i-b-1b-cas-lease`; PR target the B-1b branch.
+
+**Diff boundary**: only terminal immutability and monotonic enforcement/tests/bookkeeping; do not change B-1a/B-1b request, CAS, lease, or unsupported-dispatch behavior; do not add data-class mutation handling, terminal `ack_dispatch` idempotency, boundary transitions, or terminalization.
+
+**Strict TDD order (RED → GREEN → REFACTOR)**
+
+- [ ] P1a2-i-B-2.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 and the accepted B-1b baseline before mutation.
+- [ ] P1a2-i-B-2.1 RED: author 33 independent terminal rejection vectors — each of the 11 state-transition event types (all event types except `ack_dispatch`) against `completed`, `failed`, and `manual_recovery`; every result must reject without changing the complete state.
+- [ ] P1a2-i-B-2.2 GREEN: enforce terminal immutability inside `reduce()` after state/event validation and before any transition path; admit only the existing nonterminal `ack_dispatch` mutation needed for the version proof, without claiming terminal idempotency or data-class coverage yet.
+- [ ] P1a2-i-B-2.3 RED: author independent monotonic vectors for the permitted nonterminal acknowledgement mutation and for rejected/unsupported events; assert version regression, skipped increments, and generation changes fail.
+- [ ] P1a2-i-B-2.4 GREEN: require version to increase by exactly one on every successful mutation currently admitted by i-B, keep generation unchanged for every i-B event, and reject any version regression or generation change. Exact takeover `+1` remains P1a2-ii only.
+- [ ] P1a2-i-B-2.5 REFACTOR: freeze B-2 behavior, rerun all 33 vectors, inherited B-1a/B-1b/A checks, explicit source+test TypeScript, source-only compatibility, and the model harness.
+
+**Independent expected outcomes**: 33 terminal vectors reject with byte-identical states; the permitted nonterminal acknowledgement mutation increments version exactly once; rejected events do not change version; no i-B event changes generation; all expected states are independently authored, not derived from reducer output.
+
+**Focused test command**: `cd functions && node --experimental-strip-types test/provisioning/model.test.ts` — B-2 terminal matrix and monotonic assertions plus B-1a/B-1b/A regression coverage.
+
+**Runtime harness**: the Node strip-types model harness runs the 33 terminal vectors and nonterminal version/generation fixtures against independent in-memory states; it does not emulate boundary delivery or terminalization.
+
+**Acceptance gate**: 33/33 negative terminal vectors pass; version is exactly +1 for each successful B-2 mutation; generation never changes; `ack_dispatch` terminal idempotency and the five data classes remain explicitly pending B-3; no P1a2-ii/iii behavior exists.
+
+**Rollback boundary**: revert only B-2 additions in `model.ts`, `model.test.ts`, and the B-2 bookkeeping entries to the accepted B-1b baseline. P1a2-i-B-1a, P1a2-i-B-1b, and P1a2-i-A remain intact.
+
+### P1a2-i-B-3 — Data Immutability + `ack_dispatch` Idempotency
+
+**Objective**: complete the parent invariant set by freezing five immutable data classes and finalizing guarded acknowledgement semantics. The five classes are (1) operation identity + normalized payload + intended UID, (2) audit identity, (3) dispatch identity, (4) provisioning provenance, and (5) confirmed Auth proof.
+
+**Depends on / branch**: P1a2-i-B-2 accepted; `slice/p1a2-i-b-3-data-ack` from `slice/p1a2-i-b-2-terminal-monotonic`; PR target the B-2 branch.
+
+**Diff boundary**: only the five data immutability checks, terminal/nonterminal `ack_dispatch` behavior, their tests, and bookkeeping; do not change B-1a/B-1b/B-2 request, CAS, lease, reducer-surface, terminal, or monotonic semantics.
+
+**Strict TDD order (RED → GREEN → REFACTOR)**
+
+- [ ] P1a2-i-B-3.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 and the accepted B-2 baseline before mutation.
+- [ ] P1a2-i-B-3.1 RED: author independent mutation attempts for all five immutable data classes; each attempt must reject or preserve the original value. Add terminal `ack_dispatch` vectors for `completed`, `failed`, and `manual_recovery`, plus guarded nonterminal vectors for `pending` and `active`.
+- [ ] P1a2-i-B-3.2 GREEN: enforce immutable identity/payload/UID, audit identity, dispatch identity, provenance, and confirmed-proof fields in `reduce()` without adding new event types or persistence behavior.
+- [ ] P1a2-i-B-3.3 RED: add explicit idempotency assertions showing terminal acknowledgements are accepted without state mutation, while nonterminal acknowledgements require the full live CAS/current-dispatch guard and advance version once.
+- [ ] P1a2-i-B-3.4 GREEN: make `ack_dispatch` idempotent for all three terminal statuses and guarded for both nonterminal statuses; stale or mismatched acknowledgement attempts fail without regression or immutable-data mutation.
+- [ ] P1a2-i-B-3.5 REFACTOR: freeze the complete parent contract, rerun all 36 terminal vectors, five data classes, B-1a/B-1b CAS/lease/unsupported regressions, monotonic regressions, explicit source+test TypeScript, source-only compatibility, and the model harness.
+
+**Independent expected outcomes**: every one of the five immutable classes rejects mutation; terminal `ack_dispatch` has 3/3 positive no-mutation outcomes; nonterminal `ack_dispatch` is guarded for `pending` and `active` and increments version once; stale acknowledgement cannot regress state; the 33 inherited terminal rejections remain green.
+
+**Focused test command**: `cd functions && node --experimental-strip-types test/provisioning/model.test.ts` — B-3 data and acknowledgement assertions plus the complete frozen B-1a/B-1b/B-2/A baseline.
+
+**Runtime harness**: the Node strip-types model harness runs independent in-memory data snapshots and terminal/nonterminal acknowledgement scenarios; no Firebase/Auth/Firestore/Cloud Tasks runtime is claimed.
+
+**Acceptance gate**: 36 terminal vectors pass (33 negative state-transition rejections + 3 positive terminal acknowledgements); both nonterminal acknowledgement expectations pass; all five immutable data classes are protected; CAS, monotonicity, and `reduce()`-only API remain intact; no boundary or terminalization implementation exists.
+
+**Rollback boundary**: revert only B-3 additions in `model.ts`, `model.test.ts`, and the B-3 bookkeeping entries to the accepted B-2 baseline. B-1a, B-1b, B-2, P1a2-i-A, and P1a1 remain intact.
+
+### P1a2-i-B Child Forecast and Order
+
+| Order | Child | Expected | Early warning | STOP/reforecast | Absolute max | Feature-branch target |
+|---:|---|---:|---:|---:|---:|---|
+| 1 | P1a2-i-B-1a request contract + reducer surface | 105–135 | 120 | 170 | 200 | accepted P1a2-i-A-2 branch |
+| 2 | P1a2-i-B-1b CAS + lease + unsupported dispatch | 105–130 | 120 | 170 | 200 | B-1a branch |
+| 3 | P1a2-i-B-2 terminal immutability + monotonic state | 140–180 | 155 | 180 | 200 | B-1b branch |
+| 4 | P1a2-i-B-3 data immutability + `ack_dispatch` idempotency | 145–195 | 160 | 180 | 200 | B-2 branch |
+| **Parent P1a2-i-B** | **all four children** | **495–640 forecast; 600 binding cap** | **per child** | **per child** | **600 aggregate** | **no size:exception** |
+
+Each child stops at its own absolute 200-line cap; the parent cannot borrow unused budget across children. The honest component forecast is 495–640, so the 600-line parent cap is binding in the high case and must not be hidden by averaging or borrowing. At each warning, pause and recount all paths; at each STOP, no further mutation occurs without measured evidence and explicit continuation. Component sums are verified: B-1a `model.ts 30–40 + model.test.ts 55–70 + bookkeeping 20–25 = 105–135`; B-1b `35–45 + 50–65 + 20–20 = 105–130`; B-2 `45–60 + 80–100 + 15–20 = 140–180`; B-3 `50–65 + 75–105 + 20–25 = 145–195`. The 800-line session review budget does not relax the 600-line parent maximum; if the measured aggregate cannot remain at or below 600, stop and replan with no size exception.
+
+### Aggregate independent phase-contract gates
+
+- [ ] B-1a: exact request/ExpectedCAS records, observedAt, failure precedence through `invalid_event`, unchanged nested event guards, old-call rejection, and canonical/direct non-mutation proof are accepted through `reduce()` without CAS equality/liveness or terminal policy.
+- [ ] B-1b: all eight CAS fields, separate lease equality/liveness, exact-live unsupported behavior, exact-terminal unsupported behavior before B-2, and canonical/direct non-mutation proof are accepted through `reduce()` without implementing a boundary transition.
+- [ ] B-2: 33 non-ack terminal rejection vectors, exact version monotonicity, and unchanged generation pass with independent expected states.
+- [ ] B-3: five immutable data classes, 3/3 terminal acknowledgements, and both nonterminal acknowledgement expectations pass.
+- [ ] Aggregate: 36 terminal vectors are present; only `reduce()` is public; P1a2-i-A is byte/foundation-frozen; P1a2-ii boundary transitions and P1a2-iii terminalization remain absent.
 
 ### P1a2-i Combined Forecast
 
@@ -933,14 +1048,17 @@ Early warning at 500; STOP/reforecast at 560; absolute max 600. No size:exceptio
 | P1a2-i-A-1c | 200–270 |
 | P1a2-i-A-1d | 200–270 |
 | P1a2-i-A-2 | 120–170 |
-| P1a2-i-B | 440–590 |
-| **Total P1a2-i** | **1,360–1,840** |
+| P1a2-i-B-1a | 105–135 |
+| P1a2-i-B-1b | 105–130 |
+| P1a2-i-B-2 | 140–180 |
+| P1a2-i-B-3 | 145–195 |
+| **Total P1a2-i** | **1,415–1,890** |
 
-Combined absolute max: 2,500 (1,600 + 300 + 600). No size:exception.
+Combined absolute max remains 2,500 (1,600 + 300 + 600). No size:exception.
 
 ### Handoff contract to P1a2-ii
 
-Frozen immutable vocabulary + frozen deep runtime immutability + frozen type guards + frozen module-private CAS predicate + frozen `reduce()` as ONLY public API + frozen terminal immutability (11 state-transition types × 3 terminal = 33 negative rejection + ack_dispatch × 3 = 3 positive idempotency) + frozen monotonic state (version on every successful i-B mutation; no i-B event changes generation) + frozen data immutability + frozen dispatch acknowledgement. P1a2-i-B does NOT implement or prove boundary transitions. **Exact acquisition (generation unchanged) and exact takeover (+1 monotonic generation) success/failure are proven solely in P1a2-ii.**
+Frozen immutable vocabulary + frozen deep runtime immutability + frozen type guards + frozen B-1a request contract/reducer surface + frozen B-1b module-private CAS/lease fence and unsupported dispatch + frozen terminal immutability (11 state-transition types × 3 terminal = 33 negative rejection + `ack_dispatch` × 3 = 3 positive idempotency) + frozen monotonic state (version on every successful i-B mutation; no i-B event changes generation) + frozen five-class data immutability + frozen terminal/nonterminal dispatch acknowledgement. P1a2-i-B-3 is the handoff boundary; none of the four children implements or proves boundary transitions. **Exact acquisition (generation unchanged) and exact takeover (+1 monotonic generation) success/failure are proven solely in P1a2-ii.**
 
 ---
 
@@ -954,9 +1072,9 @@ Frozen immutable vocabulary + frozen deep runtime immutability + frozen type gua
 
 **Design traceability**: Worker acquisition and intent; Auth create result matrix; Profile and completion; Boundary and crash protocol.
 
-**Depends on**: P1a2-i-B (frozen vocabulary + CAS fence + reducer skeleton + terminal/state/data immutability).
+**Depends on**: P1a2-i-B-3 (the frozen four-child handoff: vocabulary + B-1a request surface + B-1b CAS/lease fence + reducer skeleton + terminal/state/data immutability).
 
-**Base / branch**: `slice/p1a2-ii-boundary-transitions` branched from `slice/p1a2-i-b-cas-reducer`.
+**Base / branch**: `slice/p1a2-ii-boundary-transitions` branched from `slice/p1a2-i-b-3-data-ack`.
 
 **Allowed paths** (exact):
 
@@ -965,7 +1083,7 @@ Frozen immutable vocabulary + frozen deep runtime immutability + frozen type gua
 - `openspec/changes/prepare-public-portfolio-repository/tasks.md` (SDD bookkeeping)
 - `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` (metadata updates)
 
-**Forbidden in P1a2-ii**: all P1a2-i-A and P1a2-i-B forbidden paths remain. Additionally: no terminalization implementations (those are P1a2-iii). No modification of P1a2-i-A frozen vocabulary/guards/immutability or P1a2-i-B frozen CAS/reducer/terminal-state invariants.
+**Forbidden in P1a2-ii**: all P1a2-i-A and P1a2-i-B-1a/B-1b/B-2/B-3 forbidden paths remain. Additionally: no terminalization implementations (those are P1a2-iii). No modification of P1a2-i-A frozen vocabulary/guards/immutability or the P1a2-i-B-1a/B-1b/B-2/B-3 frozen CAS/reducer/terminal-state invariants.
 
 ### Strict TDD order (RED → GREEN)
 
@@ -987,7 +1105,7 @@ Frozen immutable vocabulary + frozen deep runtime immutability + frozen type gua
 
 - `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts src/provisioning/model.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts`
 - `cd functions && node --experimental-strip-types test/provisioning/model.test.ts`
-- Git-native count (Windows PowerShell): tracked — `git diff --numstat <P1a2-i-B-baseline> -- functions/src/provisioning/model.ts functions/test/provisioning/model.test.ts`; untracked — `git diff --no-index --numstat -- NUL "<path>"` (exit code 1 expected); sum additions + deletions across all changed paths since P1a2-i-B commit.
+- Git-native count (Windows PowerShell): tracked — `git diff --numstat <P1a2-i-B-3-baseline> -- functions/src/provisioning/model.ts functions/test/provisioning/model.test.ts`; untracked — `git diff --no-index --numstat -- NUL "<path>"` (exit code 1 expected); sum additions + deletions across all changed paths since P1a2-i-B-3 commit.
 
 ### Independent phase-contract acceptance (UNCHECKED — fresh context)
 
@@ -1002,7 +1120,7 @@ Frozen immutable vocabulary + frozen deep runtime immutability + frozen type gua
 
 ### Rollback boundary
 
-Revert `functions/src/provisioning/model.ts` to P1a2-i-B frozen state, revert `functions/test/provisioning/model.test.ts` to P1a2-i-B frozen state, revert `tasks.md` and `apply-progress.md` to pre-P1a2-ii state. P1a1 + P1a2-i-A-1 (all 4 children) + P1a2-i-A-2 + P1a2-i-B intact.
+Revert `functions/src/provisioning/model.ts` to P1a2-i-B-3 frozen state, revert `functions/test/provisioning/model.test.ts` to P1a2-i-B-3 frozen state, revert `tasks.md` and `apply-progress.md` to pre-P1a2-ii state. P1a1 + P1a2-i-A-1 (all 4 children) + P1a2-i-A-2 + P1a2-i-B-1a/B-1b/B-2/B-3 intact.
 
 ### P1a2-ii Forecast (component sum verified)
 
@@ -1038,7 +1156,7 @@ Early warning at 1,100; STOP/reforecast at 1,200; absolute max 1,200. No size:ex
 - `openspec/changes/prepare-public-portfolio-repository/tasks.md` (SDD bookkeeping)
 - `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` (metadata updates)
 
-**Forbidden**: all prior forbidden paths remain. No modification of P1a2-i-A, P1a2-i-B, or P1a2-ii frozen behavior.
+**Forbidden**: all prior forbidden paths remain. No modification of P1a2-i-A, P1a2-i-B-1a/B-1b/B-2/B-3, or P1a2-ii frozen behavior.
 
 ### Strict TDD order (RED → GREEN)
 
@@ -1097,7 +1215,7 @@ Revert `functions/src/provisioning/model.ts` to P1a2-ii frozen state, revert `fu
 
 Early warning at 1,100; STOP/reforecast at 1,200; absolute max 1,200. No size:exception. Component sum verified: low 280+300+50 = 630; high 350+400+80 = 830.
 
-### P1a2 Aggregate (five sub-slices, A-1 has 4 children)
+### P1a2 Aggregate (P1a2-i-B has 4 children; A-1 has 4 children)
 
 | Sub-slice | Expected |
 |---|---:|
@@ -1106,16 +1224,19 @@ Early warning at 1,100; STOP/reforecast at 1,200; absolute max 1,200. No size:ex
 | P1a2-i-A-1c | 200–270 |
 | P1a2-i-A-1d | 200–270 |
 | P1a2-i-A-2 | 120–170 |
-| P1a2-i-B | 440–590 |
+| P1a2-i-B-1a | 105–135 |
+| P1a2-i-B-1b | 105–130 |
+| P1a2-i-B-2 | 140–180 |
+| P1a2-i-B-3 | 145–195 |
 | P1a2-ii | 850–1,100 |
 | P1a2-iii | 630–830 |
-| **Total P1a2** | **2,840–3,770** |
+| **Total P1a2** | **2,895–3,820** |
 
-P1a2 aggregate hard maximum: **4,900** (1,600 + 300 + 600 + 1,200 + 1,200). No size:exception for any P1a2 sub-slice.
+P1a2 aggregate hard maximum: **4,900** (1,600 + 300 + 600 + 1,200 + 1,200). The B parent remains capped at 600 even though the four-child forecast is 495–640; no size:exception exists for any P1a2 sub-slice.
 
 ### Handoff contract to P1b
 
-Frozen pure types + frozen normalization/fingerprint + frozen deterministic IDs + frozen canonical vector fixtures + frozen immutable vocabulary + frozen deep runtime immutability + frozen type guards + frozen CAS fence + frozen reducer skeleton (only `reduce()` as public API) + frozen terminal immutability (12×3, ack_dispatch separated) + frozen monotonic state + frozen data immutability + frozen boundary transitions + frozen Auth matrix + frozen crash vectors + frozen completion atomicity + frozen dispatch safety + frozen terminalization guards + frozen retry thresholds + frozen 5 negative probes. P1b builds the persistence port and implements the in-memory reference store and the Firestore emulator adapter; both MUST pass every frozen vector from P1a1+P1a2 identically.
+Frozen pure types + frozen normalization/fingerprint + frozen deterministic IDs + frozen canonical vector fixtures + frozen immutable vocabulary + frozen deep runtime immutability + frozen type guards + frozen CAS fence + frozen reducer skeleton (only `reduce()` as public API) + frozen terminal immutability (11×3 negative vectors plus 3 terminal `ack_dispatch` idempotency vectors) + frozen monotonic state + frozen five-class data immutability + frozen boundary transitions + frozen Auth matrix + frozen crash vectors + frozen completion atomicity + frozen dispatch safety + frozen terminalization guards + frozen retry thresholds + frozen 5 negative probes. P1b builds the persistence port and implements the in-memory reference store and the Firestore emulator adapter; both MUST pass every frozen vector from P1a1+P1a2 identically.
 
 ---
 
@@ -1877,6 +1998,6 @@ Every slice MUST deliver:
 - P1a1, P1b–P4: max 2,000 changed lines per slice; reforecast/stop at 1,700; absolute stop at 2,000. Maintainer-approved `size:exception`.
 - P1a2-i-A-1a, P1a2-i-A-1b, P1a2-i-A-1c, P1a2-i-A-1d: early warning 300; STOP/reforecast 350; absolute max 400 each. Combined P1a2-i-A-1 max 1,600. **No size:exception.**
 - P1a2-i-A-2: early warning 200; STOP/reforecast 250; absolute max 300. Combined P1a2-i-A absolute max 1,900. **No size:exception.**
-- P1a2-i-B: early warning 500; STOP/reforecast 560; absolute max 600. Combined P1a2-i (A-1+A-2+B) max 2,500. **No size:exception.**
+- P1a2-i-B-1a/B-1b/B-2/B-3: early warning 120/120/155/160; STOP/reforecast 170/170/180/180; absolute max 200 each. Parent P1a2-i-B aggregate max 600; combined P1a2-i (A-1+A-2+B) max 2,500. **No size:exception.**
 - P1a2-ii, P1a2-iii: early warning 1,100; STOP/reforecast 1,200; absolute max 1,200. **No size:exception** — if a contract-complete sub-slice cannot fit within 1,200, split it further.
 - WU5–WU10: max 400 changed lines per work unit; stop at 400. **No inherited exception** — any overrun requires a new, separate maintainer decision.

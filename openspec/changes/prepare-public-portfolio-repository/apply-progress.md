@@ -812,3 +812,31 @@ The RED probes cover valid frozen outputs and malformed initial-state fields, al
 | Focused/runtime harness | `cd functions && node --experimental-strip-types test/provisioning/model.test.ts` → exit 0; 60 constructor assertions passed alongside inherited model probes. |
 | Type compatibility | Explicit P1a1+A-1+A-2 `npx tsc --noEmit ...` and source-only `tsc --noEmit -p functions/tsconfig.json` → exit 0. |
 | Rollback boundary | Revert only `functions/src/provisioning/model.ts`, `functions/test/provisioning/model.test.ts`, and these two SDD records to tree `32496a55943fe0f12f06e6ff01130d42876af1cd`; A-1d remains intact. |
+## Native Ordinal 76 — A-2 Acceptance Record
+- Accepted unchanged candidate tree `127f8413d6273c297b09f5758fa377a3c66488ed`; evidence revision `sha256:14856ce37f3cac0542a30ed7868f579d0faefef6d291a7aea7ed6b07e22ce2a0`.
+- Constructors: 60/60 (11 initial, 41 event, 4 success, 4 failure); inherited controls: 36/36 + 36/36 + 32/32.
+- Explicit/full TypeScript, fixtures, model harness, and diff checks passed; exact four-path scope: 127/250.
+- Validation changed zero repository lines, preserved HEAD/index/path blobs/modes, and removed the ephemeral harness; P1a2-i-B remains unstarted.
+
+---
+
+## P1a2-i-B-1 — Blocked Before RED
+
+**Local status**: entry and inherited model-harness safety net passed; no B-1 test or production mutation was made. **Independent acceptance remains unchecked.**
+
+### Evidence
+
+| Item | Result |
+|---|---|
+| Entry | `node --version` → `v24.11.1` (meets Node >=22.6.0) |
+| Safety net | `cd functions && node --experimental-strip-types test/provisioning/model.test.ts` → exit 0; frozen A baseline passed |
+| RED | Not authored: the frozen `reduce(state, event)` input contract cannot carry an expected full CAS tuple. |
+| GREEN / refactor | Not run; no fake or partial CAS implementation was added. |
+
+### Blocking diagnosis
+
+`OperationState` supplies only one state and `ModelEvent` is constrained by the frozen A-1d exact event guard to `{eventId,type,payload}` with type-specific payloads. None of those payloads contains the required expected `fingerprint,status,phase,generation,version,ownerToken,currentDispatchId,leaseExpiresAt` tuple. Therefore `reduce(state,event)` has no independent live tuple against which to compare a stale tuple. Adding such fields changes frozen vocabulary/guards/constructors; adding another public input/helper violates B-1. A fabricated comparison would not prove full CAS.
+
+### Required planning decision
+
+Define an allowed, guardable expected-CAS carrier while preserving the intended public reducer surface, or explicitly revise the frozen A contract. Until then, B-1.1–B-1.5 remain unchecked and no boundary/terminalization behavior is implemented.

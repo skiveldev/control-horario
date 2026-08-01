@@ -112,6 +112,58 @@ For every active mutation, the transaction reads server time and requires equali
 
 Initial acquisition requires `pending/dispatch_pending`, exact fingerprint, `generation=0`, `version=0`, `ownerToken=null`, `leaseExpiresAt=null`, `authAttempted=false`, and the exact unacknowledged initial `acquire` dispatch. One transaction sets `active/auth_preflight`, owner token, lease `serverNow+60s`, increments version, creates the matching `auth_preflight` dispatch, audits the transition, and acknowledges the `acquire` dispatch; that invocation yields. Same-dispatch continuation requires the full live tuple. Takeover requires the full observed tuple, same current dispatch, and `leaseExpiresAt <= serverNow`; it increments generation and version, derives a new fencing token from dispatch ID plus new generation, and sets a 60-second lease. The invocation then must reread and use that exact new full active tuple before any transition. A stale generation/version, wrong owner, wrong dispatch, terminal status, or expired lease on a non-takeover mutation produces no write or side effect. Terminalization clears owner/lease, sets phase `terminal`, and preserves immutable/failure fields.
 
+### P1a2-i-B-1 amendment: explicit expected-CAS request
+
+The prior planned `reduce(state, event)` surface cannot prove CAS: `state` contains only the current tuple, while the frozen exact `ModelEvent` payloads contain no independent expectations. B-1 therefore narrowly amends the planned reducer parameter from an event to a request envelope. `reduce()` remains the only public transition function; event vocabulary, payload schemas, `isValidEvent`, `createEvent`, state vocabulary, guards, and the four accepted A constructors are unchanged.
+
+```ts
+export interface ExpectedCAS {
+  readonly fingerprint: OperationState["fingerprint"];
+  readonly status: OperationState["status"];
+  readonly phase: OperationState["phase"];
+  readonly generation: number;
+  readonly version: number;
+  readonly ownerToken: string | null;
+  readonly currentDispatchId: string | null;
+  readonly leaseExpiresAt: number | null;
+}
+
+export interface ReducerRequest {
+  readonly expected: ExpectedCAS;
+  readonly observedAt: number;
+  readonly event: ModelEvent;
+}
+
+export function reduce(
+  state: OperationState,
+  request: ReducerRequest,
+): TransitionResult;
+```
+
+`expected` is owned by the transaction/dispatch caller: it is captured from the tuple that authorized the attempted write, independently of the authoritative `state` reread passed as the first argument. The adapter must not derive expectations from that same reread. `observedAt` is the caller's authoritative server-time observation; it is outside the eight-field tuple so lease equality and lease liveness remain separate predicates and the pure model never reads a clock. The carrier is readonly, is never mutated or retained by the reducer, and all returned results/states remain deeply frozen.
+
+Validation and dispatch order is exact:
+
+1. Validate `state` with the accepted strict state guard; failure is `invalid_state`, with no mutation.
+2. Descriptor-read a plain `ReducerRequest` with exactly `expected,observedAt,event`; reject missing, extra, symbol, accessor, class, polluted-prototype, proxy/trap, fractional, negative, or non-finite values as `invalid_request` without invoking accessors.
+3. Descriptor-read a plain `expected` object with exactly the eight fields above. Validate each field independently against its canonical scalar/null domain, but do not require the expectation's status/phase or lifecycle fields to form a valid state; this preserves per-field stale-CAS diagnosis. Missing/extra/malformed fields fail as `invalid_expected`.
+4. Validate `event` unchanged through `isValidEvent`; malformed business payloads fail as `invalid_event`. Envelope validation MUST NOT add CAS keys to payloads or relax their exact-field guards.
+5. Apply B-2/B-3 terminal policy when those slices exist. For a nonterminal event that can mutate now or in P1a2-ii/iii, compare all eight expected fields to current state. Any inequality returns `cas_mismatch`. For active state, additionally require non-null `state.leaseExpiresAt` and `state.leaseExpiresAt > observedAt`; otherwise return `lease_not_live`.
+6. Dispatch supported behavior. In B-1 every boundary/terminalization event remains unsupported after a live CAS and returns `unsupported_event`; stale, malformed, terminal, and unsupported paths are all non-mutating. Later slices add behavior behind the same gate rather than bypassing it.
+
+Failure codes above are stable literal reasons and deeply frozen. Precedence is state -> request -> expected -> event -> terminal policy -> CAS equality -> lease liveness -> event dispatch. A failed predicate never calls a transition helper, increments counters, or changes nested data.
+
+| Alternative | Tradeoff | Decision |
+|---|---|---|
+| Selected event envelope (`ReducerRequest`) | Keeps two arguments and gives adapters one atomic command value; adds one narrow carrier type and changes planned callers. | Selected. CAS metadata stays beside, never inside, business events. |
+| Separate third argument | Small type, but `reduce(state,event,expected)` can split event/time/expectation assembly and requires a fourth value or hidden clock for liveness. | Rejected. |
+| Expectations embedded in state | Conflates authoritative current data with caller preconditions and risks persisting transient command metadata. | Rejected. |
+| Self-comparison | No independent precondition; always “proves” equality and falsely claims CAS. | Forbidden. |
+
+B-1 RED must prove: old `reduce(state,event)` is compile-rejected; the exact request compiles; each expected field independently mismatches through `reduce()`; an exact tuple reaches `unsupported_event`; exact-but-expired and active-null leases return `lease_not_live`; malformed/missing/extra envelope and expectation fields fail closed; existing per-event missing/extra payload probes remain green; and every failure leaves the complete input state byte-identical. Explicit source+test TypeScript and source-only `npx tsc --noEmit` remain mandatory, including `@ts-expect-error` probes for the old signature and missing/extra expected fields.
+
+This changes no downstream semantics: B-2/B-3 add terminal, monotonic, data, and acknowledgement behavior behind this request gate; P1a2-ii supplies expectations from dispatch/transaction issuance snapshots; P1a2-iii reuses the same carrier for reserved terminalization. The four implementation/planning paths remain `functions/src/provisioning/model.ts`, `functions/test/provisioning/model.test.ts`, `tasks.md`, and `apply-progress.md`. This design amendment changes only `design.md`; the next `sdd-tasks` amendment must rewrite B-1's signature, RED cases, forecast, and handoff without changing apply progress.
+
 ## Boundary and Crash Protocol
 
 ### Submission transaction
