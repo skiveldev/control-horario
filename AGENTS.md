@@ -98,6 +98,8 @@ OpenSpec task. Do not assume `npm --prefix functions test` covers them.
 
 Context is a bounded engineering resource. Enforce these rules mechanically:
 
+- Parent orchestrators pass matching executor skill paths to delegated agents;
+  they do not load complete executor-only skills into the parent context.
 - Never print or load a complete SDD runtime ledger during normal routing.
   Project JSON output to only the current revision, objective, counters,
   decision flag, and next action. Read full history only for a proven diagnosis.
@@ -111,8 +113,15 @@ Context is a bounded engineering resource. Enforce these rules mechanically:
   in the parent session.
 - Allow at most one corrective retry for the same failure. If the runtime asks
   for a maintainer decision, stop and surface that decision instead of looping.
+- On a typed terminal SDD transport failure, execute its exact continuation at
+  most once, preserve the candidate, and stop. Never relaunch an SDD phase in
+  the same session after the runtime latches dispatch.
 - For large work, report the forecast and split along independently testable
   boundaries before implementation.
+
+These safeguards reinforce rather than replace the native Gentle AI contract.
+When this guide and a newer typed provider contract differ, follow the provider
+contract and propose an evidence-backed update to this file.
 
 ## Git And Worktree Safety
 
