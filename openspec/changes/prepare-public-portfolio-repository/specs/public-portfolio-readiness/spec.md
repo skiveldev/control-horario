@@ -59,6 +59,46 @@ Idempotency SHALL be scoped to `(operationId, fingerprint)` where the fingerprin
 - WHEN the worker processes the dispatch
 - THEN the compare-and-swap rejects and no state change or side effect occurs
 
+### Requirement: Trusted Persisted Delivery Classification
+
+`classifyProvisioningDelivery` SHALL be the sole delivery classifier. A stale-write candidate MUST come from the exact dispatch-document and operation snapshots reread in the writing Firestore transaction, MUST have matching immutable operation/fingerprint and dispatch/document/task/deterministic identities, and MUST satisfy the design's legal generation/version/timestamp relation. Pure-function output, deterministic identity, or caller-supplied objects alone SHALL NOT authorize a write. Missing, malformed, corrupt, mismatched, duplicate, terminal, future, impossible, and unknown relations SHALL perform no write. Terminal classification SHALL precede duplicate classification for a matching terminal operation; both precede temporal stale eligibility. The transaction MUST rerun the same classifier before writing.
+
+#### Scenario: Legal stale persisted dispatch
+- GIVEN an unacknowledged dispatch created by an authorized backend create-if-absent path and transaction-reread with its operation
+- WHEN its generation/version/timestamps form a legal earlier relation from the design table
+- THEN the classifier returns `stale_eligible`
+- AND only the later persistence transaction may use that result to authorize stale acknowledgement
+
+#### Scenario: Deterministic but untrusted or impossible delivery
+- GIVEN a deterministic ID or arbitrary object without the trusted persisted snapshot premise, or a future/impossible/same-version-fork relation
+- WHEN delivery is classified
+- THEN no write, audit, operation mutation, or external effect is authorized
+
+### Requirement: Atomic Stale-Delivery Acknowledgement Audit
+
+A transaction-authoritative `stale_eligible` delivery MUST atomically change only its dispatch from `workerAck:null` to `workerAck:"stale"` and create-or-deduplicate one immutable audit event with exactly: `schemaVersion:1`; `eventId=deriveAuditEventId(operationId,"progress","stale_delivery",dispatch.generation,dispatch.sourceVersion)`; trusted operation `operationId`; `correlationId=hexSha256("provision-correlation:v1\0"+operationId)`; `category:"progress"`; `stage:"stale_delivery"`; `outcome:"stale"`; `code:"stale-dispatch"`; `actorUidDigest:null`; `intendedUidDigest:null`; trusted dispatch `dispatchId`, `generation`, and `sourceVersion`; and transaction time as the first-insert candidate `createdAt`. Replay MUST preserve a matching existing event, including its original `createdAt`; any audit mismatch or transaction conflict MUST fail closed with no partial acknowledgement, operation/version mutation, or external effect.
+
+#### Scenario: Concurrent stale delivery replay
+- GIVEN two transactions reread the same trusted stale-eligible dispatch and operation
+- WHEN both attempt acknowledgement and immutable audit creation
+- THEN exactly one stale acknowledgement and one audit event persist atomically
+- AND the losing/retried path preserves the existing event unchanged and commits no partial write
+- AND the adapter atomicity vector may assert real Firestore `ALREADY_EXISTS` (code 6) create-precondition failure without holding an open transaction across an external audit create
+
+### Requirement: Atomic Initial Pending Lease Acquisition
+
+The worker MUST acquire only the transaction-reread initial `pending/dispatch_pending` operation with `generation=0`, `version=0`, null owner, lease, and current-dispatch pointer, no Auth attempt, and its deterministic unacknowledged `acquire/g0/sourceVersion0` dispatch. One transaction MUST read operation, source dispatch, candidate audit, and next dispatch before writes; validate `ownerSeed===deriveOwnerToken(sourceDispatch.dispatchId,0)`; run the pure `acquire` reducer; then atomically persist `active/auth_preflight/g0/version1`, a 60-second transaction-clock lease, processed source acknowledgement, and deterministic `auth_preflight/g0/sourceVersion1` next dispatch. The adapter, not the reducer, MUST assign the next current-dispatch pointer.
+
+The same transaction MUST create-or-deduplicate the immutable 14-field audit event exactly as `schemaVersion:1`; source-g0/sourceVersion0-derived `eventId`; trusted `operationId`; approved correlation hash; `category:"progress"`; `stage:"state_transition"`; `outcome:"started"`; `code:"success"`; null actor and intended-UID digests; trusted source `dispatchId`, `generation:0`, and `sourceVersion:0`; and transaction time only as the first-insert `createdAt`. Matching replay MUST preserve the existing audit timestamp. The stale-delivery audit mapping SHALL remain unchanged.
+
+#### Scenario: Atomic acquisition and concurrent replay
+- GIVEN the exact initial pending operation and acquire dispatch
+- WHEN concurrent workers attempt acquisition
+- THEN exactly one transaction persists the lease, operation transition, processed source acknowledgement, accepted audit, and next dispatch
+- AND every conflicting audit, dispatch, create, or CAS failure rolls back all writes
+- AND losing or matching replay does not increment version, rewrite acknowledgement, duplicate dispatch, or replace the original audit timestamp
+- AND no takeover, Auth read/call, profile effect, or stale-delivery remapping occurs
+
 ### Requirement: Autonomous Backend Liveness
 
 After an accepted submission, the backend — not the Flutter client or admin retries — MUST autonomously re-drive every nonterminal operation toward `completed`, `failed`, or `manual_recovery`, provided durable dependencies (Firestore, Auth) become available within the configured retry window. Client polling is observation only and SHALL NOT be required for progress. Each autonomous execution SHALL advance at most one external-effect boundary before yielding to the next dispatch. If durable dependencies remain permanently unavailable through the absolute infrastructure retry window, the backend SHALL emit an observable operational alert with failure evidence and route the operation to explicit operator intervention; this is the sole exception to the autonomous liveness guarantee and SHALL NOT be reported as silent success.

@@ -3,7 +3,7 @@
  * RED: model.ts absent → TS2307. GREEN: type-check pass + runtime pass.
  */
 import type { ProvisioningStatus, ProvisioningPhase, StatusPhasePair } from "../../src/provisioning/types.ts";
-import { EVENT_TYPES, STATUS_PHASE_MAP, createEvent, createFailureResult, createInitialState, createSuccessResult, isEventType, isPhase, isStatus, isValidEvent, isValidState, reduce, type EventType, type ExpectedCAS, type OperationState, type ReducerRequest, type TransitionResult } from "../../src/provisioning/model.ts";
+import { EVENT_TYPES, STATUS_PHASE_MAP, createEvent, createFailureResult, createInitialState, createSuccessResult, isEventType, isPhase, isStatus, isValidEvent, isValidState, reduce, type EventType, type ExpectedCAS, type ModelEvent, type OperationState, type ReducerRequest, type TransitionResult } from "../../src/provisioning/model.ts";
 import type { _ProofNoMissing, _ProofNoExtra, _StatusPhaseMap } from "../../src/provisioning/model.ts";
 
 const ok = (c: boolean, m: string) => { if (!c) throw new Error(`FAIL: ${m}`); };
@@ -72,7 +72,7 @@ ok(_trs.type==="success", "TransitionResult.success");
 ok(_trf.type==="failure" && typeof _trf.reason==="string", "TransitionResult.failure");
 
 // ---- OperationState interface shape ----
-const _os: OperationState = { operationId:"x",fingerprint:"x",status:"pending",phase:"dispatch_pending",normalizedPayload:{},intendedUid:null,generation:0,version:0,ownerToken:null,leaseExpiresAt:null,currentDispatchId:null,authAttempted:false,authAttempt:null,createdAt:0,updatedAt:0 };
+const _os: OperationState = { operationId:"x",fingerprint:"x",status:"pending",phase:"dispatch_pending",normalizedPayload:{} as OperationState["normalizedPayload"],intendedUid:null,generation:0,version:0,ownerToken:null,leaseExpiresAt:null,currentDispatchId:null,authAttempted:false,authAttempt:null,createdAt:0,updatedAt:0 };
 ok(_os.status==="pending" && _os.phase==="dispatch_pending","OperationState shape");
 ok(_os.authAttempt===null && _os.authAttempted===false,"authAttempt defaults");
 
@@ -259,7 +259,7 @@ console.log("\n=== P1a2-i-A-1b deepFreeze probes ===\nALL PASSED\n");
 // ---- P1a2-i-A-1c strict state guard probes -------------------------------
 const validState = (): OperationState => ({
   operationId: "123e4567-e89b-42d3-a456-426614174000", fingerprint: "a".repeat(64),
-  status: "pending", phase: "dispatch_pending", normalizedPayload: { email:"employee@example.com",nombre:"Ana",apellido1:"Lopez",apellido2:null,employeeId:"",weeklyHours:40,dni:null,telefono:null,cargo:null,departamento:null,empresa:null,scheduleId:null,calendarId:null,fechaInicio:null,fechaFin:null,role:"employee",isSupervisor:false,supervisorId:null,isActive:true,displayName:"Ana Lopez" },
+  status: "pending", phase: "dispatch_pending", normalizedPayload: { email:"employee@example.com",nombre:"Ana",apellido1:"Lopez",apellido2:null,employeeId:"",weeklyHours:40,dni:null,telefono:null,cargo:null,departamento:null,empresa:null,scheduleId:null,calendarId:null,fechaInicio:null,fechaFin:null,role:"employee",isSupervisor:false,supervisorId:null,isActive:true },
   intendedUid: null, generation: 0, version: 0, ownerToken: null,
   leaseExpiresAt: null, currentDispatchId: null, authAttempted: false,
   authAttempt: null, createdAt: 0, updatedAt: 0,
@@ -293,9 +293,11 @@ rejectsState("1c string-key extra rejected", state => { state.extra = true; });
 rejectsState("1c symbol-key extra rejected", state => { state[Symbol("extra")] = true; });
 
 // ---- Ordinal 54: causal strict-state remediation matrix (RED first) -------
-const strictPayload = () => ({ email:"employee@example.com",nombre:"Ana",apellido1:"Lopez",apellido2:null,employeeId:"",weeklyHours:40,dni:null,telefono:null,cargo:null,departamento:null,empresa:null,scheduleId:null,calendarId:null,fechaInicio:null,fechaFin:null,role:"employee",isSupervisor:false,supervisorId:null,isActive:true,displayName:"Ana Lopez" });
-const strictAttempt = () => ({ attemptId:"b".repeat(64),intentAt:0,callStartedAt:0,result:"confirmed",returnedUid:"uid-1",returnedEmail:"employee@example.com",proof:{attemptId:"b".repeat(64),confirmedAt:0,uidRead:"uid-1",emailRead:"employee@example.com"} });
+const strictPayload = () => ({ email:"employee@example.com",nombre:"Ana",apellido1:"Lopez",apellido2:null,employeeId:"",weeklyHours:40,dni:null,telefono:null,cargo:null,departamento:null,empresa:null,scheduleId:null,calendarId:null,fechaInicio:null,fechaFin:null,role:"employee",isSupervisor:false,supervisorId:null,isActive:true });
+const strictAttempt = (): NonNullable<OperationState["authAttempt"]> => ({ attemptId:"b".repeat(64),intentAt:0,callStartedAt:0,result:"confirmed",returnedUid:"uid-1",returnedEmail:"employee@example.com",proof:{attemptId:"b".repeat(64),confirmedAt:0,uidRead:"uid-1",emailRead:"employee@example.com"} });
 const strictState = () => ({ operationId:"123e4567-e89b-42d3-a456-426614174000",fingerprint:"a".repeat(64),status:"pending",phase:"dispatch_pending",normalizedPayload:strictPayload(),intendedUid:null,generation:0,version:0,ownerToken:null,leaseExpiresAt:null,currentDispatchId:null,authAttempted:false,authAttempt:null,createdAt:0,updatedAt:0 });
+const confirmedProfileState = () => ({ ...strictState(), status:"active", phase:"profile_commit", intendedUid:"uid-1", ownerToken:"c".repeat(64), leaseExpiresAt:10, authAttempted:true, authAttempt:strictAttempt() });
+const definiteNoEffectPreflightState = () => ({ ...strictState(), status:"active", phase:"auth_preflight", intendedUid:"uid-1", ownerToken:"c".repeat(64), leaseExpiresAt:10, authAttempted:true, authAttempt:{ attemptId:"b".repeat(64), intentAt:0, callStartedAt:0, result:"definite_no_effect", returnedUid:null, returnedEmail:null, proof:null } });
 const badState = (mutate: (state: Record<string, any>) => void): unknown => { const state = strictState() as Record<string, any>; mutate(state); return state; };
 const redCases: readonly [string, () => unknown][] = [
   ["null-prototype root", () => Object.assign(Object.create(null), strictState())],
@@ -312,7 +314,7 @@ const redCases: readonly [string, () => unknown][] = [
   ["negative createdAt", () => badState(s => { s.createdAt = -1; })],
   ["negative leaseExpiresAt", () => badState(s => { s.leaseExpiresAt = -1; })],
   ["null-prototype payload", () => badState(s => { s.normalizedPayload = Object.assign(Object.create(null), strictPayload()); })],
-  ["payload missing key", () => badState(s => { delete s.normalizedPayload.displayName; })],
+  ["payload missing key", () => badState(s => { delete s.normalizedPayload.isActive; })],
   ["payload extra key", () => badState(s => { s.normalizedPayload.extra = true; })],
   ["payload symbol key", () => badState(s => { s.normalizedPayload[Symbol("extra")] = true; })],
   ["payload invalid role", () => badState(s => { s.normalizedPayload.role = "admin"; })],
@@ -322,7 +324,7 @@ const redCases: readonly [string, () => unknown][] = [
   ["mismatched auth proof id", () => badState(s => { s.authAttempt = strictAttempt(); s.authAttempt.proof.attemptId = "c".repeat(64); })],
 ];
 ok(isValidState(strictState()), "54 valid zero-boundary state accepted");
-ok(isValidState(badState(s => { s.authAttempt = strictAttempt(); })), "54 valid nested auth boundary accepted");
+ok(isValidState(confirmedProfileState()), "54 valid confirmed profile boundary accepted");
 ok(!isValidState(badState(s => { s.operationId = ""; })), "54 empty operationId rejected");
 ok(!isValidState(badState(s => { s.fingerprint = ""; })), "54 empty fingerprint rejected");
 const redFailures = redCases.filter(([, make]) => isValidState(make())).map(([label]) => label);
@@ -330,7 +332,25 @@ if (redFailures.length > 0) throw new Error(`ordinal 54 RED: ${redFailures.lengt
 console.log("=== Ordinal 54 strict state matrix: 22/22 rejected; 2 valid boundaries accepted ===");
 const uid128 = "u".repeat(128), uid129 = "u".repeat(129);
 const ownerState = (status: string, ownerToken: unknown) => badState(s => { s.status=status; s.phase=status === "pending" ? "dispatch_pending" : status === "active" ? "auth_preflight" : "terminal"; s.ownerToken=ownerToken; });
-const uidState = (field: string, value: unknown) => badState(s => { if (field === "intendedUid") s.intendedUid=value; else { s.authAttempt=strictAttempt(); if (field === "returnedUid") s.authAttempt.returnedUid=value; else s.authAttempt.proof.uidRead=value; } });
+const uidState = (field: string, value: unknown) => {
+  if (field === "intendedUid" && value === null) return strictState();
+  if (field === "returnedUid" && value === null) return definiteNoEffectPreflightState();
+  const state = confirmedProfileState() as Record<string, any>;
+  if (field === "intendedUid") {
+    state.intendedUid = value;
+    state.authAttempt.returnedUid = value;
+    state.authAttempt.proof.uidRead = value;
+  } else if (field === "returnedUid") {
+    state.intendedUid = value;
+    state.authAttempt.returnedUid = value;
+    state.authAttempt.proof.uidRead = value;
+  } else {
+    state.intendedUid = value;
+    state.authAttempt.returnedUid = value;
+    state.authAttempt.proof.uidRead = value;
+  }
+  return state;
+};
 const recoveryCases: readonly [string, boolean, unknown][] = [
   ["pending/null owner",true,ownerState("pending",null)], ["active/valid owner",true,ownerState("active","c".repeat(64))], ["active/null owner",false,ownerState("active",null)], ["pending/owner",false,ownerState("pending","c".repeat(64))], ["terminal/owner",false,ownerState("completed","c".repeat(64))],
   ["malformed owner",false,ownerState("active","bad")], ["uppercase owner",false,ownerState("active","C".repeat(64))], ["short owner",false,ownerState("active","c".repeat(63))],
@@ -552,6 +572,341 @@ const casMismatches: readonly [string, ExpectedCAS][] = [
 casMismatches.forEach(([field, expected]) => b1bFailure(live, { ...b1bRequest(live), expected }, "cas_mismatch", `${field} mismatch`));
 b1bFailure({ ...live, leaseExpiresAt: 5 }, b1bRequest({ ...live, leaseExpiresAt: 5 }, eventCases[1].event, 5), "lease_not_live", "expired lease");
 b1bFailure({ ...live, leaseExpiresAt: null }, b1bRequest({ ...live, leaseExpiresAt: null }, eventCases[1].event), "lease_not_live", "active null lease");
-eventCases.forEach(({ type, event }) => b1bFailure(live, b1bRequest(live, event), "unsupported_event", `${type} dispatch`));
-const terminal = { ...validState(), status: "completed" as const, phase: "terminal" as const };
+eventCases.filter(({ type }) => ["auth_preflight", "auth_no_effect", "ack_dispatch", "terminalize"].includes(type)).forEach(({ type, event }) => b1bFailure(live, b1bRequest(live, event), "unsupported_event", `${type} dispatch`));
+const terminal = { ...validState(), status: "completed" as const, phase: "terminal" as const, intendedUid:"uid-1", authAttempted:true, authAttempt:strictAttempt() };
 b1bFailure(terminal, b1bRequest(terminal), "unsupported_event", "terminal dispatch");
+
+// ---- P1a2-i-B-2 terminal rejection and non-mutation (RED) ----------------
+const terminalState = (status: "completed" | "failed" | "manual_recovery"): OperationState => ({
+  ...validState(), status, phase: "terminal",
+  ...(status === "completed" ? { intendedUid:"uid-1", authAttempted:true, authAttempt:strictAttempt() } : {}),
+  ...(status === "manual_recovery" ? { intendedUid:"uid-1", authAttempted:true, authAttempt:{ attemptId:"b".repeat(64), intentAt:0, callStartedAt:0, result:"ambiguous", returnedUid:null, returnedEmail:null, proof:null } } : {}),
+});
+const b2Failure = (state: OperationState, request: ReducerRequest, reason: string, label: string): string | null => {
+  const stateJson = JSON.stringify(state), requestJson = JSON.stringify(request);
+  const payload = state.normalizedPayload, expected = request.expected, event = request.event, eventPayload = event.payload;
+  const version = state.version, generation = state.generation;
+  const result = reduce(state, request);
+  const valid = result.type === "failure" && result.reason === reason
+    && JSON.stringify(state) === stateJson && JSON.stringify(request) === requestJson
+    && state.normalizedPayload === payload && request.expected === expected
+    && request.event === event && event.payload === eventPayload
+    && state.version === version && state.generation === generation
+    && !containsReference(result, state) && !containsReference(result, request) && !containsReference(result, event);
+  return valid ? null : `${label}: expected ${reason}, got ${result.type === "failure" ? result.reason : result.type}`;
+};
+const terminalStatuses = ["completed", "failed", "manual_recovery"] as const;
+const nonAckEvents = eventCases.filter(({ type }) => type !== "ack_dispatch");
+const b2RedFailures: string[] = [];
+for (const status of terminalStatuses) {
+  for (const { type, event } of nonAckEvents) {
+    const state = terminalState(status);
+    const failure = b2Failure(state, b1bRequest(state, event), "terminal_state", `${status}/${type}`);
+    if (failure) b2RedFailures.push(failure);
+  }
+}
+for (const status of terminalStatuses) {
+  const state = terminalState(status);
+  const request = { ...b1bRequest(state, eventCases[1].event), expected: { ...expectedFor(state), version: state.version + 1 } };
+  const failure = b2Failure(state, request, "terminal_state", `${status}/stale-expected`);
+  if (failure) b2RedFailures.push(failure);
+}
+if (b2RedFailures.length > 0) throw new Error(`B-2 RED: ${b2RedFailures.length}/36 terminal-policy vectors failed: ${b2RedFailures.join("; ")}`);
+
+const b2BaselineFailures: string[] = [];
+for (const [status, label, request, reason] of [
+  ["completed", "malformed-request", (state: OperationState) => ({ ...b1bRequest(state), observedAt: -1 } as ReducerRequest), "invalid_request"],
+  ["failed", "malformed-expected", (state: OperationState) => ({ ...b1bRequest(state), expected: { ...expectedFor(state), version: -1 } } as ReducerRequest), "invalid_expected"],
+  ["manual_recovery", "malformed-event", (state: OperationState) => b1bRequest(state, { ...eventCases[1].event, payload: {} }), "invalid_event"],
+] as const) {
+  const state = terminalState(status);
+  const failure = b2Failure(state, request(state), reason, `${status}/${label}`);
+  if (failure) b2BaselineFailures.push(failure);
+}
+for (const status of terminalStatuses) {
+  const state = terminalState(status);
+  const failure = b2Failure(state, b1bRequest(state, eventCases[0].event), "unsupported_event", `${status}/terminal-ack`);
+  if (failure) b2BaselineFailures.push(failure);
+}
+if (b2BaselineFailures.length > 0) throw new Error(`B-2 baseline regression: ${b2BaselineFailures.join("; ")}`);
+console.log("=== B-2 controls: 36 genuine RED vectors and 6 inherited baseline controls ===");
+
+// ---- P1a2-i-C RED: literal AuthAttempt lifecycle oracle -------------------
+// This table is deliberately test-owned. It is not derived from model helpers.
+type LifecycleShape = "Ø" | "I" | "C" | "D" | "K" | "A";
+const LIFECYCLE_ORACLE: readonly { readonly status: string; readonly phase: string; readonly admitted: readonly LifecycleShape[] }[] = [
+  { status:"pending", phase:"dispatch_pending", admitted:["Ø"] },
+  { status:"active", phase:"auth_preflight", admitted:["Ø","D"] },
+  { status:"active", phase:"auth_create", admitted:["I","C"] },
+  { status:"active", phase:"profile_commit", admitted:["K"] },
+  { status:"completed", phase:"terminal", admitted:["K"] },
+  { status:"failed", phase:"terminal", admitted:["Ø","D"] },
+  { status:"manual_recovery", phase:"terminal", admitted:["I","C","D","K","A"] },
+];
+const lifecycleAttempt = (shape: Exclude<LifecycleShape,"Ø"> = "I", uid = "uid-1", email = "employee@example.com") => {
+  const base = { attemptId:"b".repeat(64), intentAt:1, callStartedAt:null as number | null, result:"intent", returnedUid:null as string | null, returnedEmail:null as string | null, proof:null as Record<string, unknown> | null };
+  if (shape === "I") return base;
+  if (shape === "K") return { ...base, callStartedAt:2, result:"confirmed", returnedUid:uid, returnedEmail:email, proof:{ attemptId:base.attemptId, confirmedAt:3, uidRead:uid, emailRead:email } };
+  return { ...base, callStartedAt:2, result:shape === "C" ? "call_started" : shape === "D" ? "definite_no_effect" : "ambiguous" };
+};
+const lifecycleState = (status: string, phase: string, shape: LifecycleShape): OperationState => {
+  const attempted = shape !== "Ø";
+  return {
+    ...validState(), status:status as OperationState["status"], phase:phase as OperationState["phase"],
+    intendedUid:attempted ? "uid-1" : null, ownerToken:status === "active" ? "c".repeat(64) : null,
+    leaseExpiresAt:status === "active" ? 10 : null, authAttempted:attempted,
+    authAttempt:attempted ? lifecycleAttempt(shape as Exclude<LifecycleShape,"Ø">) : null,
+  } as OperationState;
+};
+const lifecycleRequest = (state: OperationState): ReducerRequest => ({ expected:expectedFor(state), observedAt:5, event:eventCases[1].event as never });
+const lifecycleRejected = (label: string, state: OperationState): void => {
+  const request = lifecycleRequest(state), stateJson = JSON.stringify(state), requestJson = JSON.stringify(request);
+  const payload = state.normalizedPayload, attempt = state.authAttempt, expected = request.expected, event = request.event, eventPayload = event.payload;
+  const version = state.version, generation = state.generation, result = reduce(state, request);
+  failureReason(result, "invalid_state");
+  ok(JSON.stringify(state) === stateJson && JSON.stringify(request) === requestJson, `C ${label} snapshots retained`);
+  ok(state.normalizedPayload === payload && state.authAttempt === attempt && request.expected === expected && request.event === event && event.payload === eventPayload, `C ${label} direct references retained`);
+  ok(state.version === version && state.generation === generation && !containsReference(result, state) && !containsReference(result, request) && !containsReference(result, event), `C ${label} no mutation or result graph`);
+};
+for (const row of LIFECYCLE_ORACLE) {
+  for (const shape of ["Ø","I","C","D","K","A"] as const) {
+    const state = lifecycleState(row.status, row.phase, shape);
+    const label = `${row.status}/${row.phase}/${shape}`;
+    if (row.admitted.includes(shape)) {
+      ok(isValidState(state), `C canonical ${label} admitted`);
+      const request = lifecycleRequest(state), stateJson = JSON.stringify(state), requestJson = JSON.stringify(request);
+      reduce(state, request);
+      ok(JSON.stringify(state) === stateJson && JSON.stringify(request) === requestJson && state.authAttempt === (shape === "Ø" ? null : state.authAttempt), `C canonical ${label} retained`);
+    } else lifecycleRejected(`complement ${label}`, state);
+  }
+}
+
+const lifecycleInvalids: readonly [string, (state: Record<string, any>) => void][] = [
+  ["noncanonical pair", s => { s.phase = "terminal"; }],
+  ["false with attempt", s => { s.authAttempted=false; s.authAttempt=lifecycleAttempt("I"); s.intendedUid="uid-1"; }],
+  ["true with null", s => { s.authAttempted=true; s.authAttempt=null; }],
+  ["attempt with null intended UID", s => { s.authAttempted=true; s.authAttempt=lifecycleAttempt("I"); s.intendedUid=null; }],
+  ["intent call started must be null", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("I"); s.authAttempt.callStartedAt=2; }],
+  ["intent returned UID must be null", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("I"); s.authAttempt.returnedUid="uid-1"; }],
+  ["intent returned email must be null", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("I"); s.authAttempt.returnedEmail="employee@example.com"; }],
+  ["intent proof must be null", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("I"); s.authAttempt.proof={ attemptId:"b".repeat(64), confirmedAt:3, uidRead:"uid-1", emailRead:"employee@example.com" }; }],
+  ["call started timestamp required", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("C"); s.authAttempt.callStartedAt=null; }],
+  ["call started returned UID must be null", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("C"); s.authAttempt.returnedUid="uid-1"; }],
+  ["call started returned email must be null", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("C"); s.authAttempt.returnedEmail="employee@example.com"; }],
+  ["call started proof must be null", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("C"); s.authAttempt.proof={ attemptId:"b".repeat(64), confirmedAt:3, uidRead:"uid-1", emailRead:"employee@example.com" }; }],
+  ["definite timestamp required", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("D"); s.authAttempt.callStartedAt=null; }],
+  ["definite result returned UID must be null", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("D"); s.authAttempt.returnedUid="uid-1"; }],
+  ["definite returned email must be null", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("D"); s.authAttempt.returnedEmail="employee@example.com"; }],
+  ["definite proof must be null", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("D"); s.authAttempt.proof={ attemptId:"b".repeat(64), confirmedAt:3, uidRead:"uid-1", emailRead:"employee@example.com" }; }],
+  ["ambiguous timestamp required", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("A"); s.authAttempt.callStartedAt=null; }],
+  ["ambiguous returned UID must be null", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("A"); s.authAttempt.returnedUid="uid-1"; }],
+  ["ambiguous returned email must be null", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("A"); s.authAttempt.returnedEmail="employee@example.com"; }],
+  ["ambiguous proof must be null", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("A"); s.authAttempt.proof={ attemptId:"b".repeat(64), confirmedAt:3, uidRead:"uid-1", emailRead:"employee@example.com" }; }],
+  ["confirmed call started required", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("K"); s.authAttempt.callStartedAt=null; }],
+  ["confirmed returned UID required", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("K"); s.authAttempt.returnedUid=null; }],
+  ["confirmed returned email required", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("K"); s.authAttempt.returnedEmail=null; }],
+  ["confirmed proof required", s => { s.authAttempted=true; s.intendedUid="uid-1"; s.authAttempt=lifecycleAttempt("K"); s.authAttempt.proof=null; }],
+];
+for (const [label, mutate] of lifecycleInvalids) {
+  const state = lifecycleState("active", "auth_create", "I") as unknown as Record<string, any>;
+  mutate(state); lifecycleRejected(label, state as OperationState);
+}
+for (const [shape, status, phase] of [["I","active","auth_create"],["C","active","auth_create"],["D","active","auth_preflight"],["K","active","profile_commit"],["A","manual_recovery","terminal"]] as const) {
+  const state = lifecycleState(status, phase, shape) as unknown as Record<string, any>;
+  state.intendedUid = null; lifecycleRejected(`${shape} attempt with null intended UID`, state as OperationState);
+}
+for (const [label, mutate] of [
+  ["confirmed attempt ID", (s: Record<string, any>) => { s.authAttempt.proof.attemptId="d".repeat(64); }],
+  ["confirmed returned UID", (s: Record<string, any>) => { s.authAttempt.returnedUid="other-uid"; }],
+  ["confirmed proof UID", (s: Record<string, any>) => { s.authAttempt.proof.uidRead="other-uid"; }],
+  ["confirmed returned email", (s: Record<string, any>) => { s.authAttempt.returnedEmail="other@example.com"; }],
+  ["confirmed proof email", (s: Record<string, any>) => { s.authAttempt.proof.emailRead="other@example.com"; }],
+] as const) {
+  const state = lifecycleState("active", "profile_commit", "K") as unknown as Record<string, any>;
+  mutate(state); lifecycleRejected(label, state as OperationState);
+}
+console.log("=== P1a2-i-C RED oracle: 7 rows, 42-row finite complement, lifecycle/correlation retention ===");
+
+// ---- P1a2-ii RED: exact eight-event transition matrix --------------------
+const iiOwner = "d".repeat(64), iiOtherOwner = "f".repeat(64), iiDispatch = "9".repeat(64);
+const iiAttempt = "7".repeat(64), iiUid = "uid-1", iiEmail = "employee@example.com";
+const iiEvent = (type: EventType, payload: Record<string, unknown>): ModelEvent => createEvent(type, payload);
+const iiRequest = (state: OperationState, event: ModelEvent, observedAt = 5): ReducerRequest => ({ expected: expectedFor(state), observedAt, event });
+const iiActive = (phase: "auth_preflight" | "auth_create" | "profile_commit", shape: LifecycleShape): OperationState => ({
+  ...lifecycleState("active", phase, shape), ownerToken: "c".repeat(64), leaseExpiresAt: 10, currentDispatchId: iiDispatch,
+});
+const iiWithUid = (state: OperationState): OperationState => ({ ...state, intendedUid: iiUid });
+const iiProof = () => ({ attemptId: iiAttempt, confirmedAt: 3, uidRead: iiUid, emailRead: iiEmail });
+const iiConfirmed = (): OperationState => iiActive("profile_commit", "K");
+const iiCallStarted = (): OperationState => ({
+  ...iiActive("auth_create", "C"), authAttempt: { ...(lifecycleAttempt("C") as NonNullable<OperationState["authAttempt"]>), attemptId: iiAttempt }, intendedUid: iiUid,
+});
+const iiIntent = (): OperationState => ({
+  ...iiActive("auth_create", "I"), authAttempt: { ...(lifecycleAttempt("I") as NonNullable<OperationState["authAttempt"]>), attemptId: iiAttempt }, intendedUid: iiUid,
+});
+const iiReject = (label: string, state: OperationState, request: ReducerRequest, reason: string): void => {
+  const stateJson = JSON.stringify(state), requestJson = JSON.stringify(request);
+  const refs = [state.normalizedPayload, state.authAttempt, request.expected, request.event, request.event.payload];
+  const result = reduce(state, request);
+  failureReason(result, reason);
+  ok(JSON.stringify(state) === stateJson && JSON.stringify(request) === requestJson, `ii ${label} snapshots retained`);
+  ok(refs[0] === state.normalizedPayload && refs[1] === state.authAttempt && refs[2] === request.expected && refs[3] === request.event && refs[4] === request.event.payload, `ii ${label} references retained`);
+  ok(!containsReference(result, request) && !containsReference(result, request.event), `ii ${label} result retains no request/event graph`);
+};
+const iiSuccess = (label: string, state: OperationState, request: ReducerRequest, check: (next: OperationState) => void): void => {
+  const stateJson = JSON.stringify(state), requestJson = JSON.stringify(request);
+  const result = reduce(state, request);
+  ok(result.type === "success", `ii ${label} succeeds`);
+  if (result.type !== "success") return;
+  const next = result.state;
+  ok(JSON.stringify(state) === stateJson && JSON.stringify(request) === requestJson, `ii ${label} inputs retained`);
+  ok(next.operationId === state.operationId && next.fingerprint === state.fingerprint && JSON.stringify(next.normalizedPayload) === JSON.stringify(state.normalizedPayload)
+    && next.intendedUid === state.intendedUid && next.createdAt === state.createdAt && next.currentDispatchId === state.currentDispatchId,
+  `ii ${label} common immutable fields`);
+  ok(next.updatedAt === request.observedAt && next.version === state.version + 1, `ii ${label} timestamp and version`);
+  ok(Object.isFrozen(result) && Object.isFrozen(next) && !containsReference(result, request) && !containsReference(result, request.event), `ii ${label} frozen detached result`);
+  check(next);
+};
+
+// ii.2 RED acquire: exact initial state and live payload lease only.
+{
+  const state = validState(), event = iiEvent("acquire", { ownerToken: iiOwner, leaseExpiresAt: 10 });
+  iiSuccess("ACQ", state, iiRequest(state, event), next => {
+    ok(next.status === "active" && next.phase === "auth_preflight" && next.ownerToken === iiOwner && next.leaseExpiresAt === 10, "ii ACQ output owner/lease");
+    ok(next.generation === 0 && next.authAttempted === false && next.authAttempt === null, "ii ACQ generation/auth retained");
+  });
+  const nonInitial = { ...state, version: 1 };
+  iiReject("ACQ-LIFE", nonInitial, iiRequest(nonInitial, event), "unsupported_event");
+  const nonLive = iiEvent("acquire", { ownerToken: iiOwner, leaseExpiresAt: 5 });
+  iiReject("ACQ-PRED", state, iiRequest(state, nonLive), "lease_not_live");
+}
+
+// ii.4 RED takeover: all and only the five C-admitted active lifecycle rows.
+for (const [phase, shape] of [["auth_preflight", "Ø"], ["auth_preflight", "D"], ["auth_create", "I"], ["auth_create", "C"], ["profile_commit", "K"]] as const) {
+  const state = { ...iiActive(phase, shape), leaseExpiresAt: 5 }, event = iiEvent("takeover", { ownerToken: iiOtherOwner, leaseExpiresAt: 10 });
+  iiSuccess(`TK-${phase}-${shape}`, state, iiRequest(state, event), next => {
+    ok(next.status === state.status && next.phase === state.phase && JSON.stringify(next.authAttempt) === JSON.stringify(state.authAttempt), `ii TK-${shape} lifecycle retained`);
+    ok(next.ownerToken === iiOtherOwner && next.leaseExpiresAt === 10 && next.generation === state.generation + 1, `ii TK-${shape} owner/generation`);
+  });
+}
+{
+  const state = iiActive("auth_preflight", "Ø"), live = iiRequest(state, iiEvent("takeover", { ownerToken: iiOtherOwner, leaseExpiresAt: 11 }));
+  iiReject("TK-LEASE", state, live, "lease_not_live");
+  const expired = { ...state, leaseExpiresAt: 5 };
+  iiReject("TK-OWNER", expired, iiRequest(expired, iiEvent("takeover", { ownerToken: expired.ownerToken!, leaseExpiresAt: 10 })), "unsupported_event");
+  const generationTwo = { ...expired, generation: 2 };
+  iiSuccess("TK-GEN", generationTwo, iiRequest(generationTwo, iiEvent("takeover", { ownerToken: iiOtherOwner, leaseExpiresAt: 10 })), next => ok(next.generation === 3, "ii TK prior generation +1"));
+  iiReject("TK-PAYLOAD-LEASE", expired, iiRequest(expired, iiEvent("takeover", { ownerToken: iiOtherOwner, leaseExpiresAt: 5 })), "lease_not_live");
+}
+
+// ii.6 RED auth_intent and ii.8 RED auth_start.
+{
+  const state = iiWithUid(iiActive("auth_preflight", "Ø")), event = iiEvent("auth_intent", { attemptId: iiAttempt, intentAt: 1 });
+  iiSuccess("INT", state, iiRequest(state, event), next => {
+    ok(next.status === "active" && next.phase === "auth_create" && next.authAttempted && next.authAttempt?.result === "intent", "ii INT output");
+    ok(next.authAttempt?.attemptId === iiAttempt && next.authAttempt?.callStartedAt === null && next.authAttempt?.proof === null, "ii INT shape");
+  });
+  const wrong = iiActive("auth_preflight", "D");
+  iiReject("INT-LIFE", wrong, iiRequest(wrong, event), "unsupported_event");
+  const intent = iiIntent(), start = iiEvent("auth_start", { attemptId: iiAttempt, callStartedAt: 2 });
+  iiSuccess("START", intent, iiRequest(intent, start), next => {
+    ok(next.phase === "auth_create" && next.authAttempt?.result === "call_started" && next.authAttempt.callStartedAt === 2, "ii START output");
+    ok(next.authAttempt?.attemptId === iiAttempt && next.authAttempt?.intentAt === 1 && next.authAttempt?.returnedUid === null && next.authAttempt?.proof === null, "ii START preserves intent fields");
+  });
+  const mismatched = iiEvent("auth_start", { attemptId: "8".repeat(64), callStartedAt: 2 });
+  iiReject("START-LIFE", intent, iiRequest(intent, mismatched), "unsupported_event");
+  const nullUid = iiActive("auth_preflight", "Ø");
+  iiReject("INT-FACT", nullUid, iiRequest(nullUid, event), "unsupported_event");
+}
+
+// ii.10 RED auth_confirm: call_started plus all existing identity correlations.
+{
+  const state = iiCallStarted(), event = iiEvent("auth_confirm", { attemptId: iiAttempt, returnedUid: iiUid, returnedEmail: iiEmail, proof: iiProof() });
+  iiSuccess("CONF", state, iiRequest(state, event), next => {
+    ok(next.phase === "profile_commit" && next.authAttempt?.result === "confirmed", "ii CONF output phase/result");
+    ok(next.authAttempt?.returnedUid === iiUid && next.authAttempt.returnedEmail === iiEmail && next.authAttempt.proof?.uidRead === iiUid, "ii CONF exact proof");
+  });
+  iiReject("CONF-LIFE", iiIntent(), iiRequest(iiIntent(), event), "unsupported_event");
+  for (const [label, payload] of [
+    ["CONF-ID", { ...event.payload as Record<string, unknown>, attemptId: "8".repeat(64), proof: { ...iiProof(), attemptId: "8".repeat(64) } }],
+    ["CONF-UID", { ...event.payload as Record<string, unknown>, returnedUid: "other-uid" }],
+    ["CONF-EMAIL", { ...event.payload as Record<string, unknown>, returnedEmail: "other@example.com" }],
+    ["CONF-PROOF", { ...event.payload as Record<string, unknown>, proof: { ...iiProof(), uidRead: "other-uid" } }],
+  ] as const) iiReject(label, state, iiRequest(state, iiEvent("auth_confirm", payload)), "unsupported_event");
+}
+
+// ii.12 RED auth_ambiguous and ii.14 RED auth_foreign_user.
+{
+  const state = iiCallStarted(), event = iiEvent("auth_ambiguous", { attemptId: iiAttempt, code: "internal" });
+  iiSuccess("AMB", state, iiRequest(state, event), next => {
+    ok(next.status === "manual_recovery" && next.phase === "terminal" && next.ownerToken === null && next.leaseExpiresAt === null, "ii AMB terminal clear");
+    ok(next.authAttempt?.result === "ambiguous" && next.authAttempt.returnedUid === null && next.authAttempt.proof === null, "ii AMB attempt shape");
+  });
+  iiReject("AMB-LIFE", iiIntent(), iiRequest(iiIntent(), event), "unsupported_event");
+  iiReject("AMB-ID", state, iiRequest(state, iiEvent("auth_ambiguous", { attemptId: "8".repeat(64), code: "internal" })), "unsupported_event");
+  const foreign = iiWithUid(iiActive("auth_preflight", "Ø")), foreignEvent = iiEvent("auth_foreign_user", { uid: "foreign-uid", email: iiEmail });
+  iiSuccess("FOR", foreign, iiRequest(foreign, foreignEvent), next => ok(next.status === "failed" && next.phase === "terminal" && next.ownerToken === null && next.authAttempt === null, "ii FOR terminal no copy"));
+  const emailForeign = iiEvent("auth_foreign_user", { uid: iiUid, email: "foreign@example.com" });
+  iiSuccess("FOR-EMAIL", foreign, iiRequest(foreign, emailForeign), next => ok(next.status === "failed" && next.intendedUid === iiUid, "ii FOR one-email inequality succeeds"));
+  const bothMatch = iiEvent("auth_foreign_user", { uid: iiUid, email: iiEmail });
+  iiReject("FOR-LIFE", foreign, iiRequest(foreign, bothMatch), "unsupported_event");
+  const postAttempt = iiActive("auth_preflight", "D");
+  iiReject("FOR-ATTEMPT", postAttempt, iiRequest(postAttempt, foreignEvent), "unsupported_event");
+}
+
+// ii.16 RED profile_commit and ii.18 RED retained unsupported events.
+{
+  const state = iiConfirmed(), event = iiEvent("profile_commit", { userId: iiUid });
+  iiSuccess("PRO", state, iiRequest(state, event), next => {
+    ok(next.status === "completed" && next.phase === "terminal" && next.ownerToken === null && next.leaseExpiresAt === null, "ii PRO completed clear");
+    ok(JSON.stringify(next.authAttempt) === JSON.stringify(state.authAttempt), "ii PRO proof byte-identically retained");
+  });
+  iiReject("PRO-UID", state, iiRequest(state, iiEvent("profile_commit", { userId: "other-uid" })), "unsupported_event");
+  const callStarted = iiCallStarted();
+  iiReject("PRO-LIFE", callStarted, iiRequest(callStarted, event), "unsupported_event");
+  const live = iiWithUid(iiActive("auth_preflight", "Ø"));
+  for (const event of [
+    iiEvent("auth_preflight", { intendedUid: iiUid, email: iiEmail }),
+    iiEvent("auth_no_effect", { attemptId: iiAttempt, code: "unavailable" }),
+    iiEvent("ack_dispatch", { dispatchId: iiDispatch }),
+    iiEvent("terminalize", { terminalCode: "unavailable", recoveryCode: "internal" }),
+  ]) iiReject(`UNSUPPORTED-${event.type}`, live, iiRequest(live, event), "unsupported_event");
+}
+console.log("=== P1a2-ii RED matrix: eight successes and negative/invariant families ===");
+
+// ---- P3-B.2c-pre payload contract RED: persisted state has only 19 fields --
+{
+  const persistedPayload = (): OperationState["normalizedPayload"] => ({
+    ...validState().normalizedPayload,
+  });
+  const persistedPending = (): OperationState => ({
+    ...validState(), intendedUid: "uid-1", normalizedPayload: persistedPayload(),
+  });
+  const pending = persistedPending();
+  const pendingPayload = pending.normalizedPayload;
+  const pendingSnapshot = JSON.stringify(pending);
+  const acquire = iiEvent("acquire", { ownerToken: iiOwner, leaseExpiresAt: 10 });
+
+  ok(isValidState(pending), "P3-B.2c persisted 19-field pending state accepted");
+  const acquired = reduce(pending, iiRequest(pending, acquire));
+  ok(acquired.type === "success", "P3-B.2c persisted pending state acquires");
+  if (acquired.type === "success") {
+    const active = acquired.state;
+    ok(active.status === "active" && active.phase === "auth_preflight", "P3-B.2c persisted pending becomes active");
+    ok(active.normalizedPayload !== pendingPayload && JSON.stringify(active.normalizedPayload) === JSON.stringify(pendingPayload), "P3-B.2c acquisition preserves detached persisted payload");
+    ok(active.fingerprint === pending.fingerprint, "P3-B.2c acquisition preserves canonical fingerprint");
+    ok(Object.isFrozen(active) && Object.isFrozen(active.normalizedPayload), "P3-B.2c acquisition result is deeply frozen");
+    const intent = iiEvent("auth_intent", { attemptId: iiAttempt, intentAt: 2 });
+    const afterIntent = reduce(active, iiRequest(active, intent));
+    ok(afterIntent.type === "success", "P3-B.2c active persisted state supports a later valid transition");
+    if (afterIntent.type === "success") {
+      ok(JSON.stringify(afterIntent.state.normalizedPayload) === JSON.stringify(pendingPayload), "P3-B.2c later transition does not mutate persisted payload");
+      ok(afterIntent.state.fingerprint === pending.fingerprint, "P3-B.2c later transition preserves canonical fingerprint");
+      ok(Object.isFrozen(afterIntent.state.normalizedPayload), "P3-B.2c later payload remains frozen");
+    }
+  }
+  ok(JSON.stringify(pending) === pendingSnapshot && pending.normalizedPayload === pendingPayload, "P3-B.2c persisted input snapshot and reference remain unchanged");
+
+  const transientPayload = { ...persistedPayload(), displayName: "Ana Lopez" };
+  ok(!isValidState({ ...validState(), normalizedPayload: transientPayload as unknown as OperationState["normalizedPayload"] }), "P3-B.2c transient displayName is rejected from persisted state");
+}

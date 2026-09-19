@@ -43,6 +43,79 @@ export const CANONICAL_VALID_PAIRS: readonly StatusPhasePair[] = Object.freeze([
   Object.freeze({ status: "manual_recovery" as const, phase: "terminal" as const }),
 ]);
 
+/**
+ * The accepted P1a2 transition paths, expressed as literal input/output
+ * vectors. Adapter conformance consumes this ledger; it must not recreate
+ * selected reducer paths in a persistence test.
+ */
+export interface CanonicalP1aTransitionVector {
+  readonly steps: readonly {
+    readonly observedAt: number;
+    readonly event: Readonly<{
+      type: string;
+      payload: Readonly<Record<string, unknown>>;
+    }>;
+    readonly expected: StatusPhasePair;
+  }[];
+}
+
+const VECTOR_OWNER = "b".repeat(64);
+const VECTOR_TAKEOVER_OWNER = "d".repeat(64);
+const VECTOR_ATTEMPT = "c".repeat(64);
+
+function transitionStep(
+  observedAt: number,
+  type: string,
+  payload: Record<string, unknown>,
+  expected: StatusPhasePair,
+): CanonicalP1aTransitionVector["steps"][number] {
+  return Object.freeze({
+    observedAt,
+    event: Object.freeze({
+      type,
+      payload: Object.freeze(payload),
+    }),
+    expected: Object.freeze(expected),
+  });
+}
+
+export const CANONICAL_P1A_TRANSITION_VECTOR_LEDGER: readonly CanonicalP1aTransitionVector[] = Object.freeze([
+  Object.freeze({
+    steps: Object.freeze([
+      transitionStep(1, "acquire", { ownerToken: VECTOR_OWNER, leaseExpiresAt: 10 }, { status: "active", phase: "auth_preflight" }),
+      transitionStep(2, "auth_intent", { attemptId: VECTOR_ATTEMPT, intentAt: 2 }, { status: "active", phase: "auth_create" }),
+      transitionStep(3, "auth_start", { attemptId: VECTOR_ATTEMPT, callStartedAt: 3 }, { status: "active", phase: "auth_create" }),
+      transitionStep(4, "auth_confirm", {
+        attemptId: VECTOR_ATTEMPT,
+        returnedUid: "uid-1",
+        returnedEmail: "employee@example.com",
+        proof: Object.freeze({ attemptId: VECTOR_ATTEMPT, confirmedAt: 4, uidRead: "uid-1", emailRead: "employee@example.com" }),
+      }, { status: "active", phase: "profile_commit" }),
+      transitionStep(5, "profile_commit", { userId: "uid-1" }, { status: "completed", phase: "terminal" }),
+    ]),
+  }),
+  Object.freeze({
+    steps: Object.freeze([
+      transitionStep(0, "acquire", { ownerToken: VECTOR_OWNER, leaseExpiresAt: 1 }, { status: "active", phase: "auth_preflight" }),
+      transitionStep(2, "takeover", { ownerToken: VECTOR_TAKEOVER_OWNER, leaseExpiresAt: 10 }, { status: "active", phase: "auth_preflight" }),
+    ]),
+  }),
+  Object.freeze({
+    steps: Object.freeze([
+      transitionStep(1, "acquire", { ownerToken: VECTOR_OWNER, leaseExpiresAt: 10 }, { status: "active", phase: "auth_preflight" }),
+      transitionStep(2, "auth_intent", { attemptId: VECTOR_ATTEMPT, intentAt: 2 }, { status: "active", phase: "auth_create" }),
+      transitionStep(3, "auth_start", { attemptId: VECTOR_ATTEMPT, callStartedAt: 3 }, { status: "active", phase: "auth_create" }),
+      transitionStep(4, "auth_ambiguous", { attemptId: VECTOR_ATTEMPT, code: "internal" }, { status: "manual_recovery", phase: "terminal" }),
+    ]),
+  }),
+  Object.freeze({
+    steps: Object.freeze([
+      transitionStep(1, "acquire", { ownerToken: VECTOR_OWNER, leaseExpiresAt: 10 }, { status: "active", phase: "auth_preflight" }),
+      transitionStep(2, "auth_foreign_user", { uid: "foreign", email: "foreign@example.com" }, { status: "failed", phase: "terminal" }),
+    ]),
+  }),
+]);
+
 export const TERMINAL_STATUSES: readonly ProvisioningStatus[] = Object.freeze([
   "completed", "failed", "manual_recovery",
 ]);

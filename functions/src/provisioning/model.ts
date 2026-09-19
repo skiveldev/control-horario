@@ -2,8 +2,8 @@
  * P1a2-i-A-1a — Immutable vocabulary + genuine bidirectional type proof.
  * Consumes P1a1 via `import type` ONLY. No constructors, CAS, transitions.
  */
-import type { ProvisioningStatus, ProvisioningPhase, StatusPhasePair, TerminalStatus, AuthAttemptResult } from "./types.js";
-import type { NormalizedPayload } from "./normalize.js";
+import type { ProvisioningStatus, ProvisioningPhase, StatusPhasePair, TerminalStatus, AuthAttemptResult } from "./types.ts";
+import type { NormalizedPayload } from "./normalize.ts";
 
 // ---- 12 event types (11 state-transition + 1 ack_dispatch) --------------
 export const EVENT_TYPES = Object.freeze([
@@ -76,10 +76,13 @@ export interface AuthProof { readonly attemptId: string; readonly confirmedAt: n
 export interface AuthAttempt { readonly attemptId: string; readonly intentAt: number; readonly callStartedAt: number | null; readonly result: AuthAttemptResult; readonly returnedUid: string | null; readonly returnedEmail: string | null; readonly proof: AuthProof | null; }
 
 // ---- OperationState interface ---------------------------------------------
+/** Persisted operation payload: the 19 canonical fingerprint fields only. */
+export type PersistedNormalizedPayload = Readonly<Omit<NormalizedPayload, "displayName">>;
+
 export interface OperationState {
   readonly operationId: string; readonly fingerprint: string;
   readonly status: ProvisioningStatus; readonly phase: ProvisioningPhase;
-  readonly normalizedPayload: Readonly<Record<string, unknown>>;
+  readonly normalizedPayload: PersistedNormalizedPayload;
   readonly intendedUid: string | null; readonly generation: number; readonly version: number;
   readonly ownerToken: string | null; readonly leaseExpiresAt: number | null; readonly currentDispatchId: string | null;
   readonly authAttempted: boolean; readonly authAttempt: AuthAttempt | null;
@@ -165,7 +168,8 @@ const STATE_KEYS = Object.freeze([
   "intendedUid", "generation", "version", "ownerToken", "leaseExpiresAt",
   "currentDispatchId", "authAttempted", "authAttempt", "createdAt", "updatedAt",
 ] as const);
-const PAYLOAD_KEYS = Object.freeze(["email","nombre","apellido1","apellido2","employeeId","weeklyHours","dni","telefono","cargo","departamento","empresa","scheduleId","calendarId","fechaInicio","fechaFin","role","isSupervisor","supervisorId","isActive","displayName"] as const);
+// Persisted operation state excludes normalize/profile's transient displayName.
+const PERSISTED_PAYLOAD_KEYS = Object.freeze(["email","nombre","apellido1","apellido2","employeeId","weeklyHours","dni","telefono","cargo","departamento","empresa","scheduleId","calendarId","fechaInicio","fechaFin","role","isSupervisor","supervisorId","isActive"] as const);
 const AUTH_ATTEMPT_KEYS = Object.freeze([
   "attemptId", "intentAt", "callStartedAt", "result", "returnedUid", "returnedEmail", "proof",
 ] as const);
@@ -209,13 +213,12 @@ function isDateOrNull(value: unknown): value is string | null {
   const date = new Date(`${value}T00:00:00.000Z`);
   return !Number.isNaN(date.valueOf()) && date.toISOString().slice(0, 10) === value;
 }
-function isNormalizedPayload(value: unknown): value is NormalizedPayload {
-  if (!isPlainRecord(value) || !hasExactFields(value, PAYLOAD_KEYS)) return false;
+function isPersistedNormalizedPayload(value: unknown): value is PersistedNormalizedPayload {
+  if (!isPlainRecord(value) || !hasExactFields(value, PERSISTED_PAYLOAD_KEYS)) return false;
   const payload = value;
   if (!isCanonicalText(payload.email) || payload.email !== payload.email.toLowerCase() || !isCanonicalText(payload.nombre) || !isCanonicalText(payload.apellido1) || !isNullableText(payload.apellido2) || !isCanonicalText(payload.employeeId, true)) return false;
   if (typeof payload.weeklyHours !== "number" || !Number.isFinite(payload.weeklyHours) || payload.weeklyHours < 1 || payload.weeklyHours > 168 || !isNullableText(payload.dni) || !isNullableText(payload.telefono) || !isNullableText(payload.cargo) || !isNullableText(payload.departamento) || !isNullableText(payload.empresa) || !isNullableText(payload.scheduleId) || !isNullableText(payload.calendarId) || !isDateOrNull(payload.fechaInicio) || !isDateOrNull(payload.fechaFin)) return false;
-  if ((payload.role !== "employee" && payload.role !== "rrhh") || typeof payload.isSupervisor !== "boolean" || !isNullableText(payload.supervisorId) || typeof payload.isActive !== "boolean" || !isCanonicalText(payload.displayName)) return false;
-  return payload.displayName === [payload.nombre, payload.apellido1, payload.apellido2].filter((part): part is string => part !== null).join(" ");
+  return (payload.role === "employee" || payload.role === "rrhh") && typeof payload.isSupervisor === "boolean" && isNullableText(payload.supervisorId) && typeof payload.isActive === "boolean";
 }
 function isAuthProof(value: unknown): value is AuthProof {
   if (!isPlainRecord(value) || !hasExactFields(value, AUTH_PROOF_KEYS)) return false;
@@ -225,11 +228,18 @@ function isAuthAttempt(value: unknown): value is AuthAttempt | null {
   if (value === null) return true;
   if (!isPlainRecord(value) || !hasExactFields(value, AUTH_ATTEMPT_KEYS)) return false;
   const proof = value.proof === null || isAuthProof(value.proof) ? value.proof : undefined;
-  return isSha256(value.attemptId) && isTimestamp(value.intentAt)
+  if (!(isSha256(value.attemptId) && isTimestamp(value.intentAt)
     && (value.callStartedAt === null || isTimestamp(value.callStartedAt))
     && AUTH_ATTEMPT_RESULTS.includes(value.result as AuthAttemptResult)
     && (value.returnedUid === null || isFirebaseUid(value.returnedUid)) && (value.returnedEmail === null || isNonEmptyString(value.returnedEmail))
-    && proof !== undefined && (proof === null || proof.attemptId === value.attemptId);
+    && proof !== undefined && (proof === null || proof.attemptId === value.attemptId))) return false;
+  switch (value.result) {
+    case "intent": return value.callStartedAt === null && value.returnedUid === null && value.returnedEmail === null && proof === null;
+    case "call_started": case "definite_no_effect": case "ambiguous":
+      return value.callStartedAt !== null && value.returnedUid === null && value.returnedEmail === null && proof === null;
+    case "confirmed": return value.callStartedAt !== null && value.returnedUid !== null && value.returnedEmail !== null && proof !== null;
+    default: return false;
+  }
 }
 /** Returns whether value is one of the frozen accepted provisioning statuses. */
 export function isStatus(value: unknown): value is ProvisioningStatus {
@@ -246,13 +256,22 @@ export function isValidState(value: unknown): value is OperationState {
   if (!isPlainRecord(value) || !hasExactFields(value, STATE_KEYS)) return false;
   if (!isStatus(value.status) || !isPhase(value.phase) || !STATUS_PHASE_MAP[value.status].includes(value.phase)) return false;
 
-  return typeof value.operationId === "string" && UUID_V4_RE.test(value.operationId)
-    && isSha256(value.fingerprint) && isNormalizedPayload(value.normalizedPayload)
+  if (!(typeof value.operationId === "string" && UUID_V4_RE.test(value.operationId)
+    && isSha256(value.fingerprint) && isPersistedNormalizedPayload(value.normalizedPayload)
     && (value.intendedUid === null || isFirebaseUid(value.intendedUid)) && isCounter(value.generation) && isCounter(value.version)
     && (value.status === "active" ? isSha256(value.ownerToken) : value.ownerToken === null)
     && (value.leaseExpiresAt === null || isTimestamp(value.leaseExpiresAt))
     && (value.currentDispatchId === null || isSha256(value.currentDispatchId)) && typeof value.authAttempted === "boolean"
-    && isAuthAttempt(value.authAttempt) && isTimestamp(value.createdAt) && isTimestamp(value.updatedAt);
+    && isAuthAttempt(value.authAttempt) && isTimestamp(value.createdAt) && isTimestamp(value.updatedAt))) return false;
+  const attempt = value.authAttempt as AuthAttempt | null;
+  if (value.authAttempted !== (attempt !== null) || (attempt !== null && value.intendedUid === null)) return false;
+  if (attempt?.result === "confirmed" && (attempt.returnedUid !== value.intendedUid || attempt.proof!.uidRead !== value.intendedUid || attempt.returnedEmail !== value.normalizedPayload.email || attempt.proof!.emailRead !== value.normalizedPayload.email)) return false;
+  const shape = attempt === null ? "Ø" : attempt.result === "intent" ? "I" : attempt.result === "call_started" ? "C" : attempt.result === "definite_no_effect" ? "D" : attempt.result === "confirmed" ? "K" : "A";
+  return (value.status === "pending" && shape === "Ø")
+    || (value.status === "active" && ((value.phase === "auth_preflight" && (shape === "Ø" || shape === "D")) || (value.phase === "auth_create" && (shape === "I" || shape === "C")) || (value.phase === "profile_commit" && shape === "K")))
+    || (value.status === "completed" && shape === "K")
+    || (value.status === "failed" && (shape === "Ø" || shape === "D"))
+    || (value.status === "manual_recovery" && shape !== "Ø");
 }
 
 // ---- P1a2-i-A-1d: strict event guard -------------------------------------
@@ -356,6 +375,77 @@ function isActiveLeaseLive(state: OperationState, observedAt: number): boolean {
   return state.status !== "active" || (state.leaseExpiresAt !== null && state.leaseExpiresAt > observedAt);
 }
 
+function isIntentAttempt(attempt: AuthAttempt | null): attempt is AuthAttempt {
+  return attempt !== null && attempt.result === "intent" && attempt.callStartedAt === null
+    && attempt.returnedUid === null && attempt.returnedEmail === null && attempt.proof === null;
+}
+function isCallStartedAttempt(attempt: AuthAttempt | null): attempt is AuthAttempt {
+  return attempt !== null && attempt.result === "call_started" && attempt.callStartedAt !== null
+    && attempt.returnedUid === null && attempt.returnedEmail === null && attempt.proof === null;
+}
+function isConfirmedAttempt(attempt: AuthAttempt | null): attempt is AuthAttempt & { proof: AuthProof; returnedUid: string; returnedEmail: string } {
+  return attempt !== null && attempt.result === "confirmed" && attempt.callStartedAt !== null
+    && attempt.returnedUid !== null && attempt.returnedEmail !== null && attempt.proof !== null;
+}
+function copyAttempt(attempt: AuthAttempt | null): AuthAttempt | null {
+  return attempt === null ? null : { ...attempt, proof: attempt.proof === null ? null : { ...attempt.proof } };
+}
+function successFrom(state: OperationState, observedAt: number, patch: Partial<OperationState>): TransitionResult {
+  return createSuccessResult({
+    ...state,
+    normalizedPayload: { ...state.normalizedPayload },
+    authAttempt: copyAttempt(state.authAttempt),
+    ...patch,
+    version: state.version + 1,
+    updatedAt: observedAt,
+  });
+}
+
+function reduceSupported(state: OperationState, event: ModelEvent, observedAt: number): TransitionResult {
+  const payload = event.payload as Record<string, unknown>;
+  const ownerToken = payload.ownerToken as string;
+  const leaseExpiresAt = payload.leaseExpiresAt as number;
+  switch (event.type) {
+    case "acquire":
+      if (state.status !== "pending" || state.phase !== "dispatch_pending" || state.generation !== 0 || state.version !== 0
+        || state.ownerToken !== null || state.leaseExpiresAt !== null || state.authAttempted || state.authAttempt !== null) return createFailureResult("unsupported_event");
+      if (leaseExpiresAt <= observedAt) return createFailureResult("lease_not_live");
+      return successFrom(state, observedAt, { status: "active", phase: "auth_preflight", ownerToken, leaseExpiresAt });
+    case "takeover":
+      if (state.status !== "active" || state.leaseExpiresAt === null || ownerToken === state.ownerToken) return createFailureResult("unsupported_event");
+      if (leaseExpiresAt <= observedAt) return createFailureResult("lease_not_live");
+      return successFrom(state, observedAt, { ownerToken, leaseExpiresAt, generation: state.generation + 1 });
+    case "auth_intent":
+      if (state.status !== "active" || state.phase !== "auth_preflight" || state.intendedUid === null || state.authAttempted || state.authAttempt !== null) return createFailureResult("unsupported_event");
+      return successFrom(state, observedAt, { phase: "auth_create", authAttempted: true, authAttempt: { attemptId: payload.attemptId as string, intentAt: payload.intentAt as number, callStartedAt: null, result: "intent", returnedUid: null, returnedEmail: null, proof: null } });
+    case "auth_start":
+      if (state.status !== "active" || state.phase !== "auth_create" || !state.authAttempted || !isIntentAttempt(state.authAttempt) || state.authAttempt.attemptId !== payload.attemptId) return createFailureResult("unsupported_event");
+      return successFrom(state, observedAt, { authAttempt: { ...state.authAttempt, callStartedAt: payload.callStartedAt as number, result: "call_started" } });
+    case "auth_confirm": {
+      const proof = payload.proof as AuthProof;
+      if (state.status !== "active" || state.phase !== "auth_create" || !state.authAttempted || !isCallStartedAttempt(state.authAttempt)
+        || state.authAttempt.attemptId !== payload.attemptId || proof.attemptId !== state.authAttempt.attemptId
+        || payload.returnedUid !== state.intendedUid || proof.uidRead !== state.intendedUid
+        || payload.returnedEmail !== state.normalizedPayload.email || proof.emailRead !== state.normalizedPayload.email) return createFailureResult("unsupported_event");
+      return successFrom(state, observedAt, { phase: "profile_commit", authAttempt: { ...state.authAttempt, result: "confirmed", returnedUid: payload.returnedUid as string, returnedEmail: payload.returnedEmail as string, proof: { ...proof } } });
+    }
+    case "auth_ambiguous":
+      if (state.status !== "active" || state.phase !== "auth_create" || !state.authAttempted || !isCallStartedAttempt(state.authAttempt) || state.authAttempt.attemptId !== payload.attemptId) return createFailureResult("unsupported_event");
+      return successFrom(state, observedAt, { status: "manual_recovery", phase: "terminal", ownerToken: null, leaseExpiresAt: null, authAttempt: { ...state.authAttempt, result: "ambiguous" } });
+    case "auth_foreign_user":
+      if (state.status !== "active" || state.phase !== "auth_preflight" || state.intendedUid === null || state.authAttempted || state.authAttempt !== null
+        || (payload.uid === state.intendedUid && payload.email === state.normalizedPayload.email)) return createFailureResult("unsupported_event");
+      return successFrom(state, observedAt, { status: "failed", phase: "terminal", ownerToken: null, leaseExpiresAt: null });
+    case "profile_commit":
+      if (state.status !== "active" || state.phase !== "profile_commit" || !state.authAttempted || !isConfirmedAttempt(state.authAttempt)
+        || payload.userId !== state.intendedUid || state.authAttempt.returnedUid !== state.intendedUid || state.authAttempt.proof.uidRead !== state.intendedUid
+        || state.authAttempt.returnedEmail !== state.normalizedPayload.email || state.authAttempt.proof.emailRead !== state.normalizedPayload.email
+        || state.authAttempt.proof.attemptId !== state.authAttempt.attemptId) return createFailureResult("unsupported_event");
+      return successFrom(state, observedAt, { status: "completed", phase: "terminal", ownerToken: null, leaseExpiresAt: null });
+    default: return createFailureResult("unsupported_event");
+  }
+}
+
 /** Validates the request, fences stale ownership, then dispatches supported behavior. */
 export function reduce(state: OperationState, request: ReducerRequest): TransitionResult {
   if (!isValidState(state)) return createFailureResult("invalid_state");
@@ -363,9 +453,16 @@ export function reduce(state: OperationState, request: ReducerRequest): Transiti
   if (envelope === null || !isTimestamp(envelope.observedAt)) return createFailureResult("invalid_request");
   if (!isExpectedCAS(envelope.expected)) return createFailureResult("invalid_expected");
   if (!isValidEvent(envelope.event)) return createFailureResult("invalid_event");
+  if (TERMINAL_STATUSES.includes(state.status as TerminalStatus) && (envelope.event as ModelEvent).type !== "ack_dispatch") {
+    return createFailureResult("terminal_state");
+  }
   if (!matchesExpectedCAS(state, envelope.expected as ExpectedCAS)) return createFailureResult("cas_mismatch");
-  if (!isActiveLeaseLive(state, envelope.observedAt as number)) return createFailureResult("lease_not_live");
-  return createFailureResult("unsupported_event");
+  const event = envelope.event as ModelEvent;
+  const observedAt = envelope.observedAt as number;
+  if (event.type === "takeover") {
+    if (state.leaseExpiresAt === null || state.leaseExpiresAt > observedAt) return createFailureResult("lease_not_live");
+  } else if ((event.type !== "acquire" || state.status === "active") && !isActiveLeaseLive(state, observedAt)) return createFailureResult("lease_not_live");
+  return reduceSupported(state, event, observedAt);
 }
 
 const CONSTRUCTOR_EVENT_ID = "0".repeat(64);

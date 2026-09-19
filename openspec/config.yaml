@@ -1,10 +1,8 @@
 # openspec/config.yaml
 # SDD project configuration for control-horario.
 # Consumed by the native SDD dispatcher and all sdd-* phase skills.
-# Authoritative init context also lives in Engram at topic
-# `sdd-init/control-horario` (strict_tdd: true). Do not fork the two sources:
-# if they ever disagree, the Engram init context wins and this file must be
-# updated to match.
+# OpenSpec is the canonical SDD artifact store. Engram retains contextual
+# summaries and locators only; it never carries full artifact bytes or parity gates.
 
 schema: spec-driven
 
@@ -18,7 +16,7 @@ context: |
   Style: flutter_lints 5.0 with strict strong-mode (no implicit casts/dynamic); dart format and flutter analyze enforced in CI; snake_case files, PascalCase classes; YAGNI / anti-overengineering.
 
 sdd:
-  artifact_store: both          # hybrid mode: openspec files + Engram observations
+  artifact_store: openspec     # OpenSpec files are authoritative; Engram holds summaries/locators only
   execution_mode: interactive
   delivery_strategy: auto-chain
   chain_strategy: feature-branch-chain

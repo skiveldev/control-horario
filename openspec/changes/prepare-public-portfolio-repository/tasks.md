@@ -1,40 +1,80 @@
 # Tasks: Prepare Public Portfolio Repository
 
-Decision needed before apply: No
-Chained PRs recommended: Yes
-Chain strategy: feature-branch-chain
-400-line budget risk: High
-Delivery strategy: auto-chain (P1a2 child slices retain their own lower limits)
+Aggregate plan baseline: no pre-apply decision; child slices retain independent gates.
+Aggregate chain recommendation: Yes
+Aggregate chain strategy: feature-branch-chain
+Aggregate 400-line risk: High
+Aggregate delivery strategy: auto-chain (P1a2 child slices retain their own lower limits)
 RDD routing: disabled — no automatic review activation. After cumulative backend emulator + TypeScript + independent phase-contract proof and candidate freeze at end of P3, surface explicit maintainer enable decision; no review before then.
 
 ## Review Workload Forecast
 
 | Field | Value |
+|-------|-------|
+| Estimated changed lines | Corrected P3.44a–P3.44e runtime-composition children: 835–1,185 cumulative direct changed lines across five independently capped slices |
+| 400-line budget risk | High (each child remains below the hard 399-line cap) |
+| Chained PRs recommended | Yes |
+| Suggested split | P3.44a submission → P3.44b outbox → P3.44c worker routing/Auth → P3.44d status → P3.44e integrity/reset link |
+| Delivery strategy | auto-chain |
+| Chain strategy | feature-branch-chain |
+
+Decision needed before apply: No
+Chained PRs recommended: Yes
+Chain strategy: feature-branch-chain
+400-line budget risk: High
+
+This amended P3 plan uses five ordered feature-branch children; every child has an independent RED/GREEN boundary, a conservative additions-plus-deletions forecast below 399, and no borrowing or size exception.
+
+## Next Bounded Unit Forecast — P3-B.2c Initial Pending Lease Acquisition
+
+| Field | Value |
 |---|---|
-| Estimated aggregate changed lines (tasks-phase validated) | **8,710–11,535** |
+| Estimated changed lines | Reforecast pending; historical `289–370` omitted the accepted acquisition audit and is non-operative |
+| 400-line budget risk | Pending CodeGraph-supported source-context reforecast; do not assert fit |
+| Chained PRs recommended | Pending bounded planning; preserve the existing feature-branch chain |
+| Suggested split | Parent planning must select a cohesive boundary only after the required reforecast |
+| Delivery strategy | auto-chain |
+| Chain strategy | feature-branch-chain |
+
+Decision needed before apply: Reforecast required; no audit-semantic choice remains
+Chained PRs recommended: Pending bounded reforecast
+Chain strategy: feature-branch-chain
+400-line budget risk: Pending reforecast
+Parent independent gate before native acquire: Reforecast/doc gate only
+
+## Current Planning Amendment — P1a2-i-B-3 Retired
+
+P1a2-i-B-3 is retired/superseded as an executable work unit by maintainer authorization and the amended design. It was never implemented or accepted. The historical record below remains for audit clarity only; no unchecked B-3 task, branch, PR, or native-apply route remains. P1a2-i-C and P1a2-ii are independently accepted; ii preserves operation identity, normalized payload, intended UID, and confirmed Auth proof across real transitions. P2 retains schema/audit/dispatch foundations, while P3 owns full dispatch source-tuple and worker-ack behavior plus provisioning/profile provenance and terminal persistence/no-regression.
+
+## Review Workload Forecast
+
+| Field | Value |
+|---|---|
+| Estimated aggregate changed lines (tasks-phase validated) | **8,163–10,960** |
 | Aggregate ceiling | **None** — no invented aggregate ceiling; per-slice max governs |
 | 400-line budget risk | High |
 | Delivery strategy | auto-chain (P1a2 child slices retain their own lower limits) |
 | Chain strategy | feature-branch-chain |
 | Decision needed before apply | No (auto-chain is already selected; each child still requires its independent acceptance gate) |
-| Slice count | 16 chained implementation slices; P1a2-i-B is four ordered children |
+| Slice count | 15 chained implementation slices; P1a2-i-B is three ordered executable children, P1a2-i-C is independently accepted, and retired B-3 is historical only |
 | Per-slice reforecast/STOP (P1a1 + P1b–P4 only) | 1,700 |
 | Per-slice absolute max (P1a1 + P1b–P4 only) | 2,000 |
 | P1a2-i-A absolute max | 1,900 (no size:exception) |
-| P1a2-i-B aggregate absolute max | 600 across B-1a/B-1b/B-2/B-3 (no size:exception) |
-| P1a2-ii absolute max | 1,200 (no size:exception) |
-| P1a2-iii absolute max | 1,200 (no size:exception) |
+| P1a2-i-B aggregate absolute max | 600 across B-1a/B-1b/B-2 (no size:exception; retired B-3 is not executable) |
+| P1a2-i-C absolute max | 400 (no size:exception; independent guard refinement) |
+| P1a2-ii absolute max | 1,200 (no size:exception; independently accepted pure reducer) |
+| P1a2-iii executable budget | **None — retired/superseded; historical only** |
 | Later independent chain | WU5–WU10 preserved (signing → de-branding → sanitization → README → archive → gates); each max 400, stop at 400; no inherited exception |
 
 ### Phase-Authority Decision
 
-The previous `Decision needed before apply` workload/size question is resolved for P1a1 + P1b–P4: maintainer has explicitly approved `size:exception` up to 2,000 lines per slice for P1a1 and P1b–P4 only. **P1a2 sub-slices (i-A-1a, i-A-1b, i-A-1c, i-A-1d, i-A-2, i-B-1a, i-B-1b, i-B-2, i-B-3, ii, iii) do NOT have size:exception.** Each P1a2-i-A-1 child has max 400; combined P1a2-i-A-1 max 1,600; P1a2-i-A-2 max 300; combined P1a2-i-A max 1,900; P1a2-i-B-1a/B-1b/B-2/B-3 each max 200 with a 600 aggregate; combined P1a2-i max 2,500; P1a2-ii max 1,200; P1a2-iii max 1,200. WU5–WU10 retain ordinary max 400 per work unit; any future overrun in those work units requires a separate maintainer decision. Separately, **interactive phase approval + validated planning baseline** are still required before P1a1 may begin — that gate is about phase sequencing, not about size/chaining, and does not contradict the resolved workload decision.
+The previous `Decision needed before apply` workload/size question is resolved for P1a1 + P1b-P4: maintainer has explicitly approved `size:exception` up to 2,000 lines per slice for P1a1 and P1b-P4 only. **Executable P1a2 sub-slices (i-A-1a, i-A-1b, i-A-1c, i-A-1d, i-A-2, i-B-1a, i-B-1b, i-B-2, i-C, ii) do NOT have size:exception; retired P1a2-iii has no executable budget.** Each P1a2-i-A-1 child has max 400; combined P1a2-i-A-1 max 1,600; P1a2-i-A-2 max 300; combined P1a2-i-A max 1,900; P1a2-i-B-1a/B-1b/B-2 each max 200 with a 600 aggregate; P1a2-i-C max 400 with warning 300 and STOP 350; combined P1a2-i max 2,900; P1a2-ii max 1,200 and is independently accepted after C acceptance. WU5-WU10 retain ordinary max 400 per work unit; any future overrun in those work units requires a separate maintainer decision. Separately, **interactive phase approval + validated planning baseline** are still required before P1a1 may begin - that gate is about phase sequencing, not about size/chaining, and does not contradict the resolved workload decision.
 
 ### Supersession Notice
 
-This revision **supersedes** the prior P1a plan. The single `P1a — Pure Contract + Model + Invariant Vectors` is replaced by two strictly separated slices: `P1a1 — Types + Normalization + IDs` and P1a2 (reducer + invariants). The prior P1a was invalidated by failed ordinal 22 (see below). P1a2 is further decomposed into five contract-complete sub-slices: `P1a2-i-A-1 — Immutable Vocabulary + Deep Freeze + Strict Guards`, `P1a2-i-A-2 — Validated Constructors + TypeScript Compatibility`, `P1a2-i-B — CAS Fence + Reducer Skeleton + Terminal/State/Data Immutability`, `P1a2-ii — Boundary Transitions + Auth Matrix + Crash Vectors`, `P1a2-iii — Terminalization Guards + Retry Thresholds`. The prior single P1a2 was invalidated by failed ordinals 27–28 (13 deterministic contract gaps, 2,178 lines). P1a2-i was further split into P1a2-i-A and P1a2-i-B after failed ordinal 29 (8 deterministic contract failures, 969 lines). P1a2-i-A was further split into P1a2-i-A-1 and P1a2-i-A-2 after failed ordinal 30 (8 deterministic contract failures, 529 lines). P1a2-i-A-1 was further split into P1a2-i-A-1a (Immutable Vocabulary + Genuine Type Proof), P1a2-i-A-1b (Descriptor-Safe Cycle-Safe Deep Freeze), P1a2-i-A-1c (Strict State Guard), P1a2-i-A-1d (Strict Event Guard) after failed ordinal 34 (6 deterministic blockers: Set mutability, _Eq/Extract type-proof weakness, getter-invoking deepFreeze, guard laxity on null/NaN/class/polluted roots, missing adversarial probes, over-budget compaction; 566 lines, stash `6425de640274d1990b824869b96535068ab450a5`). All downstream slices (P1b–P4) and later work units (WU5–WU10) are preserved architecturally; only their dependency edges shift where required by the P1a decomposition.
+This revision **supersedes** the prior P1a plan. The single `P1a - Pure Contract + Model + Invariant Vectors` is replaced by two strictly separated slices: `P1a1 - Types + Normalization + IDs` and P1a2 (reducer + invariants). The prior P1a was invalidated by failed ordinal 22 (see below). P1a2 was historically decomposed into `P1a2-i-A-1`, `P1a2-i-A-2`, `P1a2-i-B`, `P1a2-i-C`, `P1a2-ii`, and `P1a2-iii`; the current plan retains the executable portions through B-2 and the independently accepted C/ii eight-event pure matrix. P1a2-iii is retired/superseded and its runtime concerns are owned by P3. The prior single P1a2 was invalidated by failed ordinals 27-28 (13 deterministic contract gaps, 2,178 lines). P1a2-i was further split into P1a2-i-A and P1a2-i-B after failed ordinal 29 (8 deterministic contract failures, 969 lines). P1a2-i-A was further split into P1a2-i-A-1 and P1a2-i-A-2 after failed ordinal 30 (8 deterministic contract failures, 529 lines). P1a2-i-A-1 was further split into P1a2-i-A-1a (Immutable Vocabulary + Genuine Type Proof), P1a2-i-A-1b (Descriptor-Safe Cycle-Safe Deep Freeze), P1a2-i-A-1c (Strict State Guard), P1a2-i-A-1d (Strict Event Guard) after failed ordinal 34 (6 deterministic blockers: Set mutability, _Eq/Extract type-proof weakness, getter-invoking deepFreeze, guard laxity on null/NaN/class/polluted roots, missing adversarial probes, over-budget compaction; 566 lines, stash `6425de640274d1990b824869b96535068ab450a5`). All downstream slices (P1b-P4) and later work units (WU5-WU10) are preserved architecturally; only their dependency edges shift where required by the P1a decomposition.
 
-**Current surgical amendment**: the unstarted P1a2-i-B monolith in this historical notice is superseded only by B-1a (request contract + reducer surface), B-1b (CAS + lease + unsupported dispatch), B-2 (terminal immutability + monotonic state), and B-3 (five-class data immutability + `ack_dispatch` idempotency). P1a2-i-A-2 acceptance is preserved; no completed history or unrelated task is reopened.
+**Earlier surgical amendment (historical)**: the unstarted P1a2-i-B monolith was previously decomposed into B-1a, B-1b, B-2, and B-3. The amended design now supersedes B-3 as an executable slice; B-3 was never implemented or accepted. P1a2-i-A-2 acceptance is preserved; no completed history or unrelated task is reopened.
 
 ### Failed Ordinal 21 — Evidence (do NOT restore)
 
@@ -62,11 +102,11 @@ The tasks-phase forecast reflects honest per-slice sizing after the P1a decompos
 2. **Second refinement (3,690–5,030)**: P4 expanded to full Flutter + Firestore rules footprint.
 3. **Third refinement (5,425–7,410)**: P1 decomposed into P1a (pure contract/model) and P1b (persistence/conformance). Downstream ownership correction moves schemas/audit to P2 and profile to P3.
 4. **Fourth refinement (6,865–8,865)**: P1a further decomposed into P1a1 (types + normalization + IDs + fixtures — no reducer/model) and P1a2 (reducer + all invariant vectors), driven by failed ordinal 22 (2,679 lines, stash `3ab7b419...`). Honest ordinal-22 measured data anchors the P1a1/P1a2 component tables.
-5. **Fifth refinement (8,075–10,595)**: P1a2 further decomposed into P1a2-i (vocabulary + CAS fence + terminal immutability + state/data immutability + type guards), P1a2-ii (boundary transitions + Auth matrix + crash vectors + completion + dispatch safety), and P1a2-iii (terminalization guards + retry thresholds + negative probes), driven by failed ordinals 27–28 (2,178/2,182 lines, stash `213ff2fdf123bfa9c7b3b0ea0f83026a3b1f0306`, 13 deterministic contract gaps). Each sub-slice is independently contract-complete, targets <=1,200, and has no size:exception.
+5. **Fifth refinement (historical, 8,075–10,595)**: P1a2 was temporarily decomposed into P1a2-i (vocabulary + CAS fence + terminal rejection/non-mutation + state/data immutability + type guards), P1a2-ii (boundary transitions + Auth matrix + crash vectors + completion + dispatch safety), and P1a2-iii (terminalization guards + retry thresholds + negative probes), driven by failed ordinals 27–28 (2,178/2,182 lines, stash `213ff2fdf123bfa9c7b3b0ea0f83026a3b1f0306`, 13 deterministic contract gaps). The later maintainer correction retired P1a2-iii and narrowed executable P1a2-ii; no historical iii forecast or checklist remains active.
 6. **Sixth refinement (8,145–10,785)**: P1a2-i further decomposed into P1a2-i-A (immutable vocabulary + runtime guards + TypeScript compatibility — no transitions) and P1a2-i-B (CAS fence + reducer skeleton + terminal/state/data immutability — only `reduce()` as public API), driven by failed ordinal 29 (969/1,200 lines, stash `527d4dfb2fd0bd30eacd7b09116bec3bda79250d`, 8 deterministic contract failures). Each sub-slice targets <=600 with combined max 1,200 and no size:exception.
 7. **Seventh refinement (8,115–10,735)**: P1a2-i-A further decomposed into P1a2-i-A-1 (immutable vocabulary + deep freeze + strict guards — foundation consuming canonical P1a1 via `import type` only, no constructors, `Reflect.ownKeys`-based deep freeze) and P1a2-i-A-2 (validated constructors + TypeScript compatibility), driven by failed ordinal 30 (529/600 lines, stash `012c41516831e1579cd7162c378c123f503ee633`, 8 deterministic contract failures). P1a2-i-A-1 max 400 (STOP 350, expected 260–330), P1a2-i-A-2 max 300 (STOP 250, expected 120–170), combined P1a2-i-A max 600. No size:exception.
 8. **Eighth refinement (8,655–11,485)**: P1a2-i-A-1 further decomposed into four contract-complete child slices — P1a2-i-A-1a (Immutable Vocabulary + Genuine Type Proof, ~200–270), P1a2-i-A-1b (Descriptor-Safe Cycle-Safe Deep Freeze, ~200–270), P1a2-i-A-1c (Strict State Guard, ~200–270), P1a2-i-A-1d (Strict Event Guard, ~200–270) — driven by failed ordinal 34 (566 lines, stash `6425de640274d1990b824869b96535068ab450a5`, 6 deterministic blockers: Set mutability, _Eq/Extract type-proof weakness, getter-invoking deepFreeze, guard laxity on null/NaN/class/polluted roots, missing adversarial probes, over-budget compaction). Each child max 400 (STOP 350), combined P1a2-i-A-1 max 1,600. Corrective pass reconciled canonical arithmetic across all tables. No size:exception.
-9. **Current B-1 refinement (8,710–11,535)**: fresh planning validation rejected the monolithic B-1 forecast of 215–260 lines against its STOP 190/absolute max 200 and found that targeting the tracker would pollute the child diff. The maintainer approved two ordered children: B-1a (Request Contract + Reducer Surface, 105–135) targets accepted P1a2-i-A-2; B-1b (CAS + Lease + Unsupported Dispatch, 105–130) targets B-1a. B-2/B-3 and the parent 600-line maximum remain unchanged; no implementation or acceptance is carried forward by this planning correction.
+9. **Prior B-1 refinement (historical pre-retirement)**: fresh planning validation rejected the monolithic B-1 forecast of 215–260 lines against its STOP 190/absolute max 200 and found that targeting the tracker would pollute the child diff. The maintainer approved two ordered children: B-1a (Request Contract + Reducer Surface, 105–135) targets accepted P1a2-i-A-2; B-1b (CAS + Lease + Unsupported Dispatch, 105–130) targets B-1a. B-2 ownership and the parent 600-line maximum remain unchanged; B-3 is now retired by the amended design and is not an executable child. B-2's corrected terminal rejection/non-mutation forecast is 68–110. No implementation or acceptance is carried forward by this planning correction.
 
 Per-slice breakdown (validated from ordinal-22 measured data + design grouping + downstream ownership):
 
@@ -80,15 +120,28 @@ Per-slice breakdown (validated from ordinal-22 measured data + design grouping +
 | P1a2-i-A-2 | Validated constructors + TypeScript compatibility | 120–170 |
 | P1a2-i-B-1a | Request contract + reducer surface | 105–135 |
 | P1a2-i-B-1b | CAS + lease + unsupported dispatch | 105–130 |
-| P1a2-i-B-2 | Terminal immutability + monotonic state | 140–180 |
-| P1a2-i-B-3 | Data immutability + `ack_dispatch` idempotency | 145–195 |
-| P1a2-ii | Boundary transitions + Auth matrix + crash vectors + completion + dispatch safety | 850–1,100 |
-| P1a2-iii | Terminalization guards + retry thresholds + negative probes | 630–830 |
+| P1a2-i-B-2 | Terminal rejection + non-mutation | 68–110 |
+| P1a2-i-C | AuthAttempt lifecycle guard refinement + B-2 fixture reconstruction | 220–340 |
+| P1a2-ii | Pure OperationState transitions for exactly eight existing events after accepted C + independently authored lifecycle/correlation vectors | 680–940 |
+| P1a2-iii | Retired/superseded historical plan; no executable forecast | **0** |
 | P1b | Persistence port + in-memory reference + Firestore emulator conformance + CAS primitives (narrowed) | 1,185–1,555 |
 | P2 | Schemas + audit primitives + submission + reliable dispatch (former P1 schemas/audit + S4–S6) | 1,030–1,385 |
-| P3 | Profile provenance + worker + status + full backend proof (former P1 profile + S7–S10) | 1,300–1,625 |
+| P3 | Profile provenance + worker + status + full backend proof (former P1 profile + S7–S10, including transferred runtime concerns) | 1,550–1,965 |
 | P4 | Flutter migration + Firestore rules hardening/proof + dependency/bootstrap | 900–1,500 |
-| **Total P1a1–P4** | | **8,710–11,535** |
+| **Total P1a1–P4** | | **8,163–10,960** |
+
+### Recomputed direct and transitive review totals
+
+| Roll-up | Direct forecast | Transitive forecast from prerequisites |
+|---|---:|---:|
+| P1a2-i | 1,418–1,965 | 1,418–1,965 |
+| P1a2-ii | 680–940 | **2,098–2,905** (P1a2-i + ii) |
+| P1b | 1,185–1,555 | **4,683–6,110** (P1a1 + P1a2 + P1b) |
+| P2 | 1,030–1,385 | **5,713–7,495** (P1 + P2) |
+| P3 | 1,550–1,965 | **7,263–9,460** (P1 + P2 + P3) |
+| P4 | 900–1,500 | **8,163–10,960** (P1 + P2 + P3 + P4) |
+
+Arithmetic: P1a2-i low/high = `1,198+220 = 1,418` / `1,625+340 = 1,965`; P1a2 low/high = `1,418+680 = 2,098` / `1,965+940 = 2,905`; P1 low/high = `1,400+2,098+1,185 = 4,683` / `1,650+2,905+1,555 = 6,110`; overall low/high = `4,683+1,030+1,550+900 = 8,163` / `6,110+1,385+1,965+1,500 = 10,960`. Retired P1a2-iii contributes zero direct or transitive executable lines.
 
 ### Per-Slice Exception Boundaries
 
@@ -105,11 +158,11 @@ Per-slice breakdown (validated from ordinal-22 measured data + design grouping +
 | P1a2-i-B-1a | 120 | 170 | 200 | **No** |
 | P1a2-i-B-1b | 120 | 170 | 200 | **No** |
 | P1a2-i-B-2 | 155 | 180 | 200 | **No** |
-| P1a2-i-B-3 | 160 | 180 | 200 | **No** |
-| P1a2-i-B aggregate | — | — | 600 parent cap (four children; no borrowing) | **No** |
-| P1a2-i combined | — | — | 2,500 | **No** |
+| P1a2-i-C | 300 | 350 | 400 | **No** |
+| P1a2-i-B aggregate | — | — | 600 parent cap (three executable children; no borrowing; B-3 retired) | **No** |
+| P1a2-i combined | — | — | 2,900 | **No** |
 | P1a2-ii | 1,100 | 1,200 | 1,200 | **No** |
-| P1a2-iii | 1,100 | 1,200 | 1,200 | **No** |
+| P1a2-iii | — | — | **None — retired** | **No executable work** |
 | P1b | 1,500 | 1,700 | 2,000 | Accepted |
 | P2 | 1,500 | 1,700 | 2,000 | Accepted |
 | P3 | 1,500 | 1,700 | 2,000 | Accepted |
@@ -120,11 +173,11 @@ WU5–WU10 do **not** inherit these boundaries. Each later work unit has max 400
 ### Line-Accounting Rules
 
 - Per-slice expected range is the working budget for P1a1–P4.
-- **P1a2-i-A-1a, P1a2-i-A-1b, P1a2-i-A-1c, P1a2-i-A-1d, P1a2-i-A-2, P1a2-i-B-1a, P1a2-i-B-1b, P1a2-i-B-2, P1a2-i-B-3, P1a2-ii, P1a2-iii do NOT inherit the P1a1/P1b–P4 size:exception.** Each P1a2-i-A-1 child has early warning 300, STOP at 350, absolute max 400; combined P1a2-i-A-1 max 1,600 (4 × 400). P1a2-i-A-2 has early warning 200, STOP at 250, absolute max 300. Combined P1a2-i-A max 1,900 (1,600 + 300). P1a2-i-B-1a/B-1b each have early warning 120, STOP at 170, absolute max 200; B-2/B-3 retain early warning 155/160 and STOP at 180, each with absolute max 200; the parent aggregate is capped at 600 and is not the sum of borrowable child budgets. P1a2-ii and P1a2-iii each have early warning 1,100, STOP at 1,200, absolute max 1,200. If a coherent contract-complete slice cannot fit within its max, split it further — do NOT use size:exception.
+- **P1a2-i-A-1a, P1a2-i-A-1b, P1a2-i-A-1c, P1a2-i-A-1d, P1a2-i-A-2, P1a2-i-B-1a, P1a2-i-B-1b, P1a2-i-B-2, P1a2-i-C, and P1a2-ii do NOT inherit the P1a1/P1b–P4 size:exception.** Each P1a2-i-A-1 child has early warning 300, STOP at 350, absolute max 400; combined P1a2-i-A-1 max 1,600 (4 × 400). P1a2-i-A-2 has early warning 200, STOP at 250, absolute max 300. Combined P1a2-i-A max 1,900 (1,600 + 300). P1a2-i-B-1a/B-1b each have early warning 120 and STOP at 170, absolute max 200; B-2 has early warning 155 and STOP at 180, absolute max 200; the executable B parent aggregate is capped at 600 across those three children and is not the sum of borrowable child budgets. P1a2-i-C has early warning 300, STOP at 350, absolute max 400. P1a2-ii has early warning 1,100, STOP at 1,200, absolute max 1,200 and is independently accepted after C acceptance. P1a2-iii has no budget or executable route. If a coherent contract-complete slice cannot fit within its max, split it further — do NOT use size:exception.
 - **Recount after every RED/GREEN pair**: measure all-path changed lines via Git-native counting only. **Tracked files**: `git diff --numstat <slice-baseline> -- <tracked paths>` (sum additions + deletions; no net accounting). **Untracked files (Windows PowerShell)**: `git diff --no-index --numstat -- NUL "<path>"` — exit code 1 is expected when differences exist; parse the numstat output for additions + deletions. **POSIX alternative**: `git diff --no-index --numstat -- /dev/null "<path>"`. Never use `Measure-Object -Line`.
-- **Early warning**: P1a1/P1b–P4 at 1,500; each P1a2-i-A-1 child at 300; P1a2-i-A-2 at 200; P1a2-i-B-1a/1b at 120 and B-2/B-3 at 155/160; P1a2-ii/iii at 1,100 — pause, assess remaining work, document.
-- **STOP/reforecast**: P1a1/P1b–P4 at 1,700; each P1a2-i-A-1 child at 350; P1a2-i-A-2 at 250; P1a2-i-B-1a/1b at 170 and B-2/B-3 at 180; P1a2-ii/iii at 1,200 — no further mutation without measured evidence and explicit continuation.
-- **Absolute STOP**: P1a1/P1b–P4 before 2,000; each P1a2-i-A-1 child before 400 (STOP/reforecast at 350); combined P1a2-i-A-1 before 1,600; P1a2-i-A-2 before 300 (STOP/reforecast at 250); combined P1a2-i-A before 1,900; each P1a2-i-B-1a/B-1b/B-2/B-3 child before 200, with B-1a/B-1b STOP/reforecast at 170 and B-2/B-3 at 180, and the parent aggregate before 600; combined P1a2-i before 2,500; P1a2-ii/iii before 1,200 (STOP/reforecast at 1,200; hard max, no exception).
+- **Early warning**: P1a1/P1b–P4 at 1,500; each P1a2-i-A-1 child at 300; P1a2-i-A-2 at 200; P1a2-i-B-1a/1b at 120, B-2 at 155, C at 300, and P1a2-ii at 1,100 — pause, assess remaining work, document. Retired P1a2-iii has no checkpoint.
+- **STOP/reforecast**: P1a1/P1b–P4 at 1,700; each P1a2-i-A-1 child at 350; P1a2-i-A-2 at 250; P1a2-i-B-1a/1b at 170, B-2 at 180, C at 350, and P1a2-ii at 1,200 — no further mutation without measured evidence and explicit continuation. Retired P1a2-iii has no STOP.
+- **Absolute STOP**: P1a1/P1b–P4 before 2,000; each P1a2-i-A-1 child before 400 (STOP/reforecast at 350); combined P1a2-i-A-1 before 1,600; P1a2-i-A-2 before 300 (STOP/reforecast at 250); combined P1a2-i-A before 1,900; each executable P1a2-i-B-1a/B-1b/B-2 child before 200, with B-1a/B-1b STOP/reforecast at 170 and B-2 at 180, and the parent aggregate before 600; P1a2-i-C before 400 (STOP/reforecast at 350); combined P1a2-i before 2,900; P1a2-ii before 1,200 (STOP/reforecast at 1,200; hard max, no exception). Retired P1a2-iii has no absolute limit because it has no executable work.
 - WU5–WU10 each have max 400; if measured changed lines reach 400 within any of them, **STOP** — continuation requires a new, separate maintainer decision (no inherited exception).
 - apply-progress reconciliation lines in P1a1 count inside P1a1's range. tasks.md update lines count inside the slice that introduces them.
 - Test files count toward the slice they verify (no test-only slice).
@@ -145,11 +198,10 @@ main
                                       └── P1a2-i-A-2 branch (base: P1a2-i-A-1d)
                                        └── 📍 P1a2-i-B-1a branch (base: P1a2-i-A-2)
                                              └── P1a2-i-B-1b branch (base: P1a2-i-B-1a)
-                                                   └── P1a2-i-B-2 branch (base: P1a2-i-B-1b)
-                                                         └── P1a2-i-B-3 branch (base: P1a2-i-B-2)
-                                                               └── P1a2-ii branch (base: P1a2-i-B-3)
-                                                                    └── P1a2-iii branch (base: P1a2-ii)
-                                                                          └── P1b branch (base: P1a2-iii)
+                                                    └── P1a2-i-B-2 branch (base: P1a2-i-B-1b)
+                                                          └── 📍 P1a2-i-C branch (base: P1a2-i-B-2)
+                                                               └── P1a2-ii branch (base: P1a2-i-C)
+                                                                    └── P1b branch (base: P1a2-ii)
                                                                                 └── P2 branch (base: P1b)
                                                                                       └── P3 branch (base: P2)
                                                                                             └── P4 branch (base: P3)
@@ -158,28 +210,27 @@ Independent later chain (after P4 merges into tracker, tracker merges into main)
 main ──→ WU5 (signing) ──→ WU6 (de-branding) ──→ WU7 (sanitization) ──→ WU8 (README) ──→ WU9 (archive) ──→ WU10 (gates)
 ```
 
-Each child PR targets its immediate previous slice branch. The tracker target remains the integration boundary for P1a1; the current B chain starts from the accepted P1a2-i-A-2 branch: B-1a targets A-2 (not the tracker), B-1b targets B-1a, B-2 targets B-1b, and B-3 targets B-2. Only the tracker ultimately targets `main`. The current first-slice boundary is `📍 P1a2-i-B-1a`; each child diff contains only its own model/test/bookkeeping work unit. No branch, commit, or PR is created in this planning phase.
+Each child PR targets its immediate previous slice branch. The tracker target remains the integration boundary for P1a1; the current B chain starts from the accepted P1a2-i-A-2 branch: B-1a targets A-2 (not the tracker), B-1b targets B-1a, B-2 targets B-1b, C targets B-2, P1a2-ii targets C only after C acceptance, and P1b targets P1a2-ii directly. Retired B-3 has no branch or PR target. Only the tracker ultimately targets `main`. The current first-slice boundary is `📍 P1a2-i-C`; each child diff contains only its own model/test/bookkeeping work unit. No branch, commit, or PR is created in this planning phase.
 
 ### Commit / Work-Unit Mapping and Rollback Order
 
 | Order | Slice | Commit message (conventional) | PR target | Rollback order |
 |---|---|---|---|---|
-| 1 | P1a1 | `feat(provisioning): add canonical types, normalization, IDs, fixtures` | feature/tracker | 16 (last to revert) |
-| 2 | P1a2-i-A-1a | `feat(provisioning): add immutable vocabulary and genuine type proof` | P1a1 branch | 15 |
-| 3 | P1a2-i-A-1b | `feat(provisioning): add descriptor-safe cycle-safe deep freeze` | P1a2-i-A-1a branch | 14 |
-| 4 | P1a2-i-A-1c | `feat(provisioning): add strict state guard` | P1a2-i-A-1b branch | 13 |
-| 5 | P1a2-i-A-1d | `feat(provisioning): add strict event guard` | P1a2-i-A-1c branch | 12 |
-| 6 | P1a2-i-A-2 | `feat(provisioning): add validated constructors, TypeScript compatibility` | P1a2-i-A-1d branch | 11 |
-| 7 | P1a2-i-B-1a | `feat(provisioning): add reducer request contract and validation surface` | P1a2-i-A-2 branch | 10 |
-| 8 | P1a2-i-B-1b | `feat(provisioning): add CAS lease fence and unsupported dispatch` | P1a2-i-B-1a branch | 9 |
-| 9 | P1a2-i-B-2 | `feat(provisioning): add terminal immutability and monotonic state` | P1a2-i-B-1b branch | 8 |
-| 10 | P1a2-i-B-3 | `feat(provisioning): add data immutability and dispatch ack idempotency` | P1a2-i-B-2 branch | 7 |
-| 11 | P1a2-ii | `feat(provisioning): add boundary transitions, Auth matrix, crash vectors, completion, dispatch safety` | P1a2-i-B-3 branch | 6 |
-| 12 | P1a2-iii | `feat(provisioning): add terminalization guards, retry thresholds, negative probes` | P1a2-ii branch | 5 |
-| 13 | P1b | `feat(provisioning): add persistence port, memory/Firestore stores, CAS primitives` | P1a2-iii branch | 4 |
-| 14 | P2 | `feat(provisioning): add schemas, audit, submission, dispatch, outbox, metadata` | P1b branch | 3 |
-| 15 | P3 | `feat(provisioning): add profile, worker, status, full backend proof` | P2 branch | 2 |
-| 16 | P4 | `feat(client): migrate provisioning to trusted backend; harden Firestore rules` | P3 branch | 1 (first to revert) |
+| 1 | P1a1 | `feat(provisioning): add canonical types, normalization, IDs, fixtures` | feature/tracker | 15 (last to revert) |
+| 2 | P1a2-i-A-1a | `feat(provisioning): add immutable vocabulary and genuine type proof` | P1a1 branch | 14 |
+| 3 | P1a2-i-A-1b | `feat(provisioning): add descriptor-safe cycle-safe deep freeze` | P1a2-i-A-1a branch | 13 |
+| 4 | P1a2-i-A-1c | `feat(provisioning): add strict state guard` | P1a2-i-A-1b branch | 12 |
+| 5 | P1a2-i-A-1d | `feat(provisioning): add strict event guard` | P1a2-i-A-1c branch | 11 |
+| 6 | P1a2-i-A-2 | `feat(provisioning): add validated constructors, TypeScript compatibility` | P1a2-i-A-1d branch | 10 |
+| 7 | P1a2-i-B-1a | `feat(provisioning): add reducer request contract and validation surface` | P1a2-i-A-2 branch | 9 |
+| 8 | P1a2-i-B-1b | `feat(provisioning): add CAS lease fence and unsupported dispatch` | P1a2-i-B-1a branch | 8 |
+| 9 | P1a2-i-B-2 | `feat(provisioning): add terminal rejection and non-mutation` | P1a2-i-B-1b branch | 7 |
+| 10 | P1a2-i-C | `fix(provisioning): tighten AuthAttempt lifecycle guard` | P1a2-i-B-2 branch | 6 |
+| 11 | P1a2-ii | `feat(provisioning): add pure OperationState transitions and invariants` | P1a2-i-C branch | 5 |
+| 12 | P1b | `feat(provisioning): add persistence port, memory/Firestore stores, CAS primitives` | P1a2-ii branch | 4 |
+| 13 | P2 | `feat(provisioning): add schemas, audit, submission, dispatch, outbox, metadata` | P1b branch | 3 |
+| 14 | P3 | `feat(provisioning): add profile, worker, status, full backend proof` | P2 branch | 2 |
+| 15 | P4 | `feat(client): migrate provisioning to trusted backend; harden Firestore rules` | P3 branch | 1 (first to revert) |
 
 Rollback order is reverse of commit order. Each rollback removes only the enumerated files/behavior for that slice. P1a1 is the last to revert because all other slices depend on its frozen contract.
 
@@ -330,7 +381,7 @@ No `model.ts`, no `store.ts`, no `memory_store.ts`, no `firestore_store.ts`, no 
 
 ### Handoff contract to P1a2-i
 
-Frozen pure types + frozen normalization/fingerprint + frozen deterministic IDs + frozen canonical vector fixtures. P1a2-i builds the pure reducer vocabulary, CAS fence, terminal immutability, state/data immutability, and type guards consuming this frozen P1a1 contract.
+Frozen pure types + frozen normalization/fingerprint + frozen deterministic IDs + frozen canonical vector fixtures. P1a2-i builds the pure reducer vocabulary, CAS fence, terminal rejection/non-mutation, state/data immutability, and type guards consuming this frozen P1a1 contract.
 
 ### P1a1 Forecast (component sum verified)
 
@@ -350,9 +401,9 @@ Reforecast/STOP at 1,700; absolute max 2,000. Component sum verified: low 105+22
 
 ---
 
-## P1a2 — Reducer + Invariant Vectors (i-A, i-B, ii, iii — A-1 has 4 children)
+## P1a2 — Reducer + Invariant Vectors (i-A, i-B, ii; iii retired — A-1 has 4 children)
 
-The prior single P1a2 block is replaced by five major contract-complete sub-slices; P1a2-i-A-1 is further divided into four independently reviewable child slices. This decomposition addresses 13 deterministic contract gaps found in failed ordinals 27–28 (stash `213ff2fdf123bfa9c7b3b0ea0f83026a3b1f0306`, evidence only — never restore) and 8 deterministic contract failures found in failed ordinal 29 (stash `527d4dfb2fd0bd30eacd7b09116bec3bda79250d`, evidence only — never restore). Each slice has its own RED→GREEN cycle and no P1a2 child has a size:exception.
+The prior single P1a2 block is replaced by four executable sub-slices; P1a2-i-A-1 is further divided into four independently reviewable child slices. This decomposition addresses 13 deterministic contract gaps found in failed ordinals 27–28 (stash `213ff2fdf123bfa9c7b3b0ea0f83026a3b1f0306`, evidence only — never restore) and 8 deterministic contract failures found in failed ordinal 29 (stash `527d4dfb2fd0bd30eacd7b09116bec3bda79250d`, evidence only — never restore). P1a2-i-C is the independently accepted lifecycle-guard child after accepted B-2; P1a2-iii is a historical-only retired plan; P3 owns its former persistence/runtime concerns. Each executable slice has its own RED→GREEN cycle and no P1a2 child has a size:exception.
 
 ### Failed Ordinals 27–28 — Evidence (do NOT restore)
 
@@ -364,18 +415,18 @@ The prior single P1a2 block is replaced by five major contract-complete sub-slic
 | # | Gap | Prevented by |
 |---|---|---|
 | 1 | `validateCAS` detached from reducer mutations; transitions checked partial fields, not full tuple | P1a2-i-B |
-| 2 | Pending terminalization omitted fingerprint, dispatch source tuple, worker acknowledgement | P1a2-iii |
-| 3 | Active terminalization lacked classifier; allowed expired/foreign/stale workers; wrong failed vs manual_recovery | P1a2-iii |
-| 4 | Retry thresholds event-optional, off-by-one/unbounded; did not gate every normal-work event | P1a2-iii |
+| 2 | Pending terminalization omitted fingerprint, dispatch source tuple, worker acknowledgement | P3 |
+| 3 | Active terminalization lacked classifier; allowed expired/foreign/stale workers; wrong failed vs manual_recovery | P3 |
+| 4 | Retry thresholds event-optional, off-by-one/unbounded; did not gate every normal-work event | P3 |
 | 5 | Auth confirmation could proceed directly from intent; UID/email/dual-read absent; definite-no-effect lacked two-index evidence | P1a2-ii |
-| 6 | Crash vectors were comments, not real reducer transitions | P1a2-ii |
-| 7 | Completion did not model profile+completion+audit+ack as one pure transition | P1a2-ii |
+| 6 | Crash vectors were comments, not real reducer transitions | P3 |
+| 7 | Completion did not model profile+completion+audit+ack as one pure transition | P1a2-ii candidate, P2, P3 |
 | 8 | Payload/audit/dispatch/provenance/persisted-UID immutability missing | P1a2-i-B |
 | 9 | Acquisition changed generation; takeover accepted arbitrary regression/jumps | P1a2-ii |
-| 10 | Dispatch safety omitted next-dispatch/current-dispatch ack, orphan handling, idempotent enqueue | P1a2-ii |
+| 10 | Dispatch safety omitted next-dispatch/current-dispatch ack, orphan handling, idempotent enqueue | P1a2-ii guards, P2, P3 |
 | 11 | Terminal immutability covered only 6 of 12 event types | P1a2-i-B |
 | 12 | Public helpers/classifiers and malformed states/events could bypass type guards | P1a2-i-A |
-| 13 | Bookkeeping understated candidate size | P1a2-i-A/i-B/ii/iii (honest forecasts) |
+| 13 | Bookkeeping understated candidate size | P1a2-i-A/i-B/ii/P3 (honest forecasts) |
 
 ### Failed Ordinal 29 — Evidence (do NOT restore)
 
@@ -390,7 +441,7 @@ The prior single P1a2 block is replaced by five major contract-complete sub-slic
 | 3 | Active state with `leaseExpiresAt=null` passed CAS | P1a2-i-B (explicit null-lease rejection in CAS predicate) |
 | 4 | Event/output vocabulary incomplete; `EVENT_TYPE_VALUES` was mutable | P1a2-i-A (complete frozen vocabulary; `Object.freeze` at every level) |
 | 5 | Acquisition behavior drifted beyond authorized P1a2-i scope | P1a2-i-A (no transitions); P1a2-i-B (no boundary transitions — those are P1a2-ii) |
-| 6 | Terminal rejection semantics conflicted with downstream terminal-idempotent success | P1a2-i-B (separate `ack_dispatch` from 11 state-transition events; terminal blocks state transitions only) |
+| 6 | Terminal rejection semantics conflicted with downstream terminal-idempotent success | P1a2-i-B-2 plus later persistence/transition owners (B-2 blocks 11 state-transition events; later owners implement legal acknowledgement persistence) |
 | 7 | Runtime objects remained mutable despite readonly TypeScript types | P1a2-i-A (deep `Object.freeze`, not just `readonly` type annotations) |
 | 8 | Project-default TypeScript command failed with TS5097 | P1a2-i-A (source-only `npx tsc --noEmit` compatibility; test files use explicit CLI flags) |
 
@@ -416,18 +467,18 @@ The prior single P1a2 block is replaced by five major contract-complete sub-slic
 | Gap | Sub-slice | Explicit task(s) | Explicit test probe(s) |
 |---|---|---|---|
 | 1 — validateCAS detached | P1a2-i-B-1a/B-1b | B-1a.1–1a.6 (request/reducer surface) and B-1b.1–1b.5 (CAS/lease/dispatch) through `reduce()` | B-1a proves exact plain-record request/ExpectedCAS validation, observedAt checks, failure precedence, unchanged nested event guards, and type compatibility; B-1b independently alters each of 8 CAS fields, proves lease equality/liveness, and reaches the non-mutating unsupported outcome. No exported CAS helper. |
-| 2 — Pending terminalization incomplete | P1a2-iii | P1a2-iii.2 (full pending predicate), P1a2-iii.8 (negative probe) | Exhaustively mutate fingerprint, dispatch source, worker ack; every mismatch blocks `failed/unavailable` |
-| 3 — Active terminalization classifier | P1a2-iii | P1a2-iii.4 (exact-owner 4-path classifier), P1a2-iii.5 (foreign-owner no-steal), P1a2-iii.6 (expired-lease takeover), P1a2-iii.9 (negative probe) | Exact-owner-live, foreign-owner-unexpired, expired-takeover, terminal-idempotent; correct outcome per path |
-| 4 — Retry thresholds | P1a2-iii | P1a2-iii.1 (gate every normal-work event; exact domain 0–7 normal, 8–11 terminalize, non-integer/negative/>11 fail-closed), P1a2-iii.10 (boundary probes at -1, 0, 7, 8, 11, 12, malformed) | retryCount 0–7 allowed; 8–11 terminalize only; -1/negative/non-integer/>11 fail-closed; exact boundary at 7/8 and 11/12 |
-| 5 — Auth confirmation from intent | P1a2-ii | P1a2-ii.7 (Auth result matrix), P1a2-ii.8 (dual-read proof) | Intent alone cannot confirm; must have exact UID+email reads+proof; definite-no-effect requires two-index absence |
-| 6 — Crash vectors as comments | P1a2-ii | P1a2-ii.9 (real crash transitions) | Each crash point modeled as explicit event; reducer produces correct terminal/continuation state |
-| 7 — Completion not atomic | P1a2-ii | P1a2-ii.10 (one pure transition) | Profile+completed+audit+ack appear together; partial commit rejected |
-| 8 — Immutability missing | P1a2-i-B-3 | P1a2-i-B-3.1–3.2 (five data classes) | Operation identity/payload/UID, audit identity, dispatch identity, provenance, Auth proof — every mutation rejected |
-| 9 — Acquisition generation | P1a2-ii | P1a2-ii.3 (acquisition: no generation change), P1a2-ii.4 (takeover: exact +1) | Acquire with generation!=0 rejected; takeover with generation jump > +1 rejected |
-| 10 — Dispatch safety | P1a2-ii | P1a2-ii.11 (dispatch ack, orphan, idempotent enqueue) | Duplicate/stale/out-of-order dispatches cause no regression; orphan dispatch rejected |
-| 11 — Terminal immutability 6/12 | P1a2-i-B-2/B-3 | P1a2-i-B-2.1–2.2 (33 negative vectors), P1a2-i-B-3.1–3.4 (3 positive terminal acknowledgements) | 11 state-transition types × 3 terminal statuses = 33 negative rejection vectors; ack_dispatch × 3 terminal statuses = 3 positive idempotency vectors; 36 total terminal vectors |
-| 12 — Type guards bypass | P1a2-i-A-1a + P1a2-i-A-1b + P1a2-i-A-1c + P1a2-i-A-1d + P1a2-i-A-2 | P1a2-i-A-1c (strict state guard), P1a2-i-A-1d (strict event guard), P1a2-i-A-2.3–5 (constructor input validation) | Malformed state/event rejected at type level and runtime with exact-field-set validation; deep freeze prevents mutation; constructors reject invalid state/extra fields/malformed values |
-| 13 — Bookkeeping understated | P1a2-i-A-1/A-2/i-B-1a/i-B-1b/B-2/B-3/ii/iii | Each sub-slice has component-sum-verified forecast | Each sub-slice recount after every RED/GREEN pair |
+| 2 — Pending terminalization incomplete | P3 | P3.21–P3.24 (full pending predicate and mismatch reclassification) | Exhaustively mutate fingerprint, dispatch source, worker ack; every mismatch blocks terminalization |
+| 3 — Active terminalization classifier | P3 | P3.25–P3.32 (exact-owner, foreign-owner, expired takeover, terminal idempotency) | Exact-owner-live, foreign-owner-unexpired, expired-takeover, terminal-idempotent; correct outcome per path |
+| 4 — Retry thresholds | P3 | P3.33–P3.36 and P3.49–P3.50 (0–7 work, 8–11 terminalize-only, malformed fail-closed) | retryCount 0–7 allowed; 8–11 terminalize only; negative/non-integer/>11 fail-closed; exact boundary at 7/8 and 11/12 |
+| 5 - Auth confirmation from intent | P1a2-i-C, P1a2-ii, P3 | C lifecycle guard plus P1a2-ii.10-ii.11 (`CONF-LIFE`, `CONF-ID`, `CONF-UID`, `CONF-EMAIL`, `CONF-PROOF`); P3 Auth read/reconstruction tasks | Intent alone cannot confirm; C rejects incoherent state, the pure reducer requires existing call-started/proof correlations, while P3 proves UID/email reads and definite-no-effect absence classification |
+| 6 — Crash vectors as comments | P3 | P3.15–P3.16 and P3.53–P3.54 (real crash/reconstruction tests) | Each external-effect crash point and dual read is exercised in the worker/runtime boundary; no crash event is invented in the reducer |
+| 7 — Completion not atomic | P1a2-ii candidate, P2, P3 | P1a2-ii completion candidate; P3.13–P3.16 and P3.41–P3.46 persistence proofs | P1a2-ii proves only the pure completed OperationState candidate; P2/P3 prove persisted profile + completion + audit + acknowledgement atomicity |
+| 8 — Immutability missing | P1a2-ii, P2, P3 | P1a2-ii real-transition proof; P2 schema/dispatch/audit proof; P3 provenance/terminal persistence proof | Operation identity/normalized payload/intended UID and confirmed Auth proof stay immutable across pure transitions; P2 protects schema/dispatch/audit identity; P3 protects profile provenance and terminal no-regression persistence |
+| 9 — Acquisition generation | P1a2-ii | P1a2-ii.2–ii.5 (`ACQ-PRED`, `TK-GEN`) | Acquire with generation!=0 rejected; takeover output probes prove exact prior `+1` and reject regression/jump behavior without inventing a payload generation field |
+| 10 — Dispatch safety | P1a2-ii guards, P2, P3 | P1a2-ii representable guards; P2 schema/enqueue foundations; P3 worker delivery proof | P1a2-ii guards only existing `currentDispatchId`/`event.payload.dispatchId` relationships; P2 retains schema/audit/enqueue foundations; P3 proves full source tuple, orphan/dedup delivery, worker acknowledgement, and no regression |
+| 11 — Terminal immutability 6/12 | P1a2-i-B-2; P1a2-ii/P2/P3 persistence boundaries | P1a2-i-B-2.1–2.6 (33 negative rejection vectors plus precedence/ack characterization controls); later transition/persistence proofs cover legal acknowledgements | `acquire,takeover,auth_intent,auth_start,auth_confirm,auth_no_effect,auth_ambiguous,auth_foreign_user,auth_preflight,profile_commit,terminalize` × `completed,failed,manual_recovery` = 33 `terminal_state` rejections; exact terminal `ack_dispatch` remains `unsupported_event` in accepted B-2 until later owners implement its persistence semantics |
+| 12 - Type guards bypass | P1a2-i-A-1a + P1a2-i-A-1b + P1a2-i-A-1c + P1a2-i-A-1d + P1a2-i-A-2 + P1a2-i-C | P1a2-i-A-1c (strict state guard), P1a2-i-A-1d (strict event guard), P1a2-i-A-2.3-5 (constructor input validation), and C lifecycle-correlation guard | Malformed state/event rejected at type level and runtime with exact-field-set validation; C rejects lifecycle-incoherent AuthAttempt states as `invalid_state`; deep freeze prevents mutation; constructors reject invalid state/extra fields/malformed values |
+| 13 - Bookkeeping understated | P1a2-i-A-1/A-2/i-B-1a/i-B-1b/B-2/C/ii/P3 | Each executable sub-slice has component-sum-verified forecast; retired B-3 and P1a2-iii are excluded | Each executable slice recounts after every RED/GREEN pair |
 
 ---
 
@@ -859,13 +910,13 @@ Combined absolute max: 1,900 (1,600 + 300). No size:exception. Per-child limits:
 
 ---
 
-## P1a2-i-B — CAS, Reducer, and Immutability (four ordered children)
+## P1a2-i-B — CAS, Reducer, and Terminal Non-Mutation (three ordered children)
 
-**Surgical replan**: P1a2-i-A-2 is independently accepted and frozen; P1a2-i-B has not started. This section replaces only the unstarted monolithic implementation plan with two ordered B-1 children followed by the preserved B-2 and B-3 children. Completed history, the P1a2-i-A foundation, and unrelated tasks remain unchanged. The current edit does not modify `apply-progress.md`.
+**Surgical replan**: P1a2-i-A-2 is independently accepted and frozen; B-1a, B-1b, and B-2 are formally accepted. This section retains those accepted executable children and retires the unstarted B-3 plan. Completed history, the P1a2-i-A foundation, and unrelated tasks remain unchanged. The current edit does not modify `apply-progress.md`.
 
-**Parent contract**: all four children remain pure-model work. B-1a establishes the request contract and reducer surface; B-1b adds the module-private CAS/lease fence and unsupported dispatch; B-2 installs terminal immutability and monotonic state; B-3 completes data immutability and acknowledgement semantics. They consume the frozen P1a2-i-A vocabulary, guards, deep freeze, and constructors; expose only `reduce(state, request)` as the public transition API; implement no boundary transitions from P1a2-ii and no terminalization from P1a2-iii. The 800-line session review budget is not a size exception: the parent aggregate remains capped at 600 changed lines with no exception.
+**Parent contract**: the three executable children remain pure-model work. B-1a establishes the request contract and reducer surface; B-1b adds the module-private CAS/lease fence and unsupported dispatch; B-2 installs terminal rejection/non-mutation. They consume the frozen P1a2-i-A vocabulary, guards, deep freeze, and constructors; expose only `reduce(state, request)` as the public transition API; implement no boundary transitions from P1a2-ii and no runtime terminalization (the former P1a2-iii plan is retired). B-2 has no successful mutation or positive version-monotonicity proof; P1a2-ii owns positive version monotonicity on its real operation mutations and the transferred operation/proof immutability. P2 retains schema/audit/dispatch foundations; P3 owns full dispatch source-tuple and worker-ack behavior, provisioning/profile provenance, and terminal persistence/no-regression. The 800-line session review budget is not a size exception: the executable parent aggregate remains capped at 600 changed lines with no exception.
 
-**Terminal-policy boundary**: B-1a and B-1b do not install terminal policy. Until B-2 is accepted, even an exact terminal tuple may pass request/CAS checks and reach the non-mutating `unsupported_event` outcome; B-2 is the first child allowed to reject state-transition events for terminal statuses. No child in this parent implements a boundary transition or terminalization.
+**Terminal-policy boundary**: B-1a and B-1b do not install terminal policy. Until B-2 is accepted, even an exact terminal tuple may pass request/CAS checks and reach the non-mutating `unsupported_event` outcome. B-2 inserts policy after event validation and before CAS equality/lease liveness: `completed`, `failed`, and `manual_recovery` reject the 11 non-`ack_dispatch` event types with literal `terminal_state`; `ack_dispatch` is excluded and exact terminal acknowledgements remain `unsupported_event` until later persistence/transition owners implement legal acknowledgement semantics. No child in this parent implements a boundary transition or terminalization.
 
 **Spec traceability**: Requirement: Operation Invariants (terminal immutability, CAS, monotonic state, data immutability).
 
@@ -894,7 +945,7 @@ Combined absolute max: 1,900 (1,600 + 300). No size:exception. Per-child limits:
 
 **Depends on / branch**: accepted P1a2-i-A-2; `slice/p1a2-i-b-1a-request-reducer` branched from `slice/p1a2-i-a-2-validated-constructors`; PR target is the accepted P1a2-i-A-2 branch, not `feature/tracker`.
 
-**Diff boundary**: request types, descriptor-safe request/ExpectedCAS validation, reducer-surface tests, and B-1a bookkeeping only. Existing `isValidState` behavior is preserved; B-1a tests MUST NOT claim new accessor/proxy fail-closed state validation. Do not carry B-1b CAS/lease/dispatch behavior or B-2/B-3 behavior into this child.
+**Diff boundary**: request types, descriptor-safe request/ExpectedCAS validation, reducer-surface tests, and B-1a bookkeeping only. Existing `isValidState` behavior is preserved; B-1a tests MUST NOT claim new accessor/proxy fail-closed state validation. Do not carry B-1b CAS/lease/dispatch or B-2 behavior into this child.
 
 **Strict TDD order (RED → GREEN → REFACTOR)**
 
@@ -925,7 +976,7 @@ Combined absolute max: 1,900 (1,600 + 300). No size:exception. Per-child limits:
 | B-1a bookkeeping | 20–25 |
 | **Total P1a2-i-B-1a** | **105–135** |
 
-Early warning is 120; STOP/reforecast is 170; absolute max is 200. No size:exception and no borrowing from B-1b/B-2/B-3. If this child cannot fit within 200 after an honest Git-native recount, stop and return `blocked` rather than exceeding its independent cap.
+Early warning is 120; STOP/reforecast is 170; absolute max is 200. No size:exception and no borrowing from B-1b/B-2. If this child cannot fit within 200 after an honest Git-native recount, stop and return `blocked` rather than exceeding its independent cap.
 
 ### P1a2-i-B-1b — CAS + Lease + Unsupported Dispatch
 
@@ -933,7 +984,7 @@ Early warning is 120; STOP/reforecast is 170; absolute max is 200. No size:excep
 
 **Depends on / branch**: accepted P1a2-i-B-1a; `slice/p1a2-i-b-1b-cas-lease` branched from `slice/p1a2-i-b-1a-request-reducer`; PR target is the B-1a branch.
 
-**Diff boundary**: module-private CAS equality/liveness, unsupported dispatch, their tests, and B-1b bookkeeping only. Do not change B-1a request validation or add B-2/B-3 behavior.
+**Diff boundary**: module-private CAS equality/liveness, unsupported dispatch, their tests, and B-1b bookkeeping only. Do not change B-1a request validation or add B-2 behavior.
 
 **Strict TDD order (RED → GREEN → REFACTOR)**
 
@@ -963,61 +1014,98 @@ Early warning is 120; STOP/reforecast is 170; absolute max is 200. No size:excep
 | B-1b bookkeeping | 20–20 |
 | **Total P1a2-i-B-1b** | **105–130** |
 
-Early warning is 120; STOP/reforecast is 170; absolute max is 200. No size:exception and no borrowing from B-1a/B-2/B-3. If this child cannot fit within 200 after an honest Git-native recount, stop and return `blocked` rather than exceeding its independent cap.
+Early warning is 120; STOP/reforecast is 170; absolute max is 200. No size:exception and no borrowing from B-1a/B-2. If this child cannot fit within 200 after an honest Git-native recount, stop and return `blocked` rather than exceeding its independent cap.
 
-### P1a2-i-B-2 — Terminal Immutability + Monotonic State
+### P1a2-i-B-2 — Terminal Rejection + Non-Mutation
 
-**Objective**: install terminal-state rejection and the version/generation monotonicity invariant on top of B-1b. B-1a/B-1b deliberately leave terminal policy uninstalled; this child is the first point where the 11 non-`ack_dispatch` event types are rejected for each terminal status. The existing nonterminal acknowledgement path is the only i-B mutation used to prove version advancement. Terminal acknowledgement idempotency remains B-3.
+**Objective**: install only terminal-state rejection on top of B-1b and prove that every B-2 outcome is non-mutating. The three terminal statuses are exactly `completed`, `failed`, and `manual_recovery`; the 11 rejected event types are exactly `acquire`, `takeover`, `auth_intent`, `auth_start`, `auth_confirm`, `auth_no_effect`, `auth_ambiguous`, `auth_foreign_user`, `auth_preflight`, `profile_commit`, and `terminalize`. After accepted state/request/ExpectedCAS/event validation, B-2 inserts terminal policy before CAS equality and lease liveness: a terminal status plus any listed event returns the existing `TransitionResult` failure with literal `reason: "terminal_state"`. `ack_dispatch` is excluded; exact terminal acknowledgements remain `unsupported_event` until later persistence/transition owners implement acknowledgement semantics. B-2 adds no successful mutation, acknowledgement semantics, version increment, generation change, or positive monotonicity proof; P1a2-ii proves positive version monotonicity on its real successful operation mutations.
 
 **Depends on / branch**: P1a2-i-B-1b accepted; `slice/p1a2-i-b-2-terminal-monotonic` from `slice/p1a2-i-b-1b-cas-lease`; PR target the B-1b branch.
 
-**Diff boundary**: only terminal immutability and monotonic enforcement/tests/bookkeeping; do not change B-1a/B-1b request, CAS, lease, or unsupported-dispatch behavior; do not add data-class mutation handling, terminal `ack_dispatch` idempotency, boundary transitions, or terminalization.
+**Diff boundary**: only the terminal rejection policy, its 33 genuine RED vectors, three inherited mixed-input characterization/regression controls, three genuine stale-CAS controls, three inherited exact-terminal-ack characterization/regression controls, non-mutation assertions, and B-2 bookkeeping; do not change B-1a/B-1b request, CAS, lease, or unsupported-dispatch behavior. Do not add any successful mutation, acknowledgement semantics, version increment, generation change, data-class mutation handling, boundary transitions, or terminalization.
 
 **Strict TDD order (RED → GREEN → REFACTOR)**
 
-- [ ] P1a2-i-B-2.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 and the accepted B-1b baseline before mutation.
-- [ ] P1a2-i-B-2.1 RED: author 33 independent terminal rejection vectors — each of the 11 state-transition event types (all event types except `ack_dispatch`) against `completed`, `failed`, and `manual_recovery`; every result must reject without changing the complete state.
-- [ ] P1a2-i-B-2.2 GREEN: enforce terminal immutability inside `reduce()` after state/event validation and before any transition path; admit only the existing nonterminal `ack_dispatch` mutation needed for the version proof, without claiming terminal idempotency or data-class coverage yet.
-- [ ] P1a2-i-B-2.3 RED: author independent monotonic vectors for the permitted nonterminal acknowledgement mutation and for rejected/unsupported events; assert version regression, skipped increments, and generation changes fail.
-- [ ] P1a2-i-B-2.4 GREEN: require version to increase by exactly one on every successful mutation currently admitted by i-B, keep generation unchanged for every i-B event, and reject any version regression or generation change. Exact takeover `+1` remains P1a2-ii only.
-- [ ] P1a2-i-B-2.5 REFACTOR: freeze B-2 behavior, rerun all 33 vectors, inherited B-1a/B-1b/A checks, explicit source+test TypeScript, source-only compatibility, and the model harness.
+- [x] P1a2-i-B-2.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 and the accepted B-1b baseline before mutation.
+- [x] P1a2-i-B-2.1 RED: author 33 independent terminal rejection vectors for the explicitly listed 11 event types × `completed|failed|manual_recovery`; each must return failure reason `terminal_state`, preserve the complete state, and leave version and generation unchanged. Capture canonical snapshots plus direct-reference/deep-field checks for state, request, and event.
+- [x] P1a2-i-B-2.2 BASELINE CHARACTERIZATION/REGRESSION (may be green before B-2 production changes): retain three distinct terminal-state mixed-input controls inherited from accepted B-1a/B-1b — terminal state + malformed request returns `invalid_request`; terminal state + malformed ExpectedCAS returns `invalid_expected`; terminal state + a malformed/invalid event shape at the event-validation boundary returns `invalid_event` (not a valid but unsupported event type). Each uses complete state/request/event canonical-snapshot, direct-reference, and deep-field non-mutation evidence, including unchanged version and generation; these controls are not genuine B-2 RED work.
+- [x] P1a2-i-B-2.3 RED: add terminal-plus-stale-ExpectedCAS precedence controls for each of `completed`, `failed`, and `manual_recovery`; use a valid listed non-ack event with a stale expected field and require `terminal_state` before CAS/lease diagnosis, with state/request/event, version, and generation unchanged. Keep these three controls distinct from the mixed-input controls.
+- [x] P1a2-i-B-2.4 BASELINE CHARACTERIZATION/REGRESSION (may be green before B-2 production changes): retain three exact terminal `ack_dispatch` controls inherited from accepted B-1b; after accepted B-1b request/CAS/lease guards require `unsupported_event`, not terminal rejection or success, with the same canonical/direct/deep non-mutation proof and unchanged version/generation. Keep these three controls distinct from both preceding control families; they are not genuine B-2 RED work.
+- [x] P1a2-i-B-2.5 GREEN: insert validation in exact order `state → request → expected → event → terminal policy → CAS equality → lease liveness → dispatch`; return `terminal_state` only for terminal status plus a listed non-ack event, exclude `ack_dispatch`, and leave every B-2 rejection/fallback non-mutating. Add no successful path or version/generation mutation.
+- [x] P1a2-i-B-2.6 REFACTOR: freeze B-2, rerun the 33 genuine terminal RED vectors, three genuine stale-CAS RED controls, and six inherited baseline characterization/regression controls (three mixed-input, three terminal-ack), plus inherited B-1a/B-1b/A checks, explicit source+test TypeScript, source-only compatibility, and the model harness; retain later persistence/transition ownership of acknowledgement semantics and P1a2-ii ownership of positive version monotonicity.
 
-**Independent expected outcomes**: 33 terminal vectors reject with byte-identical states; the permitted nonterminal acknowledgement mutation increments version exactly once; rejected events do not change version; no i-B event changes generation; all expected states are independently authored, not derived from reducer output.
+**Strict-TDD classification**: genuine B-2 RED work is the 33 non-ack terminal-state vectors plus the three stale-CAS terminal-precedence controls; the three mixed-input controls and three exact terminal `ack_dispatch` controls are inherited baseline characterization/regression controls and may already be green before B-2 production changes. All 42 controls remain required: `33 + 3 mixed + 3 stale-CAS + 3 terminal-ack = 42`.
 
-**Focused test command**: `cd functions && node --experimental-strip-types test/provisioning/model.test.ts` — B-2 terminal matrix and monotonic assertions plus B-1a/B-1b/A regression coverage.
+**Independent expected outcomes**: all 33 listed terminal vectors return the existing failure result with literal `terminal_state`; the three terminal-state mixed-input controls return `invalid_request`, `invalid_expected`, and `invalid_event` before terminal policy; all three terminal-plus-stale-CAS controls return `terminal_state` before CAS/lease precedence; all three exact terminal `ack_dispatch` controls return `unsupported_event` after accepted B-1b guards. Every B-2 rejection/fallback preserves canonical state, request, and event references/deep fields and leaves version and generation unchanged; B-2 has no success path. All expected states and requests are independently authored, not derived from reducer output.
 
-**Runtime harness**: the Node strip-types model harness runs the 33 terminal vectors and nonterminal version/generation fixtures against independent in-memory states; it does not emulate boundary delivery or terminalization.
+**Focused test command**: `cd functions && node --experimental-strip-types test/provisioning/model.test.ts` — B-2 terminal rejection, mixed-input, stale-CAS, and ack controls plus B-1a/B-1b/A regression coverage.
 
-**Acceptance gate**: 33/33 negative terminal vectors pass; version is exactly +1 for each successful B-2 mutation; generation never changes; `ack_dispatch` terminal idempotency and the five data classes remain explicitly pending B-3; no P1a2-ii/iii behavior exists.
+**Runtime harness**: the Node strip-types model harness runs the 33 terminal vectors plus three mixed-input, three stale-CAS, and three exact terminal-ack controls against independently authored in-memory states/requests/events; it does not emulate boundary delivery or terminalization.
 
-**Rollback boundary**: revert only B-2 additions in `model.ts`, `model.test.ts`, and the B-2 bookkeeping entries to the accepted B-1b baseline. P1a2-i-B-1a, P1a2-i-B-1b, and P1a2-i-A remain intact.
+**Acceptance gate**: 33/33 genuine terminal RED vectors return literal `terminal_state`; all three genuine stale-CAS RED controls preserve terminal precedence with `terminal_state`; the three inherited mixed-input characterization/regression controls return `invalid_request`, `invalid_expected`, and `invalid_event` before terminal policy; all three inherited exact terminal `ack_dispatch` characterization/regression controls remain `unsupported_event`. Canonical snapshot/direct-reference/deep-field proofs cover state, request, and event for all 42 controls; version and generation are unchanged on every B-2 outcome; no B-2 success path and no P1a2-ii/iii behavior exists. Positive version monotonicity and operation/proof immutability are first proven by P1a2-ii's real successful mutations.
 
-### P1a2-i-B-3 — Data Immutability + `ack_dispatch` Idempotency
+**Rollback boundary**: revert only the B-2 terminal-policy/rejection controls, tests, and bookkeeping in `model.ts`, `model.test.ts`, `tasks.md`, and `apply-progress.md` to the accepted B-1b baseline. P1a2-i-B-1a, P1a2-i-B-1b, and P1a2-i-A remain intact; no later acknowledgement or positive monotonicity behavior is rolled back from P1a2-ii/P2/P3. The shared allowed-path contract authorizes B-2 bookkeeping in both SDD records, so neither record may retain B-2 bookkeeping after behavior rollback.
 
-**Objective**: complete the parent invariant set by freezing five immutable data classes and finalizing guarded acknowledgement semantics. The five classes are (1) operation identity + normalized payload + intended UID, (2) audit identity, (3) dispatch identity, (4) provisioning provenance, and (5) confirmed Auth proof.
+### P1a2-i-B-2 Forecast
 
-**Depends on / branch**: P1a2-i-B-2 accepted; `slice/p1a2-i-b-3-data-ack` from `slice/p1a2-i-b-2-terminal-monotonic`; PR target the B-2 branch.
+| Component | Expected lines |
+|---|---:|
+| `model.ts` terminal policy and literal rejection result | 20–30 |
+| `model.test.ts` 36 genuine RED vectors plus six inherited characterization/regression controls (33 terminal + 3 stale-CAS + 3 mixed-input + 3 terminal-ack) | 30–50 |
+| B-2 bookkeeping in `tasks.md` + `apply-progress.md` | 18–30 |
+| **Total P1a2-i-B-2** | **68–110** |
 
-**Diff boundary**: only the five data immutability checks, terminal/nonterminal `ack_dispatch` behavior, their tests, and bookkeeping; do not change B-1a/B-1b/B-2 request, CAS, lease, reducer-surface, terminal, or monotonic semantics.
+Early warning is 155; STOP/reforecast is 180; absolute max is 200. No size:exception, no split is required, and no borrowing from B-1a/B-1b. Component sum is verified: low `20+30+18 = 68`; high `30+50+30 = 110`; both are below the 155 warning. The three added mixed-input controls are included in the existing 30–50 test forecast; no forecast expansion is required. If this child cannot fit within 200 after an honest Git-native recount, stop and return `blocked` rather than exceeding its independent cap.
 
-**Strict TDD order (RED → GREEN → REFACTOR)**
+### P1a2-i-C — AuthAttempt Lifecycle Guard Refinement
 
-- [ ] P1a2-i-B-3.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 and the accepted B-2 baseline before mutation.
-- [ ] P1a2-i-B-3.1 RED: author independent mutation attempts for all five immutable data classes; each attempt must reject or preserve the original value. Add terminal `ack_dispatch` vectors for `completed`, `failed`, and `manual_recovery`, plus guarded nonterminal vectors for `pending` and `active`.
-- [ ] P1a2-i-B-3.2 GREEN: enforce immutable identity/payload/UID, audit identity, dispatch identity, provenance, and confirmed-proof fields in `reduce()` without adding new event types or persistence behavior.
-- [ ] P1a2-i-B-3.3 RED: add explicit idempotency assertions showing terminal acknowledgements are accepted without state mutation, while nonterminal acknowledgements require the full live CAS/current-dispatch guard and advance version once.
-- [ ] P1a2-i-B-3.4 GREEN: make `ack_dispatch` idempotent for all three terminal statuses and guarded for both nonterminal statuses; stale or mismatched acknowledgement attempts fail without regression or immutable-data mutation.
-- [ ] P1a2-i-B-3.5 REFACTOR: freeze the complete parent contract, rerun all 36 terminal vectors, five data classes, B-1a/B-1b CAS/lease/unsupported regressions, monotonic regressions, explicit source+test TypeScript, source-only compatibility, and the model harness.
+**Status/objective**: P1a2-i-C and P1a2-ii are independently accepted. This C guard description is retained as historical context for the seven-row canonical lifecycle matrix.
 
-**Independent expected outcomes**: every one of the five immutable classes rejects mutation; terminal `ack_dispatch` has 3/3 positive no-mutation outcomes; nonterminal `ack_dispatch` is guarded for `pending` and `active` and increments version once; stale acknowledgement cannot regress state; the 33 inherited terminal rejections remain green.
+**Depends on/paths**: accepted P1a2-i-B-2; only `functions/src/provisioning/model.ts`, `functions/test/provisioning/model.test.ts`, `openspec/changes/prepare-public-portfolio-repository/tasks.md`, and `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` may change. No other source, test, config, persistence, product, P2, or P3 path.
 
-**Focused test command**: `cd functions && node --experimental-strip-types test/provisioning/model.test.ts` — B-3 data and acknowledgement assertions plus the complete frozen B-1a/B-1b/B-2/A baseline.
+### Strict TDD order (RED → GREEN → REFACTOR)
 
-**Runtime harness**: the Node strip-types model harness runs independent in-memory data snapshots and terminal/nonterminal acknowledgement scenarios; no Firebase/Auth/Firestore/Cloud Tasks runtime is claimed.
+- [x] P1a2-i-C.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 and accepted B-2; capture no implementation or acceptance claim.
+- [x] P1a2-i-C.1 RED ORACLE: author a test-owned literal table for exactly seven canonical status/phase rows and the finite complement over `Ø/I/C/D/K/A`; cover flag/null contradictions, per-variant nullability, and every confirmed attempt/UID/email/proof edge. Never derive validity from production.
+- [x] P1a2-i-C.2 RED NEGATIVES: cover the finite complement: noncanonical pair, attempted/null mismatch, null UID, every variant nullability bit, phase/terminal incompatibility, active ambiguity, and each broken confirmed correlation; all fail existing `invalid_state` before later gates.
+- [x] P1a2-i-C.3 RED RETENTION: for every rejection prove complete state/request/event/result byte identity, direct/deep reference retention, no mutation or graph retention, unchanged version/generation, and `invalid_state` precedence; canonical rows retain exact references.
+- [x] P1a2-i-C.4 RED B-2 REGRESSION: replace exactly four pending-confirmed incoherent positives — the nested-boundary control plus its returned-UID-128, returned-UID-null, and proof-UID-128 variants — with canonical positives: reconstruct the three confirmed variants as `active/profile_commit+K` while varying only the tested scalar boundary, and reconstruct the nullable-return variant as `active/auth_preflight+D` with required returned fields/proof null. Replace 14 completed/terminal `Ø` vectors with `K`, 14 manual_recovery/terminal `Ø` vectors with `A`, and keep 14 failed/terminal `Ø` vectors unchanged. Preserve all 42 outcomes: 33 non-ack `terminal_state`, three stale-expected `terminal_state`, three malformed `invalid_request`/`invalid_expected`/`invalid_event`, and three terminal-ack `unsupported_event`, plus precedence, no mutation, graph detachment, and event/payload independence.
+- [x] P1a2-i-C.5 GREEN: change only `isAuthAttempt`/`isValidState`; incoherent states return existing `invalid_state` before request/event/terminal/CAS/lease/dispatch, with no new behavior.
+- [x] P1a2-i-C.6 REFACTOR/ACCEPTANCE: rerun inherited source+test TypeScript, Node model harness, all 42 B-2 controls, and independent design certification; recount after every RED/GREEN pair and stop at binding gates.
 
-**Acceptance gate**: 36 terminal vectors pass (33 negative state-transition rejections + 3 positive terminal acknowledgements); both nonterminal acknowledgement expectations pass; all five immutable data classes are protected; CAS, monotonicity, and `reduce()`-only API remain intact; no boundary or terminalization implementation exists.
+### Independent C acceptance gate
 
-**Rollback boundary**: revert only B-3 additions in `model.ts`, `model.test.ts`, and the B-3 bookkeeping entries to the accepted B-2 baseline. B-1a, B-1b, B-2, P1a2-i-A, and P1a1 remain intact.
+- [x] Independent certification confirms the seven-row literal oracle, finite complement, lifecycle/nullability/correlation rejection, complete retention proof, exact 42-control B-2 regression accounting, and only the four allowed paths changed. P1a2-ii was subsequently independently accepted.
+
+### Verification, rollback, and workload boundary
+
+- Focused command: `cd functions && node --experimental-strip-types test/provisioning/model.test.ts` (Node >= 22.6.0).
+- Inherited source+test typecheck: `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts src/provisioning/model.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts`; independent certification is read-only against the design hash and C gate.
+- Rollback: remove only C guard/test/bookkeeping changes and restore the independently accepted B-2 `model.ts`/`model.test.ts` fixture state plus the prior SDD records; do not touch P1a1, A, B-1a/B-1b, P2, or P3.
+
+### Local execution evidence (independent C acceptance recorded at ordinal 99)
+
+- RED: the focused Node model harness exited 1 before guard changes; the first finite-complement lifecycle vector expected `invalid_state` but reached the inherited later-gate result.
+- GREEN: focused Node model harness, explicit source+test TypeScript, and source-only TypeScript each exited 0 after the narrow guard change.
+- The literal seven-row oracle exercises all 42 row/shape combinations, invalid flag/null and result-nullability families, confirmed correlation edges, precedence, snapshots, direct/deep reference retention, version/generation stability, and result graph detachment.
+- B-2 remains 42/42: 33 non-ack terminal policy, 3 stale expected, 3 malformed precedence, and 3 `ack_dispatch` controls; completed uses `K`, failed uses `Ø`, and manual recovery uses `A`.
+
+| Component | Expected lines |
+|---|---:|
+| `model.ts` guard correlation | 40–65 |
+| `model.test.ts` oracle, finite complement, retention, B-2 migration | 160–245 |
+| `tasks.md` + `apply-progress.md` bookkeeping | 20–30 |
+| **Total P1a2-i-C** | **220–340** |
+
+Early warning **300**; STOP/reforecast **350**; absolute max **400**. No borrowing, exception, or budget transfer is allowed. If the complete C contract cannot fit, stop and reforecast; do not widen scope.
+
+### P1a2-i-B-3 — RETIRED / SUPERSEDED (historical only)
+
+**Status**: Retired by maintainer planning decision and the amended design. This former executable five-class data-immutability and `ack_dispatch` slice was never implemented, never accepted, has no branch or PR, and MUST NOT be launched by native apply.
+
+The claims are redistributed without a standalone reducer slice: P1a2-ii proves operation identity + normalized payload + intended UID and confirmed Auth proof across real state transitions; P2 proves audit identity and complete dispatch identity, enqueue acknowledgement, worker acknowledgement, deduplication, and guarded persistence; P3 proves provisioning/profile provenance and terminal persistence/no-regression. Enqueue acknowledgement is dispatch-only and never advances `OperationState.version`; worker acknowledgement advances version only inside an accompanying real transition. Exact terminal `ack_dispatch` remains B-2's `unsupported_event` characterization until those later owners implement its legal persistence semantics.
+
+No checklist, executable forecast, entry gate, rollback boundary, or apply route exists for this retired work unit. Its former claims are retained here solely to make the supersession and ownership transfer auditable.
 
 ### P1a2-i-B Child Forecast and Order
 
@@ -1025,19 +1113,18 @@ Early warning is 120; STOP/reforecast is 170; absolute max is 200. No size:excep
 |---:|---|---:|---:|---:|---:|---|
 | 1 | P1a2-i-B-1a request contract + reducer surface | 105–135 | 120 | 170 | 200 | accepted P1a2-i-A-2 branch |
 | 2 | P1a2-i-B-1b CAS + lease + unsupported dispatch | 105–130 | 120 | 170 | 200 | B-1a branch |
-| 3 | P1a2-i-B-2 terminal immutability + monotonic state | 140–180 | 155 | 180 | 200 | B-1b branch |
-| 4 | P1a2-i-B-3 data immutability + `ack_dispatch` idempotency | 145–195 | 160 | 180 | 200 | B-2 branch |
-| **Parent P1a2-i-B** | **all four children** | **495–640 forecast; 600 binding cap** | **per child** | **per child** | **600 aggregate** | **no size:exception** |
+| 3 | P1a2-i-B-2 terminal rejection + non-mutation | 68–110 | 155 | 180 | 200 | B-1b branch |
+| **Parent P1a2-i-B** | **three executable children** | **278–375 forecast; 600 binding cap** | **per child** | **per child** | **600 aggregate** | **no size:exception** |
 
-Each child stops at its own absolute 200-line cap; the parent cannot borrow unused budget across children. The honest component forecast is 495–640, so the 600-line parent cap is binding in the high case and must not be hidden by averaging or borrowing. At each warning, pause and recount all paths; at each STOP, no further mutation occurs without measured evidence and explicit continuation. Component sums are verified: B-1a `model.ts 30–40 + model.test.ts 55–70 + bookkeeping 20–25 = 105–135`; B-1b `35–45 + 50–65 + 20–20 = 105–130`; B-2 `45–60 + 80–100 + 15–20 = 140–180`; B-3 `50–65 + 75–105 + 20–25 = 145–195`. The 800-line session review budget does not relax the 600-line parent maximum; if the measured aggregate cannot remain at or below 600, stop and replan with no size exception.
+Each executable child stops at its own absolute 200-line cap; the parent cannot borrow unused budget across children. The planned component forecast is `105–135 + 105–130 + 68–110 = 278–375`, below the 600-line parent cap. Accepted evidence is B-1a 111 lines, B-1b 76 lines, and B-2 173 lines: `111 + 76 + 173 = 360`; remaining parent capacity is `600 - 360 = 240`. Retired B-3 contributes no executable lines. At each warning, pause and recount all paths; at each STOP, no further mutation occurs without measured evidence and explicit continuation. The 800-line session review budget does not relax the 600-line parent maximum. Component sums remain verified: B-1a `30–40 + 55–70 + 20–25 = 105–135`; B-1b `35–45 + 50–65 + 20–20 = 105–130`; B-2 `20–30 + 30–50 + 18–30 = 68–110`; parent low `105+105+68 = 278`, high `135+130+110 = 375`.
 
 ### Aggregate independent phase-contract gates
 
 - [x] B-1a: exact request/ExpectedCAS records, observedAt, failure precedence through `invalid_event`, unchanged nested event guards, old-call rejection, and canonical/direct non-mutation proof are accepted through `reduce()` without CAS equality/liveness or terminal policy.
 - [x] B-1b: all eight CAS fields, separate lease equality/liveness, exact-live unsupported behavior, exact-terminal unsupported behavior before B-2, and canonical/direct non-mutation proof are accepted through `reduce()` without implementing a boundary transition.
-- [ ] B-2: 33 non-ack terminal rejection vectors, exact version monotonicity, and unchanged generation pass with independent expected states.
-- [ ] B-3: five immutable data classes, 3/3 terminal acknowledgements, and both nonterminal acknowledgement expectations pass.
-- [ ] Aggregate: 36 terminal vectors are present; only `reduce()` is public; P1a2-i-A is byte/foundation-frozen; P1a2-ii boundary transitions and P1a2-iii terminalization remain absent.
+- [x] B-2: 33 non-ack terminal `terminal_state` rejections, three mixed-input validation-precedence controls, three terminal-plus-stale-CAS precedence controls, three exact terminal `ack_dispatch` `unsupported_event` characterization controls, and unchanged version/generation on every outcome pass with independent expected states.
+- [x] Retired B-3: former five-class data and acknowledgement scope is explicitly superseded; no implementation or acceptance is claimed, and its claims are assigned to P1a2-ii/P2/P3.
+- [x] Aggregate: B-2's 33 negative vectors and nine distinct B-2 controls are present; only `reduce()` is public; P1a2-i-A is byte/foundation-frozen; P1a2-i-C and P1a2-ii are independently accepted, with ii owning the first real mutations; P1a2-iii terminalization remains absent.
 
 ### P1a2-i Combined Forecast
 
@@ -1050,172 +1137,109 @@ Each child stops at its own absolute 200-line cap; the parent cannot borrow unus
 | P1a2-i-A-2 | 120–170 |
 | P1a2-i-B-1a | 105–135 |
 | P1a2-i-B-1b | 105–130 |
-| P1a2-i-B-2 | 140–180 |
-| P1a2-i-B-3 | 145–195 |
-| **Total P1a2-i** | **1,415–1,890** |
+| P1a2-i-B-2 | 68–110 |
+| P1a2-i-C | 220–340 |
+| **Total P1a2-i** | **1,418–1,965** |
 
-Combined absolute max remains 2,500 (1,600 + 300 + 600). No size:exception.
+Combined absolute max is 2,900 (1,600 + 300 + 600 + 400). No size:exception; the executable B parent forecast is 278–375, with 360 accepted baseline lines and 240 lines remaining under the 600-line parent cap. C is separate and cannot borrow from B. Retired B-3 has no executable budget.
 
 ### Handoff contract to P1a2-ii
 
-Frozen immutable vocabulary + frozen deep runtime immutability + frozen type guards + frozen B-1a request contract/reducer surface + frozen B-1b module-private CAS/lease fence and unsupported dispatch + frozen terminal immutability (11 state-transition types × 3 terminal = 33 negative rejection + `ack_dispatch` × 3 = 3 positive idempotency) + frozen monotonic state (version on every successful i-B mutation; no i-B event changes generation) + frozen five-class data immutability + frozen terminal/nonterminal dispatch acknowledgement. P1a2-i-B-3 is the handoff boundary; none of the four children implements or proves boundary transitions. **Exact acquisition (generation unchanged) and exact takeover (+1 monotonic generation) success/failure are proven solely in P1a2-ii.**
+Frozen immutable vocabulary + frozen deep runtime immutability + frozen type guards + frozen B-1a request/reducer surface + frozen B-1b module-private CAS/lease fence and unsupported dispatch + frozen B-2 terminal rejection/non-mutation (the 33 listed vectors return literal `terminal_state`; three terminal-state mixed-input controls return `invalid_request`/`invalid_expected`/`invalid_event` before terminal policy; three terminal-plus-stale-CAS controls preserve terminal precedence; exact terminal `ack_dispatch` controls remain `unsupported_event`; version and generation stay unchanged on every B-2 outcome) + C lifecycle guard and canonical Auth matrix, with C independently accepted before ii. P1a2-i-C is the handoff boundary for ii; the three executable B children and C implement no boundary transition or positive version monotonicity. **P1a2-ii alone proves positive version monotonicity on real operation mutations, exact acquisition (generation unchanged), exact takeover (+1 monotonic generation), and operation identity/normalized-payload/intended-UID plus confirmed-Auth-proof immutability across those mutations.** P2 owns audit/full-dispatch identity and acknowledgement persistence; P3 owns provisioning/profile provenance and terminal persistence/no-regression.
 
 ---
 
-## P1a2-ii — Boundary Transitions + Auth Matrix + Crash Vectors + Completion + Dispatch Safety
+## P1a2-ii — Pure OperationState Transitions + Invariants (Exactly Eight Events)
 
-**Objective**: implement all boundary transitions (acquisition without generation change, takeover with exact +1 monotonic generation fence), Auth create result matrix (all 5 design rows with mandatory UID/email dual-read and proof), crash-point vectors as REAL reducer transitions (not comments), completion as one atomic pure transition (profile + completed + success audit + current dispatch ack), and dispatch safety (next-dispatch creation, current-dispatch ack, orphan handling, idempotent enqueue semantics).
+**Objective**: after independent C acceptance, implement eight pure transitions: `acquire`, `takeover`, `auth_intent`, `auth_start`, `auth_confirm`, `auth_ambiguous`, `auth_foreign_user`, and `profile_commit`, using existing fields. Prove version `+1` per mutation, acquisition generation `0`, takeover generation `+1`, and immutability of operation identity, normalized payload, intended UID, and confirmed Auth proof.
 
-**Gaps addressed**: 5 (Auth confirmation from intent), 6 (crash vectors real), 7 (completion atomic), 9 (acquisition generation / takeover fence), 10 (dispatch safety).
+`auth_preflight`, `auth_no_effect`, `ack_dispatch`, and `terminalize` remain explicitly unsupported in the pure reducer and return the existing `unsupported_event` failure after inherited validation/CAS/lease/terminal guards. They have no pure success path. No two-index reads or absence orchestration, explicit crash/read events, incoming delivery discrimination, duplicate/order/orphan persistence, queue or create-if-absent behavior, audit, profile/provenance persistence, acknowledgement persistence, retry, terminal evidence/codes, or atomic persistence proof belongs here. P2 retains schema/audit/dispatch foundations; P3 owns worker delivery/source-tuple and acknowledgement behavior, Auth reads/crash reconstruction, retry/terminalization, evidence/codes, profile/completion persistence, and persisted no-regression.
 
-**Spec traceability**: Requirement: Auth Ambiguity and Reconstruction; Requirement: Completion Atomic Commitment; Requirement: First-Slice Compensation Policy; Requirement: Operation Invariants.
+**Traceability**: design exact pure matrix/CAS/lease contract; spec Auth ambiguity, completion candidate, no pure deletion, and operation invariants. Gaps 5, 7, 9, 10 and operation/proof immutability are owned here; crash/read and terminalization remain P3.
 
-**Design traceability**: Worker acquisition and intent; Auth create result matrix; Profile and completion; Boundary and crash protocol.
+**Depends on**: independently accepted P1a2-i-C after accepted P1a2-i-B-2. No standalone B-3 or P1a2-iii work unit is required or permitted.
 
-**Depends on**: P1a2-i-B-3 (the frozen four-child handoff: vocabulary + B-1a request surface + B-1b CAS/lease fence + reducer skeleton + terminal/state/data immutability).
-
-**Base / branch**: `slice/p1a2-ii-boundary-transitions` branched from `slice/p1a2-i-b-3-data-ack`.
+**Base / branch**: `slice/p1a2-ii-pure-transitions` branched from the `slice/p1a2-i-c-auth-lifecycle-guard` boundary after C acceptance; PR target is the C branch only after its independent acceptance.
 
 **Allowed paths** (exact):
 
-- `functions/src/provisioning/model.ts` (extend — add acquisition, takeover, Auth preflight/intent/create/confirm/definite-no-effect/foreign, crash-point transitions, completion transition, dispatch safety transitions)
-- `functions/test/provisioning/model.test.ts` (extend — add all boundary/Auth/crash/completion/dispatch tests with independent expected states)
+- `functions/src/provisioning/model.ts` (extend only the eight matrix transitions and existing-field invariants)
+- `functions/test/provisioning/model.test.ts` (extend with independent state/event/result vectors for the eight transitions and unsupported events)
 - `openspec/changes/prepare-public-portfolio-repository/tasks.md` (SDD bookkeeping)
-- `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` (metadata updates)
+- `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` (metadata updates during future apply)
 
-**Forbidden in P1a2-ii**: all P1a2-i-A and P1a2-i-B-1a/B-1b/B-2/B-3 forbidden paths remain. Additionally: no terminalization implementations (those are P1a2-iii). No modification of P1a2-i-A frozen vocabulary/guards/immutability or the P1a2-i-B-1a/B-1b/B-2/B-3 frozen CAS/reducer/terminal-state invariants.
+**Forbidden in P1a2-ii**: all P1a2-i-A, P1a2-i-B, and P1a2-i-C changes; any new event, state, result, persistence entity, helper API, or field; `auth_preflight`/`auth_no_effect`/`ack_dispatch`/`terminalize` success paths; two-index read/absence or crash/read orchestration; explicit crash/read events; delivery classification; duplicate/order/orphan persistence; queue/create-if-absent behavior; audit; profile/provenance persistence; acknowledgement persistence; retry; terminal evidence/codes; atomic persistence; Firebase/Auth/Firestore/Cloud Tasks behavior. The inherited full CAS/lease/terminal guards remain first; no standalone `ack_dispatch` success or version advancement is permitted.
 
-### Strict TDD order (RED → GREEN)
+### Strict TDD order (RED → GREEN → REFACTOR)
 
-- [ ] P1a2-ii.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0.
-- [ ] P1a2-ii.1 RED: acquisition transition — pending/dispatch_pending with exact initial predicate (fingerprint, generation=0, version=0, ownerToken=null, leaseExpiresAt=null, authAttempted=false, exact unacknowledged acquire dispatch). **No generation change.** Tests fail because transition not implemented.
-- [ ] P1a2-ii.2 GREEN: acquisition passes; generation remains 0; version increments to 1; owner token installed; lease set; phase transitions to active/auth_preflight; acquire dispatch acknowledged.
-- [ ] P1a2-ii.3 RED → GREEN — Takeover: requires exact +1 monotonic generation fence (no regression, no jumps > +1). Full expired-lease predicate. New owner token derived from dispatch ID + new generation. Tests: takeover with generation jump > +1 rejected; takeover with regression rejected; valid +1 takeover succeeds.
-- [ ] P1a2-ii.4 RED → GREEN — Negative probe (Gap 9 direct): acquire with generation != 0 rejected; acquire with non-null ownerToken rejected; takeover with arbitrary generation accepted only at exact +1.
-- [ ] P1a2-ii.5 RED → GREEN — Auth preflight: mandatory UID + email reads before any create. Foreign UID/email before any intent -> `failed/already-exists`. No Auth mutation on foreign path.
-- [ ] P1a2-ii.6 RED → GREEN — Auth intent: one transaction flips `authAttempted=true`, persists `authAttempt.result=intent`, audit, version, deterministic `auth_create` dispatch, current dispatch ack.
-- [ ] P1a2-ii.7 RED → GREEN — Auth create result matrix (all 5 rows): (a) exact live intent CAS to `call_started`; (b) exact returned UID + email + mandatory dual reads agreeing -> `active/profile_commit` + immutable proof; (c) malformed/ambiguous/timeout/crash -> `manual_recovery` (no delete, no retry create); (d) definite no-effect with BOTH indexes independently proving absence -> back to `auth_preflight` with new attempt identity; (e) foreign UID/email before intent -> `failed/already-exists`. Tests use independent expected states — NOT computed via production helpers.
-- [ ] P1a2-ii.8 RED → GREEN — Negative probe (Gap 5 direct): confirmation CANNOT proceed directly from intent; must have persisted proof with exact UID + email reads agreeing. Definite-no-effect requires two-index absence evidence, not one.
-- [ ] P1a2-ii.9 RED → GREEN — Crash-point vectors as REAL reducer transitions: before/after Auth intent, Auth call, Auth return, each dual read, proof commit, profile/completion commit. Each crash point modeled as an explicit event; reducer produces correct terminal or continuation state. Not comments — real transitions.
-- [ ] P1a2-ii.10 RED → GREEN — Completion as one pure transition: profile + completed + success audit + current dispatch ack appear together in one transition result. Partial commit (e.g., profile without audit) is not representable. Tests prove all-or-nothing.
-- [ ] P1a2-ii.11 RED → GREEN — Dispatch safety: next-dispatch creation is deterministic and idempotent (create-if-absent); current-dispatch acknowledgement is guarded; orphan dispatches (no matching operation) rejected; duplicate/stale/out-of-order dispatches cause no effect or regression. Tests: duplicate dispatch idempotent; stale dispatch no regression; orphan dispatch rejected.
-- [ ] P1a2-ii.12 REFACTOR: freeze P1a2-ii extensions. Type-level GREEN via explicit `npx tsc` on all P1a1+P1a2-i+P1a2-ii files.
+- [x] P1a2-ii.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0, accepted B-2, and independent C acceptance; no ii work starts without separate authorization.
+- [x] P1a2-ii.1 RED COMMON: author state/request/event/expected-output fixtures and a `family + label + expected reason + actual result` ledger; require exact success counts and zero negatives. Consume C's seven-row canonical lifecycle contract; takeover covers exactly `auth_preflight×{Ø,D}`, `auth_create×{I,C}`, and `profile_commit×{K}` (five rows), never an active ambiguity or phase/result Cartesian product. Terminal pairs -> `terminal_state`. Snapshot every negative's state/request/event, canonical values, refs, version/generation, and result retention; use no production oracle. Malformed state/request/expected/event -> `invalid_state`/`invalid_request`/`invalid_expected`/`invalid_event`; terminal/CAS/lease/unsupported controls are regression. Every successful expected state asserts `updatedAt=request.observedAt`.
+- [x] P1a2-ii.1a RED INVARIANTS: check unchanged `operationId`, `fingerprint`, `normalizedPayload`, `intendedUid`, `createdAt`, existing `currentDispatchId`, and confirmed attempt/proof unless named; assert `updatedAt=request.observedAt` on all eight successes; retain no request/event graph.
+- [x] P1a2-ii.2 RED `acquire`: pending/dispatch_pending only; generation/version `0/0`, null owner/lease/Auth, exact CAS, valid owner, payload lease `> observedAt`; expect active/auth_preflight with owner/lease, generation `0`, version `1`, `updatedAt=observedAt`, Auth false/null. `ACQ-LIFE`/`ACQ-PRED` cover nonzero generation, existing owner/lease, and valid-shape payload lease `<= observedAt`; non-live payload -> `lease_not_live` at lease stage, lifecycle/correlation -> `unsupported_event`, malformed lease -> inherited `invalid_event`; retain stale-CAS/terminal controls.
+- [x] P1a2-ii.3 GREEN `acquire`: changes owner/lease/status/phase/version; preserves immutable fields/no request/event graph. Lifecycle/correlation -> `unsupported_event`; valid-shape non-live payload -> `lease_not_live`; malformed lease -> `invalid_event`; inherited controls unchanged.
+- [x] P1a2-ii.4 RED `takeover`: consume exactly five C-admitted active rows: `auth_preflight+Ø`, `auth_preflight+D`, `auth_create+I`, `auth_create+C`, and `profile_commit+K`; preserve each lifecycle shape verbatim. Cover exact CAS, prior lease `<= observedAt`, different owner, live payload lease, `updatedAt=observedAt`, and no active ambiguity vector. Add `TK-LIFE`, live `TK-LEASE`, same-owner `TK-OWNER`, and `TK-GEN` with prior generations `0`/`2`, requiring outputs `1`/`3` (reject `prior-1`/`prior+2`). A still-live prior lease `> observedAt` is the applicable lease failure and returns `lease_not_live`, not `unsupported_event`.
+- [x] P1a2-ii.5 GREEN `takeover`: preserve status/phase/AuthAttempt/immutable fields; replace owner/lease; generation/version prior `+1`; preserve existing `currentDispatchId` exactly, with no new/copied dispatch identity. TK lifecycle/correlation -> `unsupported_event`; live prior lease -> `lease_not_live`; malformed lease -> `invalid_event`.
+- [x] P1a2-ii.6 RED `auth_intent`: active/auth_preflight, live lease, intendedUid non-null, Auth false/null, payload attemptId/intentAt; expect active/auth_create intent `{callStartedAt:null,result:"intent",returnedUid:null,returnedEmail:null,proof:null}`, version `+1`, generation unchanged, `updatedAt=observedAt`. Add `INT-LIFE`/`INT-FACT` (wrong lifecycle, attempted/non-null attempt, null UID, malformed/mismatched facts); malformed shape is regression.
+- [x] P1a2-ii.7 GREEN `auth_intent`: install intent fields; preserve identity/payload/owner/lease/generation, version `+1`, no audit/dispatch/ack; misses -> `unsupported_event`.
+- [x] P1a2-ii.8 RED `auth_start`: active/auth_create, live lease, attempted=true, intent-shaped attempt (null call/returns/proof), matching ID and callStartedAt; expect active/auth_create with only callStartedAt/result `"call_started"`, version `+1`, `updatedAt=observedAt`. Add `START-LIFE` wrong lifecycle, absent/non-intent/confirmed/ambiguous attempt, mismatched ID, malformed facts; no un-designed time-order predicate.
+- [x] P1a2-ii.9 GREEN `auth_start`: matching intent only; preserve attemptId/intentAt/null returns/proof and immutable fields, version `+1`, no Auth call; lifecycle -> `unsupported_event`, malformed inputs inherited.
+- [x] P1a2-ii.10 RED `auth_confirm`: active/auth_create, live lease, attempted=true, call-started attempt (callStartedAt non-null, returns/proof null), matching state/proof ID. Add `CONF-LIFE` (wrong lifecycle/direct intent/absent/non-call_started/confirmed/ambiguous), `CONF-ID`, independent `CONF-UID`/`CONF-EMAIL` link breaks, and `CONF-PROOF` absent/malformed/proven-before-call/inconsistent-read cases; expect active/profile_commit confirmed with exact returns/proof, version `+1`, `updatedAt=observedAt`.
+- [x] P1a2-ii.11 GREEN `auth_confirm`: require call-started UID/email/proof; output active/profile_commit with preserved times, exact returns/proof and immutable fields/generation, version `+1`, no reads/persistence; `CONF-*` -> `unsupported_event`.
+- [x] P1a2-ii.12 RED `auth_ambiguous`: active/auth_create, live lease, attempted=true, sole unproven call-started attempt (callStartedAt non-null, returns/proof null), matching ID; expect manual_recovery/terminal, result `"ambiguous"`, null returns/proof, cleared owner/lease, version `+1`, `updatedAt=observedAt`. `AMB-LIFE` covers wrong lifecycle, absent/intent/confirmed/definite_no_effect/already-ambiguous/proven, mismatched ID, and returned/proof identity; confirmed/proven is rejected.
+- [x] P1a2-ii.13 GREEN `auth_ambiguous`: change only result/status/phase/owner/lease/version; preserve identity/times/generation, no code/evidence; `AMB-*` -> `unsupported_event`.
+- [x] P1a2-ii.14 RED `auth_foreign_user`: active/auth_preflight, live lease, intendedUid non-null, Auth false/null; expect failed/terminal, cleared owner/lease, Auth false/null, version `+1`, `updatedAt=observedAt`. Add wrong lifecycle/prior attempt, both-identities-match rejection, both one-inequality foreign positives, and `FOR-LIFE` identity-copy/mutation probes.
+- [x] P1a2-ii.15 GREEN `auth_foreign_user`: require UID-or-normalized-email inequality; output failed/terminal without payload identity, preserve operation fields/intendedUid/generation, clear owner/lease, version `+1`; matching-both/lifecycle/prior-attempt -> `unsupported_event`.
+- [x] P1a2-ii.16 RED `profile_commit`: active/profile_commit, live lease, attempted=true, confirmed attempt (callStartedAt/returns/proof non-null); userId=returnedUid=proof.uidRead=intendedUid and returnedEmail=proof.emailRead=normalized target. Add `PRO-LIFE`, absent/non-confirmed, each `PRO-UID`/`PRO-EMAIL` link break, and `PRO-PARTIAL` proof/identity mutation; expect completed/terminal, version `+1`, `updatedAt=observedAt`.
+- [x] P1a2-ii.17 GREEN `profile_commit`: require every correlation; preserve confirmed attempt/proof byte-identically and immutable fields, clear owner/lease, set completed/terminal, version `+1`; `PRO-*` -> `unsupported_event`, no persistence.
+- [x] P1a2-ii.18 RED UNSUPPORTED/INVARIANTS: author exact valid `auth_preflight`, `auth_no_effect`, `ack_dispatch`, and `terminalize` vectors; each returns `unsupported_event` with no success/version change. Then re-run common success invariants.
+- [x] P1a2-ii.19 GREEN UNSUPPORTED/INVARIANTS: retain the four unsupported events after inherited validation/CAS/lease/terminal gates; enforce common invariants without fields, helpers, reasons, persistence, or external observations.
+- [x] P1a2-ii.20 REFACTOR/ACCEPTANCE: native ordinal 105 independently accepted the frozen eight-event matrix: 601/601 assertions; acquire, takeover, auth_intent, auth_start, auth_confirm, auth_ambiguous, auth_foreign_user, and profile_commit passed; focused Node, explicit source+test/source-only TypeScript, inherited 36/36 + 36/36 + 32/32, fixtures, and diff checks passed.
 
 ### Verification commands
 
 - `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts src/provisioning/model.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts`
 - `cd functions && node --experimental-strip-types test/provisioning/model.test.ts`
-- Git-native count (Windows PowerShell): tracked — `git diff --numstat <P1a2-i-B-3-baseline> -- functions/src/provisioning/model.ts functions/test/provisioning/model.test.ts`; untracked — `git diff --no-index --numstat -- NUL "<path>"` (exit code 1 expected); sum additions + deletions across all changed paths since P1a2-i-B-3 commit.
+- Git-native count (Windows PowerShell): `git diff --numstat <P1a2-i-C-baseline> -- functions/src/provisioning/model.ts functions/test/provisioning/model.test.ts openspec/changes/prepare-public-portfolio-repository/tasks.md openspec/changes/prepare-public-portfolio-repository/apply-progress.md`; sum additions + deletions after each RED/GREEN pair.
 
-### Independent phase-contract acceptance (UNCHECKED — fresh context)
+### Independent phase-contract acceptance — RECORDED at native ordinal 105: evidence revision `sha256:8fa48fbbd0e387f0025c95afc8bbcab0ef967093010d926f308d9fed7b1c9dd6`; ordinal-102 endpoint scope `79 + 151 + 26 + 44 = 300` changed lines; hybrid parity passed and validation made zero mutation.
 
-- [ ] Acquisition does NOT change generation; generation remains 0
-- [ ] Takeover requires exact +1 generation; regression and jumps > +1 rejected
-- [ ] Auth confirmation impossible without persisted proof + UID/email dual-read agreement
-- [ ] Definite-no-effect requires two-index independent absence evidence
-- [ ] Crash vectors are real transitions with correct outcomes (not comments)
-- [ ] Completion transition produces profile + completed + audit + ack as one unit
-- [ ] Dispatch safety: duplicate/stale/orphan cause no regression
-- [ ] All expected states in tests are independent (not computed via production helpers)
+- [ ] Exactly eight pure successes and four unsupported events; allowed paths, ownership, retirements, and no fictional crash/read events remain unchanged.
+- [ ] `ACQ-LIFE`/`ACQ-PRED`: acquire admits only pending/dispatch_pending, generation/version `0/0`, null owner/lease/Auth, exact CAS, and live payload lease; valid-shape payload lease `<= observedAt` -> `lease_not_live`, lifecycle/correlation -> `unsupported_event`, malformed lease -> `invalid_event`, other inherited guards retain reasons.
+- [ ] `TK-LIFE`/`TK-LEASE`/`TK-OWNER`/`TK-GEN`: exactly five C-admitted rows (`auth_preflight+Ø`, `auth_preflight+D`, `auth_create+I`, `auth_create+C`, `profile_commit+K`), no active ambiguity or other variant. Expired lease/different owner -> generation/version `+1`; existing `currentDispatchId` is preserved exactly, with no new/copied dispatch identity; live prior lease -> `lease_not_live`; other TK lifecycle/correlation misses -> `unsupported_event` without mutation.
+- [ ] `INT-LIFE`/`INT-FACT`: auth_intent requires active/auth_preflight, live lease, non-null intendedUid, false/null Auth fields, and exact intent output at active/auth_create; all listed contradictions fail closed.
+- [ ] `START-LIFE`: auth_start requires active/auth_create and exact intent/ID, outputs call_started with only existing fields changed, and rejects all listed attempt/ID cases; no un-designed time ordering is added.
+- [ ] `CONF-LIFE`/`CONF-ID`/`CONF-UID`/`CONF-EMAIL`/`CONF-PROOF`: auth_confirm rejects direct intent, wrong attempts, each independent ID/UID/email/proof break, and absent/malformed/proven-before-call/inconsistent proof; exact output is active/profile_commit.
+- [ ] `AMB-LIFE`: auth_ambiguous accepts only matching unproven call_started; rejects absent/intent/confirmed/definite-no-effect/already-ambiguous/proven/mismatched cases; output is manual_recovery/terminal with null returns/proof and cleared owner/lease.
+- [ ] `FOR-LIFE`/identity probes: auth_foreign_user requires pre-attempt active/auth_preflight and UID-or-email inequality; both-match rejects, one-inequality controls succeed, and payload identity is never copied.
+- [ ] `PRO-LIFE`/`PRO-UID`/`PRO-EMAIL`/`PRO-PARTIAL`: profile_commit requires active/profile_commit, confirmed proof, and every UID/email link; exact output is completed/terminal with byte-identical proof; partial/identity mutations fail closed.
+- [ ] Every negative returns the stable existing reason: lifecycle/correlation -> `unsupported_event`; valid-shape non-live acquire payload or live takeover prior lease -> `lease_not_live`; malformed lease -> `invalid_event`; otherwise inherited `invalid_*`, `terminal_state`, or `cas_mismatch`. Prove snapshots, refs, canonical fields, version/generation, no result graph.
+- [ ] Every success has an independent expected status/phase/attempt and `updatedAt=request.observedAt`, version `+1`, takeover-only generation `+1`, immutable fields including exact existing `currentDispatchId`, terminal owner/lease clearing, and no request/event retention; unsupported outputs do not mutate/version.
+- [ ] P2/P3 ownership remains intact: no pure audit/dispatch/profile/provenance/ack/retry/evidence/external proof; profile_commit remains only P3's persistence candidate.
 
 ### Rollback boundary
 
-Revert `functions/src/provisioning/model.ts` to P1a2-i-B-3 frozen state, revert `functions/test/provisioning/model.test.ts` to P1a2-i-B-3 frozen state, revert `tasks.md` and `apply-progress.md` to pre-P1a2-ii state. P1a1 + P1a2-i-A-1 (all 4 children) + P1a2-i-A-2 + P1a2-i-B-1a/B-1b/B-2/B-3 intact.
+Revert only the eight-transition additions and invariant tests in `functions/src/provisioning/model.ts` and `functions/test/provisioning/model.test.ts`, plus this slice's `tasks.md`/`apply-progress.md` bookkeeping, to the independently accepted P1a2-i-C baseline. P1a1, P1a2-i-A, B-1a, B-1b, B-2, and C remain intact; no P2/P3 persistence behavior is rolled back.
 
 ### P1a2-ii Forecast (component sum verified)
 
 | Component | Expected lines |
 |---|---:|
-| `model.ts` extensions (acquisition + takeover + auth matrix + crash transitions + completion + dispatch safety) | 400–500 |
-| `model.test.ts` extensions (boundary + auth matrix + crash + completion + dispatch + 2 negative probes) | 400–520 |
-| `tasks.md` + `apply-progress.md` bookkeeping | 50–80 |
-| **Total P1a2-ii** | **850–1,100** |
+| `model.ts` eight pure transitions + existing-field invariant enforcement | 180–240 |
+| `model.test.ts` eight independent transitions + C-admitted lifecycle/correlation negative families + unsupported/guard/invariant probes | 440–620 |
+| `tasks.md` + `apply-progress.md` bookkeeping | 60–80 |
+| **Total P1a2-ii** | **680–940** |
 
-Early warning at 1,100; STOP/reforecast at 1,200; absolute max 1,200. No size:exception. Component sum verified: low 400+400+50 = 850; high 500+520+80 = 1,100.
+Early warning is 1,100; STOP/reforecast and absolute max are 1,200. No size:exception, borrowing, invented field, or hidden transfer cost is allowed. Component sum is verified: low `180+440+60 = 680`; high `240+620+80 = 940`. If the complete pure slice cannot fit under 1,200, stop and return `blocked` with the exact decision needed; do not widen the reducer or use a size exception.
 
 ---
 
-## P1a2-iii — Terminalization Guards + Retry Thresholds + Negative Probes
+## P1a2-iii — RETIRED / SUPERSEDED (historical only)
 
-**Objective**: implement pending terminalization with the FULL required tuple (fingerprint, status, phase, generation, version, ownerToken, lease, authAttempted, authAttempt, current dispatch ID, dispatch identity/source tuple, worker acknowledgement), active terminalization 4-path classifier (exact current owner + live lease, another owner's unexpired lease, expired lease takeover, terminal idempotent) with correct failed vs manual_recovery outcome, retry thresholds gating EVERY normal-work event with exact closed domain (0–7 normal work, 8–11 terminalize only, non-integer/negative/>11 fail-closed — no mutation and no terminalization), and direct negative probes for the 5 observed unsafe behaviors.
+P1a2-iii is permanently retired by the maintainer-authorized pure-reducer correction. It was never implemented, never accepted, has no checklist, forecast, entry gate, branch, PR, rollback boundary, native apply route, or executable dependency. It MUST NOT be launched or treated as an incomplete task.
 
-**Gaps addressed**: 2 (pending terminalization complete), 3 (active terminalization classifier), 4 (retry thresholds), 13 (honest bookkeeping).
+Its former runtime/persistence claims are reassigned as follows: P3 owns retry thresholds, worker delivery classification, full dispatch tuple/source validation, worker acknowledgement, terminalization predicates, terminal evidence/codes, persisted terminal no-regression, and Auth/profile crash/read reconstruction. P2 retains schema/audit/dispatch foundations, including dispatch field definitions and enqueue foundations. P1a2-ii owns only the eight representable pure OperationState transitions and invariants listed above. The historical name is retained solely for audit traceability.
 
-**Spec traceability**: Requirement: Bounded Retry and Terminal Failure Finalization; Requirement: Operation Invariants.
-
-**Design traceability**: Retry and exhaustion semantics (exact pending/active classifier table); boundary and crash protocol.
-
-**Depends on**: P1a2-ii (frozen boundary transitions + Auth matrix + crash vectors + completion + dispatch safety).
-
-**Base / branch**: `slice/p1a2-iii-terminalization-retry` branched from `slice/p1a2-ii-boundary-transitions`.
-
-**Allowed paths** (exact):
-
-- `functions/src/provisioning/model.ts` (extend — add pending terminalization, active terminalization classifier, retry threshold gates)
-- `functions/test/provisioning/model.test.ts` (extend — add terminalization tests, retry threshold tests, 5 direct negative probes)
-- `openspec/changes/prepare-public-portfolio-repository/tasks.md` (SDD bookkeeping)
-- `openspec/changes/prepare-public-portfolio-repository/apply-progress.md` (metadata updates)
-
-**Forbidden**: all prior forbidden paths remain. No modification of P1a2-i-A, P1a2-i-B-1a/B-1b/B-2/B-3, or P1a2-ii frozen behavior.
-
-### Strict TDD order (RED → GREEN)
-
-- [ ] P1a2-iii.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0.
-- [ ] P1a2-iii.1 RED → GREEN — Retry thresholds with exact closed domain: `retryCount` 0–7 allows normal boundary work; `retryCount` 8–11 allows ONLY terminalization (no normal work); any non-integer, negative, or >11 value fails closed as malformed — no mutation, no terminalization, no state change. Explicit boundary probes: retryCount -1 (fail-closed), 0 (normal work allowed), 7 (normal work allowed), 8 (terminalization only), 11 (terminalization only), 12 (fail-closed), non-integer e.g. 7.5 or "abc" (fail-closed). Pre-handler 5xx semantics: first handler entry can have retryCount 8–11 from pre-handler retries; if retryCount >11 at first entry, fail-closed. No fictional post-exhaustion callback.
-- [ ] P1a2-iii.2 RED → GREEN — Pending terminalization (full tuple): requires ALL of operation fingerprint, status=pending, phase=dispatch_pending, generation=0, version=0, ownerToken=null, leaseExpiresAt=null, authAttempted=false, authAttempt=null, currentDispatchId equal to initial dispatch, AND that dispatch's exact operationId, fingerprint, boundary=acquire, generation=0, sourceVersion=0, workerAck=null. Writes failed/terminal, version=1, terminalCode=unavailable, retry evidence, failure audit, current dispatch workerAck=terminalized atomically. Every field independently mutated in tests — every mismatch blocks.
-- [ ] P1a2-iii.3 RED → GREEN — Pending predicate mismatch: do not infer safety; reread and reclassify; second mismatch returns success with no mutation.
-- [ ] P1a2-iii.4 RED → GREEN — Active terminalization, exact current owner + live lease: require complete active CAS tuple + current dispatch identity. Safe phase (no Auth intent: authAttempted=false, authAttempt=null) -> `failed/unavailable`. Otherwise -> `manual_recovery/internal`. Evidence + failure audit + owner/lease clear + current ack commit together.
-- [ ] P1a2-iii.5 RED → GREEN — Active terminalization, another owner's unexpired lease: no steal, no mutation. CAS loss returns success.
-- [ ] P1a2-iii.6 RED → GREEN — Active terminalization, expired lease: first transaction takes over (exact +1 generation, new owner token, live lease); same invocation then applies complete active classifier with new tuple.
-- [ ] P1a2-iii.7 RED → GREEN — Terminal operation idempotent: return success without mutation or new audit; existing dispatch ack idempotent.
-- [ ] P1a2-iii.8 RED → GREEN — Negative probe (Gap 2 direct): pending terminalization with missing fingerprint rejected; missing dispatch source tuple rejected; missing worker ack rejected.
-- [ ] P1a2-iii.9 RED → GREEN — Negative probe (Gap 3 direct): active terminalization with expired lease WITHOUT takeover first rejected; active terminalization with foreign owner's unexpired lease rejected; active terminalization with stale worker rejected.
-- [ ] P1a2-iii.10 RED → GREEN — Negative probe (Gap 4 direct): retryCount 8 attempting normal work rejected; retryCount 7 allowed; retryCount 12 (beyond 11) fails closed — no mutation, no terminalization; retryCount -1 fails closed; non-integer retryCount fails closed; every normal-work event gated by exact domain check.
-- [ ] P1a2-iii.11 REFACTOR: freeze P1a2-iii. Final type-level GREEN. Aggregate RED/GREEN for ALL P1a1+P1a2-i+P1a2-ii+P1a2-iii.
-
-  ```bash
-  cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/types.ts src/provisioning/normalize.ts src/provisioning/ids.ts src/provisioning/model.ts test/provisioning/types.test.ts test/provisioning/normalize.test.ts test/provisioning/ids.test.ts test/provisioning/fixtures.ts test/provisioning/model.test.ts
-  ```
-
-  ```bash
-  cd functions && node --experimental-strip-types test/provisioning/model.test.ts
-  ```
-
-### Verification commands
-
-- Same type-level and runtime commands as P1a2-ii but including all P1a2-iii tests
-- Git-native count (Windows PowerShell): tracked — `git diff --numstat <P1a2-ii-baseline> -- functions/src/provisioning/model.ts functions/test/provisioning/model.test.ts`; untracked — `git diff --no-index --numstat -- NUL "<path>"` (exit code 1 expected); sum additions + deletions across all changed paths since P1a2-ii commit.
-
-### Independent phase-contract acceptance (UNCHECKED — fresh context)
-
-- [ ] Pending terminalization requires all 12+ predicate fields; every independent mismatch blocks
-- [ ] Active terminalization: 4 paths produce correct outcomes (failed/unavailable, success-no-mutation, takeover+terminalize, idempotent)
-- [ ] Active terminalization never allows expired/foreign/stale workers without proper takeover
-- [ ] Retry thresholds: exact closed domain — 0–7 work; 8–11 terminalize only; non-integer/negative/>11 fail-closed (no mutation, no terminalization); exact 7/8 and 11/12 boundaries correct
-- [ ] 5 direct negative probes all pass:
-  1. Arbitrary acquire generation -> rejected
-  2. Expired active terminalization without takeover -> rejected
-  3. Malformed pending terminalization (missing fields) -> rejected
-  4. Confirmation directly from intent (no proof) -> rejected (tested in P1a2-ii)
-  5. Invalid active/auth_preflight acquire -> rejected
-- [ ] All expected states in tests are independent (not computed via production helpers or duplicate of production transition table)
-
-### Rollback boundary
-
-Revert `functions/src/provisioning/model.ts` to P1a2-ii frozen state, revert `functions/test/provisioning/model.test.ts` to P1a2-ii frozen state, revert `tasks.md` and `apply-progress.md` to pre-P1a2-iii state. P1a1 + P1a2-i + P1a2-ii intact.
-
-### P1a2-iii Forecast (component sum verified)
-
-| Component | Expected lines |
-|---|---:|
-| `model.ts` extensions (pending terminalization + active classifier + retry gates) | 280–350 |
-| `model.test.ts` extensions (terminalization + retry + 5 negative probes + exhaustive tables) | 300–400 |
-| `tasks.md` + `apply-progress.md` bookkeeping | 50–80 |
-| **Total P1a2-iii** | **630–830** |
-
-Early warning at 1,100; STOP/reforecast at 1,200; absolute max 1,200. No size:exception. Component sum verified: low 280+300+50 = 630; high 350+400+80 = 830.
-
-### P1a2 Aggregate (P1a2-i-B has 4 children; A-1 has 4 children)
+### P1a2 Aggregate (P1a2-i-B has 3 executable children; A-1 has 4 children; C gates ii)
 
 | Sub-slice | Expected |
 |---|---:|
@@ -1226,42 +1250,42 @@ Early warning at 1,100; STOP/reforecast at 1,200; absolute max 1,200. No size:ex
 | P1a2-i-A-2 | 120–170 |
 | P1a2-i-B-1a | 105–135 |
 | P1a2-i-B-1b | 105–130 |
-| P1a2-i-B-2 | 140–180 |
-| P1a2-i-B-3 | 145–195 |
-| P1a2-ii | 850–1,100 |
-| P1a2-iii | 630–830 |
-| **Total P1a2** | **2,895–3,820** |
+| P1a2-i-B-2 | 68–110 |
+| P1a2-i-C | 220–340 |
+| P1a2-ii | 680–940 |
+| P1a2-iii | **0 — retired** |
+| **Total P1a2** | **2,098–2,905** |
 
-P1a2 aggregate hard maximum: **4,900** (1,600 + 300 + 600 + 1,200 + 1,200). The B parent remains capped at 600 even though the four-child forecast is 495–640; no size:exception exists for any P1a2 sub-slice.
+P1a2 aggregate hard maximum: **4,100** (P1a2-i max 2,900 + P1a2-ii max 1,200). The B parent remains capped at 600 across its three executable children; its forecast is 278–375 and accepted baseline is 360/600. C has its independent 220–340 forecast and 400 max; ii is independently accepted at ordinal 105 (300 changed-line endpoint). Retired B-3 and P1a2-iii have no executable budget, and no size:exception exists for any P1a2 sub-slice.
 
 ### Handoff contract to P1b
 
-Frozen pure types + frozen normalization/fingerprint + frozen deterministic IDs + frozen canonical vector fixtures + frozen immutable vocabulary + frozen deep runtime immutability + frozen type guards + frozen CAS fence + frozen reducer skeleton (only `reduce()` as public API) + frozen terminal immutability (11×3 negative vectors plus 3 terminal `ack_dispatch` idempotency vectors) + frozen monotonic state + frozen five-class data immutability + frozen boundary transitions + frozen Auth matrix + frozen crash vectors + frozen completion atomicity + frozen dispatch safety + frozen terminalization guards + frozen retry thresholds + frozen 5 negative probes. P1b builds the persistence port and implements the in-memory reference store and the Firestore emulator adapter; both MUST pass every frozen vector from P1a1+P1a2 identically.
+Frozen pure types + frozen normalization/fingerprint + frozen deterministic IDs + frozen canonical vector fixtures + frozen immutable vocabulary + frozen deep runtime immutability + frozen type guards + frozen CAS fence + frozen reducer skeleton (only `reduce()` as public API) + frozen B-2 terminal rejection/non-mutation (11×3 `terminal_state` vectors, three terminal-state mixed-input `invalid_request`/`invalid_expected`/`invalid_event` controls, three terminal-plus-stale-CAS precedence controls, three exact terminal `ack_dispatch` `unsupported_event` controls, unchanged version/generation on every B-2 outcome) + C lifecycle guard accepted before ii + frozen P1a2-ii eight-event pure transition matrix, positive version monotonicity, generation rules, and operation/proof immutability. P1b builds the persistence port and implements the in-memory reference store and the Firestore emulator adapter; both MUST pass every frozen pure vector from P1a1+P1a2 identically. P2/P3 persistence ownership remains outside this pure-model handoff.
 
 ---
 
 ## P1b — Persistence Ports + Conformance (Memory Reference + Firestore Emulator)
 
-**Objective**: define the domain `Store` port (no Firebase import in the port), implement the strict in-memory reference store, implement the Firestore emulator transaction adapter using real `firebase-admin` transactions, and author CAS/lease primitives. Run **every frozen P1a vector** against both stores and assert byte-equal outcomes. Run crash-point schedules around every transaction boundary. **No schema validators, no audit primitives, no profile provenance.** Schemas/audit move to P2; profile moves to P3. **No callable, no dispatch handler, no worker, no submission, no status, no Auth.createUser call.** This slice is the persistence contract and CAS primitives only.
+**Objective**: define the domain `Store` port (no Firebase import in the port), implement the strict in-memory reference store, implement the Firestore emulator transaction adapter using real `firebase-admin` transactions, and author full CAS/lease primitives plus the generation fence. Run **every frozen P1a vector** against both stores and assert byte-equal outcomes. Run crash-point schedules around every transaction boundary. **No schema validators, no audit primitives, no profile provenance, and no terminalization predicates.** Schemas/audit move to P2; profile and terminalization move to P3. **No callable, no dispatch handler, no worker, no submission, no status, no Auth.createUser call.** This slice is the persistence contract and CAS/lease primitives only.
 
 **Spec traceability**: Requirement: Operation Invariants; Requirement: Operation Identity and Idempotency; Requirement: Completion Atomic Commitment; Requirement: First-Slice Compensation Policy.
 
 **Design traceability**: Persistence contracts (`/provisioningOperations`, `/provisioningDispatch`); indexes; full CAS and lease contract; "Executable Contract Before Production Code" (independent pure model + identical conformance vectors against both stores).
 
-**Depends on**: P1a2-iii (frozen reducer + invariants + terminalization + retry; P1a2-iii transitively includes frozen P1a1 types + normalization + IDs + fixtures and P1a2-i/P1a2-ii).
+**Depends on**: accepted P1a2-ii (frozen eight-event pure reducer matrix + invariants; transitively includes frozen P1a1 types + normalization + IDs + fixtures and P1a2-i). P3, not P1b, owns runtime terminalization and retry behavior.
 
-**Base / branch**: `slice/p1b-persistence-conformance` branched from `slice/p1a2-iii-terminalization-retry`.
+**Base / branch**: `slice/p1b-persistence-conformance` branched from `slice/p1a2-ii-pure-transitions`; PR target is the accepted P1a2-ii branch.
 
 **Allowed paths** (exact):
 
 - `functions/src/provisioning/store.ts` (new — domain port; NO firebase-admin import)
 - `functions/src/provisioning/memory_store.ts` (new — strict in-memory reference implementation)
 - `functions/src/provisioning/firestore_store.ts` (new — Firestore emulator transaction adapter; real firebase-admin)
-- `functions/src/provisioning/cas.ts` (new — full CAS predicates, lease helpers, terminalization helpers)
+- `functions/src/provisioning/cas.ts` (new — full CAS predicates, lease helpers, and generation fence; no terminalization predicates)
 - `functions/test/provisioning/store_conformance.test.ts` (new — shared harness running every frozen P1a vector against a store)
 - `functions/test/provisioning/memory_store.test.ts` (new — in-memory-specific tests)
 - `functions/test/provisioning/firestore_store.test.ts` (new — Firestore emulator conformance)
-- `functions/test/provisioning/cas.test.ts` (new — CAS predicate + lease + terminalization vectors against both stores)
+- `functions/test/provisioning/cas.test.ts` (new — CAS predicate + lease + generation-fence vectors against both stores)
 - `functions/package.json` (minimal: add emulator test script routing to `node --experimental-strip-types`; no new runtime dependencies — WU4a already has `firebase-admin`)
 
 **Forbidden in P1b**: no `schemas.ts`, no `audit.ts`, no `profile.ts`, no callable (submit/status), no outbox trigger, no scheduled sweeper, no task worker, no dispatch handler, no Auth.createUser, no `index.ts` export changes, no `firebase.json` emulator port additions, no `firestore.indexes.json` changes.
@@ -1275,22 +1299,28 @@ Frozen pure types + frozen normalization/fingerprint + frozen deterministic IDs 
 
 ### Strict TDD order (RED → GREEN)
 
-- [ ] P1b.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 before every test/emulator invocation.
-- [ ] P1b.1 RED: domain port (`Store`) — type-level compile failure until interface defined; no firebase-admin import in the port.
-- [ ] P1b.2 GREEN: define `Store` port with transactional semantics (read, write, CAS, transaction wrapper); every conformance test fails because no implementation exists yet.
-- [ ] P1b.3 RED: in-memory reference store — every frozen P1a conformance vector fails against the in-memory store.
-- [ ] P1b.4 GREEN: implement in-memory store; pass every frozen P1a vector identically.
-- [ ] P1b.5 RED: CAS primitives — full tuple predicate, lease check (server time), terminalization helper, generation fence.
-- [ ] P1b.6 GREEN: CAS primitives pass against the in-memory store.
-- [ ] P1b.7 RED: Firestore emulator adapter — every frozen P1a conformance vector fails against the real emulator via `firebase-admin` transactions.
-- [ ] P1b.8 GREEN: implement Firestore adapter using real `firebase-admin` transactions against the Firestore emulator; pass every frozen P1a vector.
-- [ ] P1b.9 RED: divergence test — run identical frozen P1a conformance vectors against both stores and assert byte-equal outcomes; any reference-vs-emulator difference fails the build.
-- [ ] P1b.10 GREEN: divergence test passes.
-- [ ] P1b.11 RED: CAS primitives against Firestore emulator — full tuple predicate, lease check, terminalization helper, generation fence; every stale mutation fails; exact live tuple succeeds.
-- [ ] P1b.12 GREEN: CAS primitives pass against both stores identically.
-- [ ] P1b.13 RED: crash-point schedule around every transaction boundary — abort simulation, retry, idempotent re-entry; both stores must behave identically.
-- [ ] P1b.14 GREEN: crash-point schedule passes for both stores identically.
-- [ ] P1b.15 REFACTOR: freeze persistence port + stores + CAS primitives. `npx tsc --noEmit` green.
+- [x] P1b.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0 before every test/emulator invocation.
+- [x] P1b.1 RED: domain port (`Store`) — type-level compile failure until interface defined; no firebase-admin import in the port.
+- [x] P1b.2 GREEN: define `Store` port with transactional semantics (read, write, CAS, transaction wrapper); every conformance test fails because no implementation exists yet.
+- [x] P1b.3 RED: in-memory reference store — every frozen P1a conformance vector fails against the in-memory store.
+- [x] P1b.4 GREEN: implement in-memory store; pass every frozen P1a vector identically.
+- [x] P1b.5 RED: CAS primitives — full tuple predicate, server-time lease check, and generation fence; terminalization predicates are excluded and owned by P3.
+- [x] P1b.6 GREEN: CAS primitives pass against the in-memory store.
+- [x] P1b.7 RED: Firestore emulator adapter — every frozen P1a conformance vector fails against the real emulator via `firebase-admin` transactions.
+- [x] P1b.8 GREEN: implement Firestore adapter using real `firebase-admin` transactions against the Firestore emulator; pass every frozen P1a vector.
+- [x] P1b.9 RED: divergence test — run identical frozen P1a conformance vectors against both stores and assert byte-equal outcomes; any reference-vs-emulator difference fails the build.
+- [x] P1b.10 GREEN: divergence test passes.
+- [x] P1b.11 RED: CAS primitives against Firestore emulator — full tuple predicate, server-time lease check, and generation fence; every stale mutation fails; exact live tuple succeeds; no terminalization predicate is added.
+- [x] P1b.12 GREEN: CAS primitives pass against both stores identically.
+- [x] P1b.13 RED: crash-point schedule around every transaction boundary — abort simulation, retry, idempotent re-entry; both stores must behave identically.
+- [x] P1b.14 GREEN: crash-point schedule passes for both stores identically.
+- [x] P1b.15 REFACTOR: freeze persistence port + stores + CAS primitives. `npx tsc --noEmit` green.
+
+### Independent P1b acceptance — RECORDED
+
+- [x] Fresh independent PASS at `sha256:7b0340540a81cf6034bdea8d5e30cc536ad55432932016a7b4db26e1d89e41b5` remediated failed evidence `sha256:701e1e83f97c2a9580bf03bd2c546bc9cb49b2154c65868cfb24aa54c2f24ac8`; native objective is complete.
+- [x] All 12/12 native controls passed: Store 4/4, memory 1/1, Firestore 7/7, CAS 4/4, and TypeScript 2/2; all five evaluator inputs passed.
+- [x] Exact OpenSpec/Engram parity, cleanup/zero mutation, and the 742/800 review scope passed; remediation evidence is `sha256:b7cbed7aef8db580233bbc394d89026cd80329d0020591690f9c7b2865fffa62`.
 
 ### Verification commands
 
@@ -1310,7 +1340,7 @@ No schemas, no audit, no profile. No submission callable. No outbox trigger. No 
 
 ### Handoff contract to P2
 
-Frozen persistence port + frozen in-memory reference store + frozen Firestore emulator adapter + frozen CAS/lease primitives. Every frozen P1a vector passes identically against both stores. P2 builds the schemas, audit primitives, submission callable, dispatch machinery, and outbox using these.
+Frozen persistence port + frozen in-memory reference store + frozen Firestore emulator adapter + frozen CAS/lease/generation primitives. Every frozen P1a vector passes identically against both stores. P2 builds the schemas, audit primitives, submission callable, dispatch machinery, and outbox using these; P3 adds runtime terminalization predicates and worker behavior.
 
 ### P1b Forecast (component sum verified)
 
@@ -1333,7 +1363,7 @@ Reforecast/STOP at 1,700; absolute max 2,000. Component sum verified: low 60+180
 
 ## P2 — Schemas + Audit + Submission + Reliable Dispatch
 
-**Objective**: implement operation/dispatch/audit schema validators with PII-safety and dedup, the `submitProvisioning` App Check-enforced callable, authorization/denial audit, safe status DTO projection, atomic operation+initial outbox transaction, shared Cloud Tasks enqueue adapter, created-only retry-enabled trigger, scheduled stale-outbox sweeper, deterministic task IDs, `ALREADY_EXISTS` acceptance, guarded acknowledgement, trigger/sweeper race safety, and the repository-preparation metadata for indexes, IAM, schedule, trigger, and monitoring/alerting/runbook.
+**Objective**: implement operation/dispatch/audit schema validators with PII-safety and dedup, the `submitProvisioning` App Check-enforced callable, authorization/denial audit, safe status DTO projection, atomic operation+initial outbox transaction, shared Cloud Tasks enqueue adapter, created-only retry-enabled trigger, scheduled stale-outbox sweeper, deterministic task IDs, deterministic create-if-absent dispatch entity behavior, `ALREADY_EXISTS` acceptance, orphan dispatch persistence lookup/rejection, and guarded enqueue acknowledgement persistence. P2 retains schema, audit, dispatch-identity, enqueue, and outbox foundations: it defines worker-acknowledgement fields but does not own worker delivery classification, full source-tuple validation, worker acknowledgement behavior, terminalization, retry, or crash/read reconstruction; those are P3. Enqueue acknowledgement updates only the dispatch record and never mutates or versions `OperationState`. Trigger/sweeper race safety and repository-preparation metadata for indexes, IAM, schedule, trigger, and monitoring/alerting/runbook remain in this slice.
 
 **Spec traceability**: Requirement: App Check Pre-Handler Enforcement; Requirement: Asynchronous Provisioning Submission; Requirement: Operation Identity and Idempotency; Requirement: Autonomous Backend Liveness; Requirement: Protected Status Query; Requirement: Application Audit and Observability Contract; Requirement: Explicit Non-Goals and Compatibility.
 
@@ -1353,6 +1383,7 @@ Reforecast/STOP at 1,700; absolute max 2,000. Component sum verified: low 60+180
 - `functions/src/provisioning/enqueue.ts` (new — shared adapter + contract + fake)
 - `functions/src/provisioning/outbox.ts` (new — created-trigger fast path)
 - `functions/src/provisioning/outbox_repair.ts` (new — scheduled handler)
+- `functions/src/provisioning/deployment_metadata.ts` (new — declarative IAM/deployment metadata carrier exporting `provisioningDeploymentMetadata`; inert repository-preparation evidence only)
 - `functions/src/index.ts` (new — callable exports with `enforceAppCheck:true`, Admin SDK init, created-trigger export, scheduled export)
 - `functions/package.json` (minimal scripts/emulator additions if not in WU4a)
 - `firebase.json` (Functions emulator port wiring if not in WU4a)
@@ -1382,54 +1413,68 @@ Reforecast/STOP at 1,700; absolute max 2,000. Component sum verified: low 60+180
 
 ### Strict TDD order (RED → GREEN)
 
-- [ ] P2.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0.
-- [ ] P2.1 RED: operation schema validator — every invalid field combination fails.
-- [ ] P2.2 GREEN: operation schema validator; valid combinations pass; invalid rejected.
-- [ ] P2.3 RED: dispatch schema validator — immutable identity + enqueue/ack updates only.
-- [ ] P2.4 GREEN: dispatch schema passes.
-- [ ] P2.5 RED: audit schema + PII-safety — no raw email, names, DNI, telephone, body, token, reset link, SDK message in any audit field.
-- [ ] P2.6 GREEN: audit schema passes; PII-safety scan passes.
-- [ ] P2.7 RED: audit dedup — same `auditEventId` with matching identity fields is idempotent; mismatched identity fails.
-- [ ] P2.8 GREEN: audit dedup passes.
-- [ ] P2.9 RED: admin authorization — unauthenticated -> `unauthenticated`; non-admin -> `permission-denied`; denial audit written before any mutation.
-- [ ] P2.10 GREEN: authorization + denial audit pass.
-- [ ] P2.11 RED: App Check metadata — `enforceAppCheck:true` structural assertion on exported callable. This test MUST be run RED against the WU4a placeholder BEFORE the callable export is introduced.
-- [ ] P2.12 GREEN: export callable with `enforceAppCheck:true`; metadata test passes.
-- [ ] P2.13 RED: submission handler — invalid schema -> `invalid-argument`; role not in `employee|rrhh` -> `invalid-argument`; missing `operationId/email/nombre/apellido1` -> `invalid-argument`.
-- [ ] P2.14 GREEN: schema validation passes.
-- [ ] P2.15 RED: submission transaction — atomic operation + initial dispatch creation; no Auth call; no profile write; return `{operationId, status:'pending'}`.
-- [ ] P2.16 GREEN: submission transaction passes.
-- [ ] P2.17 RED: idempotent replay — same `(operationId, fingerprint)` returns current safe status; different fingerprint returns `already-exists` without mutation.
-- [ ] P2.18 GREEN: idempotent replay passes.
-- [ ] P2.19 RED: safe DTO projection — each status projects only its safe fields; no raw email, owner, lease, generation/version, evidence, audit identity, reset link leaked.
-- [ ] P2.20 GREEN: DTO projection passes.
-- [ ] P2.21 RED: PII-safe log/audit structural check — application logs contain only allowlisted codes and domain-separated digests.
-- [ ] P2.22 GREEN: PII-safety passes.
-- [ ] P2.23 RED: enqueue adapter contract — injectable interface; strict fake proves outbox idempotency.
-- [ ] P2.24 GREEN: adapter contract + strict fake pass.
-- [ ] P2.25 RED: production adapter contract — deterministic queue/task construction from dispatch identity; same task ID for same dispatch.
-- [ ] P2.26 GREEN: production adapter contract passes.
-- [ ] P2.27 RED: created-trigger handler — validates immutable dispatch shape; calls shared adapter; success or `ALREADY_EXISTS` followed by guarded ack transaction (exact dispatch identity + `enqueued=false` -> `enqueued=true`).
-- [ ] P2.28 GREEN: trigger behavior passes; duplicate event, enqueue success, crash-before-ack, `ALREADY_EXISTS`, invalid dispatch, guarded ack, trigger+sweeper race vectors pass.
-- [ ] P2.29 RED: sweeper handler — invoke directly with Firestore-emulator records + shared enqueue adapter; 10-minute grace edge; `(enqueued, createdAt, __name__)` ordering/cursors; 100x5 bounds; rate/concurrency limits.
-- [ ] P2.30 GREEN: sweeper handler behavior passes.
-- [ ] P2.31 RED: sweeper forbidden operations — must NOT execute saga phases, mutate Auth/profile/operation state, acknowledge worker completion, create dispatches, or invent task identities.
-- [ ] P2.32 GREEN: forbidden operations test passes.
-- [ ] P2.33 RED: trigger+sweeper race — one enqueue wins, the other observes `ALREADY_EXISTS`; either acknowledgement wins while the other verifies `enqueued=true`.
-- [ ] P2.34 GREEN: race passes.
-- [ ] P2.35 RED: partial failure/throw — per-record failure logs PII-safe digests; run processes its bounded page, then throws so Scheduler retry + next regular schedule repair.
-- [ ] P2.36 GREEN: partial failure/throw passes.
-- [ ] P2.37 RED: trigger metadata structural proof — retry-enabled `onDocumentCreated`, `retry:true`.
-- [ ] P2.38 GREEN: trigger metadata passes.
-- [ ] P2.39 RED: scheduler metadata structural proof — `retryCount=3`, `minBackoffSeconds=30`, `maxBackoffSeconds=300`, `maxDoublings=2`, `maxInstances=1`, `timeoutSeconds=240`, every-5-minute cadence.
-- [ ] P2.40 GREEN: scheduler metadata passes.
-- [ ] P2.41 RED: monitoring metadata structural proof — alert names/thresholds documented (no production alert created).
-- [ ] P2.42 GREEN: monitoring metadata passes.
-- [ ] P2.43 RED: IAM metadata structural proof — least-privilege service accounts; queue; OIDC; Scheduler invoker; Eventarc trigger; enqueuer role; required Firestore/Auth permissions; environment/project placeholders.
-- [ ] P2.44 GREEN: IAM metadata passes; no production project ID/secret/role binding/queue/scheduler job/alert/deployment created.
-- [ ] P2.45 RED: structural boundary (BACKEND-only) — BEFORE P2 Functions production files exist, test requires BOTH: (a) required P2 Functions production files/exports/metadata exist and are wired (`submit.ts` submission handler, `schemas.ts` validators, `audit.ts` primitives, `enqueue.ts` shared adapter, `outbox.ts` created trigger, `outbox_repair.ts` scheduled sweeper, `index.ts` callable exports with `enforceAppCheck:true`, metadata tests for trigger/scheduler/monitoring/IAM paths); these are absent before P2, guaranteeing genuine RED; (b) forbidden BACKEND-only patterns remain absent in `functions/` scope (no raw HTTP task/callable workaround, no automatic Auth deletion, no client Firebase secondary-app logic copied into Functions, no unsafe direct profile mutation outside approved transaction primitives, no missing `enforceAppCheck:true` metadata on exported callables). Test scans ONLY Functions/`functions/` backend scope and MUST NOT require Flutter/client pattern removal. Test fails RED because required Functions files/exports are missing.
-- [ ] P2.46 GREEN: structural boundary (BACKEND-only) passes AFTER P2 implementation — all required P2 Functions production files exist and are wired in Functions scope; forbidden backend-only patterns remain absent in Functions scope. Client structural absence (secondary Firebase app, direct client Auth creation, direct profile write, client compensation, temp passwords) is P4's responsibility via `firebase_service_migration_test.dart` and related client/UI path tests.
-- [ ] P2.47 REFACTOR: write `docs/operations/outbox-recovery-runbook.md`; add all index additions to `firestore.indexes.json`; `npx tsc --noEmit` green.
+- [x] P2.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0.
+- [x] P2.1 RED: operation schema validator — every invalid field combination fails.
+- [x] P2.2 GREEN: operation schema validator; valid combinations pass; invalid rejected.
+- [x] P2.3 RED: dispatch schema validator — immutable identity + enqueue/ack updates only.
+- [x] P2.4 GREEN: dispatch schema passes.
+- [x] P2.5 RED: audit schema + PII-safety — no raw email, names, DNI, telephone, body, token, reset link, SDK message in any audit field.
+- [x] P2.6 GREEN: audit schema passes; PII-safety scan passes.
+- [x] P2.7 RED: audit dedup — same `auditEventId` with matching identity fields is idempotent; mismatched identity fails.
+- [x] P2.8 GREEN: audit dedup passes.
+
+### P2.0–P2.8 Current Acceptance Record
+
+- **Accepted**: correction `sha256:93b5138397a6fc507f6aa54be82196fe09a4f16e262747cc6e93c1fb5ddd89fd` and fresh independent acceptance `sha256:92d5e1f8a42edb9259172157367d05bea1ecec8fc317ccf4dd1801e8566388c7` supersede the prior failed evidence `sha256:4d632a9cbb929dbcd3d014e9618f7e54546c669fb4d1be8193e8f874e6730a3d`.
+- **Current acceptance**: schemas 41/41, audit 46/46, durable total 87/87, supplemental 9/9; configured TypeScript and `git diff --check` passed with zero-mutation independent verification.
+- **Scope**: cumulative P2 source/test scope 271/800; correction-only scope 47/200. P2.11+ remains unchecked and pending.
+- **Artifact authority**: OpenSpec is canonical. Engram chunk observations #3433, #3457–#3459, #1725, and #3460 are immutable historical snapshots, not current parity gates, and MUST NOT be updated; Engram may retain only small path/hash/evidence summaries, never full artifact bytes.
+- [x] P2.9 RED: admin authorization — unauthenticated -> `unauthenticated`; non-admin -> `permission-denied`; denial audit written before any mutation.
+- [x] P2.10 GREEN: authorization + denial audit pass.
+- [x] P2.11 RED: App Check metadata — `enforceAppCheck:true` structural assertion on exported callable. This test MUST be run RED against the WU4a placeholder BEFORE the callable export is introduced.
+- [x] P2.12 GREEN: export callable with `enforceAppCheck:true`; metadata test passes.
+- [x] P2.13 RED: submission handler — invalid schema -> `invalid-argument`; role not in `employee|rrhh` -> `invalid-argument`; missing `operationId/email/nombre/apellido1` -> `invalid-argument`.
+- [x] P2.14 GREEN: schema validation passes.
+- [x] P2.15 RED: submission transaction — atomic operation + initial dispatch creation; no Auth call; no profile write; return `{operationId, status:'pending'}`.
+- [x] P2.16 GREEN: submission transaction passes.
+- [x] P2.17 RED: idempotent replay — same `(operationId, fingerprint)` returns current safe status; different fingerprint returns `already-exists` without mutation.
+- [x] P2.18 GREEN: idempotent replay passes.
+- [x] P2.19 RED: safe DTO projection — each status projects only its safe fields; no raw email, owner, lease, generation/version, evidence, audit identity, reset link leaked.
+- [x] P2.20 GREEN: DTO projection passes.
+- [x] P2.21 RED: PII-safe log/audit structural check — application logs contain only allowlisted codes and domain-separated digests.
+- [x] P2.22 GREEN: PII-safety passes.
+- [x] P2.23 RED: enqueue adapter contract — injectable interface; strict fake proves outbox idempotency.
+- [x] P2.24 GREEN: adapter contract + strict fake pass.
+- [x] P2.25 RED: production adapter contract — deterministic queue/task construction from dispatch identity; same task ID for same dispatch.
+- [x] P2.26 GREEN: production adapter contract passes.
+- [x] P2.27 RED: created-trigger handler — validates immutable dispatch shape; calls shared adapter; success or `ALREADY_EXISTS` followed by guarded ack transaction (exact dispatch identity + `enqueued=false` -> `enqueued=true`).
+- [x] P2.28 GREEN: trigger behavior passes; duplicate event, enqueue success, crash-before-ack, `ALREADY_EXISTS`, invalid dispatch, guarded ack, trigger+sweeper race vectors pass.
+- [x] P2.29 RED: sweeper handler — invoke directly with Firestore-emulator records + shared enqueue adapter; 10-minute grace edge; `(enqueued, createdAt, __name__)` ordering/cursors; 100x5 bounds; rate/concurrency limits.
+- [x] P2.30 GREEN: sweeper handler behavior passes.
+- [x] P2.31 RED: sweeper forbidden operations — must NOT execute saga phases, mutate Auth/profile/operation state, acknowledge worker completion, create dispatches, or invent task identities.
+- [x] P2.32 GREEN: forbidden operations test passes.
+- [x] P2.33 RED exception: trigger+sweeper race characterization — maintainer authorized no genuine RED because P2.27–P2.32 already implement the required behavior; the definitive test proves one enqueue wins, the other observes `ALREADY_EXISTS`, and either acknowledgement order converges to `enqueued=true`.
+- [x] P2.34 GREEN: deterministic race characterization passes.
+- [x] P2.35 RED: partial failure/throw — per-record failure logs PII-safe digests; run processes its bounded page, then throws so Scheduler retry + next regular schedule repair.
+- [x] P2.36 GREEN: partial failure/throw passes.
+- [x] P2.37 RED: trigger metadata structural proof — retry-enabled `onDocumentCreated`, `retry:true`.
+- [x] P2.38 GREEN: trigger metadata passes.
+- [x] P2.39 RED: scheduler metadata structural proof — `retryCount=3`, `minBackoffSeconds=30`, `maxBackoffSeconds=300`, `maxDoublings=2`, `maxInstances=1`, `timeoutSeconds=240`, every-5-minute cadence.
+- [x] P2.40 GREEN: scheduler metadata passes.
+- [x] P2.41 RED: monitoring metadata structural proof — alert names/thresholds documented (no production alert created).
+- [x] P2.42 GREEN: monitoring metadata passes.
+- [x] P2.43 RED: IAM metadata structural proof — require `deployment_metadata.ts` and its `provisioningDeploymentMetadata` export; cover environment/project/region/rate/concurrency placeholders, logical per-function service accounts, Cloud Tasks queue/retry/rate-limit configuration, task OIDC identity, Scheduler invoker, Eventarc trigger identity, Cloud Tasks enqueuer capability, and required Firestore/Auth capabilities.
+- [x] P2.44 GREEN: declarative metadata only — prove the carrier passes with placeholders and capability intent; explicitly forbid real project IDs, secrets, role/principal bindings, created resources, deployment effects, and guessed region/rate/concurrency values. P3 retains ownership of the final task-function export and reviewed runtime IAM bindings.
+- [x] P2.45 RED: structural boundary (BACKEND-only) — BEFORE P2 Functions production files exist, test requires BOTH: (a) required P2 Functions production files/exports/metadata exist and are wired (`submit.ts` submission handler, `schemas.ts` validators, `audit.ts` primitives, `enqueue.ts` shared adapter, `outbox.ts` created trigger, `outbox_repair.ts` scheduled sweeper, `deployment_metadata.ts` declarative `provisioningDeploymentMetadata` carrier, `index.ts` callable exports with `enforceAppCheck:true`, metadata tests for trigger/scheduler/monitoring/IAM paths); `iam_metadata.test.ts` imports the carrier directly, with no required `index.ts` re-export; these are absent before P2, guaranteeing genuine RED; (b) forbidden BACKEND-only patterns remain absent in `functions/` scope (no raw HTTP task/callable workaround, no automatic Auth deletion, no client Firebase secondary-app logic copied into Functions, no unsafe direct profile mutation outside approved transaction primitives, no missing `enforceAppCheck:true` metadata on exported callables). Test scans ONLY Functions/`functions/` backend scope and MUST NOT require Flutter/client pattern removal. Test fails RED because required Functions files/exports are missing.
+- [x] P2.46 GREEN: structural boundary (BACKEND-only) passes AFTER P2 implementation — all required P2 Functions production files exist and are wired in Functions scope, including the declarative `deployment_metadata.ts` carrier; `iam_metadata.test.ts` imports `provisioningDeploymentMetadata` directly from that carrier, with no required `index.ts` re-export; forbidden backend-only patterns remain absent in Functions scope. Client structural absence (secondary Firebase app, direct client Auth creation, direct profile write, client compensation, temp passwords) is P4's responsibility via `firebase_service_migration_test.dart` and related client/UI path tests. P3 retains the final task-function export and reviewed runtime IAM bindings.
+- [x] P2.47 REFACTOR: write `docs/operations/outbox-recovery-runbook.md`; add all index additions to `firestore.indexes.json`; `npx tsc --noEmit` green.
+
+### Review Workload Forecast — IAM Carrier Amendment
+
+| Field | Amendment impact |
+|---|---|
+| Existing P2.43–P2.44 implementation budget | Unchanged; the carrier and direct-import proof remain within the existing IAM metadata-proof scope. |
+| Chain recommendation | Unchanged; retain `auto-chain` with `feature-branch-chain`; no delivery action is triggered. |
 
 ### Verification commands
 
@@ -1459,13 +1504,13 @@ No `profile.ts` (owned by P3). No task worker. No status callable. No Auth.creat
 
 ### Handoff contract to P3
 
-Frozen schemas + frozen audit primitives + frozen submission callable + callable export with `enforceAppCheck:true` metadata + frozen shared enqueue adapter + frozen created-trigger + frozen sweeper + frozen indexes + frozen runbook. P3 builds the profile provenance primitives, task worker, status callable, and full backend integration proof.
+Frozen schemas + frozen audit primitives + frozen submission callable + callable export with `enforceAppCheck:true` metadata + frozen shared enqueue adapter + frozen created-trigger + frozen sweeper + frozen indexes + frozen runbook. P3 consumes the dispatch schema/foundations and owns full dispatch source-tuple validation, worker acknowledgement behavior, delivery classification, Auth/profile crash/read reconstruction, retry thresholds, terminalization predicates/evidence/codes, persisted terminal no-regression, profile provenance, status callable, and full backend integration proof.
 
 ### P2 Forecast (component sum verified)
 
 Original P2 forecast (without schemas/audit): 660–890. Moved schemas + audit from P1b: +370–495 (schemas.ts 120-160, audit.ts 80-110, schemas.test.ts 100-130, audit.test.ts 70-95).
 
-**P2 Forecast**: 1,030–1,385 (660+370=1,030; 890+495=1,385).
+**P2 Forecast**: 1,030–1,385 (660+370=1,030; 890+495=1,385). This forecast is unchanged: audit/full-dispatch ownership was already included in P2, so no retired B-3 executable cost is duplicated here.
 
 Reforecast/STOP at 1,700; absolute max 2,000.
 
@@ -1473,7 +1518,7 @@ Reforecast/STOP at 1,700; absolute max 2,000.
 
 ## P3 — Profile Provenance + Worker + Status + Full Backend Proof
 
-**Objective**: implement profile provenance matching (moved from P1b), the one-effect-boundary `onTaskDispatched` worker, Auth preflight/intent/create/dual-index reconstruction/manual recovery/no-deletion, profile+completed+success audit+ack atomicity, 12/8 pending+active terminalization, `getProvisioningStatus` callable with completed-integrity checks and fresh reset link generation, final exports and IAM metadata, and the full test suite (unit, crash, threshold, task HTTP, true concurrency, outbox race, full emulator integration). Because behavior and full proof share P3, same-slice backend corrections are allowed until final proof/freeze; no frozen-backend contradiction within this slice. After the last source mutation: aggregate emulator, TypeScript, independent phase-contract validation, candidate freeze. RDD remains disabled; surface explicit maintainer enable decision only after all gates.
+**Objective**: implement profile provenance matching (moved from P1b), the one-effect-boundary `onTaskDispatched` worker, full dispatch source-tuple validation and worker acknowledgement, incoming delivery classification, Auth preflight/intent/create/dual-index reconstruction/manual recovery/no-deletion, profile+completed+success audit+ack atomicity, 12/8 pending+active terminalization, terminal evidence/codes and persisted no-regression, `getProvisioningStatus` callable with completed-integrity checks and fresh reset link generation, final exports and IAM metadata, and the full test suite (unit, crash/read, threshold, task HTTP, true concurrency, outbox race, full emulator integration). P3 explicitly owns every former P1a2-iii runtime concern: retry thresholds, worker delivery classification, full dispatch source tuple, worker acknowledgement behavior, terminalization predicates/evidence/codes, persisted terminal no-regression, and Auth/profile crash/read reconstruction. P2 retains only schema/audit/dispatch/enqueue foundations. A worker acknowledgement advances `OperationState.version` only in the same transaction as a real operation transition; enqueue acknowledgement never versions it. Because behavior and full proof share P3, same-slice backend corrections are allowed until final proof/freeze. After the last source mutation: aggregate emulator, TypeScript, independent phase-contract validation, candidate freeze. RDD remains disabled; surface explicit maintainer enable decision only after all gates.
 
 **Spec traceability**: all provisioning-domain requirements.
 
@@ -1516,53 +1561,259 @@ Reforecast/STOP at 1,700; absolute max 2,000.
 
 ### Strict TDD order (RED → GREEN)
 
-- [ ] P3.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0.
-- [ ] P3.1 RED: profile provenance match — UID + email + operationId + fingerprint + schema version + every normalized field must all match.
-- [ ] P3.2 GREEN: profile provenance passes.
-- [ ] P3.3 RED: profile provenance against Firestore emulator — match/missing/mismatch vectors.
-- [ ] P3.4 GREEN: profile provenance passes against Firestore emulator.
-- [ ] P3.5 RED: worker acquisition — acquire/take over lease; duplicate/out-of-order/terminal deliveries atomically mark dispatch stale and return 2xx; never advance operation state.
-- [ ] P3.6 GREEN: acquisition passes.
-- [ ] P3.7 RED: Auth preflight — mandatory UID + email reads before any create; foreign UID/email before intent -> `failed/already-exists`; no Auth mutation.
-- [ ] P3.8 GREEN: preflight passes.
-- [ ] P3.9 RED: Auth intent — one transaction flips `authAttempted=true`, persists `authAttempt.result=intent`, audit, version, deterministic `auth_create` dispatch, current ack.
-- [ ] P3.10 GREEN: intent commit passes.
-- [ ] P3.11 RED: Auth create boundary — CAS to `call_started`; call create once; exact return + UID/email reads + proof commit -> `profile_commit`; malformed/ambiguous/timeout/crash -> `manual_recovery` (no delete); definite no-effect -> back to `auth_preflight`.
-- [ ] P3.12 GREEN: Auth create boundary passes; no repeated ambiguous create; no automatic deletion.
-- [ ] P3.13 RED: profile_commit boundary — requires persisted Auth proof + mandatory matching UID/email reads; one transaction creates/verifies operation-matching profile + `completed/terminal` + `success.completed` audit + current ack; all-or-nothing.
-- [ ] P3.14 GREEN: profile_commit passes; conflicting profile -> `manual_recovery`; no deletion.
-- [ ] P3.15 RED: crash injection around every external effect — before/after enqueue, Auth intent, Auth call, Auth return, each dual read, proof commit, profile/completion commit.
+- [x] P3.0 ENTRY/FAIL-FAST: verify `node --version` >= 22.6.0.
+- [x] P3.1 RED: profile provenance match — UID + email + operationId + fingerprint + schema version + every normalized field must all match.
+- [x] P3.2 GREEN: profile provenance passes.
+- [x] P3.3 RED: profile provenance against Firestore emulator — match/missing/mismatch vectors.
+- [x] P3.4 GREEN: profile provenance passes against Firestore emulator.
+- [x] P3.5 RED: worker acquisition and delivery classification — validate the full persisted dispatch source tuple, acquire/take over lease, and classify duplicate/out-of-order/orphan/terminal deliveries; stale deliveries mark only the dispatch where legal and return 2xx without advancing operation state.
+- [x] P3.6 GREEN: acquisition passes.
+- [x] P3.7 RED: Auth preflight — mandatory UID + email reads before any create; foreign UID/email before intent -> `failed/already-exists`; no Auth mutation.
+- [x] P3.8 GREEN: preflight passes.
+- [x] P3.9 RED: Auth intent — one transaction flips `authAttempted=true`, persists `authAttempt.result=intent`, audit, version, deterministic `auth_create` dispatch, and worker acknowledgement using P2 schemas; the full source tuple and current-dispatch fence are verified.
+- [x] P3.10 GREEN: intent commit passes.
+- [x] P3.11 RED: Auth create boundary — CAS to `call_started`; call create once; exact return + UID/email reads + proof commit -> `profile_commit`; malformed/ambiguous/timeout/crash -> `manual_recovery` (no delete); definite no-effect -> back to `auth_preflight`.
+- [x] P3.12 GREEN: Auth create boundary passes; no repeated ambiguous create; no automatic deletion.
+- [x] P3.13 RED: profile_commit boundary — requires persisted Auth proof + mandatory matching UID/email reads; one transaction creates/verifies operation-matching profile + `completed/terminal` + `success.completed` audit + current ack; all-or-nothing.
+- [x] P3.14 GREEN: profile_commit passes; conflicting profile -> `manual_recovery`; no deletion.
+- [ ] P3.15 RED: crash/read reconstruction around every runtime effect — before/after enqueue delivery, Auth intent, Auth call, Auth return, each UID/email read, proof commit, profile/completion commit, and terminalization; no explicit crash/read event is added to the pure model.
 - [ ] P3.16 GREEN: crash injection passes.
-- [ ] P3.17 RED: true parallel emulator clients/workers — at least two actual parallel clients for one operation proving lease + CAS semantics (sequential mocks do not qualify).
-- [ ] P3.18 GREEN: true parallel test passes.
-- [ ] P3.19 RED: Functions emulator task endpoint — task worker exercised via authenticated HTTP POST to Functions emulator task endpoint with controlled TaskContext headers (no `emulators.tasks` config).
-- [ ] P3.20 GREEN: Functions emulator task endpoint test passes.
-- [ ] P3.21 RED: pending classifier — exact initial pending state predicate; writes `failed/terminal` + `version=1` + `terminalCode=unavailable` + retry evidence + failure audit + current dispatch `workerAck=terminalized` atomically.
-- [ ] P3.22 GREEN: pending classifier passes.
-- [ ] P3.23 RED: pending predicate mismatch — do not infer safety; reread + reclassify as exact pending/active/terminal; second mismatch/CAS loss returns success with no mutation.
-- [ ] P3.24 GREEN: pending mismatch passes.
-- [ ] P3.25 RED: active with exact current owner + live lease — require complete active CAS tuple; safe phase -> `failed/unavailable`; otherwise -> `manual_recovery/internal`; evidence + audit + owner/lease clear + current ack commit together.
-- [ ] P3.26 GREEN: active exact-owner passes.
-- [ ] P3.27 RED: active with another owner's unexpired lease — no steal, no mutation; CAS loss returns success.
-- [ ] P3.28 GREEN: active foreign-owner passes.
-- [ ] P3.29 RED: active with expired lease — first transaction requires full observed expired tuple, increments generation + version, installs new owner token + live lease; same invocation applies complete active terminalization guard using the exact new tuple.
-- [ ] P3.30 GREEN: expired-lease takeover passes.
-- [ ] P3.31 RED: terminal operation — return success without operation mutation or new audit; existing dispatch acknowledgement idempotent.
-- [ ] P3.32 GREEN: terminal idempotency passes.
-- [ ] P3.33 RED: 12/8 protocol — `retryCount` 0–7 may work; 8–11 terminalize only; non-integer/negative/>11 fail-closed; pre-handler 5xx semantics; no fictional post-exhaustion callback; permanent durable-store outage -> alert + runbook, not silent success.
-- [ ] P3.34 GREEN: 12/8 protocol passes.
-- [ ] P3.35 RED: reserved attempts 8, 9, 10, 11 repeat only guarded terminalization paths; failed terminalization transaction throws so next reserved attempt retries; committed terminal returns success.
-- [ ] P3.36 GREEN: reserved-attempt idempotency passes.
-- [ ] P3.37 RED: status authorization — unauthenticated -> `unauthenticated`; non-admin -> `permission-denied`; unknown operationId -> `not-found`; optional fingerprint mismatch -> `already-exists`; no mutation on either path.
-- [ ] P3.38 GREEN: status authorization passes.
-- [ ] P3.39 RED: status DTO projection — each status returns only its safe fields; no raw email/owner/lease/generation/version/evidence/audit identity.
-- [ ] P3.40 GREEN: DTO projection passes.
-- [ ] P3.41 RED: completed integrity — re-read both Auth indexes + full provenance-tagged profile; failure or inconsistency returns stable integrity error without changing terminal operation or generating a link; deduplicated integrity audit.
-- [ ] P3.42 GREEN: completed integrity passes.
-- [ ] P3.43 RED: fresh reset link — Auth `generatePasswordResetLink` called only after integrity passes; link returned; link never stored, logged, audited, or emailed; transient link failure returns stable retryable error leaving `completed` unchanged.
-- [ ] P3.44 GREEN: reset link passes.
-- [ ] P3.45 RED: full emulator flow — happy-path submission through to completed status with fresh reset link; no client-driven re-drive.
-- [ ] P3.46 GREEN: full emulator flow passes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### P3.15a — Approved Current-Effect Crash/Reconstruction Subslice
+
+Terminalization remains deferred to P3.21+; P3.15 and P3.16 remain unchecked. This subslice covers only existing enqueue delivery, Auth intent/call/return, UID/email reads, proof commit, and profile/completion commit behavior. It adds no pure-model crash/read event and preserves P3.14 profile-conflict and bounded closed-transaction retry coverage.
+
+- [x] P3.15a RED: author crash/restart/replay vectors for the implemented effects, including persisted `call_started` reconstruction and failed proof-commit retry, before changing production code. <!-- sdd-owner: implementation -->
+- [x] P3.15a GREEN: reread both Auth indexes before terminally recording persisted `call_started` ambiguity; never repeat Auth create. <!-- sdd-owner: implementation -->
+- [x] P3.15a TRIANGULATE: retain each-read ambiguity, existing enqueue replay, and profile completion rollback/retry vectors without weakening profile-conflict or closed-transaction coverage. <!-- sdd-owner: implementation -->
+- [x] P3.15a REFACTOR: run focused worker/outbox tests and explicit/configured TypeScript checks; terminalization remains unimplemented. <!-- sdd-owner: implementation -->
+- [x] P3.17 RED: true parallel emulator clients/workers — at least two actual parallel clients for one operation proving lease + CAS semantics (sequential mocks do not qualify). — Maintainer-authorized test-only characterization; existing production behavior passed the first REAL run, so no RED is claimed.
+- [x] P3.18 GREEN: true parallel test passes. — Two independently initialized Firestore clients converged on one persisted operation under a shared pre-start barrier; independent emulator verification passed 67/67.
+- [x] P3.19 RED: Functions emulator task endpoint — task worker exercised via authenticated HTTP POST to Functions emulator task endpoint with controlled TaskContext headers (no `emulators.tasks` config).
+- [x] P3.20 GREEN: Functions emulator task endpoint test passes.
+- [x] P3.21 RED: pending terminalization classifier — exact initial pending operation plus full dispatch/source tuple and null worker acknowledgement; write `failed/terminal`, `terminalCode=unavailable`, retry/failure evidence, failure audit, and current dispatch `workerAck=terminalized` atomically.
+- [x] P3.22 GREEN: pending classifier passes.
+- [x] P3.23 RED: pending predicate mismatch — do not infer safety; reread + reclassify as exact pending/active/terminal; second mismatch/CAS loss returns success with no mutation.
+- [x] P3.24 GREEN: pending mismatch passes.
+- [x] P3.25 RED: active with exact current owner + live lease — require complete active CAS tuple; safe phase -> `failed/unavailable`; otherwise -> `manual_recovery/internal`; evidence + audit + owner/lease clear + current ack commit together.
+- [x] P3.26 GREEN: active exact-owner passes.
+- [x] P3.27 RED: active with another owner's unexpired lease — no steal, no mutation; CAS loss returns success.
+- [x] P3.28 GREEN: active foreign-owner passes.
+- [x] P3.29 RED: active with expired lease — first transaction requires full observed expired tuple, increments generation + version, installs new owner token + live lease; same invocation applies complete active terminalization guard using the exact new tuple.
+- [x] P3.30 GREEN: expired-lease takeover passes.
+- [x] P3.31 RED: terminal operation — return success without operation mutation or new audit; existing dispatch acknowledgement is idempotent in dispatch persistence and never causes a standalone `OperationState.version` increment.
+- [x] P3.32 GREEN: terminal idempotency passes.
+- [x] P3.33 RED: 12/8 retry protocol — `retryCount` 0–7 may work; 8–11 terminalize only; non-integer/negative/>11 fail-closed; pre-handler 5xx semantics; no fictional post-exhaustion callback; permanent durable-store outage -> alert + runbook, not silent success.
+- [x] P3.34 GREEN: 12/8 protocol passes.
+- [x] P3.35 RED: reserved attempts 8, 9, 10, 11 repeat only guarded terminalization paths; failed terminalization transaction throws so next reserved attempt retries; committed terminal returns success.
+- [x] P3.36 GREEN: reserved-attempt idempotency passes.
+- [x] P3.37 RED: status authorization — unauthenticated -> `unauthenticated`; non-admin -> `permission-denied`; unknown operationId -> `not-found`; optional fingerprint mismatch -> `already-exists`; no mutation on either path.
+- [x] P3.38 GREEN: status authorization passes.
+- [x] P3.39 RED: status DTO projection — each status returns only its safe fields; no raw email/owner/lease/generation/version/evidence/audit identity.
+- [x] P3.40 GREEN: DTO projection passes.
+- [x] P3.41 RED: completed integrity — re-read both Auth indexes + full provenance-tagged profile; failure or inconsistency returns stable integrity error without changing terminal operation or generating a link; deduplicated integrity audit.
+- [x] P3.42 GREEN: completed integrity passes.
+- [x] P3.43 RED: fresh reset link — Auth `generatePasswordResetLink` called only after integrity passes; link returned; link never stored, logged, audited, or emailed; transient link failure returns stable retryable error leaving `completed` unchanged.
+- [x] P3.44 GREEN: reset link passes.
+### P3.44a–P3.44e — Corrected runtime-composition prerequisites
+
+This corrected amendment is placed after the already accepted P3.44 and immediately before P3.45. The first child targets the current cumulative P3.43/P3.44 candidate; each later child targets the immediately preceding child. Existing accepted P3.17–P3.44 behavior is consumed, not re-authored. No child changes P3.15/P3.16 ownership, P3.47/P3.48 race proof, P3.49+ matrices, or P3.55 finalization.
+
+#### P3.44a — Submission callable + Firestore persistence composition
+
+**Depends on / branch:** current cumulative accepted P3.43/P3.44 candidate; `slice/p3-44a-submission-composition` branches from that candidate.
+
+**Exact candidate edit paths:** `functions/src/index.ts`; `functions/src/provisioning/submit.ts`; `functions/src/provisioning/boundaries.ts`; `functions/test/provisioning/submit.test.ts`; `openspec/changes/prepare-public-portfolio-repository/tasks.md`; `openspec/changes/prepare-public-portfolio-repository/apply-progress.md`. No other paths.
+
+- [x] P3.44a.1 RED: extend `submit.test.ts` before composition with callable endpoint/App Check/auth wiring, canonical pending response, deterministic initial dispatch, same-identity replay, fingerprint conflict, and atomic Firestore persistence assertions; retain accepted P3.13/P3.14 domain tests as regressions rather than new RED.
+- [x] P3.44a.2 GREEN: compose `submitProvisioning` with `persistInitialSubmission` and the existing Firestore transaction adapter; create operation and initial dispatch atomically, without Auth, queue, profile, or client re-drive effects.
+- [x] P3.44a.3 TRIANGULATE: run the focused test, endpoint emulator test, explicit source+test TypeScript, source-only `npx tsc --noEmit`, and accepted submission/schema regressions.
+    - [x] P3.44a.4 REFACTOR: retain the accepted submission/schema coverage while keeping callable composition limited to persistence and initial dispatch.
+
+**Exact commands:** RED `cd functions && node --experimental-strip-types test/provisioning/submit.test.ts`; RED typecheck `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/index.ts src/provisioning/submit.ts src/provisioning/boundaries.ts src/provisioning/normalize.ts src/provisioning/schemas.ts test/provisioning/submit.test.ts`; GREEN repeats both, then `cd functions && npx firebase emulators:exec --only firestore,auth,functions "node --experimental-strip-types test/provisioning/submit.test.ts"` and `cd functions && npx tsc --noEmit`.
+
+**Rollback boundary:** revert only P3.44a paths and bookkeeping to the current accepted P3.44 candidate; no later child exists in this boundary. **Forecast:** `index.ts` 45–60 + `submit.ts`/`boundaries.ts` 35–50 + `submit.test.ts` 90–120 + bookkeeping 15–20 = **185–250** changed lines; warning 320, STOP 380, hard max 399.
+
+#### P3.44b — Minimal outbox trigger/repair + enqueue/ack composition
+
+**Depends on / branch:** accepted P3.44a; `slice/p3-44b-outbox-composition` branches from P3.44a.
+
+**Exact candidate edit paths:** `functions/src/index.ts`; `functions/src/provisioning/enqueue.ts`; `functions/src/provisioning/outbox.ts`; `functions/src/provisioning/outbox_repair.ts`; `functions/test/provisioning/enqueue.test.ts`; `functions/test/provisioning/outbox.test.ts`; `functions/test/provisioning/outbox_repair.test.ts`; `openspec/changes/prepare-public-portfolio-repository/tasks.md`; `openspec/changes/prepare-public-portfolio-repository/apply-progress.md`. No worker/status or configuration paths.
+
+- [x] P3.44b.1 RED: add only the minimum created-dispatch happy-path vectors for shared enqueue, guarded `enqueued` acknowledgement, stale-record selection, and trigger/scheduler endpoint wiring before composition. Do not add race, duplicate, crash, or `ALREADY_EXISTS` matrix vectors here.
+- [x] P3.44b.2 GREEN: compose the retry-enabled created trigger and scheduled repair with the existing enqueue and acknowledgement seams, preserving deterministic identity and dispatch-only acknowledgement.
+- [x] P3.44b.3 TRIANGULATE: run focused enqueue/outbox tests, Firestore endpoint tests, explicit/source-only TypeScript, and accepted P2 outbox regressions. P3.47/P3.48 retain the complete trigger+sweeper race, duplicate/out-of-order, crash-before/after-enqueue, and `ALREADY_EXISTS` matrix unchanged.
+    - [x] P3.44b.4 REFACTOR: preserve the shared adapter and dispatch-only acknowledgement without widening into worker or status behavior.
+
+**Exact commands:** RED `cd functions && node --experimental-strip-types test/provisioning/enqueue.test.ts && node --experimental-strip-types test/provisioning/outbox.test.ts`; RED typecheck `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/index.ts src/provisioning/enqueue.ts src/provisioning/outbox.ts src/provisioning/outbox_repair.ts src/provisioning/schemas.ts src/provisioning/audit.ts test/provisioning/enqueue.test.ts test/provisioning/outbox.test.ts test/provisioning/outbox_repair.test.ts`; GREEN repeats both, then `cd functions && npx firebase emulators:exec --only firestore,functions "node --experimental-strip-types test/provisioning/outbox.test.ts && node --experimental-strip-types test/provisioning/outbox_repair.test.ts"` and `cd functions && npx tsc --noEmit`. The repair harness remains emulator-only because it requires `FIRESTORE_EMULATOR_HOST`.
+
+**Rollback boundary:** revert only P3.44b paths and bookkeeping to accepted P3.44a; P3.44c–P3.44e are future dependents and are not claimed intact. **Forecast:** `index.ts` 25–40 + enqueue/outbox/repair 25–40 + three focused tests 70–100 + bookkeeping 15–20 = **135–200** changed lines; warning 320, STOP 380, hard max 399.
+
+#### P3.44c — Worker runtime phase routing + Firebase Auth composition
+
+**Depends on / branch:** accepted P3.44b and already accepted focused P3.15a/P3.13–P3.14 regressions; `slice/p3-44c-worker-composition` branches from P3.44b.
+
+**Exact candidate edit paths:** `functions/src/index.ts`; `functions/src/provisioning/worker.ts`; `functions/src/provisioning/boundaries.ts`; `functions/test/provisioning/worker_auth.test.ts`; `openspec/changes/prepare-public-portfolio-repository/tasks.md`; `openspec/changes/prepare-public-portfolio-repository/apply-progress.md`. No terminalization, retry, concurrency, status, or broad crash-matrix paths.
+
+- [x] P3.44c.1 RED: extend `worker_auth.test.ts` before composition only for task endpoint dispatch to the already implemented phase handlers, Firebase Auth adapter construction, and the minimum preflight/intent routing smoke path; accepted worker/domain tests remain regressions. Do not re-author P3.15/P3.16 crash vectors or P3.49+ retry/Auth/concurrency matrices.
+- [x] P3.44c.2 GREEN: compose `onTaskDispatched` phase routing and Firebase Auth reader/creator injection for the minimum runtime path, preserving backend-owned liveness, persisted intent-before-effect, and no Auth deletion.
+- [x] P3.44c.3 TRIANGULATE: run focused worker endpoint tests through Firestore/Auth/Functions emulators, explicit/source-only TypeScript, and already accepted worker regressions only.
+    - [x] P3.44c.4 REFACTOR: retain backend-owned liveness, persisted intent-before-effect, and no-deletion boundaries while removing only composition duplication.
+
+**Exact commands:** RED `cd functions && node --experimental-strip-types test/provisioning/worker_auth.test.ts`; RED typecheck `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/index.ts src/provisioning/worker.ts src/provisioning/boundaries.ts test/provisioning/worker_auth.test.ts`; GREEN repeats both, then `cd functions && npx firebase emulators:exec --only firestore,auth,functions "node --experimental-strip-types test/provisioning/worker_auth.test.ts"` and `cd functions && npx tsc --noEmit`.
+
+**Rollback boundary:** revert only P3.44c paths and bookkeeping to accepted P3.44b; P3.44d/P3.44e are future dependents and are not claimed intact. **Forecast:** `worker.ts` 45–65 + `boundaries.ts`/`index.ts` 25–40 + `worker_auth.test.ts` 90–125 + bookkeeping 15–20 = **175–250** changed lines; warning 320, STOP 380, hard max 399.
+
+#### P3.44d — Status callable + safe DTO composition
+
+**Depends on / branch:** accepted P3.44c and accepted P3.37–P3.40 domain tests; `slice/p3-44d-status-composition` branches from P3.44c.
+
+**Exact candidate edit paths:** `functions/src/index.ts`; `functions/src/provisioning/status.ts`; `functions/src/provisioning/boundaries.ts`; `functions/test/provisioning/status.test.ts`; `openspec/changes/prepare-public-portfolio-repository/tasks.md`; `openspec/changes/prepare-public-portfolio-repository/apply-progress.md`.
+
+- [x] P3.44d.1 RED: extend `status.test.ts` before composition only for missing callable/Firestore/Auth adapters, endpoint authorization wiring, and emulator invocation; retain accepted P3.37–P3.40 authorization and DTO cases as regressions, not new RED behavior.
+- [x] P3.44d.2 GREEN: compose `getProvisioningStatus` with the existing authorization and safe DTO projection; expose no new fields and issue no reset link in this child.
+- [x] P3.44d.3 TRIANGULATE: run focused endpoint tests in Firestore/Auth/Functions emulators plus explicit/source-only TypeScript and accepted status-domain regressions.
+    - [x] P3.44d.4 REFACTOR: retain the safe DTO and authorization projection without adding reset-link or integrity behavior.
+
+**Exact commands:** RED `cd functions && node --experimental-strip-types test/provisioning/status.test.ts`; RED typecheck `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/index.ts src/provisioning/status.ts src/provisioning/boundaries.ts src/provisioning/dto.ts test/provisioning/status.test.ts`; GREEN repeats both, then `cd functions && npx firebase emulators:exec --only firestore,auth,functions "node --experimental-strip-types test/provisioning/status.test.ts"` and `cd functions && npx tsc --noEmit`.
+
+**Rollback boundary:** revert only P3.44d paths and bookkeeping to accepted P3.44c; P3.44e is a future dependent and is not claimed intact. **Forecast:** `status.ts` 35–50 + `boundaries.ts`/`index.ts` 25–40 + `status.test.ts` 90–125 + bookkeeping 15–20 = **165–235** changed lines; warning 320, STOP 380, hard max 399.
+
+#### P3.44e — Completed integrity + immediate fresh reset-link composition
+
+**Depends on / branch:** accepted P3.44d, frozen `profile.ts`, and accepted P3.41–P3.44 domain tests; `slice/p3-44e-integrity-reset-link` branches from P3.44d.
+
+**Exact candidate edit paths:** `functions/src/index.ts`; `functions/src/provisioning/status.ts`; `functions/src/provisioning/boundaries.ts`; `functions/test/provisioning/completed_integrity.test.ts`; `openspec/changes/prepare-public-portfolio-repository/tasks.md`; `openspec/changes/prepare-public-portfolio-repository/apply-progress.md`.
+
+- [x] P3.44e.1 RED: extend `completed_integrity.test.ts` before composition only for callable/emulator adapter invocation around the already accepted integrity and fresh-link domain functions; retain P3.41–P3.44 tests as regressions, not new domain RED.
+- [x] P3.44e.2 GREEN: compose completed-resource integrity reads and Firebase Auth reset-link generation into the status endpoint; generate an immediate fresh link only after integrity passes, never store/log/audit/email it, and preserve completed state.
+- [x] P3.44e.3 TRIANGULATE: run focused Firestore/Auth/Functions emulator endpoint tests, explicit/source-only TypeScript, and accepted integrity/reset-link regressions.
+    - [x] P3.44e.4 REFACTOR: preserve immediate fresh-link issuance only after integrity success and keep the link out of persistence, logs, audits, and email.
+
+**Exact commands:** RED `cd functions && node --experimental-strip-types test/provisioning/completed_integrity.test.ts`; RED typecheck `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/index.ts src/provisioning/status.ts src/provisioning/boundaries.ts src/provisioning/profile.ts test/provisioning/completed_integrity.test.ts`; GREEN repeats both, then `cd functions && npx firebase emulators:exec --only firestore,auth,functions "node --experimental-strip-types test/provisioning/completed_integrity.test.ts"` and `cd functions && npx tsc --noEmit`.
+
+**Rollback boundary:** revert only P3.44e paths and bookkeeping to accepted P3.44d; no future dependent child exists in this boundary. **Forecast:** `status.ts` 35–50 + `boundaries.ts`/`index.ts` 25–40 + `completed_integrity.test.ts` 100–140 + bookkeeping 15–20 = **175–250** changed lines; warning 320, STOP 380, hard max 399.
+
+#### Corrected P3.44a–P3.44e arithmetic and final boundary
+
+| Slice | Forecast (additions + deletions) |
+|:---|---:|
+| P3.44a submission | 185–250 |
+| P3.44b minimal outbox | 135–200 |
+| P3.44c worker routing/Auth composition | 175–250 |
+| P3.44d status callable/DTO | 165–235 |
+| P3.44e integrity/fresh reset link | 175–250 |
+| **Total five-child prerequisite segment** | **835–1,185** |
+
+Arithmetic: `185+135+175+165+175 = 835`; `250+200+250+235+250 = 1,185`. Every child is below the hard 399-line maximum, with no borrowing or `size:exception`. P3.45/P3.46 are final for the happy path: submission through completed status, a fresh status-issued reset link, and no client-driven re-drive. P3.47/P3.48 retain the complete outbox race matrix; P3.49+ retain their existing retry/Auth/concurrency ownership. P3.55 remains the final export/full-suite refactor; these prerequisite children may compose only exports required for their own executable behavior.
+
+- [x] P3.45 RED: full emulator flow — happy-path submission through to completed status with fresh reset link; no client-driven re-drive.
+- [x] P3.46 GREEN: full emulator flow passes.
+
+P3.45/P3.46 prior candidate is verification-rejected because it bypassed the durable-outbox acknowledgement gate; these checkboxes are retained only after the corrected emulator evidence proves every worker delivery follows a guarded trigger acknowledgement.
 - [ ] P3.47 RED: outbox race — trigger+sweeper race; duplicate event; out-of-order delivery; crash before enqueue; crash after enqueue; task already exists (`ALREADY_EXISTS` accepted).
 - [ ] P3.48 GREEN: outbox race passes.
 - [ ] P3.49 RED: retry threshold conformance — `retryCount` 7/8/9/10/11 valid; pre-handler 5xx first entry at 8–11; reserved attempts terminalize only; retryCount >11 or non-integer/negative fail-closed; poison behavior; no fictional exhaustion callback.
@@ -1605,15 +1856,377 @@ No Flutter client change yet (P4). No production deploy. No modification of P1a/
 
 Frozen profile provenance + frozen full backend capability + complete integration proof. P4 migrates the Flutter client and hardens Firestore rules.
 
-### P3 Forecast (component sum verified)
+### P3 Forecast (historical baseline; runtime-composition rows superseded by P3.44a–P3.44e)
 
-Original P3 forecast (without profile): 1,180–1,460. Moved profile provenance from P1b: +120–165 (profile.ts 60-80, profile.test.ts 60-85).
+The former P1a2-iii executable reducer forecast is removed, not copied. The prior aggregate P3 component table is historical context only for the runtime-composition portion: the maintained execution forecast is the five-child P3.44a–P3.44e table inserted after accepted P3.44. The five-child arithmetic is direct and non-additive with the superseded worker/status rows; terminalization and final-proof tasks retain their existing ownership and ordering.
 
-**P3 Forecast**: 1,300–1,625 (1,180+120=1,300; 1,460+165=1,625).
+| Component | Expected lines |
+|---|---:|
+| `profile.ts` + `profile.test.ts` provenance contract | 120–165 |
+| `worker.ts` + `boundaries.ts` dispatch/source tuple, acquisition, Auth boundary, and worker acknowledgement behavior | 260–330 |
+| `terminalization.ts` + pending/active terminalization tests | 280–350 |
+| Auth dual-read/crash reconstruction and retry-threshold tests | 240–300 |
+| `status.ts` + status/integrity/reset-link tests | 180–230 |
+| full integration/concurrency/outbox/retry proof and P3 bookkeeping | 470–590 |
+| **Total P3** | **1,550–1,965** |
 
-Reforecast/STOP at 1,700; absolute max 2,000.
+Component sum is verified: low `120+260+280+240+180+470 = 1,550`; high `165+330+350+300+230+590 = 1,965`. This remains below the existing authorized P3 absolute max of 2,000; no new size exception, borrowing, or hidden transfer cost is used. Reforecast/STOP at 1,700; absolute max 2,000. If the measured transferred runtime scope cannot fit under 2,000, stop and return `blocked` with the exact maintainer decision needed.
+
+## CURRENT / APPROVED FOR APPLY — P3 Ordinary Takeover Unit
+
+This planning correction supersedes the proposed T1→T2→T3 chain without changing any P3 checkbox. P3.5/P3.6 remain unchecked mixed acquisition/classification work. P3.29/P3.30 remain separately owned reserved-attempt takeover-plus-terminalization requirements and receive no completion authority from this unit. The maintainer approved implementation of this ordinary-takeover unit after accepting the measured forecast below.
+
+**Cohesive boundary.** The one current unit implements the approved normal expired-current takeover behavior: full source and eight-field operation predicate; generation derived from the latest observed operation (`operation.generation+1`); deterministic owner/live lease; source dispatch unchanged/current with `workerAck:null`; no next dispatch; audited atomic ownership transition; and exact reread before later ordinary work. It includes strict-fake proof plus minimal REAL Firestore proof for one winner, replay/timestamp preservation, and rollback/atomicity. It excludes Auth/profile behavior and all reserved-attempt terminalization.
+
+**Required proof.** RED covers source identity, each CAS field, expired/live lease edges, and the minimal REAL conflict/convergence vector before production changes. GREEN implements the strict-fake and REAL-backed transaction path as one acceptance unit. TRIANGULATE proves repeated takeover of a retained current source, replay timestamp preservation, one-winner convergence, loser/no-write behavior, and rollback on audit or transaction conflict. REFACTOR runs focused type/unit/emulator checks without reducing coverage.
+
+**Measured gate accepted.** The current-byte pre-edit forecast is: `worker.ts` 70–86 additions; `worker_auth.test.ts` 156–186 additions; task bookkeeping 3–5 additions; apply-progress bookkeeping 16–22 additions; explicit review margin 38–46; no deletions expected; total 283–345 changed lines. This is a warning-range forecast but remains below STOP/reforecast 380 and hard maximum 399. The maintainer approved apply with warning 320, STOP 380, hard 399, no size exception, borrowing, or coverage reduction. REAL proof is not a standalone preventive split; split/reforecast only if the cohesive unit cannot remain below STOP 380 and hard 399.
+
+**Reserved-attempt separation.** P3.29/P3.30 may later reuse the accepted takeover primitive, but they must not couple to this unit. Their existing terminalization, audit, source-acknowledgement, and retry semantics remain unchanged.
+
+## Superseding P3-B Planning Amendment — Blocked, Provisional Chain Only
+
+This documentation-only amendment supersedes the stale P3-B planning basis without changing any P3 checkbox, ID, order, code, config, native state, or authority record. P3-B remains blocked. Its provisional chain is **B1 acquisition/classification (P3.5–P3.6) → B2 preflight/intent (P3.7–P3.10)**, both feature-branch-chain slices from the frozen P2 handoff; no size exception or fresh budget is granted.
+
+### Honest workload correction and accounting basis
+
+- The original conversational estimate was **180–240 lines**; it was inaccurate and need not have appeared in this artifact.
+- The full corrected candidate forecast is **505–650 lines**, a different basis from the **B1 incremental correction forecast of 346–439 lines**. Neither figure is completed work.
+- The historical native observation was **232 charged with 168 remaining under 400**. That is not a caller-owned ledger and must not be presented as B1 budget or as proof that B1 fits 400.
+- B1 incremental correction: `worker.ts 125–155 + boundaries.ts 28–40 + test 175–220 + tasks 4 + progress 14–20 = 346–439`; its endpoint against the historical observation is **578–671**. These are forecasts only.
+- One honest slicing pass may narrow B1/B2 only along independently testable boundaries, counting deletion, tests, and documentation. No code-golf, deletion of proof, or iterative budget manipulation is permitted. If no cohesive subunit fits, remain blocked and request a maintainer decision.
+
+### Candidate reuse failure and frozen validation contract
+
+The reusable worker/boundary skeleton and existing Auth test are useful, but the tests are insufficient, not useless. The failed candidate must not be reused as completion or GREEN evidence. Known missing contracts are: TypeScript parameter properties incompatible with `node --experimental-strip-types`; deterministic incoming ID plus the complete dispatch source tuple; legal stale-dispatch acknowledgement and P2-validated/deduplicated audit; takeover reread and fencing; foreign identity classification as `failed/already-exists`; and read spies plus transaction atomicity vectors. A genuine historical missing-module RED is recorded, but no GREEN is accepted from it; configured TypeScript passing alone is insufficient.
+
+### B1 acquisition/classification — P3.5–P3.6
+
+- **Exact candidate files**: `functions/src/provisioning/worker.ts`, `functions/src/provisioning/boundaries.ts`, and `functions/test/provisioning/worker_auth.test.ts`; no new path is implied by this amendment.
+- **Dependency/start**: accepted P2 schemas, deterministic IDs, enqueue/dispatch identity, audit dedup, and P1a2/P1b contracts; start only after a fresh native eligibility check and a new genuine RED.
+- **Acceptance**: incoming dispatch ID is resolved deterministically; operation and dispatch full tuple (`operationId,fingerprint,boundary,generation,sourceVersion`) and `currentDispatchId` are checked; duplicate, out-of-order, orphan, terminal, and malformed deliveries are classified fail-closed; legal stale acknowledgement changes only dispatch acknowledgement fields and returns 2xx; acquisition uses exact initial fields; takeover requires full observed tuple, expired lease, generation `+1`, new fence, authoritative reread, and no external effect before the reread; transaction writes are atomic and P2 audit validation/dedup is used.
+- **Required RED/GREEN proof**: direct `node --experimental-strip-types` tests plus explicit test-file `npx tsc`; Firestore/Auth/Functions emulator vectors with read spies, stale/no-mutation assertions, takeover-reread fences, and atomicity failure injection. The RED must precede source correction; no emulator or test is run in this planning phase.
+
+### B2 preflight/intent — P3.7–P3.10
+
+- **Exact candidate files**: the same three files, chained from accepted B1; B2 may not widen into Auth create, profile commit, terminalization, status, or retry work.
+- **Acceptance**: mandatory UID and email reads occur before any create; read errors fail closed; a foreign UID/email produces `failed/already-exists` without Auth mutation; both absent reads permit exactly one atomic intent transaction with `authAttempted=true`, `intent`, deterministic `auth_create` dispatch, P2-validated/deduplicated audit, version increment, and current worker acknowledgement; incoming/full-tuple/fence checks and transaction atomicity remain mandatory.
+- **Required RED/GREEN proof**: direct strip-types execution, explicit source+test TypeScript, and Firestore/Auth/Functions emulator tests with read spies, foreign identity controls, both-absent controls, duplicate/replay controls, and injected atomicity failures. `functions/package.json`, lockfile, and `functions/tsconfig.json` are frozen; TypeScript success alone is not runtime or contract proof.
+
+### Authority, rescope, and validation preservation
+
+Native rescope zero-drift means unchanged since settlement, **not zero accumulated lines**; narrowing carries its existing budgets. No supported widening or budget reset is authorized here, no tokens are stored, and docs must not be manipulated to enable a reset. This amendment can change candidate identity/post-settlement drift, so fresh native eligibility must be checked before future execution. Existing P3.5–P3.10 acceptance tasks and checks remain verbatim and unchecked; this amendment records planning boundaries only.
 
 ---
+
+## P3-B Successor Narrowing Pass — P3-B.1 Delivery Identity Gate
+
+**Planning status:** sound as a bounded successor; documentation only. This does not acquire an attempt, implement behavior, settle P3-B, or change P3.5–P3.10. It supersedes only the earlier reset/eligibility wording: the supplied native state is last-observed readiness at `next_action=begin`, not a fresh admission or semantic proof, while this task remains implementation-blocked because no apply is authorized. The supplied remediation revision is `sha256:01a82d5f9eb50f0f2cbb4ad310876fcaa598f22b9a1b92993c30b9e18b63062b`, with `objective=null`, current `0`, attempts `0`, lines `0`, and lifetime `5/794`.
+
+### Smallest independently testable boundary
+
+- **Unit:** deterministic delivery identity classification before any acquisition, lease mutation, Auth read, acknowledgement, or audit write.
+- **Write paths (exact):** `functions/src/provisioning/worker.ts` and `functions/test/provisioning/worker_auth.test.ts`. The rewritten worker and test import no symbol from `functions/src/provisioning/boundaries.ts`; that file remains read-only and its preserved hash is historical evidence. No new path, manifest, config, emulator fixture, or generated file is allowed.
+- **Current read evidence:** the unchanged candidate files are 101 lines (`worker.ts`), 58 lines (`boundaries.ts`), and 73 lines (`worker_auth.test.ts`), 232 lines total—not an assumed 310-ish source basis. These are source lengths, not changed-line budget.
+- **Isolation required:** remove the currently reachable coupled acquisition/Auth-preflight path from the unit's callable export and retain only a classification surface. This explicitly counts deletion/isolation of premature unverified behavior; it must not remain reachable as if accepted.
+- **Accepted behavior:** given `request.dispatchId` plus persisted operation/dispatch records, compare the request ID to persisted `dispatch.dispatchId`; the request has no task ID. Persisted `taskId === dispatchId` is enforced by the dispatch validator. Derive the expected ID with `deriveDispatchId(operationId, boundary, generation, sourceVersion)`, then compare fingerprint equality and `currentDispatchId` separately. Classify `eligible`, `duplicate`, `orphan`, `terminal`, `mismatch`, or `malformed` fail-closed; exact pending-initial and active-current tuples are the only eligible results. The classifier performs no external effect and returns no success claim for acquisition.
+- **Adversarial vectors:** each source-tuple field changed independently; wrong `request.dispatchId`; persisted `taskId !== dispatchId`; deterministic-ID mismatch; pending nonzero generation/version or non-null owner/lease; active phase/boundary, generation, source-version, current-dispatch, or fingerprint mismatch; duplicate worker acknowledgement; terminal operation; missing operation; missing dispatch; invalid/extra persisted records; top-level accessor descriptors; and reflective/proxy exceptions that are caught and classified fail-closed. Add a descriptor-safe exact persisted-envelope extractor before `isValidState`: `isValidOperation` covers only initial pending and `isValidState` excludes the envelope, so active and pending envelope fields must be validated explicitly. Accessors are rejected without invoking getters; do not promise arbitrary Proxy traps never run. Assert no Auth call, persistence write, version/generation change, or stale acknowledgement from this unit.
+- **Dependencies:** accepted P2 schemas, deterministic ID contract, frozen model/status-phase guards, P1a2/P1b lifecycle contract, and a fresh native eligibility check immediately before any future implementation. The historical failed evidence `sha256:1770af2293aa772bdfe644120e875fcdd18a2f73ea2e693c163c736615d30a54` remains an obligation, not GREEN evidence.
+- **RED (not run):** `cd functions && node --experimental-strip-types test/provisioning/worker_auth.test.ts`; then `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/worker.ts test/provisioning/worker_auth.test.ts`. New classifier and envelope-validator vectors must fail before the source correction.
+- **GREEN (not run):** rerun both commands after the worker/test correction; no emulator or package install is part of this unit. Emulator/Auth/Functions persistence proof remains deferred.
+- **Non-goals:** no Firestore transaction, worker acknowledgement, P2 audit creation/deduplication, acquisition, lease/takeover, Auth UID/email reads, `auth_intent`, Auth create, profile commit, terminalization, retry threshold, status callable, P3.5–P3.10 completion, checkbox change, native mutation, or reset.
+- **Downstream ownership:** the next P3-B slice owns persistence-backed stale acknowledgement plus validated/deduplicated stale audit, transaction atomicity/read spies, exact acquisition, takeover reread/fencing, and their P3.5–P3.6 acceptance. B2 remains the chained owner of P3.7–P3.10 preflight/intent and may not claim this classifier as full B1 proof.
+
+### First-unit changed-line forecast (local, not the historical B1 estimate)
+
+| File | Additions | Deletions | Replacements shown (counted as add+delete) | Changed-line range |
+|---|---:|---:|---:|---:|
+| `functions/src/provisioning/worker.ts` | 60–74 | 72–88 | 16–22 | 132–162 |
+| `functions/test/provisioning/worker_auth.test.ts` | 86–106 | 39–57 | 12–18 | 125–163 |
+| `tasks.md` bookkeeping | 6–10 | 0 | 0 | 6–10 |
+| `apply-progress.md` bookkeeping | 10–16 | 0 | 0 | 10–16 |
+| **Total** | **162–206** | **111–145** | **28–40** | **273–351** |
+
+The estimate includes the descriptor-safe envelope validator, accessor/proxy-exception tests, test vectors, removal/isolation, import/extraction overhead, and bookkeeping; replacement rows are descriptive and not added again. Local warning is **320**, STOP/reforecast is **380**, and the hard maximum is **399**; no size exception or borrowing is authorized. This unit is independently rollbackable by reverting the two code/test paths and its two bookkeeping records, without touching P2 or later P3 behavior.
+
+## P3-B.2 — Persist Stale Delivery Acknowledgement + P2-Deduplicated Audit (Superseded Planning Record)
+
+> Superseded by corrective P3-B.2a planning below. The prior 213–317 forecast and full persistence boundary remain retained evidence only; omitted boundary plumbing, legal stale matrix, rollback/concurrency, and emulator convergence are explicitly downstream.
+
+**Order:** P3-B.1 classifier → this persistence slice → later P3.5–P3.6 acquisition/takeover; P3.7–P3.10 and all later P3 tasks remain unchecked. This is P3-B.2, not historical P1 B-1a.
+
+**Chosen boundary:** persist only an out-of-order/mismatched delivery when the incoming `dispatchId` exactly matches the transaction-reread dispatch identity and both persisted envelopes validate. The transaction rereads operation and dispatch, validates the complete dispatch source tuple (`operationId,fingerprint,boundary,generation,sourceVersion`) plus `dispatchId/taskId`, operation identity/status/phase/generation/version/currentDispatchId, and re-runs the classifier before writing. It never derives a comparison from a stale caller copy.
+
+**Atomic behavior:** use `isValidDispatchUpdate` for the sole legal `workerAck:null → stale` update; create or read the deterministic `progress/stale_delivery` audit through P2 `createAuditEvent`/`deduplicateAudit` and `deriveAuditEventId`; commit dispatch acknowledgement and audit together. Operation data, `OperationState.version`, leases, Auth, and profiles are never written. A matching replay rereads and deduplicates without rewriting provenance; an audit identity mismatch, invalid record, missing record, wrong request ID, orphan, malformed/accessor/proxy failure, or transaction failure commits nothing.
+
+**Exact paths:** modify only `functions/src/provisioning/worker.ts`, `functions/src/provisioning/boundaries.ts` (add transaction audit reread), `functions/test/provisioning/worker_auth.test.ts`, and these two SDD records. Reuse the existing Firestore adapter shape and `outbox_repair.test.ts` emulator setup; no new path, manifest, config, or generated file.
+
+**Acceptance vectors:** independent mutation of every source-tuple/identity field; wrong incoming ID and `taskId`; duplicate/terminal/orphan/malformed records; accessor and reflective failures; first stale acknowledgement; replay deduplication; conflicting existing audit; dispatch-only mutation and unchanged operation/version; injected audit/write failure rollback; two parallel Firestore transactions yielding one stale acknowledgement and one audit document; no acquisition, takeover, Auth read, or external effect.
+
+**Strict TDD tasks:**
+- [ ] RED: extend `functions/test/provisioning/worker_auth.test.ts` with stale-ack/audit, full-reread, rollback, and Firestore concurrency vectors before changing `worker.ts` or `boundaries.ts`. <!-- sdd-owner: implementation -->
+- [ ] GREEN: implement the transaction reread, P2 audit validation/deduplication, and dispatch-only stale acknowledgement in `functions/src/provisioning/worker.ts` and `functions/src/provisioning/boundaries.ts`. <!-- sdd-owner: implementation -->
+- [ ] TRIANGULATE: run `functions/test/provisioning/worker_auth.test.ts` against the pure fake and Firestore emulator, proving atomicity, one audit, unchanged operation/version, and no external-effect calls. <!-- sdd-owner: implementation -->
+- [ ] REFACTOR: run inherited `functions/test/provisioning/{schemas,audit,outbox}.test.ts`, the worker test, and TypeScript checks; preserve all P3.5–P3.10 checkboxes as unchecked. <!-- sdd-owner: implementation -->
+
+**Commands/dependencies:** require Node 24.x (`node --version`, minimum 22.6.0) and Java 21 (`java -version`) before every runtime/emulator command. RED is `cd functions && node --experimental-strip-types test/provisioning/worker_auth.test.ts`, followed by explicit `npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/worker.ts src/provisioning/boundaries.ts test/provisioning/worker_auth.test.ts`; GREEN repeats both, adds `cd functions && npx firebase emulators:exec --only firestore "node --experimental-strip-types test/provisioning/worker_auth.test.ts"`, then `cd functions && npx tsc --noEmit`. No install or Functions/Auth emulator is needed.
+
+**Forecast and boundary:**
+
+| Path/category | Additions | Deletions | Changed-line range |
+|---|---:|---:|---:|
+| `worker.ts` | 62–82 | 8–18 | 70–100 |
+| `boundaries.ts` | 10–18 | 0–4 | 10–22 |
+| `worker_auth.test.ts` | 102–138 | 12–24 | 114–162 |
+| `tasks.md` | 9–13 | 0–2 | 9–15 |
+| `apply-progress.md` | 10–16 | 0–2 | 10–18 |
+| New/extracted paths | 0 | 0 | 0 |
+| **Total** | **193–267** | **20–50** | **213–317** |
+
+Warning is 320; STOP/reforecast is 380; hard maximum is 399. Rollback reverts only the three code/test paths and these planning records; P2 remains frozen. The next unit after acceptance owns exact acquisition/takeover, not this slice.
+
+## P3-B.2a — Safe Stale Delivery Eligibility Predicate (Planning Only)
+
+**Authorized clarification:** one classifier, `classifyProvisioningDelivery`, must implement the design's complete `eligible | stale_eligible | orphan | duplicate | terminal | mismatch | malformed | corrupt` vocabulary and precedence; no helper may retain a competing stale predicate. Its pure output is never write authority. P3-B.2a remains classification-only: no acknowledgement, audit, acquisition, lease, Auth, or emulator behavior.
+
+**Exact files:** `functions/src/provisioning/worker.ts`, `functions/test/provisioning/worker_auth.test.ts`, `tasks.md`, and `apply-progress.md`. No `boundaries.ts`, new file, manifest, config, or generated output. The predicate is a direct consumer for the downstream persistence unit, not a syntax-only abstraction.
+
+**Executable semantics:** implement the exact decision table in `design.md`. `malformed` remains structural/schema failure; only dispatch self-identity contradictions are `corrupt`; cross-record/delivery and impossible, future, boundary, or same-version relations are `mismatch`. Pending has no legal stale row. For active legal earlier relations `(dg=og && sv<ov) || (dg<og && sv<ov)` plus timestamp coherence, the dispatch is `eligible` when it remains the phase-matching `currentDispatchId` (same-boundary mutation/takeover retention), otherwise `stale_eligible`; exact current is also `eligible`. Orphan, duplicate, and terminal retain their names and no-write behavior.
+
+**Trust gate:** add the adapter-owned document-reference/snapshot carrier needed to compare delivery ID, Firestore document ID, `dispatchId`, `taskId`, and deterministic identity, but expose no new unauthenticated caller contract. Before persistence planning proceeds, prove every reachable dispatch creation uses the backend atomic/create-if-absent paths and Firestore clients cannot write provisioning operation/dispatch collections. Current `functions/src/index.ts` runtime stubs mean that production premise is not yet proven.
+
+**Legal matrix:** independently vary `operationId`, `fingerprint`, `boundary`, `generation`, `sourceVersion`, `currentDispatchId`, `taskId`, request ID, worker acknowledgement, pending initial fields, active lease/owner shape, terminal status, missing records, exact extra/accessor fields, and reflective failures. Every corrupt or no-write row proves input/reference retention and no persistence/Auth call; legal stale rows prove only classification, never an acknowledgement claim.
+
+**Strict TDD and regression commands:** require Node 24.x (`cd functions && node --version`, minimum 22.6.0). RED/GREEN use `cd functions && node --experimental-strip-types test/provisioning/worker_auth.test.ts`, then the explicit `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/worker.ts test/provisioning/worker_auth.test.ts`; GREEN also runs configured `cd functions && npx tsc --noEmit`. P2 regressions are exactly `cd functions && node --experimental-strip-types test/provisioning/schemas.test.ts`, `cd functions && node --experimental-strip-types test/provisioning/audit.test.ts`, and `cd functions && node --experimental-strip-types test/provisioning/outbox.test.ts`. These are pure/strict-fake checks; no emulator, Java, install, store/Auth write, or native operation is needed here.
+
+**Next bounded unit — P3-B.2a-1 (implementation-ready for approved feature-branch-chain routing):** trusted adapter-owned snapshot/document-reference envelope plus the single classifier's structural identity gate. Interim eligibility is ONLY exact pending-initial or exact active-current. Retained historical current temporal relations and all temporal stale relations belong to P3-B.2a-2; every noncurrent/older temporal candidate is `mismatch`, and `stale_eligible` is unreachable until P3-B.2a-2. It covers valid identity, document-reference mismatch, request/delivery mismatch, `taskId` self-conflict as `corrupt`, deterministic self-conflict as `corrupt`, operation/fingerprint cross-record mismatch, terminal/duplicate/orphan precedence, exact extra/accessor/proxy failures, purity, and absence of competing predicate exports.
+
+**Scoped P2 telemetry correction (user-authorized):** This frozen-boundary exception permits only the preexisting audit-telemetry correction in `functions/src/provisioning/outbox_repair.ts` and `functions/test/provisioning/outbox_repair.test.ts`: replace the audit-scanner-bypassing `console.error` with an injected safe application-log sink. Preserve all unrelated P2 history, checks, and scanner strength; this is not a design-wide override.
+
+**TDD tasks:**
+- [x] P3-B.2a-1.1 RED: add document-reference, valid/corrupt identity, precedence, reflection, purity, and no-write vectors in `functions/test/provisioning/worker_auth.test.ts` before changing `functions/src/provisioning/worker.ts`. <!-- sdd-owner: implementation -->
+- [x] P3-B.2a-1.2 GREEN: add the adapter-owned carrier and extend only `classifyProvisioningDelivery` in `functions/src/provisioning/worker.ts`; keep `boundaries.ts` unchanged and unimported, with only exact pending-initial and exact active-current eligibility. <!-- sdd-owner: implementation -->
+- [x] P3-B.2a-1.3 TRIANGULATE: run the worker test plus `schemas.test.ts`, `audit.test.ts`, and `outbox.test.ts`, proving interim temporal candidates mismatch, identity precedence, reference retention, purity, and no external effect. <!-- sdd-owner: implementation -->
+- [x] P3-B.2a-1.4 REFACTOR: run the explicit and configured TypeScript checks, verify no competing classifier export, preserve P3.5–P3.10 unchecked, and record P3-B.2a-2 ownership in `apply-progress.md`. <!-- sdd-owner: implementation -->
+
+**Full clarified vector inventory across the two bounded units:** independently vary `operationId`, `fingerprint`, document ID, delivery/request ID, `dispatchId`, `taskId`, deterministic tuple, `boundary`, `generation`, `sourceVersion`, `currentDispatchId`, worker acknowledgement, pending initial fields, active owner/lease shape, terminal status, missing records, exact extra/accessor fields, and reflective failures. P3-B.2a-1 covers only exact pending-initial and exact active-current; P3-B.2a-2 adds retained current temporal relations, same-generation lower-version retained, takeover-retained lower-generation/lower-version, stale non-current rows, same-version forks, future/mixed/unknown quadrants, wrong phase/boundary, and created/updated/dispatch timestamp failures. Until P3-B.2a-2, every non-exact temporal candidate is `mismatch` and `stale_eligible` is unreachable.
+
+**Forecast — actual starting `worker.ts` classifier and `worker_auth.test.ts` fixture, not the historical estimate:**
+
+| Path/category | Additions | Deletions | Changed-line range |
+|---|---:|---:|---:|
+| `worker.ts` — full carrier, identity, temporal classifier | 110–165 | 40–70 | 150–235 |
+| `worker_auth.test.ts` — full identity and temporal matrix | 220–320 | 35–65 | 255–385 |
+| `tasks.md` planning amendment | 20–35 | 8–15 | 28–50 |
+| `apply-progress.md` supersession note | 10–18 | 2–6 | 12–24 |
+| Review margin (distributed; no code-golf) | 5–6 | 0 | 5–6 |
+| **Full clarified P3-B.2a total** | **365–544** | **85–156** | **450–700** |
+
+**Safe first-boundary forecast (P3-B.2a-1):** `worker.ts` 65–90 additions/25–40 deletions (90–130); `worker_auth.test.ts` 95–135/18–30 (113–165); `tasks.md` 10–16/4–8 (14–24); `apply-progress.md` 8–14/0–2 (8–16); review margin 15–20; **sum 240–355**. Warning is 320, STOP is 380, and hard maximum is 399; the approved feature-branch-chain strategy removes any pending chain-choice or ask-on-risk decision. P3-B.2a-2 owns retained current temporal relations and the full temporal quadrant/timestamp matrix after B.2a-1 acceptance; until then, all non-exact temporal candidates mismatch and `stale_eligible` is unreachable. Persistence, acknowledgement, audit, acquisition, lease/takeover, Auth, emulator convergence, and P3.5–P3.10 remain unchecked.
+
+## P3-B.2a-2 — Temporal Delivery Classifier (Planning Only)
+
+**Dependency and boundary:** accepted P3-B.2a-1 identity gate plus the completed telemetry correction; modify only `functions/src/provisioning/worker.ts`, `functions/test/provisioning/worker_auth.test.ts`, `tasks.md`, and `apply-progress.md`. Preserve one `classifyProvisioningDelivery` authority. No persistence, stale acknowledgement, audit, lease, Auth, emulator, new file, or P3.5–P3.10 completion.
+
+**Exact temporal matrix:** pending exact `pending/dispatch_pending`, `g=0,v=0`, null owner/lease/current ID, no Auth attempt, `acquire,g=0,sv=0`, and equal operation-created/updated/dispatch-created timestamps => `eligible`; every other pending boundary/generation/sourceVersion/timestamp relation => `mismatch` with no stale row. Active exact current `dg=og,sv=ov`, phase-matching boundary/current ID, and `operation.createdAt <= dispatch.createdAt <= operation.updatedAt` => `eligible`. Active retained current rows with `dg=og,sv<ov` or `dg<og,sv<ov` remain `eligible` only when the dispatch ID is current; otherwise those same two legal earlier quadrants with in-lifetime timestamps => `stale_eligible`. `dg>og`, `sv>ov`, `dg<og && sv>=ov`, every other unlisted generation/version quadrant, same-version fork/wrong current ID, wrong boundary/phase, or timestamp outside the operation lifetime => `mismatch`. Terminal precedes duplicate; both precede temporal classification.
+
+**TDD tasks:**
+- [x] P3-B.2a-2.1 RED: author independent temporal fixtures and assertions in `functions/test/provisioning/worker_auth.test.ts` first, covering exact pending timestamps, exact active/current retention, same-generation and takeover-retained current/noncurrent stale quadrants, all future/mixed/unlisted generation-version quadrants, same-version/boundary forks, timestamp `<`, `=`, `>` boundaries, purity, reference retention, and obsolete interim-mismatch deletions. <!-- sdd-owner: implementation -->
+- [x] P3-B.2a-2.2 GREEN: extend only `classifyProvisioningDelivery` in `functions/src/provisioning/worker.ts` with the approved temporal matrix and timestamp coherence; keep `boundaries.ts` unchanged/unimported and expose no competing stale predicate or new caller authority. <!-- sdd-owner: implementation -->
+- [x] P3-B.2a-2.3 TRIANGULATE: run Node 24 direct worker tests, explicit NodeNext TypeScript, configured TypeScript, and exact `schemas.test.ts`, `audit.test.ts`, and `outbox.test.ts` regressions; no emulator or persistence claim. <!-- sdd-owner: implementation -->
+- [x] P3-B.2a-2.4 REFACTOR: prove one classifier export, preserve terminal/duplicate/orphan/malformed/corrupt precedence, run `git diff --check`, record evidence and rollback in `apply-progress.md`, and leave P3.5–P3.10 unchecked. <!-- sdd-owner: implementation -->
+
+**First-unit changed-line forecast (actual current files; additions/deletions, tests/docs/deletion and refactor margin included):**
+
+| Path/category | Changed-line range |
+|---|---:|
+| `functions/src/provisioning/worker.ts` temporal branches, timestamp checks, and obsolete interim logic | 70–102 |
+| `functions/test/provisioning/worker_auth.test.ts` matrix, boundary vectors, retention, and removed interim expectations | 146–200 |
+| `tasks.md` planning/tasks bookkeeping | 12–18 |
+| `apply-progress.md` evidence/rollback bookkeeping | 10–15 |
+| Refactor/review margin without code-golf or borrowed budget | 12–18 |
+| **Total P3-B.2a-2** | **250–353** |
+
+Warning is 320; STOP/reforecast is 380; hard maximum is 399. Approved delivery is feature-branch-chain; no new ask-on-risk decision or size exception is authorized. Rollback removes only this temporal classifier/test extension and its two planning records; P3-B.2a-1 identity and telemetry correction remain intact.
+
+## P3-B.2b-1 — Transactional Stale Acknowledgement + Deduplicated Audit (superseded planning record — fake-only boundary rejected)
+
+**Historical rationale only:** the complete persistence package is 430–560 lines after the accepted classifier; the former fake-only split deferred mandatory emulator proof and is rejected as an acceptance route. Preserve this record and IDs; do not execute it.
+
+**Allowed writer paths (not repo-wide):** `functions/src/provisioning/worker.ts`, `functions/src/provisioning/boundaries.ts`, `functions/test/provisioning/worker_auth.test.ts`, and the two SDD records. Consume, but do not modify, `audit.ts`, `schemas.ts`, `store.ts`, `memory_store.ts`, and their P2/P1b tests. Preserve all older checkbox IDs/history and broader P3.5–P3.10 checkboxes.
+
+**Prerequisite proof:** separately verify the trusted domain premise from `submit.ts` create-if-absent submission, `boundaries.ts` transaction `createDispatch`, and the Firestore catch-all client denial. Record that `index.ts` runtime composition is still undeployed/fail-closed; no deployment assertion is permitted.
+
+- [ ] P3-B.2b-1.1 RED: independently author fake-backed vectors for trusted dispatch-document rereads, classifier rerun, `stale_eligible`-only authorization, `workerAck:null→stale`, validated `createAuditEvent`/`deduplicateAudit`, all-reads-before-writes, rollback, idempotent replay, race loss, immutable operation/version, and no caller counters/tokens stored. <!-- sdd-owner: implementation -->
+- [ ] P3-B.2b-1.2 GREEN: remove parameter-property syntax from touched `boundaries.ts` classes; add `readAudit` to `WorkerTransaction`, Firestore adapter, and fake; implement only the stale acknowledgement transaction using trusted dispatch→operation→audit reads, the same classifier, `isValidDispatchUpdate`, and P2 audit primitives. <!-- sdd-owner: implementation -->
+- [ ] P3-B.2b-1.3 TRIANGULATE: prove the fake commits dispatch acknowledgement plus audit atomically, writes neither on validation/CAS/audit failure, deduplicates matching replay, rejects identity drift, never changes operation/version, and leaves structured-log safety unchanged. <!-- sdd-owner: implementation -->
+- [ ] P3-B.2b-1.4 REFACTOR: run the exact checks below, audit the allowed-path diff, record the deferred emulator boundary, and stop before acquisition/takeover or any runtime-composition claim. <!-- sdd-owner: implementation -->
+
+**First-unit forecast (changed lines, including tests/docs/deletions/extraction margin):** `boundaries.ts` 26–38; `worker.ts` 84–110; `worker_auth.test.ts` 160–190; SDD records 22–30; review/refactor margin 13–24; **total 305–392**. Warning 320, STOP/reforecast 380, hard maximum 399; no exception or borrowing. Rollback removes only this transaction helper, port propagation, fake vectors, and two records; P3-B.2a-2 remains intact.
+
+**Contract acceptance:** only a transaction-reread `stale_eligible` may write; delivery ID/document ID/dispatch self-identity and operation/fingerprint must match; all reads precede writes; acknowledgement changes only legal dispatch acknowledgement fields; audit is schema-validated and create-if-absent/deduplicated; concurrent loss rolls back; replay is idempotent; operation data, version, leases, Auth/profile, caller counters, and tokens are untouched; no new stale predicate, logger, endpoint, deployment, or native claim is introduced.
+
+**Planned verification (not run in this planning phase):** Node 24 gate `cd functions && node --version` (expected installed `v24.11.1`), then `cd functions && node --experimental-strip-types test/provisioning/worker_auth.test.ts`; explicit test-file TypeScript `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/worker.ts src/provisioning/boundaries.ts test/provisioning/worker_auth.test.ts`; configured `cd functions && npx tsc --noEmit`; regressions `node --experimental-strip-types test/provisioning/audit.test.ts`, `schemas.test.ts`, `store_conformance.test.ts`, and `memory_store.test.ts`.
+
+**P3-B.2b-2 handoff:** run the same worker fake plus real Firestore transaction race/rollback/idempotency proof with installed Temurin 21.0.12.8: PowerShell `cd functions; $env:JAVA_HOME='C:\Program Files\Eclipse Adoptium\jdk-21.0.12.8-hotspot'; $env:PATH="$env:JAVA_HOME\bin;$env:PATH"; npx firebase emulators:exec --only firestore "node --experimental-strip-types test/provisioning/worker_auth.test.ts"`. It must prove both concurrent arrivals reread trusted documents, one stale acknowledgement/audit commit wins, the loser retries safely, and no operation version update occurs.
+
+## P3-B.2b prerequisite handoff — completed
+
+**Status:** Completed under Strict TDD. This preserves fake-only P3-B.2b-1 as superseded history; the next bounded unit below owns the full atomic stale-ack+audit acceptance.
+
+**Evidence basis:** current `functions/src/provisioning/boundaries.ts` has exactly three parameter-property constructors and no `readAudit`; current `worker_auth.test.ts` has classifier fixtures but no transaction read contract. Define `readAudit(eventId): Promise<WorkerRecord | null>` against exactly `provisioningAudit/{eventId}`: existing record returns, missing returns `null`, read errors propagate, and it performs zero writes.
+
+| Future writer path | Changed lines (min–max, additions + deletions) |
+|---|---:|
+| `functions/src/provisioning/boundaries.ts` — strip all three constructors, port, Firestore adapter | 26–36 |
+| `functions/test/provisioning/worker_auth.test.ts` — strict fake + emulator and rejecting-get vectors | 52–70 |
+| `tasks.md` — scoped prerequisite bookkeeping | 4–8 |
+| Eventual `apply-progress.md` evidence append (budget only; not edited now) | 6–10 |
+| Independent validation/refactor margin | 7–11 |
+| **Total** | **95–135** |
+
+**Safe acceptance:** fake matrix covers record/absence/failure; REAL Firestore emulator covers record/absence; an injected rejecting transaction `get` separately proves adapter error propagation; all paths prove zero writes. The accepted classifier is reused unchanged. No stale acknowledgement or production-trust claim is accepted.
+
+- [x] P3-B.2b-pre.1 RED: author the fake matrix and adapter rejecting-`get` vectors in `functions/test/provisioning/worker_auth.test.ts` before changing `boundaries.ts`. <!-- sdd-owner: implementation -->
+- [x] P3-B.2b-pre.2 GREEN: explicitly rewrite `FirebaseAuthReader`, `FirestoreWorkerTransaction`, and `FirestoreWorkerStore` without parameter properties; add the exact `readAudit` port/adapter/fake contract and no stale-ack caller. <!-- sdd-owner: implementation -->
+- [x] P3-B.2b-pre.3 TRIANGULATE: gate Node 24 and Java 21, run the REAL Firestore existing/absence command, and prove injected read failure plus zero writes. <!-- sdd-owner: implementation -->
+- [x] P3-B.2b-pre.4 REFACTOR: run explicit NodeNext TypeScript, schema/audit/outbox regressions, and the scoped diff check; do not change `worker.ts` or P3.5–P3.10 checkboxes. <!-- sdd-owner: implementation -->
+
+**Exact checks (planning only):** `cd functions && node --version`; `java -version` must report installed Java 21; `cd functions && node --experimental-strip-types test/provisioning/worker_auth.test.ts`; `cd functions && npx firebase emulators:exec --only firestore "node --experimental-strip-types test/provisioning/worker_auth.test.ts"`; explicit `cd functions && npx tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/boundaries.ts src/provisioning/worker.ts test/provisioning/worker_auth.test.ts`; `cd functions && node --experimental-strip-types test/provisioning/schemas.test.ts`; `cd functions && node --experimental-strip-types test/provisioning/audit.test.ts`; `cd functions && npx firebase emulators:exec --only firestore,functions "node --experimental-strip-types test/provisioning/outbox.test.ts"`; configured `cd functions && npx tsc --noEmit`; and `git diff --check -- functions/src/provisioning/boundaries.ts functions/test/provisioning/worker_auth.test.ts openspec/changes/prepare-public-portfolio-repository/tasks.md`.
+
+**Dependencies/rollback:** accepted P3-B.2a-2, P2 `audit.ts`/`schemas.ts`, existing Firebase CLI, installed Node 24/Java 21, no install. Rollback is `boundaries.ts`, `worker_auth.test.ts`, and `tasks.md`; future atomic stale-ack paths remain `worker.ts`, `boundaries.ts`, `worker_auth.test.ts`, and `tasks.md`, with full fake/reference CAS, legal `null→stale` only, no operation/version write, validated audit, read-before-write, rollback/replay/concurrency proof. P3.5–P3.10 remain unchecked.
+
+## P3-B.2b-2 — Atomic Stale Acknowledgement + Deduplicated Audit (next coherent tranche)
+
+**Status:** Maintainer-confirmed and implementation-ready after prerequisite evidence `ec00561095f904aec24d84bd7c89e6b7913908d484cdf6dfae5329d829215848`; no stale-audit field-choice blocker remains. Traceability: the accepted stale-audit table in `design.md`, the Atomic Stale-Delivery Acknowledgement Audit requirement in `spec.md`, and read-only prerequisite record `apply-progress.md:1753-1772`. This planning acceptance is not implementation or deployment evidence.
+
+**Boundary:** apply may modify only `functions/src/provisioning/worker.ts`, `functions/src/provisioning/boundaries.ts`, `functions/test/provisioning/worker_auth.test.ts`, and `openspec/changes/prepare-public-portfolio-repository/tasks.md`; parent evidence may append only `openspec/changes/prepare-public-portfolio-repository/apply-progress.md`. The writer receives exactly a `WorkerStore` and `deliveryDispatchId`; `store.transaction` supplies the existing `WorkerTransaction` ports (`readDispatch`, `readOperation`, `readAudit`, `writeDispatch`, `createAudit`) and its authoritative `now`. It accepts no caller snapshots, classifier result, audit candidate/override, clock, counters, tokens, or caller digests. No new file, manifest, config, install, `index.ts` surface, acquisition, lease/takeover, Auth/profile read, terminalization, deployment, or runtime-composition claim.
+
+**Contract:** trusted-reread dispatch then operation, rerun `classifyProvisioningDelivery`, derive `eventId=deriveAuditEventId(operationId,"progress","stale_delivery",dispatch.generation,dispatch.sourceVersion)`, derive `correlationId=hexSha256("provision-correlation:v1\0"+operationId)`, and read the audit before any write. Populate all 14 fields exactly from the accepted design: actor/intended digests are null; dispatch ID/generation/sourceVersion use the immutable dispatch; `transaction.now` is only the candidate `createdAt` for first insertion. `deduplicateAudit` compares every field except `createdAt` and preserves a matching existing event unchanged. Only authoritative `stale_eligible` may atomically commit legal `workerAck:null → stale` plus that validated create-if-absent audit; every mismatch, race loss, or failure writes neither and never mutates operation/version or invokes external effects.
+
+**Forecast (changed lines = additions + deletions):** correlation hashing and exact-field tests raise the honest range to `worker.ts` 78–102; `boundaries.ts` 24–36; `worker_auth.test.ts` 154–194; `tasks.md` 8–12; parent-only future `apply-progress.md` evidence 6–10; test/docs/refactor margin 14–22; **total 284–376**. Warning 320; STOP/reforecast 380; hard maximum 399; no exception or borrowing. Rollback removes only this writer, adapter, test vectors, and bookkeeping; the accepted prerequisite and classifier remain.
+
+**Strict TDD and same-unit acceptance:**
+- [x] P3-B.2b-2.1 RED: author fake and REAL Firestore vectors before source changes for trusted rereads, classifier rerun, legal `null→stale`, all 14 audit fields/IDs, all-reads-before-writes, every no-write classification, conflicting audit, injected failures, atomic rollback, replay, and coordinated concurrency. <!-- sdd-owner: implementation -->
+- [x] P3-B.2b-2.2 GREEN: implement only the transaction stale-ack path in `worker.ts`/`boundaries.ts`; use the existing store/transaction ports and transaction `now`, derive every field from trusted rereads, and add no competing classifier, caller override, acquisition, or Auth. <!-- sdd-owner: implementation -->
+- [x] P3-B.2b-2.3 TRIANGULATE: in this same unit, run the fake and REAL Firestore harness for all acceptance vectors; retain concurrent `Promise.all` worker replay convergence, and separately stage adapter `writeDispatch` then `createAudit` against an existing audit without a prior audit read to prove real Firestore `ALREADY_EXISTS` (code 6) atomically preserves dispatch/audit bytes. This replaces the deadlocking externally coordinated post-read interleaving; it proves adapter atomicity, not that old interleaving. No fake commit hook substitutes for emulator proof. <!-- sdd-owner: implementation -->
+- [x] P3-B.2b-2.4 REFACTOR: gate Node 24 and Java 21, run the exact typecheck, emulator, three direct regressions, and full-path scoped diff check below; preserve broader P3.5–P3.10 and historical checkboxes as unchecked. <!-- sdd-owner: implementation -->
+
+**Exact checks (run only during apply):** gate `cd functions && node --version` (Node >=22.6.0; installed Node 24) and `java -version` (Java 21); run `cd functions && node --experimental-strip-types test/provisioning/worker_auth.test.ts`, REAL Firestore worker for all acceptance, `cd functions && ./node_modules/.bin/tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/worker.ts src/provisioning/boundaries.ts test/provisioning/worker_auth.test.ts`, and configured `cd functions && ./node_modules/.bin/tsc --noEmit`. The three direct regressions are exact: `cd functions && node --experimental-strip-types test/provisioning/schemas.test.ts`; `cd functions && node --experimental-strip-types test/provisioning/audit.test.ts`; `cd functions && node --experimental-strip-types test/provisioning/outbox.test.ts`. Also run `cd functions && ./node_modules/.bin/firebase emulators:exec --only firestore "node --experimental-strip-types test/provisioning/worker_auth.test.ts"`. Scoped `git diff --check` names full paths `functions/src/provisioning/worker.ts functions/src/provisioning/boundaries.ts functions/test/provisioning/worker_auth.test.ts openspec/changes/prepare-public-portfolio-repository/tasks.md openspec/changes/prepare-public-portfolio-repository/apply-progress.md` when parent evidence changes; no install, `index.ts`, acquisition, or Auth emulator is allowed.
+
+## P3-B.2c-pre-payload-contract — Persisted Payload Reducer Repair (required prerequisite)
+
+**Status and ownership:** required, bounded reducer-contract repair before any P3-B.2c acquisition work. Persisted `normalizedPayload` has exactly 19 canonical fields; `displayName` is transiently derived at the normalize/profile boundary and must not become persisted state. This resolves the confirmed persisted-19 versus reducer-20 defect without changing hashing, submission persistence, normalization, or profile behavior. Acquisition remains **NO-GO** under its existing scope/budget decision.
+
+**Allowed repair paths (exact):** `functions/src/provisioning/model.ts`, `functions/test/provisioning/model.test.ts`, `functions/test/provisioning/worker_auth.test.ts`, and this `tasks.md`. `functions/test/provisioning/fixtures.ts` is a read-only dependency and is not an allowed repair path: its canonical normalized vectors retain transient `displayName`, while active delivery fixtures must instead use the persisted 19-field record. A future evidence append is limited to 6–10 lines in `openspec/changes/prepare-public-portfolio-repository/apply-progress.md`; its existing prefix remains byte-for-byte intact. No other source, test, schema, persistence, profile, config, progress, or documentation path is authorized.
+
+**Strict TDD and canonical ownership:**
+- [x] P3-B.2c-pre-payload-contract.1 RED: first author reducer and active-delivery fixture assertions proving a 19-field persisted pending record transitions to active and supports a further valid transition without payload mutation; reject an otherwise valid persisted payload with extra `displayName`; prove deep-freeze/reference immutability and canonical fingerprint stability. <!-- sdd-owner: implementation -->
+- [x] P3-B.2c-pre-payload-contract.2 GREEN: change only `model.ts` persisted payload validation/typing to accept exactly the canonical 19 fields and reject transient `displayName`; keep `displayName` derivation, canonical-key hashing, submission stripping, and profile input behavior unchanged. <!-- sdd-owner: implementation -->
+- [x] P3-B.2c-pre-payload-contract.3 TRIANGULATE: make the active `worker_auth.test.ts` delivery fixture persisted-19, then run the exact focused reducer, worker-auth, schemas, and profile regressions plus explicit NodeNext and configured local `tsc`; no emulator is required because no adapter changes. <!-- sdd-owner: implementation -->
+- [x] P3-B.2c-pre-payload-contract.4 REFACTOR: retain one canonical persisted-payload ownership marker, remove no coverage to meet budget, run scoped diff check, and append only the bounded future evidence lines; leave acquisition and broader P3 checkboxes unchecked. <!-- sdd-owner: implementation -->
+
+**Forecast (additions + deletions; complete accounting):** `model.ts` 12–22; `model.test.ts` 42–66; `worker_auth.test.ts` 8–16; `tasks.md` 18–28; future `apply-progress.md` evidence 6–10; deletion/refactor/documentation margin 14–24; **total 100–166**. Warning 320; STOP/reforecast 380; hard maximum 399; no exception, borrowing, or coverage reduction. Rollback removes only this repair's reducer/test/fixture edits and future bounded evidence append; it does not alter normalization, persistence, profile, or the retained acquisition NO-GO.
+
+**Apply-only regression commands (not run in this planning amendment):** `cd functions && node --experimental-strip-types test/provisioning/model.test.ts`; `cd functions && node --experimental-strip-types test/provisioning/worker_auth.test.ts`; `cd functions && node --experimental-strip-types test/provisioning/schemas.test.ts`; `cd functions && node --experimental-strip-types test/provisioning/profile.test.ts`; `cd functions && ./node_modules/.bin/tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/model.ts test/provisioning/model.test.ts test/provisioning/worker_auth.test.ts`; and `cd functions && ./node_modules/.bin/tsc --noEmit`. Node 24 is required; no emulator is authorized unless an adapter changes, which this prerequisite forbids.
+
+## P3-B.2c — Initial Pending Lease Acquisition (planning-only; amended)
+
+**Accepted two-unit gate — planning only.** The explicit human-approved split supersedes the prior same-unit NO-GO; its 428–533 figure is retained below as historical evidence for the rejected indivisible boundary, not a measured forecast for either new unit. Unit A is atomic production acquisition plus strict-fake proof; Unit B is REAL Firestore rollback/concurrency/replay acceptance. A passing Unit A is not full acquisition acceptance, and broader P3 remains incomplete until Unit B passes.
+
+**Immutable scope:** one transaction must trusted-read source dispatch, operation, candidate audit, and next dispatch before writes; validate only the initial pending tuple and source `acquire/g0/sourceVersion0`; pure-reduce `acquire`; atomically write operation, source `processed` acknowledgement, 14-field audit, and deterministic next dispatch. It excludes takeover, Auth/profile, terminalization, and classifier remapping. The 60-second lease uses `transaction.now`; the source is `processed`; the audit is `progress/state_transition/started/success`, g0/sv0, approved correlation, and null actor/intended digests.
+
+**Design skeleton (not implementation evidence):**
+
+| Block | Concrete planned content | Lines |
+|---|---|---:|
+| `worker.ts` imports/types | `createHash`, audit/create-deduplicate, `deriveAuditEventId`/`deriveDispatchId`/`deriveOwnerToken`, reducer types and schema guards | 14–18 |
+| trusted-read validation | dispatch → operation → audit → next dispatch; exact initial constants, identity relations, `ownerSeed===deriveOwnerToken(source.dispatchId,0)`, and all eight `ExpectedCAS` fields | 42–52 |
+| reducer/write stages | `createEvent("acquire",…)`, `reduce`, lease `now+60_000`, adapter-only pointer, validated operation/source update, next create, audit create-or-deduplicate | 44–52 |
+| test imports/helpers/fixture | canonical fixture factory derives operation/fingerprint/source/task/seed/audit/next IDs; `expectedCAS`, request, `assertUnchanged`, and call-order helpers | 54–64 |
+| operation matrix | 17 named isolated mutation rows plus legal-equivalence rows; each has strict-map snapshot and no-write or successful outcome | 68–85 |
+| source matrix | 16 named isolated mutation rows plus legal enqueue-shape rows; each has strict-map snapshot and no-write or successful outcome | 64–80 |
+| positive/audit/replay fake cases | `ACQ-OK`, matching audit, processed replay, grouped timestamp relation, coherent recomputation, and rollback assertions | 54–70 |
+| REAL emulator cases | matching-audit convergence/replay, `Promise.all` convergence, and four-write code-6 rollback with original/next-absence assertions | 54–64 |
+| four checkbox replacements | four unchecked task lines replaced by four outcome lines | 8 |
+| future progress evidence | bounded post-apply evidence append | 6–12 |
+| contingency | formatting, type diagnostics, and assertion clarity; not code-golfed away | 20–28 |
+| **Total** | **all blocks counted; no shared/omitted block** | **428–533** |
+
+**Semantic matrix correction:** the 17 operation and 16 source fields are not “all invalid.” Named negative rows replace a field with an actual malformed value or broken acquisition constant/relation: `schemaVersion:2`; other valid UUID/digest identity mismatch; active/noninitial status or phase; nonzero generation/version; non-null initial owner/lease/pointer; `authAttempted:true` or coherent non-null attempt; unequal timestamps; wrong source boundary/generation/sourceVersion; wrong task/operation/fingerprint identity; wrong owner seed; acknowledged source; and malformed enqueue/ack shape. Positive rows use schema-valid alternate normalized payload/intended UID/submitted digest without pinning fixture values; grouped equal `operation.createdAt`/`updatedAt`/`source.createdAt`; both valid empty enqueue and valid trigger/sweeper acknowledged enqueue tuples; and a coherently recomputed operation/fingerprint/dispatch/task/seed/audit/next identity. The full eight-field CAS is preserved. Thus legal equivalents are distinguished from malformed or inconsistent persisted records.
+
+**Proof skeleton:** fake `ACQ-OK` asserts four reads precede every write, reducer output retains null pointer until adapter assignment, lease/processed/audit/next values, and three-map snapshots. `ACQ-MATCHING-AUDIT` preserves existing `createdAt`; `ACQ-PROCESSED-REPLAY` proves replay bytes unchanged; `ACQ-ROLLBACK` covers audit mismatch, next conflict, create conflict, and reducer/CAS failure. REAL uses existing `StrictWorkerStore`/`strictStoreSnapshot` savings only for the fake, and existing Firebase app/store lifecycle plus `Promise.all` and code-6 pattern for emulator setup. REAL convergence asserts persisted final state rather than a returned loser. The code-6 case stages operation write, source acknowledgement write, next create, then conflicting audit create and asserts code 6, original operation/source/audit, and absent next dispatch.
+
+**Execution order and gate:** Unit B depends on completed Unit A and reruns against A's committed candidate; it is never replaced by a fake substitute. No production edit is authorized in Unit B: a defect exposed there stops for a separately authorized bounded remediation. Each unit has warning 320, STOP/reforecast 380, hard maximum 399, no exception, no borrowing, no coverage reduction, and its own implementation-owner checklist.
+
+### P3-B.2c-pre — StrictWorkerStore test-only `createDispatch` prerequisite
+
+**Purpose and boundary (historical, completed):** Before completion, `StrictWorkerStore.createDispatch` always threw in `functions/test/provisioning/worker_auth.test.ts:345–378`. This completed prerequisite implemented only test-only create-if-absent behavior on the transaction working copy. Its prior edit surface was limited to `functions/test/provisioning/worker_auth.test.ts` and this `tasks.md`; no `worker.ts` or `boundaries.ts` change occurred, and planning does not write progress.
+
+**Behavior:** duplicate creation rejects without overwrite; a later callback failure rolls back all three maps byte-for-byte; and success creates exactly once. Retain the existing stale-audit fake regressions. This prerequisite makes no claim of acquisition fake acceptance or emulator acceptance, and no emulator run is needed for passive planning.
+
+**Strict TDD, independent acceptance:**
+- [x] P3-B.2c-pre.1 RED: add focused `StrictWorkerStore` vectors that expose the always-throwing `createDispatch` behavior and specify create-if-absent success, duplicate rejection without overwrite, and byte-for-byte three-map rollback after a later callback failure. <!-- sdd-owner: implementation -->
+- [x] P3-B.2c-pre.2 GREEN: implement the test-only transaction-working-copy create-if-absent behavior in `worker_auth.test.ts`; retain stale-audit fake regressions and change no production source, `worker.ts`, or `boundaries.ts`. <!-- sdd-owner: implementation -->
+- [x] P3-B.2c-pre.3 TRIANGULATE: prove one successful create, duplicate preservation, and rollback of all three maps after a later callback failure using the strict fake only; do not represent this as acquisition fake or REAL Firestore acceptance. <!-- sdd-owner: implementation -->
+- [x] P3-B.2c-pre.4 REFACTOR: keep the fake-store helper and vectors clear without expanding the prerequisite surface; future parent bookkeeping remains append-only and is not written during planning. <!-- sdd-owner: implementation -->
+
+**Prerequisite forecast (changed lines = additions + deletions; forecast only):** `worker_auth.test.ts` 26–44 (adds 24–38, deletes 2–6); `tasks.md` 5–10; parent-only future `apply-progress.md` 6–10; contingency 5–8; **total 42–72**. This is a standalone test-only work unit with terminal implementation ownership. It has no exception and does not alter the initial-acquisition budget decision.
+
+**Acquisition implementation paths after prerequisite:** `functions/src/provisioning/worker.ts`, `functions/test/provisioning/worker_auth.test.ts`, and `tasks.md`; future apply evidence may append only 6–12 lines to `apply-progress.md`. `boundaries.ts` remains a read-only dependency: existing `WorkerTransaction` already supplies every required production primitive, so acquisition expects **zero** `boundaries.ts` changes. Planning does not edit `apply-progress.md`.
+
+**Prerequisites/symbol map:** reuse `model.ts` `reduce`, `createEvent`, `ReducerRequest`, `ExpectedCAS`; `cas.ts` full-tuple/lease fences; `schemas.ts` `isValidOperation`, `isValidDispatch`, `isValidDispatchUpdate`; `ids.ts` `deriveDispatchId`, `deriveOwnerToken`; `worker.ts` `classifyProvisioningDelivery` and `acknowledgeStaleDelivery`; and read-only `boundaries.ts` `WorkerStore`, `WorkerTransaction`, `FirestoreWorkerStore`, authoritative `now`, trusted rereads, `writeOperation`, `writeDispatch`, `createDispatch`. Existing callers are `submit.ts` atomic initial operation/dispatch creation and `outbox.ts` enqueue-only acknowledgement; verify all callers and explicit TypeScript impact.
+
+**Contract:** in one trusted transaction, read dispatch, operation, candidate audit, and next dispatch before any write. Require the full operation tuple and immutable source `acquire/g0/sourceVersion0` tuple, exact pending `dispatch_pending`, `version=0`, `currentDispatchId=null`, `workerAck=null`, server transaction clock, and deterministic owner-seed/token relation. Invoke the pure `acquire` reducer, which preserves `generation=0` and its null pointer while producing `version=1`; the adapter assigns the deterministic `auth_preflight/g0/sourceVersion1` next pointer. Atomically persist the 60-second lease, processed source acknowledgement, accepted 14-field `progress/state_transition/started/success` audit sourced from g0/sourceVersion0 with approved correlation hash and null actor/subject digests, and create-if-absent next dispatch. Matching replay preserves the original audit timestamp; any audit/dispatch/create/CAS conflict rolls back all writes, and concurrency has one winner.
+
+Owner injection is a genuine contract: require `sourceDispatch.ownerSeed===deriveOwnerToken(sourceDispatch.dispatchId,0)` and assign that derived token as owner; tests may inject only the transaction clock and persisted canonical seed. The initial persisted pointer is normatively null, and only the adapter assigns the next pointer; no field or reducer behavior may be invented.
+
+**Ordered work units, strict TDD, and canonical ownership:**
+
+**Unit A — Atomic acquisition implementation + strict fake (first; implementation owner).** Allowed writes: `functions/src/provisioning/worker.ts`, `functions/test/provisioning/worker_auth.test.ts`, this `tasks.md`, and a future 6–10-line append to `apply-progress.md`; user-authorized repair additionally permits only persisted-19 constructor corrections in `functions/test/provisioning/store_conformance.test.ts` and `functions/test/provisioning/memory_store.test.ts`; all other production files are read-only. Reuse existing `StrictWorkerStore` and `strictStoreSnapshot` only for A's fake matrix; the existing canonical operation/dispatch data fixture may be shared with B. B independently uses its existing Firebase lifecycle, `Promise.all`, and code-6 pattern. A owns `ACQ-OK`, both complete named fence matrices, matching-audit fake, processed-replay fake, and every strict-fake rollback branch.
+- [x] P3-B.2c-A.1 RED: add named strict-fake vectors before production edits for the four trusted reads-before-writes, all eight-field CAS, source constants/identity/seed, valid-versus-invalid operation/source mutations (including schema-invalid/broken relation rejection and legal payload/intendedUid/submittedByDigest, timestamp/identity, and empty/trigger/sweeper enqueue tuples), exact audit, matching-audit/replay distinction, and all rollback branches. <!-- sdd-owner: implementation -->
+- [x] P3-B.2c-A.2 GREEN: implement only initial pending acquisition in `worker.ts`: pure `acquire`, derived owner/lease60, adapter pointer, and one transaction writing operation, processed source acknowledgement, 14-field audit, and next dispatch atomically. No Auth/profile, takeover/renewal, terminalization, classifier, or `boundaries.ts` change. <!-- sdd-owner: implementation -->
+- [x] P3-B.2c-A.3 TRIANGULATE: prove the complete fake matrix, all four writes, reducer-null-pointer then adapter assignment, matching audit timestamp preservation, processed replay byte stability, and rollback of originals plus next absence. <!-- sdd-owner: implementation -->
+- [x] P3-B.2c-A.4 REFACTOR: retain readable cases and shared helper ownership without coverage removal; run Unit A commands and scoped diff check. A is complete only for implementation/fake proof; full acquisition remains unchecked pending B. <!-- sdd-owner: implementation -->
+
+**Accepted A-only disposition:** Maintainer accepted the historical missing-export compilation RED deviation; no behavioral RED is claimed or fabricated. Independent verification passed 7 regressions, 2 TypeScript checks, worker 22 pass/3 skip, store 4/4, and memory 1/1. Unit B remains pending and must execute all REAL rollback, concurrency, and replay proof.
+
+**Unit B — REAL Firestore rollback/concurrency/replay acceptance (second; depends on A; implementation owner).** Allowed writes are test/documentation only: `functions/test/provisioning/worker_auth.test.ts`, this `tasks.md`, `design.md`, `spec.md`, and a future 6–10-line `apply-progress.md` append. B executes against A's candidate and may read `worker.ts`, `boundaries.ts` (Firestore transaction/clock mapping), `model.ts`, `schemas.ts`, `ids.ts`, and `audit.ts`; it changes none. A REAL-exposed defect is a stop for separately authorized bounded remediation, never a silent B production roll-forward.
+- [x] P3-B.2c-B.1 RED: add emulator-gated `REAL-ACQ-ONE-WINNER`, matching-audit, processed-replay, and `REAL-ACQ-CODE6-ROLLBACK` acceptance vectors before any remediation; use a pre-start barrier and `Promise.all`, never an external write or held post-read barrier. <!-- sdd-owner: implementation -->
+- [x] P3-B.2c-B.2 GREEN: run the REAL vectors against Unit A unchanged; assert convergence rather than a returned loser, matching-audit original timestamp, replay byte stability, and code-6 rollback of original operation/source/audit with next dispatch absent. <!-- sdd-owner: implementation -->
+- [x] P3-B.2c-B.3 TRIANGULATE: rerun REAL acceptance after the focused A fake regression and prove one active g0/v1 operation, one processed source ack, one deterministic next dispatch, and one accepted audit under concurrency. <!-- sdd-owner: implementation -->
+- [x] P3-B.2c-B.4 REFACTOR: preserve test-only B scope, no coverage removal, scoped diff check, and bounded evidence append; only then mark full acquisition acceptance verified while broader P3 remains unchecked. <!-- sdd-owner: implementation -->
+
+**Forecasts (additions + deletions; estimates, not measured source fit):** A: `worker.ts` 92–116; `worker_auth.test.ts` 140–165; `tasks.md` 25–33; future progress 6–10; margin 22–28; **285–352**. B: `worker_auth.test.ts` 104–136; `tasks.md` 20–28; `design.md`/`spec.md` 12–18; future progress 6–10; margin 20–26; **162–218**. A straddles warning 320, so review is required if actual change reaches it; B remains below warning. Both remain below STOP/reforecast 380 and hard maximum 399; no exception, borrowing, or coverage reduction.
+
+### Concrete matrix and proof ownership
+
+All cases are readable named cases, not a generic test abstraction. Unit A owns every strict-fake row and Unit B owns every REAL row; each operation and source-dispatch field gets an independently named mutation and three-map snapshot assertion. Acquisition fixtures derive `ownerSeed` with `deriveOwnerToken(acquireDispatchId, 0)` rather than the stale fixture constant. Only the existing canonical operation/dispatch data fixture may be shared; strict-fake helpers and Firebase lifecycle/concurrency/code-6 setup remain unit-specific.
+
+| Named cases | Strict fake proves | REAL Firestore proves | Required assertions |
+|---|---|---|---|
+| `ACQ-OK` | Transaction call log reads source dispatch, operation, candidate audit, and next dispatch before any write; canonical initial records are accepted. | — | Full pending tuple; `acquire/g0/sourceVersion0`; null initial pointer; canonical derived seed/token; reducer yields `active/auth_preflight,g0,v1` with null pointer; adapter assigns deterministic `auth_preflight/g0/sourceVersion1` pointer; lease is `transaction.now + 60_000`; source `workerAck="processed"`. |
+| `ACQ-FENCE-operation` | Independently replace every persisted operation field: `schemaVersion,operationId,fingerprint,normalizedPayload,intendedUid,submittedByDigest,status,phase,generation,version,ownerToken,leaseExpiresAt,currentDispatchId,authAttempted,authAttempt,createdAt,updatedAt`; malformed/broken constants or relations fail closed, while the separately named legal-equivalence values are accepted. | — | Invalid rows make no write and preserve operation, source/next dispatches, and audits byte-identically; legal rows reach the normal positive assertion. |
+| `ACQ-FENCE-source` | Independently replace every persisted source field: `schemaVersion,dispatchId,taskId,operationId,fingerprint,boundary,generation,sourceVersion,ownerSeed,enqueued,enqueuedAt,enqueueSource,enqueueEventId,workerAck,workerAckAt,createdAt`; malformed/broken identity/seed/acquisition values fail closed, while valid empty and trigger/sweeper enqueue tuples are separately accepted. | — | Invalid rows fail closed without reducer/map writes; legal rows reach the normal positive assertion. |
+| `ACQ-MATCHING-AUDIT` | Constructs and compares all 14 audit fields: g0/sv0 event ID, approved correlation hash, `progress/state_transition/started/success`, null actor/subject digests, source dispatch, and first-insert clock timestamp. | A preexisting matching audit on a valid pending acquisition preserves its timestamp while operation, source acknowledgement, and next dispatch commit. | No audit rewrite; acquisition commits exactly once. |
+| `ACQ-PROCESSED-REPLAY` | After processed source acknowledgement, a fake replay leaves operation, source, next-dispatch, and audit byte unchanged. | After processed source acknowledgement, later invocation/replay leaves every operation, source, next-dispatch, and audit byte unchanged. | This is distinct from matching-audit acquisition and makes no result/winner discriminator claim. |
+| `ACQ-ROLLBACK` | Explicit audit identity mismatch, existing conflicting next dispatch, dispatch create conflict, audit create conflict, and reducer/CAS failure rows each restore all three maps. | — | `assertUnchanged` after each rejection proves rollback of operation, source acknowledgement, next dispatch, and audit together. |
+| `REAL-ACQ-ONE-WINNER` | — | Pre-start barrier plus `Promise.all` runs competing worker transactions against one initial pair. | Assert convergence only: one active g0/v1 operation, one processed source ack, one deterministic next dispatch, one accepted audit, then post-completion and replay byte stability. Do not infer a loser from `Promise<void>` or Firestore retries. |
+| `REAL-ACQ-CODE6-ROLLBACK` | — | Stage operation write, source `workerAck:"processed"` write, next-dispatch `create`, and conflicting audit `create` against an existing audit, without prior audit read. | Firestore `ALREADY_EXISTS` code 6 rejects atomically; compare original operation, source dispatch, and audit individually, and prove next dispatch remains absent. |
+
+The fake proves ordered port use, every individual persisted-field fence, and deterministic rollback. REAL Firestore proves convergence, matching-audit timestamp preservation, processed replay stability, and full multi-write create-precondition rollback; no fake-only branch is represented as REAL proof.
+
+### Corrected accounting decision
+
+**Historical accounting, superseded boundary:** 360, 390–440, and 428–533 remain traceability for the rejected indivisible same-unit plan, not a forecast for A or B and not measured source fit. The approved two-unit forecasts above govern execution; both preserve all acceptance and prohibit exception, borrowing, or coverage reduction.
+
+**Source evidence and scope:** parent CodeGraph located `worker.ts` `classifyProvisioningDelivery:120` and `acknowledgeStaleDelivery:150`; direct reads confirm `boundaries.ts` supplies `now`, the four reads, two writes, `createDispatch`, `createAudit`, Firestore mapping, and transaction clock. `model.ts` supplies `OperationState`, `ExpectedCAS`, `ReducerRequest`, `createEvent`, and pure `reduce`; `schemas.ts` supplies initial/update guards; `ids.ts` derives dispatch/audit/owner IDs; `audit.ts` validates and deduplicates the 14-field record. Existing `worker_auth.test.ts` supplies `StrictWorkerStore`, `strictStoreSnapshot`, Firebase lifecycle, `Promise.all`, and code-6 pattern. Unit A writes only `worker.ts` and `worker_auth.test.ts`; Unit B writes only `worker_auth.test.ts`; `boundaries.ts`, `model.ts`, `schemas.ts`, `ids.ts`, `audit.ts`, `normalize.ts`, `submit.ts`, `profile.ts`, `fixtures.ts`, and `explore.md` stay read-only. Planning does not write `apply-progress.md`.
+
+**Apply-only commands (not run in planning):** `cd functions && node --version` (Node 24.x); `java -version` (Java 21); `cd functions && node --experimental-strip-types test/provisioning/worker_auth.test.ts`; `cd functions && ./node_modules/.bin/tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --esModuleInterop --skipLibCheck --allowImportingTsExtensions src/provisioning/worker.ts test/provisioning/worker_auth.test.ts`; `cd functions && ./node_modules/.bin/tsc --noEmit`; and, for B, `cd functions && ./node_modules/.bin/firebase emulators:exec --only firestore "node --experimental-strip-types test/provisioning/worker_auth.test.ts"`. Regressions are the local-CLI `schemas.test.ts`, `audit.test.ts`, `outbox.test.ts`, `store_conformance.test.ts`, and `memory_store.test.ts`; they are justified by A's schema/audit/store writes and B's real adapter path. No install, test/emulator run, native operation, commit, or progress write occurs in planning.
+
+**Accepted normal-takeover subdecision; current unit remains blocked.** The maintainer accepted the normal-takeover audit/source-dispatch contract: the atomic takeover leaves the source dispatch byte-identical, current, and `workerAck:null`, creates no next dispatch, derives the next generation from the latest observed operation generation, increments version, installs deterministic owner/live lease, and preserves status/phase/AuthAttempt/source pointer. It creates or deduplicates `schemaVersion:1` `progress/state_transition/started/success` audit identity `deriveAuditEventId(operationId,"progress","state_transition",observedOperation.generation,observedOperation.version)` with trusted operation ID/correlation, null actor/intended-UID digests, source dispatch ID, and pre-takeover observed operation generation/version; first insert alone receives `transaction.now`, matching replay preserves `createdAt`, and any other-field mismatch rolls back all writes. After exact reread, an ordinary phase transition atomically acknowledges the source `processed` and creates/points to the deterministic next dispatch. A retained-source repeat uses the latest operation tuple and receives a distinct audit identity. The current ordinary-takeover unit combines strict-fake and minimal REAL Firestore one-winner, replay/timestamp, and rollback/atomicity proof; it remains implementation-blocked pending the measured 320/380/399 forecast. P3.29/P3.30 separately own reserved-attempt takeover plus terminalization and may later reuse this primitive without coupling.
+
+**Decision, acceptance, and rollback:** this amendment authorizes planning only and marks no acquisition or P3.29/P3.30 task complete. The superseded A/B initial-acquisition rollback boundaries remain historical only; no takeover implementation boundary is authorized until the measured forecast fits. No Auth/profile, status, terminalization, classifier remapping, or broader P3.5–P3.10 completion is implied. Planning delta is measured from captured current bytes, never `HEAD`; no native baseline is invented.
 
 ## P4 — Flutter Migration + Firestore Rules Hardening
 
@@ -1998,6 +2611,12 @@ Every slice MUST deliver:
 - P1a1, P1b–P4: max 2,000 changed lines per slice; reforecast/stop at 1,700; absolute stop at 2,000. Maintainer-approved `size:exception`.
 - P1a2-i-A-1a, P1a2-i-A-1b, P1a2-i-A-1c, P1a2-i-A-1d: early warning 300; STOP/reforecast 350; absolute max 400 each. Combined P1a2-i-A-1 max 1,600. **No size:exception.**
 - P1a2-i-A-2: early warning 200; STOP/reforecast 250; absolute max 300. Combined P1a2-i-A absolute max 1,900. **No size:exception.**
-- P1a2-i-B-1a/B-1b/B-2/B-3: early warning 120/120/155/160; STOP/reforecast 170/170/180/180; absolute max 200 each. Parent P1a2-i-B aggregate max 600; combined P1a2-i (A-1+A-2+B) max 2,500. **No size:exception.**
-- P1a2-ii, P1a2-iii: early warning 1,100; STOP/reforecast 1,200; absolute max 1,200. **No size:exception** — if a contract-complete sub-slice cannot fit within 1,200, split it further.
+- P1a2-i-B-1a/B-1b/B-2: early warning 120/120/155; STOP/reforecast 170/170/180; absolute max 200 each. Executable parent P1a2-i-B aggregate max 600; P1a2-i-C: warning 300, STOP/reforecast 350, max 400; combined P1a2-i (A-1+A-2+B+C) max 2,900. Retired B-3 has no budget or apply route. **No size:exception.**
+- P1a2-ii: early warning 1,100; STOP/reforecast 1,200; absolute max 1,200. **No size:exception** — independently accepted at ordinal 105 within its 300 changed-line endpoint. Retired P1a2-iii has no guard or executable route.
 - WU5–WU10: max 400 changed lines per work unit; stop at 400. **No inherited exception** — any overrun requires a new, separate maintainer decision.
+
+## P3 Ordinary Takeover Unit — Applied, No P3 Checkbox Completion
+
+- Implemented only the approved normal-work expired-current takeover primitive in `worker.ts` with focused fake and Firestore emulator proof.
+- P3.5 and P3.6 remain globally unchecked because their acquisition/classification scope is broader than this unit.
+- P3.29 and P3.30 remain unchecked and excluded: this unit neither enters reserved attempts nor terminalizes an operation.
