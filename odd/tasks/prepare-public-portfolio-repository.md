@@ -49,7 +49,7 @@ A reconciled ODD task authority is needed to prevent duplicate implementation, p
 
 ## Tasks
 
-- [ ] **ODD-001 — Reconcile the current implementation baseline.** Classify every current tracked modification and untracked path as accepted implementation, pending work, generated output, or unrelated state; compare current bytes with OpenSpec acceptance evidence; record discrepancies before any new source edit.
+- [x] **ODD-001 — Reconcile the current implementation baseline.** Classify every current tracked modification and untracked path as accepted implementation, pending work, generated output, or unrelated state; compare current bytes with OpenSpec acceptance evidence; record discrepancies before any new source edit. Completed with work-unit commit `bc781d246ac566f3adea95cc9ed3d8d3cdba7e44`.
 - [ ] **ODD-002 — Resolve P3.15/P3.16 crash-reconstruction ownership.** Determine which requirements remain after accepted P3.15a and later terminalization work; either retain a narrow independent task or move the residual acceptance coverage explicitly into ODD-007 without duplicate implementation.
 - [ ] **ODD-003 — Complete P3.47/P3.48 outbox race coverage.** Prove trigger+sweeper races, duplicates, out-of-order delivery, crash before/after enqueue, and accepted `ALREADY_EXISTS` behavior.
 - [ ] **ODD-004 — Complete P3.49/P3.50 retry conformance.** Prove retryCount boundaries, reserved terminalization attempts, fail-closed malformed input, poison behavior, and absence of a fictional exhaustion callback.
@@ -85,7 +85,7 @@ A reconciled ODD task authority is needed to prevent duplicate implementation, p
 - Migration audit completed read-only.
 - P3.45/P3.46 corrected backend happy path is accepted by the existing evidence.
 - No new source implementation has begun under ODD.
-- ODD-001 technical reconciliation is complete; its checkbox remains open only because no work-unit commit has been authorized or created.
+- ODD-001 is complete. Work-unit commit: `bc781d246ac566f3adea95cc9ed3d8d3cdba7e44` (`docs(odd): establish portfolio migration baseline`).
 - Evidence-backed accepted paths include the accumulated provisioning source/tests and OpenSpec artifacts; `functions/lib/**` is generated output and is excluded from authored acceptance accounting.
 - `functions/tsconfig.json` is preserved as a documented baseline exception: overriding `rewriteRelativeImportExtensions` off causes 25 TS5097 failures in current source, while the configured source-only typecheck passes.
 - `.pi/gentle-ai/sdd-preflight.json` and `.atl/skill-registry.md` are local/generated harness metadata; they are excluded from authored implementation acceptance. `.gitignore` contains the matching local `.atl/` exclusion.
@@ -110,4 +110,4 @@ A reconciled ODD task authority is needed to prevent duplicate implementation, p
 
 ## Next Step
 
-Obtain explicit authorization for the ODD-001 documentation work-unit commit. After that boundary is recorded, begin ODD-002 without modifying accepted implementation during the ownership analysis.
+Begin ODD-002 as a read-only ownership analysis. Do not modify accepted implementation while deciding whether residual P3.15/P3.16 coverage remains independent or belongs in ODD-006.
