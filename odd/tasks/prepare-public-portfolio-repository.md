@@ -50,7 +50,7 @@ A reconciled ODD task authority is needed to prevent duplicate implementation, p
 ## Tasks
 
 - [x] **ODD-001 — Reconcile the current implementation baseline.** Classify every current tracked modification and untracked path as accepted implementation, pending work, generated output, or unrelated state; compare current bytes with OpenSpec acceptance evidence; record discrepancies before any new source edit. Completed with work-unit commit `bc781d246ac566f3adea95cc9ed3d8d3cdba7e44`.
-- [ ] **ODD-002 — Resolve P3.15/P3.16 crash-reconstruction ownership.** Ownership analysis is technically complete and awaits its work-unit commit. P3.15a and later accepted work cover the implemented boundaries at their accepted scopes; no separate duplicate implementation remains. Residual proof stays with ODD-003 (outbox race/crash/`ALREADY_EXISTS`), ODD-005 (Auth emulator matrix), and ODD-006 (end-to-end crash injection around every retained runtime effect, including terminalization).
+- [x] **ODD-002 — Resolve P3.15/P3.16 crash-reconstruction ownership.** P3.15a and later accepted work cover the implemented boundaries at their accepted scopes; no separate duplicate implementation remains. Residual proof stays with ODD-003 (outbox race/crash/`ALREADY_EXISTS`), ODD-005 (Auth emulator matrix), and ODD-006 (end-to-end crash injection around every retained runtime effect, including terminalization). Completed with work-unit commit `cdaf4f908428d595243d25c49a0f87317ceba6d0`.
 - [ ] **ODD-003 — Complete P3.47/P3.48 outbox race coverage.** Prove trigger+sweeper races, duplicates, out-of-order delivery, crash before/after enqueue, and accepted `ALREADY_EXISTS` behavior.
 - [ ] **ODD-004 — Complete P3.49/P3.50 retry conformance.** Prove retryCount boundaries, reserved terminalization attempts, fail-closed malformed input, poison behavior, and absence of a fictional exhaustion callback.
 - [ ] **ODD-005 — Complete P3.51/P3.52 Auth emulator matrix.** Prove foreign identity, exact create result, dual-index reads, ambiguity, provenance conflict, atomic completion, completed integrity, and no automatic deletion.
@@ -91,7 +91,7 @@ A reconciled ODD task authority is needed to prevent duplicate implementation, p
 - `.pi/gentle-ai/sdd-preflight.json` and `.atl/skill-registry.md` are local/generated harness metadata; they are excluded from authored implementation acceptance. `.gitignore` contains the matching local `.atl/` exclusion.
 - `docs/operations/outbox-recovery-runbook.md` is retained as operational evidence, but its `ALREADY_EXISTS` instructions do not establish P3.47/P3.48 implementation acceptance.
 - No observed path by itself proves P3.47+ implementation.
-- ODD-002 ownership analysis found no independent implementation gap. P3.15/P3.16 residual acceptance is preserved without duplication across ODD-003, ODD-005, and ODD-006; the task remains open only until its documentation work-unit commit is authorized and recorded.
+- ODD-002 ownership analysis found no independent implementation gap. P3.15/P3.16 residual acceptance is preserved without duplication across ODD-003, ODD-005, and ODD-006. Work-unit commit: `cdaf4f908428d595243d25c49a0f87317ceba6d0` (`docs(odd): assign residual crash coverage`).
 
 ## Verification Evidence
 
@@ -111,4 +111,4 @@ A reconciled ODD task authority is needed to prevent duplicate implementation, p
 
 ## Next Step
 
-Obtain explicit authorization for the ODD-002 documentation work-unit commit. After recording that boundary, begin ODD-003 with Strict TDD for the still-pending P3.47/P3.48 outbox race matrix.
+Begin ODD-003 with Strict TDD for the still-pending P3.47/P3.48 outbox race matrix.
