@@ -1268,7 +1268,7 @@ test("TK-OK atomically takes over an expired current source without acknowledgin
   assert.deepEqual(store.operations.get(operationId), expectedTakeover(records, store.now));
   assert.deepEqual(store.dispatches.get(records.sourceId), sourceBefore);
   assert.deepEqual(store.audits.get(records.auditId), takeoverAudit(records, store.now));
-  assert.deepEqual(result, { operation: expectedTakeover(records, store.now), source: sourceBefore });
+  assert.deepEqual(result, { takeoverCommitted: true });
   assert.equal(store.calls.some((call) => call.startsWith("createDispatch")), false);
 });
 
@@ -1300,7 +1300,7 @@ test("TK-REPEAT derives the next generation and audit identity from the latest r
   const result = await takeoverExpiredCurrent(store, records.sourceId);
   const expected = expectedTakeover(records, store.now, expired);
   const secondAuditId = deriveAuditEventId(operationId, "progress", "state_transition", 1, 2);
-  assert.deepEqual(result, { operation: expected, source: records.source });
+  assert.deepEqual(result, { takeoverCommitted: true });
   assert.deepEqual(store.operations.get(operationId), expected);
   assert.deepEqual(store.dispatches.get(records.sourceId), records.source);
   assert.notEqual(secondAuditId, firstAuditId);
@@ -2212,7 +2212,56 @@ test("P3.21 RED preserves every record when the initial source tuple or retry ev
 });
 
 
-test("P3.22 GREEN commits pending terminalization atomically through Firestore and preserves its audit on replay", {
+test("ODD-007 re-enters only recognized closed pending terminalizations within the eight-attempt ceiling", async () => {
+      const records = acquisitionRecords();
+      const strictStore = new StrictWorkerStore();
+      seedAcquisition(strictStore, records);
+      const closed = Object.assign(new Error("outer wrapper"), {
+        cause: Object.assign(new Error("Transaction is invalid or closed"), { code: "3" }),
+      });
+      let attempts = 0;
+      const retryingStore: WorkerStore = {
+        transaction<T>(work: (transaction: WorkerTransaction) => Promise<T>): Promise<T> {
+          attempts += 1;
+          return attempts === 1 ? Promise.reject(closed) : strictStore.transaction(work);
+        },
+      };
+
+      assert.equal(await terminalizeInitialPending(retryingStore, records.sourceId, { retryCount: 8, executionCount: 9 }), true);
+      assert.equal(attempts, 2, "one closed transaction gets exactly one re-entry");
+      assert.equal(strictStore.operations.get(operationId)?.status, "failed");
+      assert.equal(strictStore.dispatches.get(records.sourceId)?.workerAck, "terminalized");
+      assert.deepEqual(strictStore.audits.get(pendingTerminalizationAudit(records, strictStore.now).eventId as string), pendingTerminalizationAudit(records, strictStore.now));
+
+      const nonmatching = new Error("Transaction is invalid or closed");
+      let nonmatchingAttempts = 0;
+      const nonmatchingStore: WorkerStore = {
+        transaction<T>(): Promise<T> {
+          nonmatchingAttempts += 1;
+          return Promise.reject(nonmatching);
+        },
+      };
+      await assert.rejects(
+        () => terminalizeInitialPending(nonmatchingStore, records.sourceId, { retryCount: 8, executionCount: 9 }),
+        (error: unknown) => error === nonmatching,
+      );
+      assert.equal(nonmatchingAttempts, 1, "nonmatching errors still propagate");
+
+      let exhaustedAttempts = 0;
+      const exhaustedStore: WorkerStore = {
+        transaction<T>(): Promise<T> {
+          exhaustedAttempts += 1;
+          return Promise.reject(closed);
+        },
+      };
+      await assert.rejects(
+        () => terminalizeInitialPending(exhaustedStore, records.sourceId, { retryCount: 8, executionCount: 9 }),
+        /closed Firestore transaction retry exhausted/,
+      );
+      assert.equal(exhaustedAttempts, 8, "closed-transaction re-entry remains capped at eight attempts");
+    });
+
+    test("P3.22 GREEN commits pending terminalization atomically through Firestore and preserves its audit on replay", {
   skip: !process.env.FIRESTORE_EMULATOR_HOST,
 }, async () => {
   const app = initializeApp({ projectId: "p3-pending-terminalization" }, "p3-pending-terminalization");
@@ -2582,8 +2631,6 @@ test("P3.27 RED rejects an unexpired foreign owner without mutating the operatio
   assert.deepEqual(store.calls, [
     `readDispatch:${records.sourceId}`,
     `readOperation:${operationId}`,
-    `readDispatch:${records.sourceId}`,
-    `readOperation:${operationId}`,
   ]);
   assert.equal(store.calls.some((call) => call.startsWith("write") || call.startsWith("create")), false);
 });
@@ -2613,7 +2660,68 @@ test("P3.28 GREEN treats a foreign-owner CAS reread mismatch as successful and m
   }
 });
 
-test("P3.29 RED takes over an exact expired active tuple before terminalizing with the new generation and version", async () => {
+function closedTransactionTakeoverStore(failure: Error): { readonly store: WorkerStore; readonly strictStore: StrictWorkerStore; readonly records: ReturnType<typeof activeTerminalizationRecords>; readonly attempts: () => number } {
+      const strictStore = new StrictWorkerStore();
+      const records = activeTerminalizationRecords();
+      records.active.leaseExpiresAt = strictStore.now;
+      strictStore.operations.set(operationId, records.active);
+      strictStore.dispatches.set(records.sourceId, records.source);
+      let transactions = 0;
+      const store: WorkerStore = {
+        async transaction<T>(work: (transaction: WorkerTransaction) => Promise<T>): Promise<T> {
+          transactions += 1;
+          if (transactions === 1) throw failure;
+          const result = await strictStore.transaction(work);
+          if (transactions === 2) {
+            const takenOver = strictStore.operations.get(operationId)!;
+            strictStore.operations.set(operationId, { ...takenOver, ownerToken: "f".repeat(64) });
+          }
+          return result;
+        },
+      };
+      return { store, strictStore, records, attempts: () => transactions };
+    }
+
+    async function assertClosedTransactionTakeoverReentry(failure: Error): Promise<void> {
+      const { store, strictStore, records, attempts } = closedTransactionTakeoverStore(failure);
+      assert.equal(await takeoverExpiredCurrent(store, records.sourceId), null);
+      assert.equal(attempts(), 3, "one failed takeover, one bounded re-entry, then authoritative reread");
+      assert.equal(strictStore.operations.get(operationId)?.status, "active");
+      assert.equal(strictStore.dispatches.get(records.sourceId)?.workerAck, null);
+      assert.equal(strictStore.audits.size, 1, "takeover alone never terminalizes without its valid reread tuple");
+    }
+
+    test("P3.54 RED accepts real closed-transaction wrapper shapes only when code and message share a cause node", async () => {
+      for (const failure of [
+        Object.assign(new Error("Transaction is invalid or closed"), { code: 3 }),
+        Object.assign(new Error("Transaction invalid or closed"), { code: "3" }),
+        Object.assign(new Error("transaction is invalid or closed"), { code: "INVALID_ARGUMENT" }),
+        Object.assign(new Error("outer wrapper"), { cause: Object.assign(new Error("Transaction is invalid or closed"), { code: "3" }) }),
+      ]) {
+        await assertClosedTransactionTakeoverReentry(failure);
+      }
+    });
+
+    test("P3.54 RED propagates nonmatching, split-node, and cyclic closed-transaction wrapper shapes", async () => {
+      const codeWithoutMessage = Object.assign(new Error("unrelated failure"), { code: 3 });
+      const messageWithoutCode = new Error("Transaction is invalid or closed");
+      const splitAcrossNodes = Object.assign(new Error("outer wrapper"), {
+        code: 3,
+        cause: Object.assign(new Error("Transaction is invalid or closed"), { code: "unavailable" }),
+      });
+      const cycle = Object.assign(new Error("outer wrapper"), { code: "unavailable" }) as Error & { cause?: unknown };
+      cycle.cause = cycle;
+      for (const failure of [codeWithoutMessage, messageWithoutCode, splitAcrossNodes, cycle]) {
+        const { store, records } = closedTransactionTakeoverStore(failure);
+        await assert.rejects(
+          () => takeoverExpiredCurrent(store, records.sourceId),
+          (error: unknown) => error === failure,
+          "only a same-node closed-transaction tuple can re-enter",
+        );
+      }
+    });
+
+    test("P3.29 RED takes over an exact expired active tuple before terminalizing with the new generation and version", async () => {
   const records = activeTerminalizationRecords();
   const store = new StrictWorkerStore();
   records.active.leaseExpiresAt = store.now;
@@ -2717,35 +2825,55 @@ test("P3.30 GREEN terminalizes an expired active tuple through the Auth and Fire
   }
 });
 
-test("P3.27 RED returns success without writes when a final active-owner reread loses CAS", async () => {
+test("P3.27 RED discards a conflicted terminalization buffer before a foreign owner wins the retry", async () => {
   const records = activeTerminalizationRecords();
   const foreign = { ...records.active, ownerToken: "f".repeat(64) };
-  let operationReads = 0;
-  const writes: string[] = [];
+  let attempts = 0;
+  let committedOperation: WorkerRecord = records.active;
+  let committedDispatch: WorkerRecord = records.source;
+  const committedAudits = new Map<string, WorkerRecord>();
+  const committedWorkerWrites: string[] = [];
+  const discardedWorkerWrites: string[] = [];
   const store: WorkerStore = {
     async transaction<T>(work: (transaction: WorkerTransaction) => Promise<T>): Promise<T> {
-      return work({
+      attempts += 1;
+      const attempt = attempts;
+      let bufferedOperation: WorkerRecord | undefined;
+      let bufferedDispatch: WorkerRecord | undefined;
+      const bufferedAudits = new Map<string, WorkerRecord>();
+      const bufferedWorkerWrites: string[] = [];
+      const result = await work({
         now,
-        async readOperation() {
-          operationReads += 1;
-          return operationReads === 1 ? records.active : foreign;
-        },
-        async readDispatch() { return records.source; },
-        async readAudit() { return null; },
+        async readOperation() { return committedOperation; },
+        async readDispatch() { return committedDispatch; },
+        async readAudit(eventId) { return committedAudits.get(eventId) ?? null; },
         async readProfile() { return null; },
-        writeOperation() { writes.push("operation"); },
-        writeDispatch() { writes.push("dispatch"); },
-        createDispatch() { writes.push("next-dispatch"); },
-        createAudit() { writes.push("audit"); },
-        writeProfile() { writes.push("profile"); },
+        writeOperation(_operationId, operation) { bufferedWorkerWrites.push("operation"); bufferedOperation = operation; },
+        writeDispatch(_dispatchId, dispatch) { bufferedWorkerWrites.push("dispatch"); bufferedDispatch = dispatch; },
+        createDispatch() { bufferedWorkerWrites.push("next-dispatch"); },
+        createAudit(eventId, audit) { bufferedWorkerWrites.push("audit"); bufferedAudits.set(eventId, audit); },
+        writeProfile() { bufferedWorkerWrites.push("profile"); },
       });
+      if (attempt === 1) {
+        discardedWorkerWrites.push(...bufferedWorkerWrites);
+        committedOperation = foreign;
+        throw Object.assign(new Error("INVALID_ARGUMENT: transaction invalid or closed"), { code: 3 });
+      }
+      if (bufferedOperation !== undefined) { committedWorkerWrites.push("operation"); committedOperation = bufferedOperation; }
+      if (bufferedDispatch !== undefined) { committedWorkerWrites.push("dispatch"); committedDispatch = bufferedDispatch; }
+      for (const [eventId, audit] of bufferedAudits) { committedWorkerWrites.push("audit"); committedAudits.set(eventId, audit); }
+      return result;
     },
   };
 
   await terminalizeActiveCurrent(store, records.sourceId, { retryCount: 8, executionCount: 9 });
 
-  assert.equal(operationReads, 2);
-  assert.deepEqual(writes, []);
+  assert.equal(attempts, 2);
+  assert.deepEqual(discardedWorkerWrites, ["operation", "dispatch", "audit"]);
+  assert.deepEqual(committedWorkerWrites, []);
+  assert.deepEqual(committedOperation, foreign);
+  assert.equal(committedDispatch.workerAck, null);
+  assert.equal(committedAudits.size, 0);
 });
 
 test("P3.31 RED preserves terminal bytes and an existing acknowledgement without replay mutation", async () => {
@@ -2951,10 +3079,13 @@ test("P3.33 RED surfaces a durable-store outage with operational alert and runbo
   }
 
   assert.deepEqual(alerts, [[{
-    severity: "ERROR",
-    event: "provisioning_durable_store_outage",
-    retryCount: 11,
-    runbook: "docs/operations/outbox-recovery-runbook.md",
+    eventCode: "retry-exhausted",
+    resultCode: null,
+    reasonCode: "unavailable",
+    digests: [{
+      domain: "provision-dispatch:v1",
+      value: createHash("sha256").update(`provision-dispatch:v1\0${"f".repeat(64)}`, "utf8").digest("hex"),
+    }],
   }]]);
 });
 

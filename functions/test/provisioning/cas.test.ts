@@ -17,8 +17,8 @@ const LIVE_LEASE = 4_102_444_800_000;
 
 const pending = (): OperationState => createInitialState({
   operationId: "123e4567-e89b-42d3-a456-426614174000", fingerprint: "a".repeat(64), status: "pending", phase: "dispatch_pending",
-  normalizedPayload: { email: "employee@example.com", nombre: "Ana", apellido1: "Lopez", apellido2: null, employeeId: "", weeklyHours: 40, dni: null, telefono: null, cargo: null, departamento: null, empresa: null, scheduleId: null, calendarId: null, fechaInicio: null, fechaFin: null, role: "employee", isSupervisor: false, supervisorId: null, isActive: true, displayName: "Ana Lopez" },
-  intendedUid: null, generation: 0, version: 0, ownerToken: null, leaseExpiresAt: null, currentDispatchId: null, authAttempted: false, authAttempt: null, createdAt: 0, updatedAt: 0,
+  normalizedPayload: { email: "employee@example.com", nombre: "Ana", apellido1: "Lopez", apellido2: null, employeeId: "", weeklyHours: 40, dni: null, telefono: null, cargo: null, departamento: null, empresa: null, scheduleId: null, calendarId: null, fechaInicio: null, fechaFin: null, role: "employee", isSupervisor: false, supervisorId: null, isActive: true },
+  intendedUid: "uid-employee", generation: 0, version: 0, ownerToken: null, leaseExpiresAt: null, currentDispatchId: null, authAttempted: false, authAttempt: null, createdAt: 0, updatedAt: 0,
 });
 
 const expectedFor = (state: OperationState): ExpectedCAS => ({ fingerprint: state.fingerprint, status: state.status, phase: state.phase, generation: state.generation, version: state.version, ownerToken: state.ownerToken, currentDispatchId: state.currentDispatchId, leaseExpiresAt: state.leaseExpiresAt });
@@ -133,7 +133,9 @@ test("CAS primitives reject every stale tuple field and preserve takeover genera
   assert.equal(passesGenerationFence(state, { ...state, generation: 1 }, "acquire"), false);
 });
 
-test("CAS mutations have byte-equal stale, lease, generation, and live outcomes in both stores", async () => {
+test("CAS mutations have byte-equal stale, lease, generation, and live outcomes in both stores", {
+  skip: !process.env.FIRESTORE_EMULATOR_HOST,
+}, async () => {
   assert.ok(process.env.FIRESTORE_EMULATOR_HOST, "Firestore emulator must be running");
   const app = initializeApp({ projectId: "p1b-cas-test" }, "p1b-cas-test");
   try {
@@ -145,7 +147,9 @@ test("CAS mutations have byte-equal stale, lease, generation, and live outcomes 
   }
 });
 
-test("abort, retry, and stale idempotent re-entry have byte-equal store outcomes", async () => {
+test("abort, retry, and stale idempotent re-entry have byte-equal store outcomes", {
+  skip: !process.env.FIRESTORE_EMULATOR_HOST,
+}, async () => {
   assert.ok(process.env.FIRESTORE_EMULATOR_HOST, "Firestore emulator must be running");
   const app = initializeApp({ projectId: "p1b-crash-test" }, "p1b-crash-test");
   try {

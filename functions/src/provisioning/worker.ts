@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { createAuditEvent, deduplicateAudit } from "./audit.ts";
+import { createApplicationLog, createAuditEvent, deduplicateAudit } from "./audit.ts";
 import type { AuthCreator, AuthReader, WorkerStore, WorkerTransaction } from "./boundaries.ts";
 import { matchesProfileProvenance } from "./profile.ts";
 import { deriveDisplayName } from "./normalize.ts";
@@ -145,9 +145,21 @@ export function classifyProvisioningDelivery(requestValue: unknown): DeliveryCla
 }
 
 function isClosedFirestoreTransaction(error: unknown): boolean {
-  if (error === null || typeof error !== "object") return false;
-  const { code, message } = error as { readonly code?: unknown; readonly message?: unknown };
-  return code === 3 && typeof message === "string" && /transaction invalid or closed/i.test(message);
+  const visited = new Set<object>();
+  let current: unknown = error;
+  for (let depth = 0; depth < 4; depth += 1) {
+    if (current === null || typeof current !== "object" || visited.has(current)) return false;
+    visited.add(current);
+    try {
+      const { code, message, cause } = current as { readonly code?: unknown; readonly message?: unknown; readonly cause?: unknown };
+      if ((code === 3 || code === "3" || code === "INVALID_ARGUMENT")
+        && typeof message === "string" && /transaction(?: is)? invalid or closed/i.test(message)) return true;
+      current = cause;
+    } catch {
+      return false;
+    }
+  }
+  return false;
 }
 
 /**
@@ -968,18 +980,21 @@ export async function processProvisioningTask(
     return;
   }
 
-  const evidence = { retryCount, executionCount: retryCount + 1 };
+  const evidence = { retryCount: retryCount, executionCount: retryCount + 1 };
   try {
     const pendingTerminal = await terminalizeInitialPending(store, deliveryDispatchId, evidence);
     if (!pendingTerminal) await terminalizeActiveCurrent(store, deliveryDispatchId, evidence);
   } catch (error) {
     if (retryCount < 11) throw error;
-    console.error({
-      severity: "ERROR",
-      event: "provisioning_durable_store_outage",
-      retryCount,
-      runbook: "docs/operations/outbox-recovery-runbook.md",
-    });
+    console.error(createApplicationLog({
+      eventCode: "retry-exhausted",
+      resultCode: null,
+      reasonCode: "unavailable",
+      digests: [{
+        domain: "provision-dispatch:v1",
+        value: createHash("sha256").update(`provision-dispatch:v1\0${deliveryDispatchId}`, "utf8").digest("hex"),
+      }],
+    }));
     throw new RetryableTaskError(
       "provisioning durable-store outage requires operator recovery; see docs/operations/outbox-recovery-runbook.md",
     );
@@ -1232,16 +1247,34 @@ export async function terminalizeInitialPending(
 ): Promise<boolean> {
   if (!isPendingTerminalizationEvidence(evidence)) return false;
 
-  if (await terminalizeInitialPendingOnce(store, deliveryDispatchId, evidence)) return true;
+  if (await terminalizeInitialPendingWithClosedTransactionRetry(store, deliveryDispatchId, evidence)) return true;
   const classification = await rereadPendingTerminalization(store, deliveryDispatchId);
   if (classification !== "pending") return classification === "terminal";
 
   // A second predicate loss is a successful no-op: no stale observation may
   // infer authority to write terminal state or acknowledge the dispatch.
-  return terminalizeInitialPendingOnce(store, deliveryDispatchId, evidence);
+  return terminalizeInitialPendingWithClosedTransactionRetry(store, deliveryDispatchId, evidence);
 }
 
-async function terminalizeInitialPendingOnce(
+async function terminalizeInitialPendingWithClosedTransactionRetry(
+    store: WorkerStore,
+    deliveryDispatchId: string,
+    evidence: PendingTerminalizationEvidence,
+  ): Promise<boolean> {
+    for (let attempt = 0; attempt < CLOSED_TRANSACTION_MAX_ATTEMPTS; attempt += 1) {
+      try {
+        return await terminalizeInitialPendingOnce(store, deliveryDispatchId, evidence);
+      } catch (error) {
+        if (!isClosedFirestoreTransaction(error)) throw error;
+        if (attempt + 1 === CLOSED_TRANSACTION_MAX_ATTEMPTS) {
+          throw new Error("closed Firestore transaction retry exhausted");
+        }
+      }
+    }
+    throw new Error("closed Firestore transaction retry exhausted");
+  }
+
+  async function terminalizeInitialPendingOnce(
   store: WorkerStore,
   deliveryDispatchId: string,
   evidence: PendingTerminalizationEvidence,

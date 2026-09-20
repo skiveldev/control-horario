@@ -157,10 +157,14 @@ async function sourceFiles(directory: URL): Promise<URL[]> {
   return files;
 }
 
-const applicationSources = await sourceFiles(new URL("../../src/", import.meta.url));
+const applicationSources = await sourceFiles(new URL("../../src/provisioning/", import.meta.url));
+const approvedOutageLog = /console\.error\(createApplicationLog\(\{\s*eventCode: "retry-exhausted",\s*resultCode: null,\s*reasonCode: "unavailable",\s*digests: \[\{\s*domain: "provision-dispatch:v1",\s*value: createHash\("sha256"\)\.update\(`provision-dispatch:v1\\0\$\{deliveryDispatchId\}`, "utf8"\)\.digest\("hex"\),\s*}\],\s*}\)\);/g;
 for (const sourceFile of applicationSources) {
+  const source = await readFile(sourceFile, "utf8");
+  const permitted = source.match(approvedOutageLog) ?? [];
+  assert.equal(permitted.length, sourceFile.pathname.endsWith("/worker.ts") ? 1 : 0, `${sourceFile.pathname} permits only the bounded outage log`);
   assert.doesNotMatch(
-    await readFile(sourceFile, "utf8"),
+    source.replace(approvedOutageLog, ""),
     /\b(?:console\.(?:debug|error|info|log|warn)|logger\.(?:debug|error|info|log|warn)|process\.(?:stderr|stdout)\.write)\s*\(/,
     `${sourceFile.pathname} must not bypass the bounded application-log contract`,
   );

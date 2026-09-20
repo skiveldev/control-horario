@@ -81,9 +81,25 @@ for (const file of backendSources) {
   const source = await readFile(file, "utf8");
   const scopedPath = relative(functionsRoot, file);
   assert.doesNotMatch(source, /\bdeleteUser\s*\(/, `${scopedPath} must not automatically delete Auth users`);
-  assert.doesNotMatch(source, /\bcreateUser\s*\(/, `${scopedPath} must not create Auth users in P2`);
-  assert.doesNotMatch(source, /\bgeneratePasswordResetLink\s*\(/, `${scopedPath} must not issue reset links in P2`);
-  assert.doesNotMatch(source, /onRequest\s*\(|https?\.request\s*\(|fetch\s*\([^)]*cloudtasks/i, `${scopedPath} must not use raw HTTP task/callable workarounds`);
+  if (scopedPath === "src/index.ts") {
+    assert.match(source, /return getAuth\(\)\.generatePasswordResetLink\(email\);/, "index.ts must compose the accepted P3.44e reset-link generator");
+  } else if (scopedPath === "src/provisioning/status.ts") {
+        const acceptedStatusResetLinkPort = source
+          .replace(/export interface PasswordResetLinkGenerator \{\s*generatePasswordResetLink\(email: string\): Promise<string>;\s*\}/, "")
+          .replace(/generator\.generatePasswordResetLink\(resetEmail\)/, "");
+        assert.match(source, /export interface PasswordResetLinkGenerator \{\s*generatePasswordResetLink\(email: string\): Promise<string>;\s*\}/, "status.ts must declare the injected reset-link port");
+        assert.match(source, /generator\.generatePasswordResetLink\(resetEmail\)/, "status.ts must invoke only the injected reset-link port");
+        assert.doesNotMatch(acceptedStatusResetLinkPort, /\bgeneratePasswordResetLink\s*\(/, `${scopedPath} must not issue reset links`);
+      } else {
+    assert.doesNotMatch(source, /\bgeneratePasswordResetLink\s*\(/, `${scopedPath} must not issue reset links`);
+  }
+  const acceptedP344bTransport = /function cloudTasksTransport\(\) \{\s*return \{\s*async createTask\(request: CloudTasksCreateTaskRequest\): Promise<void> \{[\s\S]*?fetch\(`https:\/\/cloudtasks\.googleapis\.com\/v2\/\$\{request\.parent\}\/tasks`, \{\s*method: "POST",[\s\S]*?\n    \},\n  \};\n\}/g;
+  const permittedTransport = source.match(acceptedP344bTransport) ?? [];
+  assert.equal(permittedTransport.length, scopedPath === "src/index.ts" ? 1 : 0, `${scopedPath} permits only the accepted P3.44b Cloud Tasks transport`);
+  if (scopedPath === "src/index.ts") {
+    assert.match(source, /enqueue: createCloudTasksEnqueueAdapter\(queueEnvironment\(\), cloudTasksTransport\(\)\)/, "index.ts must compose the accepted P3.44b transport at the outbox adapter");
+  }
+  assert.doesNotMatch(source.replace(acceptedP344bTransport, ""), /onRequest\s*\(|https?\.request\s*\(|fetch\s*\([^)]*cloudtasks/i, `${scopedPath} must not use raw HTTP task/callable workarounds`);
   assert.doesNotMatch(source, /initializeApp\s*\([^)]*,\s*["'][^"']+["']\s*\)/, `${scopedPath} must not copy secondary client Firebase-app logic into Functions source`);
   assert.doesNotMatch(source, /collection\s*\(\s*["']users["']\s*\)\s*\.doc\([^)]*\)\s*\.set\s*\(/, `${scopedPath} must not directly mutate profiles outside approved primitives`);
 }

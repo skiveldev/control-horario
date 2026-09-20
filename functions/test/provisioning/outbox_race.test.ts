@@ -82,6 +82,26 @@ class FirstSuccessThenAlreadyExists implements EnqueueAdapter {
   }
 }
 
+class ConcurrentEnqueueBarrier implements EnqueueAdapter {
+  calls = 0;
+  private release!: () => void;
+  private readonly released = new Promise<void>((resolve) => { this.release = resolve; });
+  private arrivals!: () => void;
+  private readonly bothArrived = new Promise<void>((resolve) => { this.arrivals = resolve; });
+
+  async enqueue(_record: EnqueueDispatch): Promise<void> {
+    this.calls += 1;
+    if (this.calls === 2) this.arrivals();
+    await this.bothArrived;
+    await this.released;
+  }
+
+  async releaseAfterBothArrive(): Promise<void> {
+    await this.bothArrived;
+    this.release();
+  }
+}
+
 {
   const store = new MemoryStore(dispatch());
   const enqueue = createStrictEnqueueFake();
@@ -152,10 +172,10 @@ if (process.env.FIRESTORE_EMULATOR_HOST !== undefined) {
   await withFirestore("p3-outbox-race", async (firestore) => {
     const stale = dispatch(6);
     await firestore.collection("provisioningDispatch").doc(stale.dispatchId as string).set(stale);
-    const enqueue = new FirstSuccessThenAlreadyExists();
+    const enqueue = new ConcurrentEnqueueBarrier();
     const store = new FirestoreOutboxRepairStore(firestore);
 
-    await Promise.all([
+    const race = Promise.all([
       trigger(store, enqueue, EVENT_A, stale),
       repairStaleDispatches({
         now: 600_000,
@@ -167,6 +187,8 @@ if (process.env.FIRESTORE_EMULATOR_HOST !== undefined) {
         delay: async () => undefined,
       }),
     ]);
+    await enqueue.releaseAfterBothArrive();
+    await race;
 
     const persisted = (await firestore.collection("provisioningDispatch").doc(stale.dispatchId as string).get()).data();
     equal(enqueue.calls, 2, "trigger and sweeper both reach the deterministic queue identity during the persisted race");

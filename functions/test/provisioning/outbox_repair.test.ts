@@ -217,6 +217,9 @@ class AcknowledgementOrderStore implements DispatchRepairStore {
   }
 }
 
+if (!process.env.FIRESTORE_EMULATOR_HOST) {
+  console.log("SKIP: Firestore-backed outbox repair scenarios require FIRESTORE_EMULATOR_HOST");
+} else {
 await withFirestore("p2-repair-order-test", async (firestore) => {
   const cutoff = NOW - 600_000;
   const exactGrace = dispatch(2, cutoff);
@@ -422,3 +425,4 @@ await withFirestore("p2-repair-partial-failure-test", async (firestore) => {
 });
 
 console.log(`OK: scheduled outbox repair ${assertions} assertions`);
+}
