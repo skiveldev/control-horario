@@ -398,100 +398,90 @@ export async function preflightAuth(
  * work. It deliberately leaves that source dispatch unacknowledged: a later
  * phase transition owns acknowledgement and next-dispatch creation.
  */
-type ExpiredTakeoverResult = { readonly operation: PersistedRecord; readonly source: PersistedRecord }
-  | { readonly terminal: true };
+const CLOSED_TRANSACTION_MAX_ATTEMPTS = 8;
+type TerminalizationOutcome = "terminal" | "no-op" | "takeover-committed" | "retryable-conflict";
+type ExpiredTakeoverResult = { readonly terminal: true } | { readonly takeoverCommitted: true };
 
+/**
+ * Commits takeover separately from terminalization, then rereads the committed
+ * state in a fresh transaction. No transaction adapter or snapshot crosses an
+ * attempt boundary; only the explicit outcome does.
+ */
 export async function takeoverExpiredCurrent(
   store: WorkerStore,
   deliveryDispatchId: string,
 ): Promise<ExpiredTakeoverResult | null> {
-  const committed = await retryClosedFirestoreTransaction(() => store.transaction(async (transaction) => {
-    const source = await transaction.readDispatch(deliveryDispatchId);
-    if (source === null || !isValidDispatch(source)) return null;
-    const operation = await transaction.readOperation(source.operationId as string);
-    if (isPersistedTerminalOperation(operation)) return { terminal: true } as const;
-    if (
-      source.workerAck !== null
-      || source.ownerSeed !== deriveOwnerToken(source.dispatchId as string, source.generation as number)
-    ) return null;
-    if (operation === null || classifyProvisioningDelivery({
-      deliveryDispatchId,
-      dispatchDocumentId: deliveryDispatchId,
-      operationSnapshot: operation,
-      dispatchSnapshot: source,
-    }) !== "eligible") return null;
+  for (let attempt = 0; attempt < CLOSED_TRANSACTION_MAX_ATTEMPTS; attempt += 1) {
+    let outcome: TerminalizationOutcome;
+    try {
+      outcome = await store.transaction(async (transaction) => {
+        const source = await transaction.readDispatch(deliveryDispatchId);
+        if (source === null || !isValidDispatch(source)) return "no-op";
+        const operation = await transaction.readOperation(source.operationId as string);
+        if (isPersistedTerminalOperation(operation)) return "terminal";
+        if (source.workerAck !== null || source.ownerSeed !== deriveOwnerToken(source.dispatchId as string, source.generation as number)) return "no-op";
+        if (operation === null || classifyProvisioningDelivery({
+          deliveryDispatchId, dispatchDocumentId: deliveryDispatchId, operationSnapshot: operation, dispatchSnapshot: source,
+        }) !== "eligible") return "no-op";
 
-    const state = Object.fromEntries(STATE_FIELDS.map((field) => [field, operation[field]])) as unknown as OperationState;
-    const nextGeneration = state.generation + 1;
-    const result = reduce(state, {
-      expected: {
-        fingerprint: state.fingerprint,
-        status: state.status,
-        phase: state.phase,
-        generation: state.generation,
-        version: state.version,
-        ownerToken: state.ownerToken,
-        currentDispatchId: state.currentDispatchId,
-        leaseExpiresAt: state.leaseExpiresAt,
-      },
-      observedAt: transaction.now,
-      event: createEvent("takeover", {
-        ownerToken: deriveOwnerToken(source.dispatchId as string, nextGeneration),
-        leaseExpiresAt: transaction.now + 60_000,
-      }),
-    });
-    if (result.type !== "success") return null;
+        const state = Object.fromEntries(STATE_FIELDS.map((field) => [field, operation[field]])) as unknown as OperationState;
+        const result = reduce(state, {
+          expected: {
+            fingerprint: state.fingerprint, status: state.status, phase: state.phase, generation: state.generation,
+            version: state.version, ownerToken: state.ownerToken, currentDispatchId: state.currentDispatchId, leaseExpiresAt: state.leaseExpiresAt,
+          },
+          observedAt: transaction.now,
+          event: createEvent("takeover", {
+            ownerToken: deriveOwnerToken(source.dispatchId as string, state.generation + 1),
+            leaseExpiresAt: transaction.now + 60_000,
+          }),
+        });
+        if (result.type !== "success") return "no-op";
 
-    const updatedOperation = { ...operation, ...result.state };
-    if (!isValidState(Object.fromEntries(STATE_FIELDS.map((field) => [field, updatedOperation[field]])))) {
-      throw new TypeError("invalid takeover operation");
+        const updatedOperation = { ...operation, ...result.state };
+        if (!isValidState(Object.fromEntries(STATE_FIELDS.map((field) => [field, updatedOperation[field]])))) throw new TypeError("invalid takeover operation");
+        const audit = createAuditEvent({
+          schemaVersion: 1,
+          eventId: deriveAuditEventId(operation.operationId as string, "progress", "state_transition", state.generation, state.version),
+          operationId: operation.operationId,
+          correlationId: createHash("sha256").update(`provision-correlation:v1\0${operation.operationId as string}`, "utf8").digest("hex"),
+          category: "progress", stage: "state_transition", outcome: "started", code: "success",
+          actorUidDigest: null, intendedUidDigest: null, dispatchId: source.dispatchId,
+          generation: state.generation, sourceVersion: state.version, createdAt: transaction.now,
+        });
+        const existingAudit = await transaction.readAudit(audit.eventId);
+        if (existingAudit !== null) deduplicateAudit(existingAudit, audit);
+        transaction.writeOperation(operation.operationId as string, updatedOperation);
+        if (existingAudit === null) transaction.createAudit(audit.eventId, audit as unknown as PersistedRecord);
+        return "takeover-committed";
+      });
+    } catch (error) {
+      if (!isClosedFirestoreTransaction(error)) throw error;
+      outcome = "retryable-conflict";
     }
-    const audit = createAuditEvent({
-      schemaVersion: 1,
-      eventId: deriveAuditEventId(operation.operationId as string, "progress", "state_transition", state.generation, state.version),
-      operationId: operation.operationId,
-      correlationId: createHash("sha256").update(`provision-correlation:v1\0${operation.operationId as string}`, "utf8").digest("hex"),
-      category: "progress",
-      stage: "state_transition",
-      outcome: "started",
-      code: "success",
-      actorUidDigest: null,
-      intendedUidDigest: null,
-      dispatchId: source.dispatchId,
-      generation: state.generation,
-      sourceVersion: state.version,
-      createdAt: transaction.now,
-    });
-    const existingAudit = await transaction.readAudit(audit.eventId);
-    if (existingAudit !== null) deduplicateAudit(existingAudit, audit);
-
-    transaction.writeOperation(operation.operationId as string, updatedOperation);
-    if (existingAudit === null) transaction.createAudit(audit.eventId, audit as unknown as PersistedRecord);
-    return { operation: updatedOperation, source };
-  }));
-  if (committed === null || "terminal" in committed) return committed;
-
-  return retryClosedFirestoreTransaction(() => store.transaction(async (transaction) => {
-    const source = await transaction.readDispatch(deliveryDispatchId);
-    const operation = source === null ? null : await transaction.readOperation(source.operationId as string);
-    if (source === null || operation === null
-      || JSON.stringify(source) !== JSON.stringify(committed.source)
-      || JSON.stringify(operation) !== JSON.stringify(committed.operation)) {
-      throw new Error("takeover post-commit reread mismatch");
+    if (outcome === "retryable-conflict") {
+      if (attempt + 1 === CLOSED_TRANSACTION_MAX_ATTEMPTS) throw new Error("closed Firestore transaction retry exhausted");
+      continue;
     }
-    return { operation, source };
-  }));
-}
+    if (outcome === "terminal") return { terminal: true };
+    if (outcome === "no-op") return null;
 
-async function retryClosedFirestoreTransaction<T>(
-  work: () => Promise<T>,
-): Promise<T> {
-  try {
-    return await work();
-  } catch (error) {
-    if (!isClosedFirestoreTransaction(error)) throw error;
-    return work();
+    try {
+      const reread = await store.transaction(async (transaction) => {
+        const source = await transaction.readDispatch(deliveryDispatchId);
+        const operation = source === null ? null : await transaction.readOperation(source.operationId as string);
+        return source !== null && isRetainedTakeoverTerminalizationTuple(operation, source, transaction.now)
+          ? "takeover-committed"
+          : "no-op";
+      });
+      if (reread === "takeover-committed") return { takeoverCommitted: true };
+      return null;
+    } catch (error) {
+      if (!isClosedFirestoreTransaction(error)) throw error;
+      if (attempt + 1 === CLOSED_TRANSACTION_MAX_ATTEMPTS) throw new Error("closed Firestore transaction retry exhausted");
+    }
   }
+  throw new Error("closed Firestore transaction retry exhausted");
 }
 
 /**
@@ -1085,20 +1075,34 @@ function isExactActiveTerminalizationTuple(
     && state.ownerToken === expectedOwnerToken;
 }
 
-function isExactTakenOverTerminalizationTuple(
+function isExpiredExactCurrentTerminalizationTuple(
   operation: PersistedRecord | null,
   source: PersistedRecord | null,
-  expectedOperation: PersistedRecord,
-  expectedSource: PersistedRecord,
+  observedAt: number,
+): boolean {
+  return operation !== null
+    && typeof operation.leaseExpiresAt === "number"
+    && operation.leaseExpiresAt <= observedAt
+    && isExactActiveTerminalizationTuple({ ...operation, leaseExpiresAt: observedAt + 1 }, source, observedAt);
+}
+
+function isExpiredRetainedTakeoverTerminalizationTuple(
+  operation: PersistedRecord | null,
+  source: PersistedRecord | null,
+  observedAt: number,
+): boolean {
+  return operation !== null
+    && typeof operation.leaseExpiresAt === "number"
+    && operation.leaseExpiresAt <= observedAt
+    && isRetainedTakeoverTerminalizationTuple({ ...operation, leaseExpiresAt: observedAt + 1 }, source, observedAt);
+}
+
+function isRetainedTakeoverTerminalizationTuple(
+  operation: PersistedRecord | null,
+  source: PersistedRecord | null,
   observedAt: number,
 ): operation is PersistedRecord {
-  if (
-    operation === null
-    || source === null
-    || JSON.stringify(operation) !== JSON.stringify(expectedOperation)
-    || JSON.stringify(source) !== JSON.stringify(expectedSource)
-    || !isValidDispatch(source)
-  ) return false;
+  if (operation === null || source === null || !isValidDispatch(source)) return false;
   const state = Object.fromEntries(STATE_FIELDS.map((field) => [field, operation[field]])) as unknown as OperationState;
   return isValidState(state)
     && state.status === "active"
@@ -1110,6 +1114,8 @@ function isExactTakenOverTerminalizationTuple(
     && source.fingerprint === state.fingerprint
     && source.boundary === state.phase
     && source.ownerSeed === deriveOwnerToken(source.dispatchId as string, source.generation as number)
+    && (source.generation as number) < state.generation
+    && (source.sourceVersion as number) < state.version
     && state.currentDispatchId === source.dispatchId
     && state.ownerToken === deriveOwnerToken(source.dispatchId as string, state.generation);
 }
@@ -1125,26 +1131,27 @@ export async function terminalizeActiveCurrent(
   evidence: PendingTerminalizationEvidence,
 ): Promise<void> {
   if (!isPendingTerminalizationEvidence(evidence)) return;
-  const takeover = await takeoverExpiredCurrent(store, deliveryDispatchId);
-  if (takeover !== null && "terminal" in takeover) return;
-  await store.transaction(async (transaction) => {
+  let terminalizeCommittedTakeover = false;
+  for (let attempt = 0; attempt < CLOSED_TRANSACTION_MAX_ATTEMPTS; attempt += 1) {
+    try {
+      const decision = await store.transaction(async (transaction) => {
     const source = await transaction.readDispatch(deliveryDispatchId);
-    if (source === null) return;
+    if (source === null) return "no-op" as const;
     const operation = await transaction.readOperation(source.operationId as string);
-    const matchesTerminalizationTuple = takeover === null
-      ? isExactActiveTerminalizationTuple(operation, source, transaction.now)
-      : isExactTakenOverTerminalizationTuple(operation, source, takeover.operation, takeover.source, transaction.now);
-    if (!matchesTerminalizationTuple) return;
+    if (isPersistedTerminalOperation(operation)) return "terminal" as const;
+    if (!terminalizeCommittedTakeover && (isExpiredExactCurrentTerminalizationTuple(operation, source, transaction.now)
+      || isExpiredRetainedTakeoverTerminalizationTuple(operation, source, transaction.now))) return "expired" as const;
+    const matchesTerminalizationTuple = terminalizeCommittedTakeover
+      ? isRetainedTakeoverTerminalizationTuple(operation, source, transaction.now)
+      : isExactActiveTerminalizationTuple(operation, source, transaction.now);
+    if (!matchesTerminalizationTuple) return "no-op" as const;
 
-    const rereadSource = await transaction.readDispatch(deliveryDispatchId);
-    if (rereadSource === null) return;
-    const rereadOperation = await transaction.readOperation(rereadSource.operationId as string);
-    const matchesRereadTuple = takeover === null
-      ? isExactActiveTerminalizationTuple(rereadOperation, rereadSource, transaction.now)
-      : isExactTakenOverTerminalizationTuple(rereadOperation, rereadSource, takeover.operation, takeover.source, transaction.now);
-    if (rereadOperation === null || !matchesRereadTuple) return;
+    // The fresh decision read is the terminalization authority. Takeover has
+    // already completed its separately committed authoritative reread.
+    const rereadSource = source;
+    const rereadOperation = operation;
 
-    const state = Object.fromEntries(STATE_FIELDS.map((field) => [field, rereadOperation[field]])) as unknown as OperationState;
+    const state = Object.fromEntries(STATE_FIELDS.map((field) => [field, rereadOperation![field]])) as unknown as OperationState;
     const isSafePreflight = state.phase === "auth_preflight";
     const code = isSafePreflight ? "unavailable" : "internal";
     const audit = createAuditEvent({
@@ -1196,10 +1203,20 @@ export async function terminalizeActiveCurrent(
       throw new TypeError("invalid terminalized active source acknowledgement");
     }
 
-    transaction.writeOperation(state.operationId, terminalOperation);
-    transaction.writeDispatch(rereadSource.dispatchId as string, terminalizedSource);
+      transaction.writeOperation(state.operationId, terminalOperation);
+      transaction.writeDispatch(rereadSource.dispatchId as string, terminalizedSource);
     if (existingAudit === null) transaction.createAudit(audit.eventId, audit as unknown as PersistedRecord);
-  });
+    return "terminal" as const;
+      });
+      if (decision === "terminal" || decision === "no-op") return;
+      const takeover = await takeoverExpiredCurrent(store, deliveryDispatchId);
+      if (takeover === null || "terminal" in takeover) return;
+      terminalizeCommittedTakeover = true;
+    } catch (error) {
+      if (!isClosedFirestoreTransaction(error)) throw error;
+      if (attempt + 1 === CLOSED_TRANSACTION_MAX_ATTEMPTS) throw new Error("closed Firestore transaction retry exhausted");
+    }
+  }
 }
 
 /**
