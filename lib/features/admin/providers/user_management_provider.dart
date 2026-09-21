@@ -1,76 +1,72 @@
-import 'package:flutter/foundation.dart';
+import 'dart:math';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import '../../../core/services/firebase_service.dart';
+import '../../../core/services/provisioning_service.dart';
 import '../../auth/models/user_model.dart';
 import '../../auth/providers/auth_provider.dart';
 
 part 'user_management_provider.g.dart';
 
-/// Estado de creación de usuario
+/// The application composition root for employee provisioning.
 ///
-/// Gestiona el estado durante el proceso de creación
-class UserCreationState {
-  final bool isLoading;
-  final String? error;
-  final Map<String, String>? result; // userId + temporaryPassword
+/// Keeping this hand-written provider outside generated output makes the
+/// workflow explicitly overrideable in widget and provider tests.
+final provisioningWorkflowProvider = Provider<ProvisioningWorkflow>((ref) {
+  return ProvisioningWorkflow(
+    ProvisioningService(FirebaseCallableTransport()),
+    storage: SharedPreferencesProvisioningOperationStorage(),
+    operationIdFactory: _newUuidV4,
+  );
+});
 
-  const UserCreationState({
-    this.isLoading = false,
-    this.error,
-    this.result,
-  });
-
-  UserCreationState copyWith({
-    bool? isLoading,
-    String? error,
-    Map<String, String>? result,
-  }) {
-    return UserCreationState(
-      isLoading: isLoading ?? this.isLoading,
-      error: error,
-      result: result ?? this.result,
-    );
+String _newUuidV4() {
+  final random = Random.secure();
+  final bytes = List<int>.generate(16, (_) => random.nextInt(256));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  final hex = StringBuffer();
+  for (final byte in bytes) {
+    hex.write(byte.toRadixString(16).padLeft(2, '0'));
   }
+  final value = hex.toString();
+  return '${value.substring(0, 8)}-'
+      '${value.substring(8, 12)}-'
+      '${value.substring(12, 16)}-'
+      '${value.substring(16, 20)}-'
+      '${value.substring(20)}';
 }
 
-/// Provider para gestión de usuarios (creación, edición, eliminación)
-///
-/// Gestiona todas las operaciones CRUD de usuarios desde el panel admin.
-/// Usa EmployeeCreationService para interactuar con Firebase.
+/// Typed provisioning state for employee creation.
+class UserCreationState {
+  const UserCreationState({
+    this.isLoading = false,
+    this.result,
+    this.error,
+  });
+
+  final bool isLoading;
+  final ProvisioningResult? result;
+  final ProvisioningFailure? error;
+}
+
+/// Manages employee creation and existing employee updates for the admin panel.
 @riverpod
 class UserManagement extends _$UserManagement {
   @override
   UserCreationState build() {
+    ref.listen(authStateProvider, (previous, next) {
+      if (previous?.valueOrNull != null && next.valueOrNull == null) {
+        ref.read(provisioningWorkflowProvider).cancel();
+      }
+    });
     return const UserCreationState();
   }
 
-  /// Crea un nuevo empleado en el sistema
-  ///
-  /// Parámetros obligatorios:
-  /// - [email]: Email del empleado
-  /// - [nombre]: Nombre del empleado
-  /// - [apellido1]: Primer apellido del empleado
-  ///
-  /// Parámetros opcionales:
-  /// - [apellido2]: Segundo apellido
-  /// - [employeeId]: ID manual (si null, se auto-genera)
-  /// - [weeklyHours]: Horas semanales (default: 40.0)
-  /// - [dni]: DNI del empleado
-  /// - [telefono]: Teléfono
-  /// - [cargo]: Cargo/posición
-  /// - [departamento]: Departamento
-  /// - [empresa]: Empresa (por defecto "Escuela Música")
-  /// - [scheduleId]: ID de plantilla de horario
-  /// - [calendarId]: ID del calendario laboral asignado
-  /// - [fechaInicio]: Fecha de inicio en la APLICACIÓN (acceso al sistema de fichaje)
-  /// - [fechaFin]: Fecha de fin en la APLICACIÓN (baja/baja temporal del sistema)
-  /// - [role]: Rol del usuario (default: employee)
-  /// - [isSupervisor]: Habilita permisos de supervision sobre equipo
-  /// - [supervisorId]: Supervisor asignado para este empleado
-  /// - [isActive]: Estado inicial del empleado en el sistema
-  ///
-  /// Retorna el resultado con userId y contraseña temporal, o null si hay error
-  Future<Map<String, String>?> createEmployee({
+  /// Creates an employee through the durable provisioning workflow.
+  Future<ProvisioningResult?> createEmployee({
     required String email,
     required String nombre,
     required String apellido1,
@@ -91,128 +87,67 @@ class UserManagement extends _$UserManagement {
     String? supervisorId,
     bool isActive = true,
   }) async {
-    // Verificar rol admin
     final currentUser = await ref.read(currentUserProvider.future);
     if (currentUser == null || currentUser.role != UserRole.admin) {
-      state = state.copyWith(
-          error: 'Sin permisos: solo administradores pueden crear empleados');
-      return null;
+      const failure = ProvisioningFailure.permissionDenied();
+      state = const UserCreationState(error: failure);
+      return failure;
+    }
+    if (email.trim().isEmpty ||
+        nombre.trim().isEmpty ||
+        apellido1.trim().isEmpty) {
+      const failure = ProvisioningFailure.invalidArgument();
+      state = const UserCreationState(error: failure);
+      return failure;
     }
 
-    // DEBUGGING
-    debugPrint('🔄 UserManagementProvider.createEmployee() iniciado');
-    debugPrint('📧 Email: $email');
-    debugPrint('👤 Nombre: $nombre $apellido1');
-
-    // Validaciones básicas
-    if (email.trim().isEmpty) {
-      state = state.copyWith(error: 'El email es obligatorio');
-      return null;
-    }
-    if (nombre.trim().isEmpty) {
-      state = state.copyWith(error: 'El nombre es obligatorio');
-      return null;
-    }
-    if (apellido1.trim().isEmpty) {
-      state = state.copyWith(error: 'El primer apellido es obligatorio');
-      return null;
-    }
-
-    // Verificar que el email no esté ya registrado
-    // TODO: Implementar verificación en Firestore antes de crear en Auth
-    // (por ahora el servicio ya maneja esto)
-
-    state = state.copyWith(isLoading: true, error: null);
-    debugPrint('⏳ Estado: isLoading = true');
-
+    state = const UserCreationState(isLoading: true);
     try {
-      final service = ref.read(employeeCreationServiceProvider);
-      debugPrint('📞 Llamando a employeeCreationService.createEmployee()...');
-
-      final result = await service.createEmployee(
-        email: email,
-        nombre: nombre,
-        apellido1: apellido1,
-        apellido2: apellido2,
-        employeeId: employeeId,
-        weeklyHours: weeklyHours,
-        dni: dni,
-        telefono: telefono,
-        cargo: cargo,
-        departamento: departamento,
-        empresa: empresa,
-        scheduleId: scheduleId,
-        calendarId: calendarId,
-        fechaInicio: fechaInicio,
-        fechaFin: fechaFin,
-        role: role,
-        isSupervisor: isSupervisor,
-        supervisorId: supervisorId,
-        isActive: isActive,
-      );
-
-      debugPrint('✅ Usuario creado exitosamente');
-      debugPrint('🆔 userId: ${result['userId']}');
-      debugPrint('🔑 Contraseña temporal generada correctamente');
-
-      state = state.copyWith(
-        isLoading: false,
+      final result = await ref.read(provisioningWorkflowProvider).submit(
+            (operationId) => ProvisioningRequest(
+              operationId: operationId,
+              email: email.trim(),
+              nombre: nombre.trim(),
+              apellido1: apellido1.trim(),
+              apellido2: apellido2,
+              employeeId: employeeId,
+              weeklyHours: weeklyHours,
+              dni: dni,
+              telefono: telefono,
+              cargo: cargo,
+              departamento: departamento,
+              empresa: empresa,
+              scheduleId: scheduleId,
+              calendarId: calendarId,
+              fechaInicio: fechaInicio?.toIso8601String(),
+              fechaFin: fechaFin?.toIso8601String(),
+              role: role.name,
+              isSupervisor: isSupervisor,
+              supervisorId: supervisorId,
+              isActive: isActive,
+            ),
+          );
+      state = UserCreationState(
         result: result,
-        error: null,
+        error: result is ProvisioningFailure ? result : null,
       );
-
       return result;
-    } on AdminSessionExpiredException catch (e) {
-      debugPrint('⚠️ Alta completada con sesión admin expirada: $e');
-
-      state = state.copyWith(
-        isLoading: false,
-        result: e.employeeData,
-        error: null,
-      );
-      return e.employeeData;
-    } catch (e) {
-      debugPrint('❌ ERROR en createEmployee: $e');
-      debugPrint('❌ Tipo de error: ${e.runtimeType}');
-
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-      return null;
+    } catch (_) {
+      const failure = ProvisioningFailure.unknown();
+      state = const UserCreationState(error: failure);
+      return failure;
     }
   }
 
-  /// Resetea el estado del provider
-  ///
-  /// Útil para limpiar errores o resultados después de mostrarlos
-  void reset() {
-    state = const UserCreationState();
-  }
+  void cancelObservation() => ref.read(provisioningWorkflowProvider).cancel();
 
-  /// Limpia solo el error
+  void reset() => state = const UserCreationState();
+
   void clearError() {
-    state = state.copyWith(error: null);
+    state = UserCreationState(result: state.result);
   }
 
-  /// Actualizar campos de un empleado existente
-  ///
-  /// Permite actualizar cualquier campo del empleado en Firestore.
-  /// Solo actualiza los campos proporcionados en [updates].
-  ///
-  /// [userId]: ID del usuario a actualizar
-  /// [updates]: Map con los campos a actualizar
-  ///
-  /// Ejemplo:
-  /// ```dart
-  /// await updateEmployee(
-  ///   userId: 'user123',
-  ///   updates: {
-  ///     'scheduleType': 'template',
-  ///     'scheduleId': 'schedule_40h_9_17',
-  ///   },
-  /// );
-  /// ```
+  /// Updates an existing employee without changing its legacy update behavior.
   Future<void> updateEmployee({
     required String userId,
     required Map<String, dynamic> updates,
@@ -220,32 +155,17 @@ class UserManagement extends _$UserManagement {
     final currentUser = await ref.read(currentUserProvider.future);
     if (currentUser == null || currentUser.role != UserRole.admin) {
       throw Exception(
-          'Sin permisos: solo administradores pueden actualizar empleados');
+        'Sin permisos: solo administradores pueden actualizar empleados',
+      );
     }
 
-    state = state.copyWith(isLoading: true, error: null);
-
+    state = const UserCreationState(isLoading: true);
     try {
-      debugPrint('🔄 Actualizando empleado: $userId');
-      debugPrint('📝 Campos a actualizar: ${updates.keys.join(", ")}');
-
-      // TODO: Move to UserService
       final firestore = ref.read(firestoreProvider);
       await firestore.collection('users').doc(userId).update(updates);
-
-      debugPrint('✅ Empleado actualizado exitosamente');
-
-      state = state.copyWith(
-        isLoading: false,
-        error: null,
-      );
-    } catch (e) {
-      debugPrint('❌ ERROR al actualizar empleado: $e');
-
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = const UserCreationState();
+    } catch (error) {
+      state = const UserCreationState(error: ProvisioningFailure.unknown());
       rethrow;
     }
   }

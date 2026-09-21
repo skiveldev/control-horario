@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/services/provisioning_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -13,13 +14,6 @@ import '../../providers/supervisors_provider.dart';
 import '../../providers/user_management_provider.dart';
 import '../../providers/schedule_management_provider.dart';
 import '../../providers/calendar_management_provider.dart';
-
-String formatTemporaryCredentialsForClipboard({
-  required String email,
-  required String temporaryPassword,
-}) {
-  return 'Email: $email\nContraseña temporal: $temporaryPassword';
-}
 
 /// Drawer lateral para crear nuevo empleado
 ///
@@ -103,9 +97,17 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
   final Map<String, String?> _errors = {};
   bool _showValidation = false;
   bool _isSubmitting = false;
+  late final ProvisioningWorkflow _workflow;
+
+  @override
+  void initState() {
+    super.initState();
+    _workflow = ref.read(provisioningWorkflowProvider);
+  }
 
   @override
   void dispose() {
+    _workflow.cancel();
     _nombreController.dispose();
     _apellido1Controller.dispose();
     _apellido2Controller.dispose();
@@ -171,7 +173,11 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
   // MÉTODOS DE GUARDADO - FASE 2 (Sprint 1.3)
   // ============================================================================
 
-  Future<void> _save() async {
+  Future<void> _save() => _submit(closeAfterCompletion: true);
+
+  Future<void> _saveAndAddAnother() => _submit(closeAfterCompletion: false);
+
+  Future<void> _submit({required bool closeAfterCompletion}) async {
     if (_isSubmitting) return;
     if (!_validateForm()) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -186,63 +192,22 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
     setState(() => _isSubmitting = true);
     try {
       final result = await _createEmployeeInFirebase();
-
-      if (result != null && mounted) {
-        _showSuccessDialog(result);
+      if (!mounted || result == null) return;
+      if (result is CompletedProvisioningStatus) {
         widget.onEmployeeCreated?.call();
-        widget.onClose();
+        if (closeAfterCompletion) {
+          _showCompletedDialog(result);
+        } else {
+          _clearForm();
+        }
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
-  Future<void> _saveAndAddAnother() async {
-    if (_isSubmitting) return;
-    if (!_validateForm()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor completa todos los campos obligatorios'),
-          backgroundColor: AppColors.error,
-        ),
-      );
-      return;
-    }
-
-    setState(() => _isSubmitting = true);
-    try {
-      final result = await _createEmployeeInFirebase();
-
-      if (result != null && mounted) {
-        final temporaryPassword = result['temporaryPassword'] ?? '';
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Usuario creado: ${_emailController.text}\nContraseña: $temporaryPassword'),
-            backgroundColor: AppColors.success,
-            duration: const Duration(seconds: 5),
-            action: SnackBarAction(
-              label: 'COPIAR',
-              textColor: Theme.of(context).colorScheme.surface,
-              onPressed: () => _copyToClipboard(
-                temporaryPassword,
-                successMessage: 'Contraseña copiada al portapapeles',
-              ),
-            ),
-          ),
-        );
-
-        widget.onEmployeeCreated?.call();
-        _clearForm();
-      }
-    } finally {
-      if (mounted) setState(() => _isSubmitting = false);
-    }
-  }
-
-  /// Crea el empleado en Firebase usando el provider
-  Future<Map<String, String>?> _createEmployeeInFirebase() async {
+  /// Creates the employee through the typed provisioning provider.
+  Future<ProvisioningResult?> _createEmployeeInFirebase() async {
     // Convertir role de String a UserRole
     UserRole role = UserRole.employee;
     var isSupervisor = false;
@@ -306,38 +271,9 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                 fechaFin: _fechaFin,
               );
 
-      if (result == null) {
-        // Hubo un error, mostrar mensaje
-        final error = ref.read(userManagementProvider).error;
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(error ?? 'Error desconocido al crear usuario'),
-              backgroundColor: AppColors.error,
-              duration: const Duration(seconds: 10), // Más tiempo para leer
-            ),
-          );
-
-          // DEBUGGING: Imprimir error en consola
-          debugPrint('❌ ERROR AL CREAR USUARIO: $error');
-        }
-      }
-
       return result;
-    } catch (e) {
-      // DEBUGGING: Imprimir error completo en consola
-      debugPrint('❌ EXCEPCIÓN AL CREAR USUARIO: $e');
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: AppColors.error,
-            duration: const Duration(seconds: 10),
-          ),
-        );
-      }
-      return null;
+    } catch (_) {
+      return const ProvisioningFailure.unknown();
     }
   }
 
@@ -372,137 +308,52 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
     }
   }
 
-  /// Muestra un diálogo con las credenciales temporales
-  void _showSuccessDialog(Map<String, String> credentials) {
-    final email = _emailController.text.trim();
-    final temporaryPassword = credentials['temporaryPassword'] ?? '';
-
+  void _showCompletedDialog(CompletedProvisioningStatus result) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) => AlertDialog(
-        title: Row(
-          children: [
-            const Icon(Icons.check_circle, color: AppColors.success, size: 32),
-            const SizedBox(width: AppSpacing.md),
-            Flexible(
-              child: Text(
-                'Usuario Creado',
-                style: AppTextStyles.h3,
-              ),
-            ),
-          ],
-        ),
+        title: const Text('Alta completada'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Credenciales de acceso temporal:',
-              style: AppTextStyles.bodyMedium,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(8),
-                border:
-                    Border.all(color: Theme.of(context).colorScheme.outline),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.email,
-                          size: 16,
-                          color:
-                              Theme.of(context).colorScheme.onSurfaceVariant),
-                      const SizedBox(width: AppSpacing.sm),
-                      Flexible(
-                        child: Text(
-                          email,
-                          style: AppTextStyles.bodyLarge.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Row(
-                    children: [
-                      Icon(Icons.lock,
-                          size: 16,
-                          color:
-                              Theme.of(context).colorScheme.onSurfaceVariant),
-                      const SizedBox(width: AppSpacing.sm),
-                      Flexible(
-                        child: Text(
-                          temporaryPassword,
-                          style: AppTextStyles.bodyLarge.copyWith(
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'monospace',
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
             const Text(
-              '⚠️ El empleado deberá cambiar la contraseña en su primer acceso.',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.warning,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
+                'Copiá este enlace y entregáselo de forma segura al empleado.'),
+            const SizedBox(height: AppSpacing.md),
+            SelectableText(result.passwordResetLink),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () async {
-              final copied = await _tryCopyToClipboard(
-                formatTemporaryCredentialsForClipboard(
-                  email: email,
-                  temporaryPassword: temporaryPassword,
-                ),
-              );
-
+              final copied =
+                  await _tryCopyToClipboard(result.passwordResetLink);
               if (!dialogContext.mounted) return;
-
-              ScaffoldMessenger.of(dialogContext)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      copied
-                          ? 'Credenciales copiadas al portapapeles'
-                          : 'No se pudo copiar',
-                    ),
-                    backgroundColor:
-                        copied ? AppColors.success : AppColors.error,
-                  ),
-                );
-
-              if (copied) {
-                Navigator.of(dialogContext).pop();
-              }
+              ScaffoldMessenger.of(dialogContext).showSnackBar(
+                SnackBar(
+                    content:
+                        Text(copied ? 'Enlace copiado' : 'No se pudo copiar')),
+              );
             },
-            child: const Text('COPIAR CREDENCIALES'),
+            child: const Text('COPIAR ENLACE'),
           ),
           CustomButton(
             text: 'CERRAR',
-            onPressed: () => Navigator.of(dialogContext).pop(),
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              _closeDrawer();
+            },
             variant: ButtonVariant.brand,
           ),
         ],
       ),
     );
+  }
+
+  void _closeDrawer() {
+    ref.read(userManagementProvider.notifier).cancelObservation();
+    widget.onClose();
   }
 
   // TODO [COMENTADO Sprint 1.3]: Ya no se usa, se crea directamente en Firebase
@@ -637,7 +488,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
           duration: const Duration(milliseconds: 300),
           opacity: widget.isOpen ? 0.5 : 0.0,
           child: GestureDetector(
-            onTap: widget.onClose,
+            onTap: _closeDrawer,
             child: Container(
               color: theme.colorScheme.onSurface,
               width: double.infinity,
@@ -670,6 +521,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          _buildProvisioningState(),
                           _buildPersonalSection(theme),
                           AppSpacing.verticalSpaceXxl,
                           _buildWorkSection(theme),
@@ -688,6 +540,35 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildProvisioningState() {
+    final result = ref.watch(userManagementProvider).result;
+    if (result == null) return const SizedBox.shrink();
+    final message = switch (result) {
+      PendingProvisioningStatus(:final operationId) =>
+        'Alta pendiente. Operación: $operationId',
+      ActiveProvisioningStatus(:final operationId) =>
+        'Alta en curso. Operación: $operationId',
+      CompletedProvisioningStatus(:final passwordResetLink) =>
+        'Alta completada. Enlace de restablecimiento: $passwordResetLink',
+      FailedProvisioningStatus(:final operationId, :final terminalCode) =>
+        'Alta fallida. Código terminal: $terminalCode. Operación: $operationId',
+      ManualRecoveryProvisioningStatus(
+        :final operationId,
+        :final terminalCode,
+        :final recoveryCode,
+      ) =>
+        'Recuperación manual requerida. Código terminal: $terminalCode. '
+            'Código de recuperación: $recoveryCode. Operación: $operationId',
+      ProvisioningFailure(:final code) =>
+        'No se pudo completar el alta. Código: $code',
+      _ => 'No se pudo completar el alta.',
+    };
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+      child: Text(message, key: const Key('provisioningResult')),
     );
   }
 
@@ -711,7 +592,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
           ),
           IconButton(
             icon: const Icon(Icons.close),
-            onPressed: widget.onClose,
+            onPressed: _closeDrawer,
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ],
@@ -730,7 +611,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
       CustomButton(
         text: 'Cancelar',
         variant: ButtonVariant.text,
-        onPressed: isProcessing ? null : widget.onClose,
+        onPressed: isProcessing ? null : _closeDrawer,
       ),
       if (!isNarrow) AppSpacing.horizontalSpaceSm,
       CustomButton(
@@ -764,8 +645,13 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
               children: buttons,
             )
           : Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: buttons,
+              children: [
+                Expanded(child: buttons[0]),
+                AppSpacing.horizontalSpaceSm,
+                Expanded(child: buttons[2]),
+                AppSpacing.horizontalSpaceSm,
+                Expanded(child: buttons[4]),
+              ],
             ),
     );
   }
