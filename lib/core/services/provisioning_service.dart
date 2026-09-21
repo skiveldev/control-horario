@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Narrow boundary for invoking protected Firebase callable functions.
 ///
@@ -228,6 +231,163 @@ class ProvisioningFailure extends ProvisioningResult {
 
   @override
   int get hashCode => code.hashCode;
+}
+
+/// Durable local storage for an in-flight provisioning operation identifier.
+abstract interface class ProvisioningOperationStorage {
+  Future<void> saveOperationId(String operationId);
+  Future<String?> readOperationId();
+}
+
+/// Production storage backed by SharedPreferences.
+class SharedPreferencesProvisioningOperationStorage
+    implements ProvisioningOperationStorage {
+  SharedPreferencesProvisioningOperationStorage({
+    Future<SharedPreferences>? preferences,
+  }) : _preferences = preferences ?? SharedPreferences.getInstance();
+
+  static const _key = 'provisioning.operationId';
+  final Future<SharedPreferences> _preferences;
+
+  @override
+  Future<String?> readOperationId() async =>
+      (await _preferences).getString(_key);
+
+  @override
+  Future<void> saveOperationId(String operationId) async {
+    await (await _preferences).setString(_key, operationId);
+  }
+}
+
+typedef ProvisioningRequestBuilder = ProvisioningRequest Function(
+  String operationId,
+);
+typedef ProvisioningSleeper = Future<void> Function(Duration delay);
+typedef ProvisioningJitter = Duration Function(Duration delay);
+
+/// Coordinates durable submission recovery and local status observation.
+class ProvisioningWorkflow {
+  ProvisioningWorkflow(
+    this._service, {
+    required ProvisioningOperationStorage storage,
+    required String Function() operationIdFactory,
+    ProvisioningSleeper? sleeper,
+    ProvisioningJitter? jitter,
+  })  : _storage = storage,
+        _operationIdFactory = operationIdFactory,
+        _sleeper = sleeper ?? Future<void>.delayed,
+        _jitter = jitter ?? _identityJitter;
+
+  final ProvisioningService _service;
+  final ProvisioningOperationStorage _storage;
+  final String Function() _operationIdFactory;
+  final ProvisioningSleeper _sleeper;
+  final ProvisioningJitter _jitter;
+  Completer<void>? _resumeSignal;
+  bool _cancelled = false;
+
+  Future<ProvisioningResult> submit(ProvisioningRequestBuilder request) async {
+    _cancelled = false;
+    final operationId = _operationIdFactory();
+    await _storage.saveOperationId(operationId);
+    final result = await _service.submit(request(operationId));
+    if (result is ProvisioningFailure ||
+        result is! ProvisioningSubmissionResult) {
+      return result;
+    }
+    if (_isTerminal(result.status)) return result;
+    return _observe(operationId, result);
+  }
+
+  /// Resumes observation of the durable operation without resubmitting it.
+  Future<ProvisioningResult?> recover({String? fingerprint}) async {
+    _cancelled = false;
+    final operationId = await _storage.readOperationId();
+    if (operationId == null) return null;
+    final result =
+        await _service.getStatus(operationId, fingerprint: fingerprint);
+    if (result is ProvisioningFailure || result is! ProvisioningStatusResult) {
+      return result;
+    }
+    return _isTerminal(result.status) ? result : _observe(operationId, result);
+  }
+
+  /// Stops local observation only; the durable ID remains available for recovery.
+  void cancel() {
+    _cancelled = true;
+    resume();
+  }
+
+  void pause() {
+    _resumeSignal ??= Completer<void>();
+  }
+
+  void resume() {
+    final signal = _resumeSignal;
+    _resumeSignal = null;
+    if (signal != null && !signal.isCompleted) signal.complete();
+  }
+
+  Future<ProvisioningResult> _observe(
+    String operationId,
+    ProvisioningResult latest,
+  ) async {
+    var attempt = 0;
+    var retryAfterSeconds = _retryAfterSeconds(latest);
+    while (!_cancelled) {
+      await _waitUntilResumed();
+      if (_cancelled) break;
+      final localDelay = _jitter(_localDelay(attempt));
+      final backendDelay = Duration(seconds: retryAfterSeconds ?? 0);
+      await _sleeper(localDelay >= backendDelay ? localDelay : backendDelay);
+      await _waitUntilResumed();
+      if (_cancelled) break;
+
+      final result = await _service.getStatus(operationId);
+      if (result is ProvisioningFailure ||
+          result is! ProvisioningStatusResult) {
+        return result;
+      }
+      latest = result;
+      if (_isTerminal(result.status)) return result;
+      retryAfterSeconds = _retryAfterSeconds(result);
+      attempt += 1;
+    }
+    return latest;
+  }
+
+  Future<void> _waitUntilResumed() async {
+    while (_resumeSignal != null && !_cancelled) {
+      await _resumeSignal!.future;
+    }
+  }
+
+  static Duration _identityJitter(Duration delay) => delay;
+
+  static Duration _localDelay(int attempt) => Duration(
+        seconds: switch (attempt) {
+          0 => 1,
+          1 => 2,
+          2 => 4,
+          3 => 8,
+          _ => 15,
+        },
+      );
+
+  static int? _retryAfterSeconds(ProvisioningResult result) => switch (result) {
+        PendingProvisioningStatus(:final retryAfterSeconds) =>
+          retryAfterSeconds,
+        ActiveProvisioningStatus(:final retryAfterSeconds) => retryAfterSeconds,
+        _ => null,
+      };
+
+  static bool _isTerminal(ProvisioningStatus status) => switch (status) {
+        ProvisioningStatus.pending || ProvisioningStatus.active => false,
+        ProvisioningStatus.completed ||
+        ProvisioningStatus.failed ||
+        ProvisioningStatus.manualRecovery =>
+          true,
+      };
 }
 
 class ProvisioningService {

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:control_horario/core/services/provisioning_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -261,6 +263,384 @@ void main() {
           const ProvisioningFailure.unknown());
     });
   });
+
+  group('ProvisioningWorkflow', () {
+    test('persists a factory operation id before submit and polls with delays',
+        () async {
+      final storage = _FakeStorage();
+      final delays = <Duration>[];
+      final transport = _FakeTransport.responses(<Object?>[
+        <String, dynamic>{'operationId': 'generated', 'status': 'pending'},
+        <String, dynamic>{
+          'operationId': 'generated',
+          'status': 'pending',
+          'retryAfterSeconds': 3,
+        },
+        <String, dynamic>{
+          'operationId': 'generated',
+          'status': 'active',
+          'phase': 'auth_create',
+          'retryAfterSeconds': 1,
+        },
+        <String, dynamic>{
+          'operationId': 'generated',
+          'status': 'completed',
+          'userId': 'uid',
+          'idempotent': true,
+          'passwordResetLink': 'https://reset',
+        },
+      ]);
+      final workflow = ProvisioningWorkflow(
+        ProvisioningService(transport),
+        storage: storage,
+        operationIdFactory: () => 'generated',
+        sleeper: (delay) async => delays.add(delay),
+        jitter: (delay) => delay,
+      );
+
+      final result = await workflow.submit(_requestFor);
+
+      expect(storage.savedIds, <String>['generated']);
+      expect(transport.calls.first.payload['operationId'], 'generated');
+      expect(delays, <Duration>[
+        Duration(seconds: 1),
+        Duration(seconds: 3),
+        Duration(seconds: 4),
+      ]);
+      expect(result, isA<CompletedProvisioningStatus>());
+    });
+
+    test('recovers a persisted id through status without resubmitting',
+        () async {
+      final transport = _FakeTransport.responses(<Object?>[
+        <String, dynamic>{
+          'operationId': 'saved',
+          'status': 'failed',
+          'terminalCode': 'internal',
+        },
+      ]);
+      final workflow = ProvisioningWorkflow(
+        ProvisioningService(transport),
+        storage: _FakeStorage(initialId: 'saved'),
+        operationIdFactory: () => 'unused',
+        sleeper: (_) async {},
+      );
+
+      final result = await workflow.recover();
+
+      expect(transport.calls.single.name, 'getProvisioningStatus');
+      expect(result, isA<FailedProvisioningStatus>());
+    });
+
+    test('does not poll terminal submit results and retains the id on failure',
+        () async {
+      final storage = _FakeStorage();
+      final transport = _FakeTransport.responses(<Object?>[
+        <String, dynamic>{'operationId': 'generated', 'status': 'completed'},
+      ]);
+      final workflow = ProvisioningWorkflow(
+        ProvisioningService(transport),
+        storage: storage,
+        operationIdFactory: () => 'generated',
+        sleeper: (_) async => fail('terminal submit must not sleep'),
+      );
+
+      final result = await workflow.submit(_requestFor);
+
+      expect(result, isA<ProvisioningSubmissionResult>());
+      expect(transport.calls, hasLength(1));
+      expect(storage.savedIds, <String>['generated']);
+    });
+
+    test('cancellation stops observation without clearing the persisted id',
+        () async {
+      final storage = _FakeStorage();
+      late ProvisioningWorkflow workflow;
+      workflow = ProvisioningWorkflow(
+        ProvisioningService(_FakeTransport.responses(<Object?>[
+          <String, dynamic>{'operationId': 'generated', 'status': 'pending'},
+        ])),
+        storage: storage,
+        operationIdFactory: () => 'generated',
+        sleeper: (_) async => workflow.cancel(),
+      );
+
+      final result = await workflow.submit(_requestFor);
+
+      expect(result, isA<ProvisioningSubmissionResult>());
+      expect(storage.savedIds, <String>['generated']);
+    });
+
+    test('caps local delays and never lets backend retry shorten them',
+        () async {
+      final delays = <Duration>[];
+      final pending = <String, dynamic>{
+        'operationId': 'generated',
+        'status': 'pending',
+        'retryAfterSeconds': 1,
+      };
+      final transport = _FakeTransport.responses(<Object?>[
+        <String, dynamic>{'operationId': 'generated', 'status': 'pending'},
+        pending,
+        pending,
+        pending,
+        pending,
+        <String, dynamic>{
+          'operationId': 'generated',
+          'status': 'pending',
+          'retryAfterSeconds': 20,
+        },
+        <String, dynamic>{
+          'operationId': 'generated',
+          'status': 'completed',
+          'userId': 'uid',
+          'idempotent': true,
+          'passwordResetLink': 'https://reset',
+        },
+      ]);
+      final workflow = ProvisioningWorkflow(
+        ProvisioningService(transport),
+        storage: _FakeStorage(),
+        operationIdFactory: () => 'generated',
+        sleeper: (delay) async => delays.add(delay),
+        jitter: (delay) => delay,
+      );
+
+      await workflow.submit(_requestFor);
+
+      expect(delays, <Duration>[
+        Duration(seconds: 1),
+        Duration(seconds: 2),
+        Duration(seconds: 4),
+        Duration(seconds: 8),
+        Duration(seconds: 15),
+        Duration(seconds: 20),
+      ]);
+    });
+
+    test('waits for durable persistence before starting submit', () async {
+      final saveGate = Completer<void>();
+      final storage = _FakeStorage(saveGate: saveGate.future);
+      final transport = _FakeTransport.responses(<Object?>[
+        <String, dynamic>{'operationId': 'generated', 'status': 'completed'},
+      ]);
+      final workflow = ProvisioningWorkflow(
+        ProvisioningService(transport),
+        storage: storage,
+        operationIdFactory: () => 'generated',
+      );
+
+      final result = workflow.submit(_requestFor);
+      await storage.saveStarted.future;
+      expect(transport.calls, isEmpty);
+
+      saveGate.complete();
+      expect(await result, isA<ProvisioningSubmissionResult>());
+    });
+
+    test('jitter changes local delay while backend retry remains a lower bound',
+        () async {
+      final delays = <Duration>[];
+      final workflow = ProvisioningWorkflow(
+        ProvisioningService(_FakeTransport.responses(<Object?>[
+          <String, dynamic>{'operationId': 'generated', 'status': 'pending'},
+          <String, dynamic>{
+            'operationId': 'generated',
+            'status': 'pending',
+            'retryAfterSeconds': 5,
+          },
+          <String, dynamic>{
+            'operationId': 'generated',
+            'status': 'completed',
+            'userId': 'uid',
+            'idempotent': true,
+            'passwordResetLink': 'https://reset',
+          },
+        ])),
+        storage: _FakeStorage(),
+        operationIdFactory: () => 'generated',
+        sleeper: (delay) async => delays.add(delay),
+        jitter: (delay) => delay + const Duration(seconds: 2),
+      );
+
+      await workflow.submit(_requestFor);
+
+      expect(delays, <Duration>[Duration(seconds: 3), Duration(seconds: 5)]);
+    });
+
+    test('terminal statuses and failures stop polling', () async {
+      for (final status in <ProvisioningStatus>[
+        ProvisioningStatus.completed,
+        ProvisioningStatus.failed,
+        ProvisioningStatus.manualRecovery,
+      ]) {
+        final transport = _FakeTransport.responses(<Object?>[
+          <String, dynamic>{
+            'operationId': 'generated',
+            'status': status.wireValue
+          },
+        ]);
+        final result = await ProvisioningWorkflow(
+          ProvisioningService(transport),
+          storage: _FakeStorage(),
+          operationIdFactory: () => 'generated',
+          sleeper: (_) async => fail('terminal submit must not sleep'),
+        ).submit(_requestFor);
+        expect(result, isA<ProvisioningSubmissionResult>());
+        expect(transport.calls, hasLength(1));
+      }
+
+      for (final error in <Object?>[
+        const CallableTransportFailure('invalid-argument'),
+        const CallableTransportFailure('unauthenticated'),
+        const CallableTransportFailure('permission-denied'),
+        const CallableTransportFailure('already-exists'),
+        const CallableTransportFailure('aborted'),
+        const CallableTransportFailure('not-found'),
+        const CallableTransportFailure('internal'),
+        const CallableTransportFailure('unavailable'),
+        StateError('unknown'),
+      ]) {
+        final submitTransport = _FakeTransport.throwing(error);
+        final submitResult = await ProvisioningWorkflow(
+          ProvisioningService(submitTransport),
+          storage: _FakeStorage(),
+          operationIdFactory: () => 'generated',
+        ).submit(_requestFor);
+        expect(submitResult, isA<ProvisioningFailure>());
+        expect(submitTransport.calls, hasLength(1));
+
+        final statusTransport = _FakeTransport.responses(<Object?>[
+          <String, dynamic>{'operationId': 'generated', 'status': 'pending'},
+        ])
+          ..nextError = error
+          ..errorAfterCalls = 1;
+        final statusResult = await ProvisioningWorkflow(
+          ProvisioningService(statusTransport),
+          storage: _FakeStorage(),
+          operationIdFactory: () => 'generated',
+          sleeper: (_) async {},
+        ).submit(_requestFor);
+        expect(statusResult, isA<ProvisioningFailure>());
+        expect(statusTransport.calls, hasLength(2));
+      }
+    });
+
+    test('malformed submit and status responses stop polling', () async {
+      final submitTransport = _FakeTransport.responses(<Object?>[null]);
+      final submitResult = await ProvisioningWorkflow(
+        ProvisioningService(submitTransport),
+        storage: _FakeStorage(),
+        operationIdFactory: () => 'generated',
+      ).submit(_requestFor);
+      expect(submitResult, const ProvisioningFailure.malformedResponse());
+      expect(submitTransport.calls, hasLength(1));
+
+      final statusTransport = _FakeTransport.responses(<Object?>[
+        <String, dynamic>{'operationId': 'generated', 'status': 'pending'},
+        null,
+      ]);
+      final statusResult = await ProvisioningWorkflow(
+        ProvisioningService(statusTransport),
+        storage: _FakeStorage(),
+        operationIdFactory: () => 'generated',
+        sleeper: (_) async {},
+      ).submit(_requestFor);
+      expect(statusResult, const ProvisioningFailure.malformedResponse());
+      expect(statusTransport.calls, hasLength(2));
+    });
+
+    test('pause during an active delay blocks the next status call', () async {
+      final delayStarted = Completer<void>();
+      final delayFinished = Completer<void>();
+      final transport = _FakeTransport.responses(<Object?>[
+        <String, dynamic>{'operationId': 'generated', 'status': 'pending'},
+        <String, dynamic>{
+          'operationId': 'generated',
+          'status': 'completed',
+          'userId': 'uid',
+          'idempotent': true,
+          'passwordResetLink': 'https://reset',
+        },
+      ]);
+      final workflow = ProvisioningWorkflow(
+        ProvisioningService(transport),
+        storage: _FakeStorage(),
+        operationIdFactory: () => 'generated',
+        sleeper: (_) async {
+          delayStarted.complete();
+          await delayFinished.future;
+        },
+      );
+
+      final result = workflow.submit(_requestFor);
+      await delayStarted.future;
+      workflow.pause();
+      delayFinished.complete();
+      await Future<void>.value();
+      await Future<void>.value();
+      expect(transport.calls, hasLength(1));
+
+      workflow.resume();
+      expect(await result, isA<CompletedProvisioningStatus>());
+    });
+
+    test('pause defers observation until resumed', () async {
+      final gate = Completer<void>();
+      final transport = _FakeTransport.responses(<Object?>[
+        <String, dynamic>{'operationId': 'generated', 'status': 'pending'},
+        <String, dynamic>{
+          'operationId': 'generated',
+          'status': 'completed',
+          'userId': 'uid',
+          'idempotent': true,
+          'passwordResetLink': 'https://reset',
+        },
+      ]);
+      final workflow = ProvisioningWorkflow(
+        ProvisioningService(transport),
+        storage: _FakeStorage(),
+        operationIdFactory: () => 'generated',
+        sleeper: (_) => gate.future,
+      );
+      workflow.pause();
+
+      final result = workflow.submit(_requestFor);
+      await Future<void>.delayed(Duration.zero);
+      expect(transport.calls, hasLength(1));
+
+      workflow.resume();
+      gate.complete();
+      expect(await result, isA<CompletedProvisioningStatus>());
+    });
+  });
+}
+
+ProvisioningRequest _requestFor(String operationId) => ProvisioningRequest(
+      operationId: operationId,
+      email: 'ada@example.com',
+      nombre: 'Ada',
+      apellido1: 'Lovelace',
+      role: 'employee',
+    );
+
+class _FakeStorage implements ProvisioningOperationStorage {
+  _FakeStorage({this.initialId, this.saveGate});
+
+  final String? initialId;
+  final Future<void>? saveGate;
+  final savedIds = <String>[];
+  final saveStarted = Completer<void>();
+
+  @override
+  Future<String?> readOperationId() async => initialId;
+
+  @override
+  Future<void> saveOperationId(String operationId) async {
+    savedIds.add(operationId);
+    saveStarted.complete();
+    await saveGate;
+  }
 }
 
 class _FakeTransport implements CallableTransport {
@@ -268,11 +648,16 @@ class _FakeTransport implements CallableTransport {
   _FakeTransport.throwing(this._error) : _responses = const <Object?>[];
   final List<Object?> _responses;
   final Object? _error;
+  Object? nextError;
+  int? errorAfterCalls;
   final calls = <_Call>[];
   @override
   Future<Object?> call(String name, Map<String, dynamic> payload) async {
     calls.add(_Call(name, payload));
     if (_error != null) throw _error;
+    if (nextError != null && calls.length > (errorAfterCalls ?? 0)) {
+      throw nextError!;
+    }
     return _responses.removeAt(0);
   }
 }
