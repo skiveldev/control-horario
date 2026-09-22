@@ -23,11 +23,6 @@ import '../../providers/calendar_management_provider.dart';
 /// - Backdrop oscuro con tap para cerrar
 /// - Formulario con 3 secciones: Personal, Laboral, Control Horario
 ///
-/// FASE 2 - SPRINT 1.3: Conectado con Firebase
-/// - Crea usuarios reales en Firebase Auth + Firestore
-/// - Genera employeeId automático si no se especifica
-/// - Genera displayName automático
-/// - Solo 3 campos obligatorios: Nombre, Apellido1, Email
 class NewEmployeeDrawer extends ConsumerStatefulWidget {
   /// Controla si el drawer está abierto
   final bool isOpen;
@@ -356,61 +351,6 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
     widget.onClose();
   }
 
-  // TODO [COMENTADO Sprint 1.3]: Ya no se usa, se crea directamente en Firebase
-  // El método _buildEmployeeData() se reemplazó por _createEmployeeInFirebase()
-  /*
-  Map<String, dynamic> _buildEmployeeData() {
-    final nombre = _nombreController.text.trim();
-    final apellido1 = _apellido1Controller.text.trim();
-    final apellido2 = _apellido2Controller.text.trim();
-
-    // Auto-generar employeeId si está vacío
-    final employeeId = _employeeIdController.text.trim().isEmpty
-        ? MockData.generateEmployeeId()
-        : _employeeIdController.text.trim();
-
-    // Auto-generar displayName
-    final displayName = apellido2.isEmpty
-        ? '$nombre $apellido1'
-        : '$nombre $apellido1 $apellido2';
-
-    return {
-      // Sección 1: Información Personal
-      'id': employeeId,
-      'name': displayName,
-      'nombre': nombre,
-      'apellido1': apellido1,
-      'apellido2': apellido2.isEmpty ? null : apellido2,
-      'dni': _dniController.text.trim(),
-      'telefono': _telefonoController.text.trim().isEmpty
-          ? null
-          : _telefonoController.text.trim(),
-      'email': _emailController.text.trim(),
-
-      // Sección 2: Información Laboral
-      'position': _cargoController.text.trim(),
-      'department': _selectedDepartamento,
-      'empresa': _empresaController.text.trim(),
-
-      // Sección 3: Control Horario
-      'role': _selectedRole,
-      'fechaInicio': _fechaInicio.toIso8601String(),
-      'fechaFin': _fechaFin?.toIso8601String(),
-      'scheduleId': _selectedScheduleId,
-      'weeklyHours': _weeklyHoursController.text.trim().isEmpty
-          ? null
-          : double.tryParse(_weeklyHoursController.text.trim()),
-
-      // Sección 4: Auto-generada
-      'displayName': displayName,
-      'createdAt': DateTime.now().toIso8601String(),
-      'isActive': _isActive,
-      'status': _isActive ? 'activo' : 'inactivo',
-      'isClockedIn': false,
-    };
-  }
-  */
-
   void _clearForm() {
     setState(() {
       _nombreController.clear();
@@ -459,15 +399,6 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
       _fechaFin = date;
     });
   }
-
-  // TODO [COMENTADO Sprint 1.3]: Ya no se usa, se genera automáticamente en Firebase
-  /*
-  void _generateEmployeeId() {
-    setState(() {
-      _employeeIdController.text = MockData.generateEmployeeId();
-    });
-  }
-  */
 
   // ============================================================================
   // BUILD
@@ -755,27 +686,6 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
           ],
         ),
         AppSpacing.verticalSpaceMd,
-
-        // Employee ID con botón generar (COMENTADO Sprint 1.3 - se genera automático)
-        // Row(
-        //   crossAxisAlignment: CrossAxisAlignment.end,
-        //   children: [
-        //     Expanded(
-        //       flex: 2,
-        //       child: CustomTextField(
-        //         controller: _employeeIdController,
-        //         label: 'Código empleado',
-        //         hintText: 'Ej: EMP-009',
-        //       ),
-        //     ),
-        //     AppSpacing.horizontalSpaceSm,
-        //     CustomButton(
-        //       text: 'Generar',
-        //       variant: ButtonVariant.outline,
-        //       onPressed: _generateEmployeeId,
-        //     ),
-        //   ],
-        // ),
 
         // Código empleado (opcional, se genera automático)
         CustomTextField(
