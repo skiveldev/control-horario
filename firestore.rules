@@ -62,8 +62,14 @@ service cloud.firestore {
         request.resource.data.isSupervisor == false;
     }
 
-    function isSafeSelfProfileUpdate(userId) {
+    function isAllowedUserProfileUpdate(userId) {
       return isActiveOwner(userId) &&
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['nombre', 'apellido1', 'apellido2', 'displayName', 'telefono', 'dni']);
+    }
+
+    function isAdminOrRrhhProfileUpdate() {
+      return isAdminOrRrhh() &&
         request.resource.data.diff(resource.data).affectedKeys()
           .hasOnly(['nombre', 'apellido1', 'apellido2', 'displayName', 'telefono', 'dni']);
     }
@@ -80,14 +86,15 @@ service cloud.firestore {
                     resource.data.supervisorId == request.auth.uid &&
                     resource.data.isActive == true));
       
-      // Solo admin y RRHH pueden crear usuarios.
-      // Si el alta ocurre desde la propia sesión recién creada, limitarla a un
-      // perfil base sin privilegios para evitar escalado de rol/capacidad.
-      allow create: if isAdminOrRrhh() || isSafeSelfUserCreate(userId);
+      // User provisioning is server-only; no client actor may create /users.
+      //
+      //
+      allow create: if false;
       
-      // Admin y RRHH pueden actualizar cualquier campo.
-      // Un empleado activo puede editar solo campos seguros de su propio perfil.
-      allow update: if isAdminOrRrhh() || isSafeSelfProfileUpdate(userId);
+      // Client updates are limited to explicit nonprivileged profile fields.
+      //
+      allow update: if isAdminOrRrhhProfileUpdate() ||
+                           isAllowedUserProfileUpdate(userId);
       
       // No permitir eliminar usuarios (seguridad)
       allow delete: if false;
