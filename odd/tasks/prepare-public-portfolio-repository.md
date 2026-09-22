@@ -59,7 +59,7 @@ A reconciled ODD task authority is needed to prevent duplicate implementation, p
 - [x] **ODD-008 — Complete P4 client transport and dependency migration.** P4.0-P4.10 completed in two work units: **P4-T1** dependency, App Check bootstrap, and trusted callable transport foundation at `276ad35dd3b297fee0a67d5c5c82467bc1137f10`; **P4-T2** submit/status payload, result, and exact eight-code mapping at `f7b1e1a813a4480e7cefab1c87d284b3c5e3a7c1`. Polling, UX, direct-creation retirement, rules, and P4 final gates remain in ODD-009.
 - [x] **ODD-009 — Complete P4 polling, UX, and Firestore hardening.** P4.11-P4.21 are complete across resilient polling, typed UX migration, legacy client-creation retirement, Firestore user-write hardening, and final aggregate gates. Final gate correction committed as work unit `16a8195d7e3ed8bb8ebcdeb4263ccef78540b78e`.
 - [x] **ODD-010 — Complete WU5 signing readiness.** Release builds now fail closed without local signing material, signing secrets are ignored, and the Android toolchain is coherently migrated to the Flutter 3.47.5 template stack (Gradle 9.3.1, AGP 9.1.0, KGP 2.4.0, JVM 17) while explicitly deferring built-in Kotlin and the new DSL. Independent verification passes debug assembly, exact release fail-fast, wrapper provenance/modes, secret inspection, protected-path isolation, and the authored workload guard. Completed with work-unit commit `5b5f57c736dc035a51d4e0da48b23487e2b1c1f1`.
-- [ ] **ODD-011 — Complete WU6 de-branding.** Preserve its existing acceptance criteria and ordering after WU5.
+- [x] **ODD-011 — Complete WU6 de-branding.** The user-selected visible brand `controlhorario-rega` consistently covers Flutter app chrome, login/navigation/settings surfaces, Android launcher label, iOS display name, and web/PWA metadata. Strict TDD recorded legacy-brand RED and 17/17 GREEN with zero skips; independent verification passes exact-brand coverage, functional-label and technical-ID preservation, protected-path isolation, diff-check, and a 142-line authored workload. Completed with work-unit commit `e6c2dae26e22546f792a7d12ee7e8370f9f6f682`.
 - [ ] **ODD-012 — Complete WU7 sanitization.** Preserve its existing acceptance criteria and ordering after WU6.
 - [ ] **ODD-013 — Complete WU8 README and WU9 archive work.** Keep documentation and archive behavior reviewable and preserve their existing order.
 - [ ] **ODD-014 — Complete WU10 final gates.** Run the existing publication/readiness gates and report every failed, skipped, unavailable, or pending check.
@@ -132,4 +132,4 @@ A reconciled ODD task authority is needed to prevent duplicate implementation, p
 
 ## Next Step
 
-Map ODD-011 de-branding requirements and define its smallest reviewable work unit before implementation.
+Map ODD-012 sanitization requirements and define its smallest reviewable work unit before implementation.
