@@ -1893,7 +1893,7 @@ Define an allowed, guardable expected-CAS carrier while preserving the intended 
 - Cleanup/process: Firebase reported orderly Firestore emulator, hub, and logging shutdown; no emulator/background process remained and no generated debug path was added to Git status.
 - Rollback: remove `profile.ts` and `profile.test.ts`, revert only P3.0–P3.4 checkboxes, and remove this appended block; P2 and unrelated dirty/untracked files remain intact.
 - Native authority: parent supplied proceed continuation and retained its token; this executor did not acquire, settle, reset, or persist tokens.
-- Structured status consumed: `prepare-public-portfolio-repository`, OpenSpec, apply ready, repo-local allowed root `/home/skivel/control-horario-worktrees/p1a2-i-b-2-terminal-monotonic`; no action-context warning.
+- Structured status consumed: `prepare-public-portfolio-repository`, OpenSpec, apply ready, repo-local allowed root `<workspace-root>`; no action-context warning.
 - Remaining P3 implementation starts at exact unchecked task `- [ ] P3.5 RED: worker acquisition and delivery classification — validate the full persisted dispatch source tuple, acquire/take over lease, and classify duplicate/out-of-order/orphan/terminal deliveries; stale deliveries mark only the dispatch where legal and return 2xx without advancing operation state.`
 
 ## P3-B Planning Amendment — Documentation Only, Blocked
@@ -2084,7 +2084,7 @@ P3.5–P3.10 remain unchecked and match the pre-amendment worktree text captured
 - **Files changed:** `functions/src/provisioning/boundaries.ts`, `functions/test/provisioning/worker_auth.test.ts`, `openspec/changes/prepare-public-portfolio-repository/tasks.md`, and this append-only record. `worker.ts` was not changed.
 - **Workload / PR boundary:** feature-branch-chain child prerequisite only; no commit or PR was created. Independent in-memory comparison against native begin tree `6a76159b1dd412ebaccd8bada6029c3284d9c27f` yields 19 source changes (16 additions, 3 deletions) and 109 test additions; with 8 task changes and 21 progress additions, the baseline-relative total is 157 changed lines. This supersedes the writer's non-reproducible 163-line count and is 22 above the 95–135 forecast but below warning 320, STOP 380, and hard maximum 399; the excess is necessary for independent fake, injected-failure, and real-emulator assertions, not code-golf candidate material.
 - **Progress integrity:** pre-append `apply-progress.md` was 159,071 bytes with SHA-256 `90eda4516614d922ab4bb246be3eae5b7c9bba5bd68b413c94ce9ca6f0536b6c`; this record was appended only. Rollback removes only the port/adapter conversion, its test vectors, these four checkbox updates, and this appended section.
-- **Status consumed:** parent-authoritative `prepare-public-portfolio-repository` apply-ready status for `/home/skivel/control-horario-worktrees/p1a2-i-b-2-terminal-monotonic`; `actionContext.mode=repo-local`, sole allowed root was that worktree, and no action-context warning was present.
+- **Status consumed:** parent-authoritative `prepare-public-portfolio-repository` apply-ready status for `<workspace-root>`; `actionContext.mode=repo-local`, sole allowed root was that worktree, and no action-context warning was present.
 
 ## P3-B.2b-2 — Interrupted Apply Evidence (blocked)
 
@@ -2217,7 +2217,7 @@ P3.5–P3.10 remain unchecked and match the pre-amendment worktree text captured
 
 - Required configured runner: `flutter test` exited 127 before test discovery: `/mnt/c/flutter/bin/flutter` has CRLF script line endings and `/usr/bin/env` rejected `bash\\r`. This is an environment/toolchain blocker, not a source assertion failure.
 - Files changed: `functions/src/provisioning/worker.ts` adds an expired-takeover owner-seed derivation fence; `functions/test/provisioning/worker_auth.test.ts` derives canonical active owner seeds and proves seed drift causes no write. No task checkbox was changed.
-- Status consumed: `gentle-ai.sdd-status` v2, `prepare-public-portfolio-repository`, apply ready, repo-local allowed root `/home/skivel/control-horario-worktrees/p1a2-i-b-2-terminal-monotonic`; no action-context warning.
+- Status consumed: `gentle-ai.sdd-status` v2, `prepare-public-portfolio-repository`, apply ready, repo-local allowed root `<workspace-root>`; no action-context warning.
 - Workload / PR boundary: P3.5–P3.6 only; no commit, stage, push, review, or deployment. The runtime attempt binding was supplied by the parent; no acquire, reset, rescope, supersede, or settlement was run.
 - Remaining implementation tasks: `- [ ] P3.5 RED: worker acquisition and delivery classification — validate the full persisted dispatch source tuple, acquire/take over lease, and classify duplicate/out-of-order/orphan/terminal deliveries; stale deliveries mark only the dispatch where legal and return 2xx without advancing operation state.` and `- [ ] P3.6 GREEN: acquisition passes.`
 - Settlement-ready diagnosis: focused Functions evidence is green, but final required Flutter verification is blocked by the CRLF Flutter launcher. Cleanup/process evidence: `emulators:exec` exited 0 and stopped Firestore, hub, and logging processes; no native settlement was performed.
@@ -2261,7 +2261,7 @@ P3.5–P3.10 remain unchecked and match the pre-amendment worktree text captured
 - **Files changed:** `functions/src/provisioning/worker.ts`, `functions/test/provisioning/worker_auth.test.ts`, `tasks.md`, and this append-only record.
 - **Configured runner:** `flutter test` exited 127 before discovery with `/usr/bin/env: ‘bash\\r’: No such file or directory` from `/mnt/c/flutter/bin/flutter`; this is the independently established CRLF/WSL launcher failure, not a Flutter or Functions test failure.
 - **Workload / PR boundary:** P3.7–P3.8 Functions-only feature-chain slice; no stage, commit, push, review, deploy, install, or P3.9+ mutation.
-- **Status/action context:** consumed parent native `gentle-ai.sdd-status` v2 (`applyState: ready`), repo-local root `/home/skivel/control-horario-worktrees/p1a2-i-b-2-terminal-monotonic`, no action-context warning; continuing active attempt token `sha256:bb1f4733c7ff5985897eece3e4b5b6865fcf157ee417c3311fb0757323e927c1` acquired as `proceed`.
+- **Status/action context:** consumed parent native `gentle-ai.sdd-status` v2 (`applyState: ready`), repo-local root `<workspace-root>`, no action-context warning; continuing active attempt token `sha256:bb1f4733c7ff5985897eece3e4b5b6865fcf157ee417c3311fb0757323e927c1` acquired as `proceed`.
 - **Settlement-ready diagnosis:** focused Node, Firestore emulator, and configured TypeScript checks passed. The only non-green command is the known Flutter launcher pre-discovery failure. **Cleanup/process evidence:** `emulators:exec` exited 0 and stopped Firestore, hub, and logging processes. Do not settle from this executor.
 
 ## P3.9–P3.10 — Atomic Auth Intent
@@ -2287,7 +2287,7 @@ P3.5–P3.10 remain unchecked and match the pre-amendment worktree text captured
 - Changed paths: `functions/src/provisioning/worker.ts`, `functions/test/provisioning/worker_auth.test.ts`, `openspec/changes/prepare-public-portfolio-repository/{tasks.md,apply-progress.md}`.
 - No deviation from the accepted Auth-intent design; the REAL-test fixture uses a live lease because the emulator transaction clock is current while historical fixture timestamps are not.
 - PR boundary: one Functions-only atomic Auth-intent work unit; no Flutter, Auth create, profile, retry, deployment, or P3.11+ behavior was changed.
-- Status consumed: `gentle-ai.sdd-status` v2, `applyState: ready`, `nextRecommended: apply`, repo-local action context with workspace root `/home/skivel/control-horario-worktrees/p1a2-i-b-2-terminal-monotonic` and the supplied allowed root. No action-context warning occurred.
+- Status consumed: `gentle-ai.sdd-status` v2, `applyState: ready`, `nextRecommended: apply`, repo-local action context with workspace root `<workspace-root>` and the supplied allowed root. No action-context warning occurred.
 - Remaining implementation begins with exact unchecked line: `- [ ] P3.11 RED: Auth create boundary — CAS to \`call_started\`; call create once; exact return + UID/email reads + proof commit -> \`profile_commit\`; malformed/ambiguous/timeout/crash -> \`manual_recovery\` (no delete); definite no-effect -> back to \`auth_preflight\`.`
 - Settlement-ready (not settled): passed diagnosis is that focused and Firestore-emulator evidence prove the atomic intent transaction; cleanup evidence is that the Firebase emulator reported orderly Firestore/hub/logging shutdown; process evidence is the completed `firebase emulators:exec` exit-0 run. No acquire, settle, reset, commit, staging, push, or deployment was performed by this slice.
 
@@ -2312,7 +2312,7 @@ P3.5–P3.10 remain unchecked and match the pre-amendment worktree text captured
 - Persisted task updates: P3.11 and P3.12 are visibly `[x]`; P3.13+ remains untouched.
 - Files changed: `functions/src/provisioning/boundaries.ts`, `functions/src/provisioning/worker.ts`, `functions/test/provisioning/worker_auth.test.ts`, `openspec/changes/prepare-public-portfolio-repository/tasks.md`, and this append-only record.
 - Workload / PR boundary: one Functions-only feature-chain P3.11–P3.12 child. Baseline-relative line accounting is unavailable from `git diff --numstat` because all three provisioning code paths are pre-existing untracked candidate files; no size exception is claimed. No commit, stage, push, review, deployment, install, or Flutter edit occurred.
-- Status/action context: consumed native `gentle-ai.sdd-status` v2, apply ready, repo-local root `/home/skivel/control-horario-worktrees/p1a2-i-b-2-terminal-monotonic`, with that root as the allowed edit surface and no warning. Continuing acquire token `sha256:99396aacab8cfd21c9b0ad5739897c6c9369c1fc4016ff4cee6b3bf27e01e0ea` returned `proceed`; no settlement was performed.
+- Status/action context: consumed native `gentle-ai.sdd-status` v2, apply ready, repo-local root `<workspace-root>`, with that root as the allowed edit surface and no warning. Continuing acquire token `sha256:99396aacab8cfd21c9b0ad5739897c6c9369c1fc4016ff4cee6b3bf27e01e0ea` returned `proceed`; no settlement was performed.
 - Remaining implementation begins with exact unchecked lines: `- [ ] P3.13 RED: profile_commit boundary — requires persisted Auth proof + mandatory matching UID/email reads; one transaction creates/verifies operation-matching profile + \`completed/terminal\` + \`success.completed\` audit + current ack; all-or-nothing.` and `- [ ] P3.14 GREEN: profile_commit passes; conflicting profile -> \`manual_recovery\`; no deletion.`
 - Settlement-ready diagnosis: focused direct, emulator, and TypeScript evidence pass; Flutter did not reach discovery because of the known CRLF launcher. Cleanup/process evidence: the successful `emulators:exec` invocation stopped Firestore, hub, and logging processes. Do not settle from this executor.
 
@@ -2336,7 +2336,7 @@ P3.5–P3.10 remain unchecked and match the pre-amendment worktree text captured
 - Regression commands passed: direct `schemas.test.ts` (41 assertions), `audit.test.ts` (99 assertions), and `outbox.test.ts` (20 assertions).
 - Files changed: `functions/src/provisioning/worker.ts`, `functions/test/provisioning/worker_auth.test.ts`, and this append-only record. No task checkbox changed because P3.11/P3.12 were already `[x]`; no P3.13+ row changed.
 - Workload / PR boundary: `p3-11-auth-create-boundary` remediation only. No commit, stage, push, PR, deployment, reset, rescope, or supersession occurred. Git cannot measure the existing untracked provisioning files against a tree blob; this correction is limited to the two behavioral fixes and evidence.
-- Status consumed: native `gentle-ai.sdd-status` v2, apply ready, repo-local root `/home/skivel/control-horario-worktrees/p1a2-i-b-2-terminal-monotonic`, with that root as the sole allowed edit root and no action-context warning.
+- Status consumed: native `gentle-ai.sdd-status` v2, apply ready, repo-local root `<workspace-root>`, with that root as the sole allowed edit root and no action-context warning.
 - Remaining implementation starts with `P3.13 RED: profile_commit boundary`; no P3.13+ source or task row changed.
 
 ### Native Settlement Result
@@ -2473,7 +2473,7 @@ P3.5–P3.10 remain unchecked and match the pre-amendment worktree text captured
 - **Persisted tasks:** P3.14 was already visibly `[x]`; no task checkbox changed. P3.15 remains visibly unchecked.
 - **Runtime cleanup:** `firebase emulators:exec` exited 0 and reported orderly Firestore, hub, and logging shutdown. No acquire, settle, reset, rescope, staging, commit, push, PR, or deployment was performed.
 - **Workload / PR boundary:** bounded P3.14 remediation in the existing feature-chain work unit. Native begin-tree measurement remains parent-owned because the scoped provisioning source is pre-existing untracked candidate content; no size exception is claimed.
-- **Status consumed:** `gentle-ai.sdd-status` v2 for `prepare-public-portfolio-repository`, `applyState: ready`, repo-local workspace root `/home/skivel/control-horario-worktrees/p1a2-i-b-2-terminal-monotonic`, and that sole allowed edit root; no action-context warning.
+- **Status consumed:** `gentle-ai.sdd-status` v2 for `prepare-public-portfolio-repository`, `applyState: ready`, repo-local workspace root `<workspace-root>`, and that sole allowed edit root; no action-context warning.
 
 ## P3.15a — Current-Effect Crash/Reconstruction Subslice
 
@@ -2492,7 +2492,7 @@ P3.5–P3.10 remain unchecked and match the pre-amendment worktree text captured
 - **Focused verification:** `cd functions && node --experimental-strip-types test/provisioning/worker_auth.test.ts` → 48 pass, 12 emulator-gated skips; `node --experimental-strip-types test/provisioning/outbox.test.ts` → 20 assertions; explicit worker/test NodeNext `tsc` and configured `tsc --noEmit` → exit 0.
 - **Deviation:** a real reconstruction defect required a four-line `worker.ts` repair; no other production behavior changed.
 - **Workload / PR boundary:** approved P3.15a current-effect child only; native-begin raw-byte accounting remains below the 300 warning, 350 reforecast stop, and 399 hard maximum. No commit, PR, staging, deployment, or native attempt action occurred.
-- **Status consumed:** `gentle-ai.sdd-status` v2 reported `prepare-public-portfolio-repository` apply-ready with repo-local root `/home/skivel/control-horario-worktrees/p1a2-i-b-2-terminal-monotonic`; allowed root was honored. The supplied corrective-relaunch instruction prohibited acquire/settle/reset/rescope.
+- **Status consumed:** `gentle-ai.sdd-status` v2 reported `prepare-public-portfolio-repository` apply-ready with repo-local root `<workspace-root>`; allowed root was honored. The supplied corrective-relaunch instruction prohibited acquire/settle/reset/rescope.
 - **Remaining implementation tasks:** `- [ ] P3.15 RED: crash/read reconstruction around every runtime effect — before/after enqueue delivery, Auth intent, Auth call, Auth return, each UID/email read, proof commit, profile/completion commit, and terminalization; no explicit crash/read event is added to the pure model.`; `- [ ] P3.16 GREEN: crash injection passes.`
 
 ### P3.15a Gatekeeper Command-Evidence Correction
@@ -2579,7 +2579,7 @@ P3.5–P3.10 remain unchecked and match the pre-amendment worktree text captured
 - **Endpoint rerun:** `cd functions && ./node_modules/.bin/firebase emulators:exec --project p3-task-endpoint --only firestore,functions "node --experimental-strip-types test/provisioning/worker_auth.test.ts"` exited 0 with 67 pass, 0 fail, and 1 skip. The skipped test is `P3.19 posts the exact Cloud Tasks envelope to the Functions emulator and acquires the persisted dispatch`; no HTTP envelope/context/persistence acceptance can be claimed.
 - **Cleanup:** both `emulators:exec` invocations reported orderly Functions, Eventarc, Tasks, Hub, Logging, and (when started) Firestore emulator shutdown. `functions/lib/` was retained because the updated Firebase package contract intentionally includes the compiled entrypoint; no generated output was deleted.
 - **Task state:** P3.19 and P3.20 remain visibly unchecked. No deployment, install, source/test behavior edit, staging, commit, push, PR, native settlement, or task-checkbox mutation occurred.
-- **Status/action context:** consumed parent-native apply-ready v2 status for `prepare-public-portfolio-repository`; `repo-local` workspace root was `/home/skivel/control-horario-worktrees/p1a2-i-b-2-terminal-monotonic`, the allowed root matched, and no action-context warning occurred. Continued the parent-provided active token via acquire with state `proceed`; parent owns settlement.
+- **Status/action context:** consumed parent-native apply-ready v2 status for `prepare-public-portfolio-repository`; `repo-local` workspace root was `<workspace-root>`, the allowed root matched, and no action-context warning occurred. Continued the parent-provided active token via acquire with state `proceed`; parent owns settlement.
 
 ## P3.19–P3.20 — Independent Functions Endpoint Acceptance
 
@@ -2598,7 +2598,7 @@ P3.5–P3.10 remain unchecked and match the pre-amendment worktree text captured
 - **Files changed:** `openspec/changes/prepare-public-portfolio-repository/tasks.md`; `openspec/changes/prepare-public-portfolio-repository/apply-progress.md`; deleted generated `functions/lib/` only.
 - **Verification:** `git diff --check` over the scoped endpoint/package/task/progress paths exited 0 before and after the bookkeeping update; `git status --short` confirmed that `functions/lib/` is absent from the untracked inventory.
 - **Workload / PR boundary:** existing P3.19–P3.20 feature-branch-chain acceptance-only correction; no delivery action, source edit, test rerun, deploy, install, stage, commit, push, PR, native settlement, reset, or advance occurred.
-- **Status consumed:** parent-authoritative `gentle-ai.sdd-status` v2 was apply-ready for `prepare-public-portfolio-repository`; action context was repo-local at `/home/skivel/control-horario-worktrees/p1a2-i-b-2-terminal-monotonic` with that sole allowed edit root and no warning. The parent retains the active native attempt and settlement authority.
+- **Status consumed:** parent-authoritative `gentle-ai.sdd-status` v2 was apply-ready for `prepare-public-portfolio-repository`; action context was repo-local at `<workspace-root>` with that sole allowed edit root and no warning. The parent retains the active native attempt and settlement authority.
 
 
 ## P3.21–P3.22 — Initial Pending Terminalization

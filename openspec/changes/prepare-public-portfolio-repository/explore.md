@@ -4,7 +4,7 @@
 
 ## Evidence
 
-- CodeGraph was already indexed for `/home/skivel/control-horario-worktrees/p1a2-i-b-2-terminal-monotonic` and was used exclusively for source discovery.
+- CodeGraph was already indexed for `<workspace-root>` and was used exclusively for source discovery.
 - `worker.ts:1-196` currently implements only classification and stale acknowledgement; acquisition is absent. `boundaries.ts:10-21,38-69` already supplies `now`, three reads, operation/dispatch writes, and create-only dispatch/audit; no boundary change is evidenced.
 - Reusable sources: `model.ts:341-462` (`ExpectedCAS`, `createEvent`, `reduce`); `ids.ts:40-48,97-100` (`deriveDispatchId`, `deriveOwnerToken`); `audit.ts:28-53` (`createAuditEvent`, `deduplicateAudit`); test helpers `worker_auth.test.ts:28-109,336-446,461-605` (operation/dispatch builders, `StrictWorkerStore`, snapshot, stale real-Firestore setup/concurrency and create-conflict patterns).
 - The prequisite is checked complete in `tasks.md:1908-1916`; no acquisition completion is claimed.

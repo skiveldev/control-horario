@@ -191,7 +191,7 @@ Si no quieres usar Cloud Functions, otra opción es:
 - La limitación actual NO afecta la funcionalidad: los usuarios SÍ se crean correctamente
 - Es solo una inconveniencia para el admin que debe re-iniciar sesión
 - Para los 458 usuarios (Día 6), podemos crear ~50-60 por hora con re-logins
-- La solución definitiva se implementará después del MVP en producción
+- Esta nota describe una solución hipotética para una futura adaptación del portfolio.
 
 ---
 

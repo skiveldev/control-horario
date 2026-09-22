@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "113891078966",
-    "project_id": "control-horario-rega",
-    "storage_bucket": "control-horario-rega.firebasestorage.app"
+    "project_number": "000000000000",
+    "project_id": "demo-control-horario",
+    "storage_bucket": "demo-control-horario.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:113891078966:android:5e7379e3021e71f1823997",
+        "mobilesdk_app_id": "1:000000000000:android:localdemoconfig",
         "android_client_info": {
           "package_name": "app.controlhorario.control_horario"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDtG8gEmH8kd4890HBFBUk2XgQr-7lFySo"
+          "current_key": "demo-local-api-key"
         }
       ],
       "services": {
