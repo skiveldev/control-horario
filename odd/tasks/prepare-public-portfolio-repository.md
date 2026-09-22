@@ -58,7 +58,7 @@ A reconciled ODD task authority is needed to prevent duplicate implementation, p
 - [x] **ODD-007 — Finalize and freeze P3.** Callable exports and aggregate gates are finalized. The frozen P3 candidate passed configured TypeScript, build, direct tests, aggregate emulator tests, repeated concurrency, and independent verification. Completed with work-unit commit `348aafb24069b4bf478fd98b72e58a0c35c6c4fa`.
 - [x] **ODD-008 — Complete P4 client transport and dependency migration.** P4.0-P4.10 completed in two work units: **P4-T1** dependency, App Check bootstrap, and trusted callable transport foundation at `276ad35dd3b297fee0a67d5c5c82467bc1137f10`; **P4-T2** submit/status payload, result, and exact eight-code mapping at `f7b1e1a813a4480e7cefab1c87d284b3c5e3a7c1`. Polling, UX, direct-creation retirement, rules, and P4 final gates remain in ODD-009.
 - [x] **ODD-009 — Complete P4 polling, UX, and Firestore hardening.** P4.11-P4.21 are complete across resilient polling, typed UX migration, legacy client-creation retirement, Firestore user-write hardening, and final aggregate gates. Final gate correction committed as work unit `16a8195d7e3ed8bb8ebcdeb4263ccef78540b78e`.
-- [ ] **ODD-010 — Complete WU5 signing readiness.** Preserve its existing acceptance criteria and independent rollback boundary.
+- [x] **ODD-010 — Complete WU5 signing readiness.** Release builds now fail closed without local signing material, signing secrets are ignored, and the Android toolchain is coherently migrated to the Flutter 3.47.5 template stack (Gradle 9.3.1, AGP 9.1.0, KGP 2.4.0, JVM 17) while explicitly deferring built-in Kotlin and the new DSL. Independent verification passes debug assembly, exact release fail-fast, wrapper provenance/modes, secret inspection, protected-path isolation, and the authored workload guard. Completed with work-unit commit `5b5f57c736dc035a51d4e0da48b23487e2b1c1f1`.
 - [ ] **ODD-011 — Complete WU6 de-branding.** Preserve its existing acceptance criteria and ordering after WU5.
 - [ ] **ODD-012 — Complete WU7 sanitization.** Preserve its existing acceptance criteria and ordering after WU6.
 - [ ] **ODD-013 — Complete WU8 README and WU9 archive work.** Keep documentation and archive behavior reviewable and preserve their existing order.
@@ -132,4 +132,4 @@ A reconciled ODD task authority is needed to prevent duplicate implementation, p
 
 ## Next Step
 
-Map ODD-010 signing-readiness requirements and define its smallest reviewable work unit before implementation.
+Map ODD-011 de-branding requirements and define its smallest reviewable work unit before implementation.
