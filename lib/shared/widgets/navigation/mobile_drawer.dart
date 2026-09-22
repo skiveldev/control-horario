@@ -100,7 +100,7 @@ class MobileDrawer extends ConsumerWidget {
               _buildLogoutItem(context, ref),
               AppSpacing.verticalSpaceSm,
               Text(
-                'Control Horario v1.0.0',
+                'controlhorario-rega v1.0.0',
                 style: AppTextStyles.labelSmall.copyWith(
                   color: cs.onSurfaceVariant,
                 ),

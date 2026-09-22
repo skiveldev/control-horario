@@ -178,7 +178,7 @@ class DesktopSidebar extends ConsumerWidget {
             // Título
             Expanded(
               child: Text(
-                'Control Horario',
+                'controlhorario-rega',
                 style: TextStyle(
                   fontSize: 18,
                   color: isDark

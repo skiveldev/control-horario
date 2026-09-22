@@ -34,7 +34,7 @@ class LoginFooter extends StatelessWidget {
 
           // Copyright y seguridad
           Text(
-            'Sistema seguro • © 2026 Time Rega',
+            'Sistema seguro • © 2026 controlhorario-rega',
             style: AppTextStyles.caption.copyWith(
               color: Theme.of(context).colorScheme.outline,
             ),

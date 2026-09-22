@@ -142,6 +142,35 @@ void main() {
       expect(find.text('U'), findsOneWidget);
     });
 
+    testWidgets('shows the canonical app brand and version in its footer',
+        (tester) async {
+      final router = GoRouter(
+        initialLocation: '/test',
+        routes: [
+          GoRoute(
+            path: '/test',
+            builder: (context, state) => const Scaffold(
+              drawer: MobileDrawer(),
+              body: SizedBox(),
+            ),
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp.router(routerConfig: router),
+        ),
+      );
+
+      final scaffoldState = tester.state<ScaffoldState>(find.byType(Scaffold));
+      scaffoldState.openDrawer();
+      await tester.pumpAndSettle();
+
+      expect(find.text('controlhorario-rega v1.0.0'), findsOneWidget);
+      expect(find.text('Control Horario v1.0.0'), findsNothing);
+    });
+
     testWidgets('user with single name shows single initial', (tester) async {
       final testUser = UserModel(
         userId: 'user-2',

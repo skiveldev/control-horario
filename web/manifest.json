@@ -1,6 +1,6 @@
 {
-    "name": "control_horario",
-    "short_name": "control_horario",
+    "name": "controlhorario-rega",
+    "short_name": "controlhorario-rega",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

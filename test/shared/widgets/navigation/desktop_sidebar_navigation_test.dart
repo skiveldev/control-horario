@@ -31,6 +31,15 @@ void main() {
       expect(find.text('Equipo'), findsOneWidget);
     });
 
+    testWidgets('shows the canonical app brand in the expanded header',
+        (tester) async {
+      await tester.pumpWidget(_buildAppWithUser(_employee('employee-1')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('controlhorario-rega'), findsOneWidget);
+      expect(find.text('Control Horario'), findsNothing);
+    });
+
     testWidgets('el empleado no supervisor no ve el acceso a Equipo',
         (tester) async {
       await tester.pumpWidget(

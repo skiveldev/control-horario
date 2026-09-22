@@ -1,4 +1,4 @@
-/// Constantes generales del Control Horario
+/// Constantes generales de controlhorario-rega
 ///
 /// Centraliza todos los valores constantes usados en la aplicación.
 /// Incluye duraciones, límites, configuraciones, etc.
@@ -11,7 +11,7 @@ class AppConstants {
   // ============================================================================
 
   /// Nombre de la aplicación
-  static const String appName = 'Control Horario';
+  static const String appName = 'controlhorario-rega';
 
   /// Versión de la aplicación
   static const String appVersion = '1.0.0';
