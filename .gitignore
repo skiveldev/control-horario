@@ -72,3 +72,9 @@ coverage/
 commit_message.txt
 # Local Pi runtime state
 .atl/
+
+# Android release-signing secrets
+*.jks
+*.keystore
+key.properties
+release-signing.properties
