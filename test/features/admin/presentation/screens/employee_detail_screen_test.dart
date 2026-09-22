@@ -219,7 +219,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Router location is back to the employees list
-      final location = router.routerDelegate.currentConfiguration.uri.toString();
+      final location =
+          router.routerDelegate.currentConfiguration.uri.toString();
       expect(location, AppRouter.adminEmployees);
     });
 
@@ -276,7 +277,8 @@ void main() {
 
       // Since canPop() was false, the button called context.go()
       // and the router location is now the employees list.
-      final location = router.routerDelegate.currentConfiguration.uri.toString();
+      final location =
+          router.routerDelegate.currentConfiguration.uri.toString();
       expect(location, AppRouter.adminEmployees);
     });
 

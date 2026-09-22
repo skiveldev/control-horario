@@ -496,7 +496,8 @@ void main() {
       );
     });
 
-    testWidgets('"Nuevo Trabajador" CTA is present exactly once in empty state', (
+    testWidgets('"Nuevo Trabajador" CTA is present exactly once in empty state',
+        (
       tester,
     ) async {
       _setDesktopViewport(tester);

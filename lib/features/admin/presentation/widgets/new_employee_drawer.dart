@@ -272,26 +272,6 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
     }
   }
 
-  Future<void> _copyToClipboard(
-    String text, {
-    required String successMessage,
-  }) async {
-    final copied = await _tryCopyToClipboard(text);
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            copied ? successMessage : 'No se pudo copiar',
-          ),
-          backgroundColor: copied ? AppColors.success : AppColors.error,
-        ),
-      );
-  }
-
   Future<bool> _tryCopyToClipboard(String text) async {
     if (text.isEmpty) return false;
 

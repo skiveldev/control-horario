@@ -513,6 +513,7 @@ void main() {
           copiedText =
               (call.arguments as Map<Object?, Object?>)['text'] as String?;
         }
+        return null;
       },
     );
     addTearDown(() => tester.binding.defaultBinaryMessenger
