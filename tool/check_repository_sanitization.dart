@@ -40,15 +40,18 @@ List<Finding> scanTextFiles(
   Directory root,
   Iterable<String> paths, {
   Iterable<String> excludePrefixes = const [],
+  Iterable<String> excludePaths = const [],
 }) {
   final normalizedPrefixes = excludePrefixes
       .map(_normalizePrefix)
       .where((prefix) => prefix.isNotEmpty)
       .toList();
+  final normalizedPaths = excludePaths.map(_normalizePath).toSet();
   final findings = <Finding>[];
 
   for (final path in paths.map(_normalizePath).toSet().toList()..sort()) {
     if (_isProtected(path) ||
+        normalizedPaths.contains(path) ||
         normalizedPrefixes.any((prefix) => path.startsWith(prefix))) {
       continue;
     }
@@ -117,12 +120,27 @@ bool _isBinary(File file) {
   }
 }
 
-String _normalizePath(String path) =>
-    path.replaceAll('\\', '/').replaceFirst('./', '');
+String _normalizePath(String path) {
+  final normalized = path.replaceAll('\\', '/');
+  return normalized.startsWith('./') ? normalized.substring(2) : normalized;
+}
 
 String _normalizePrefix(String prefix) {
   final normalized = _normalizePath(prefix);
   return normalized.endsWith('/') ? normalized : '$normalized/';
+}
+
+String _normalizeRepoRelativePath(String path) {
+  final normalized = _normalizePath(path);
+  if (normalized.isEmpty ||
+      normalized.startsWith('/') ||
+      RegExp(r'^[A-Za-z]:/').hasMatch(normalized) ||
+      normalized.split('/').any((segment) => segment == '..')) {
+    throw FormatException(
+      'Expected a non-empty repository-relative path inside the repository.',
+    );
+  }
+  return normalized;
 }
 
 Directory repositoryRoot() {
@@ -149,15 +167,31 @@ List<String> repositoryTextCandidates(Directory root) {
 
 void main(List<String> arguments) {
   final excludePrefixes = <String>[];
+  final excludePaths = <String>[];
   for (final argument in arguments) {
-    const option = '--exclude-prefix=';
-    if (!argument.startsWith(option) || argument.length == option.length) {
+    const prefixOption = '--exclude-prefix=';
+    const pathOption = '--exclude-path=';
+    if (argument.startsWith(prefixOption) &&
+        argument.length > prefixOption.length) {
+      excludePrefixes.add(argument.substring(prefixOption.length));
+    } else if (argument.startsWith(pathOption) &&
+        argument.length > pathOption.length) {
+      try {
+        excludePaths.add(_normalizeRepoRelativePath(
+          argument.substring(pathOption.length),
+        ));
+      } on FormatException catch (error) {
+        stderr.writeln('Invalid --exclude-path: ${error.message}');
+        exitCode = 64;
+        return;
+      }
+    } else {
       stderr.writeln('Usage: dart run tool/check_repository_sanitization.dart '
-          '[--exclude-prefix=<repo-relative-prefix>]');
+          '[--exclude-prefix=<repo-relative-prefix>] '
+          '[--exclude-path=<repo-relative-file>]');
       exitCode = 64;
       return;
     }
-    excludePrefixes.add(argument.substring(option.length));
   }
 
   final root = repositoryRoot();
@@ -165,6 +199,7 @@ void main(List<String> arguments) {
     root,
     repositoryTextCandidates(root),
     excludePrefixes: excludePrefixes,
+    excludePaths: excludePaths,
   );
   for (final finding in findings) {
     stdout.writeln(finding);

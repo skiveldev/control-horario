@@ -68,5 +68,23 @@ Production deployments should use least privilege.
         ['z.txt:1:weak-documented-credential'],
       );
     });
+
+    test('excludes an exact path without excluding its sibling', () {
+      File('${root.path}/docs/pending.txt')
+        ..createSync(recursive: true)
+        ..writeAsStringSync('admin123');
+      File('${root.path}/docs/quickstart.txt').writeAsStringSync('rrhh123');
+
+      final findings = scanner.scanTextFiles(
+        root,
+        ['docs/pending.txt', 'docs/quickstart.txt'],
+        excludePaths: ['docs/pending.txt'],
+      );
+
+      expect(
+        findings.map((finding) => finding.toString()),
+        ['docs/quickstart.txt:1:weak-documented-credential'],
+      );
+    });
   });
 }
