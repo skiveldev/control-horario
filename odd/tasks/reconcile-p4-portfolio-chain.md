@@ -52,7 +52,7 @@ Materialize a new isolated portfolio integration chain that preserves the accept
 ## Tasks
 
 - [x] **ODD-CHAIN-001 — Materialize the stabilized P4 chain.** Planned at `d79f6c3`, advanced the three base-safe WU10 fixes, replayed P4 through `16a8195`, advanced `40e2693`, and replayed the P4 closure. The early checkpoint passed 576 full tests, 36 focused tests, fatal analysis, and diff-check. The final P4 checkpoint passed 608 full tests, 53 focused tests, fatal analysis, 269-file format check, 64 Firestore rules tests, Android debug assembly, dependency reproducibility, and diff-check. Root `npm ci` reported 12 dependency audit findings (9 moderate, 2 high, 1 critical) without changing tracked manifests; dependency remediation is outside this replay task.
-- [ ] **ODD-CHAIN-002 — Materialize WU5 and its CI transition.** Replay WU5 with exact accepted Android bytes, add the bounded Flutter 3.47.5/debug-APK CI transition, replay WU5 closure, record mappings, and verify debug/release/toolchain behavior.
+- [x] **ODD-CHAIN-002 — Materialize WU5 and its CI transition.** Replayed WU5 at `8794ea6` using exact accepted Android bytes, added the bounded Flutter 3.47.5/debug-APK CI transition at `e04e741`, replayed the WU5 closure at `5132b4a`, and recorded the exact Flutter 3.47.5 resolver state at `7b0263b`. After cleaning stale Flutter 3.41 outputs, focused shader regressions passed 14/14 and 7/7, the full suite passed 608/608, fatal analysis passed, debug APK assembly succeeded, release assembly failed closed exactly for missing `release-signing.properties`, and Gradle 9.3.1 ran on JDK 21. The original Windows wrapper batch has 90 CRLF `diff --check` warnings in both historical and replay commits; its bytes remain exact by explicit maintainer decision rather than silently normalizing the generated wrapper.
 - [ ] **ODD-CHAIN-003 — Materialize WU6 through the final source tip.** Replay WU6, advance `eb40134`, replay the remaining source commits while skipping all five original WU10 positions, replay final-gate documentation, record mappings, and verify WU6 plus the final source checkpoint.
 - [ ] **ODD-CHAIN-004 — Materialize final CI and close the chain.** Replay `acc11dc` using its exact accepted workflow bytes, replay its two documentation commits, complete the mapping ledger, run final independent verification, and record closure evidence.
 
@@ -75,7 +75,10 @@ Original hashes identify historical source artifacts and remain provenance evide
 | `40e2693` | `ab14a59` | Immediately after replayed `16a8195` |
 | `3a4e281` | `98d140f` | P4 closure |
 | `eb40134` | pending | Immediately after replayed `e6c2dae` |
-| `5b5f57c` | pending | WU5 exact Android transition |
+| `5b5f57c` | `8794ea6` | WU5 exact Android transition |
+| new transition | `e04e741` | CI Flutter 3.47.5 and Android debug artifact |
+| `b9c7a3b` | `5132b4a` | WU5 closure |
+| new transition | `7b0263b` | Exact WU5/final Flutter 3.47.5 lockfile resolution |
 | `acc11dc` | pending | Final exact CI workflow |
 | Remaining historical commits | pending | Preserve original order, skipping advanced positions |
 
@@ -88,3 +91,4 @@ Original hashes identify historical source artifacts and remain provenance evide
 - Early checkpoint: full Flutter suite 576/576, focused widget/tool suite 36/36, fatal analysis, and diff-check passed under Flutter 3.41.9.
 - P4 checkpoint: dependency/registrant hashes remained stable after `pub get`; full Flutter suite 608/608; focused provisioning/drawer suite 53/53; fatal analysis; 269-file format check; Firestore rules 64/64; Android debug APK `build/app/outputs/flutter-apk/app-debug.apk` (164,183,518 bytes); and diff-check passed.
 - Ignored outputs retained: `node_modules/`, `build/`, and `firestore-debug.log`. `.atl/skill-registry.md` remains local, ignored, and untracked.
+- WU5 checkpoint: exact Android path blobs match historical `5b5f57c`; workflow has four Flutter 3.47.5 pins and a debug APK artifact; lockfile matches historical WU5/final bytes. After `flutter clean`, shader regressions passed 14/14 and 7/7, full Flutter passed 608/608, fatal analysis passed, debug APK `build/app/outputs/flutter-apk/app-debug.apk` was 170,269,367 bytes, release failed closed only for missing signing properties, and Gradle reported 9.3.1 on JDK 21. The known analyzer migration and generated `android/build/` were removed under explicit authorization. `android/gradlew.bat` remains byte-identical to WU5 and carries its inherited 90 CRLF `diff --check` warnings as an explicit generated-wrapper exception.
