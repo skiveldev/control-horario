@@ -6,7 +6,7 @@ Reconstruct the verified public-portfolio chain on the current `origin/master` w
 
 ## Constraints
 
-- Source worktree: `/home/skivel/control-horario-worktrees/portfolio-p4-flutter-reconciled`
+- Source worktree: `<SOURCE_WORKTREE>`
 - Source tip: `d2e9c1c2761cee47ecb8c186c883bc33696512d2`
 - Source merge base: `05685e070d0972a47e1bb19f7dd9c9555597570b`
 - Target base: `origin/master` at `e9952ed9a268ee7dc4ac328fd7c4aac1ca86dc0b`
@@ -18,7 +18,7 @@ Reconstruct the verified public-portfolio chain on the current `origin/master` w
 ## Tasks
 
 - [x] ODD-DELIVERY-001 — Replay the 78 source commits onto current `origin/master` in order, resolve only target-base conflicts, preserve functional bytes, and record the old-to-new commit ledger.
-- [ ] ODD-DELIVERY-002 — Independently verify history completeness, source-byte parity modulo the intended `AGENTS.md` base delta, repository cleanliness, and required runtime gates.
+- [x] ODD-DELIVERY-002 — Independently verify history completeness, source-byte parity modulo the intended `AGENTS.md` base delta, repository cleanliness, and required runtime gates.
 - [ ] ODD-DELIVERY-003 — Measure one honest Feature Branch Chain slicing pass, record exact tracker/child boundaries and size exceptions, and stop before publication for explicit maintainer approval.
 
 ## Evidence
@@ -29,6 +29,13 @@ ODD-DELIVERY-001 replay evidence (documentation only; independent verification a
 - Target base (`origin/master`): `e9952ed9a268ee7dc4ac328fd7c4aac1ca86dc0b`; plan commit: `c6f96c00c3b8446529fe6968ad15b80839052e28`; replay tip: `91f6e2d847ca00fc4321338abb89d3da86aa7bec`.
 - Replay reported no conflicts. Local Git history confirms 78 source and 78 replay commits with identical ordinal subject order.
 - Tip tree diff is limited to `AGENTS.md` and this task file; all other tracked tree bytes match. Replay-tip `AGENTS.md` blob equals `origin/master:AGENTS.md` (`cea78f8423e1b64c9ae2cab0b492093e9f91000b`).
+
+ODD-DELIVERY-002 independent verification evidence:
+
+- Toolchain: Flutter 3.47.5 / Dart 3.13.4 and Temurin 21.0.12.1. Initial `flutter pub get` succeeded; its incidental `analysis_options.yaml` drift was restored under explicit maintainer authorization, and subsequent Flutter commands used `--no-pub`.
+- Formatting: 273 files checked, 0 changed. The sanitizer initially failed only because this new task document contained an absolute user-machine path; replacing it with `<SOURCE_WORKTREE>` produced a corrective sanitizer PASS. Analyzer PASS; Flutter tests 616/616 PASS.
+- Debug APK PASS (170,268,183 bytes); web release PASS. Functions: 273 tests total, 237 passed / 36 skipped; TypeScript build PASS. Firestore rules: 64/64 PASS.
+- Release build failed closed as expected because `release-signing.properties` was missing. Source/replay parity and diff-check PASS. Untracked generated `android/build` and `functions/lib` were removed under explicit maintainer authorization; ignored reproducible outputs remain local. Independent corrective verification PASS.
 
 | # | Source commit | Replay commit |
 | ---: | --- | --- |
