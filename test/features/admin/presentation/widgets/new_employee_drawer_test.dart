@@ -90,10 +90,14 @@ Widget _drawer({
   Key? drawerKey,
   bool isOpen = true,
   Stream<User?>? authStates,
+  ValueNotifier<int>? workflowProviderReads,
 }) {
   return ProviderScope(
     overrides: [
-      provisioningWorkflowProvider.overrideWithValue(workflow),
+      provisioningWorkflowProvider.overrideWith((ref) {
+        workflowProviderReads?.value += 1;
+        return workflow;
+      }),
       currentUserProvider.overrideWith((ref) => Stream.value(_admin)),
       authStateProvider.overrideWith(
         (ref) => authStates ?? Stream.value(_FakeAuthUser()),
@@ -633,18 +637,46 @@ void main() {
     expect(find.textContaining('malformed-response'), findsOneWidget);
   });
 
-  testWidgets('P4 close and dispose cancel local observation', (tester) async {
+  testWidgets('P4 passive mount and dispose do not construct workflow',
+      (tester) async {
     final workflow = _TerminalWorkflow(
       const PendingProvisioningStatus(
         operationId: 'operation-pending',
         retryAfterSeconds: 1,
       ),
     );
+    final workflowProviderReads = ValueNotifier(0);
+    await tester.pumpWidget(_drawer(
+      workflow: workflow,
+      isOpen: false,
+      authStates: Stream<User?>.empty(),
+      workflowProviderReads: workflowProviderReads,
+    ));
+    await tester.pumpAndSettle();
+    await tester.pumpWidget(const SizedBox());
+
+    expect(workflowProviderReads.value, 0);
+    expect(workflow.cancelCalls, 0);
+  });
+
+  testWidgets('P4 initialized workflow cancels on close and dispose',
+      (tester) async {
+    final workflow = _TerminalWorkflow(
+      const PendingProvisioningStatus(
+        operationId: 'operation-pending',
+        retryAfterSeconds: 1,
+      ),
+    );
+    final workflowProviderReads = ValueNotifier(0);
     var closes = 0;
     await tester.pumpWidget(_drawer(
       workflow: workflow,
       onClose: () => closes += 1,
+      workflowProviderReads: workflowProviderReads,
     ));
+    await tester.pumpAndSettle();
+    await _fillRequiredFields(tester);
+    await tester.tap(find.text('Guardar'));
     await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.close));
     await tester.tapAt(const Offset(10, 10));
@@ -652,6 +684,7 @@ void main() {
     await tester.pumpWidget(const SizedBox());
 
     expect(closes, 3);
+    expect(workflowProviderReads.value, 1);
     expect(workflow.cancelCalls, 4);
   });
 

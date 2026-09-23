@@ -92,17 +92,11 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
   final Map<String, String?> _errors = {};
   bool _showValidation = false;
   bool _isSubmitting = false;
-  late final ProvisioningWorkflow _workflow;
-
-  @override
-  void initState() {
-    super.initState();
-    _workflow = ref.read(provisioningWorkflowProvider);
-  }
+  ProvisioningWorkflow? _workflow;
 
   @override
   void dispose() {
-    _workflow.cancel();
+    _workflow?.cancel();
     _nombreController.dispose();
     _apellido1Controller.dispose();
     _apellido2Controller.dispose();
@@ -185,6 +179,7 @@ class _NewEmployeeDrawerState extends ConsumerState<NewEmployeeDrawer> {
     }
 
     setState(() => _isSubmitting = true);
+    _workflow ??= ref.read(provisioningWorkflowProvider);
     try {
       final result = await _createEmployeeInFirebase();
       if (!mounted || result == null) return;
