@@ -19,9 +19,54 @@ Reconstruct the verified public-portfolio chain on the current `origin/master` w
 
 - [x] ODD-DELIVERY-001 — Replay the 78 source commits onto current `origin/master` in order, resolve only target-base conflicts, preserve functional bytes, and record the old-to-new commit ledger.
 - [x] ODD-DELIVERY-002 — Independently verify history completeness, source-byte parity modulo the intended `AGENTS.md` base delta, repository cleanliness, and required runtime gates.
-- [ ] ODD-DELIVERY-003 — Measure one honest Feature Branch Chain slicing pass, record exact tracker/child boundaries and size exceptions, and stop before publication for explicit maintainer approval.
+- [x] ODD-DELIVERY-003 — Measure one honest Feature Branch Chain slicing pass, record exact tracker/child boundaries and size exceptions, and stop before publication for explicit maintainer approval.
 
 ## Evidence
+
+## Delivery plan (ODD-DELIVERY-003)
+
+The maintainer explicitly accepted this exact topology and exactly these 16 fresh `size:exception` totals: 854, 733, 490, 3100, 3687, 2180, 612, 14036, 461, 523, 639, 545, 1783, 593, 2065, 7635. Tracker `feat/portfolio-delivery-tracker` is proposed for later creation at exact base `e9952ed9a268ee7dc4ac328fd7c4aac1ca86dc0b`, which yields a zero diff; the ref does not exist yet, as required by the pre-publication stop. The Feature Branch Chain has 36 cumulative children. Aggregate `origin/master..6fc919f`: 30,623 additions / 11,004 deletions / 41,627 lines. The final two ODD evidence commits remain in child 36. Live GitHub Actions remains pending delivery. Approval closes local planning only; it does not authorize push, PR creation, merge, deploy, or publication.
+
+Each inclusive replay range is measured against the preceding row's last commit (row 1 against `origin/master`). Additions/deletions use local Git numstat; the binary Gradle wrapper contributes no line counts.
+
+| Position | Branch | Inclusive replay range | Additions | Deletions | Total | Fresh exception |
+| ---: | --- | --- | ---: | ---: | ---: | --- |
+| 01 | `feat/chain-bootstrap-format` | `c6f96c0..74da290` | 732 | 122 | 854 | `size:exception` |
+| 02 | `feat/remove-status-artifact` | `c519885..c519885` | 0 | 114 | 114 | — |
+| 03 | `feat/migrate-portfolio-openspec` | `4aab9ac..4aab9ac` | 733 | 0 | 733 | `size:exception` |
+| 04 | `feat/remove-demo-credentials` | `88c6ee5..88c6ee5` | 273 | 217 | 490 | `size:exception` |
+| 05 | `feat/clarify-deployment-status` | `9542895..9542895` | 112 | 3 | 115 | — |
+| 06 | `feat/functions-dependency-scaffold` | `a3faf93..a3faf93` | 3099 | 1 | 3100 | `size:exception` |
+| 07 | `feat/provisioning-contract-model` | `8723f09..15632a7` | 3583 | 104 | 3687 | `size:exception` |
+| 08 | `feat/validated-provisioning-constructors` | `fd3bca2..55ad4c9` | 2071 | 109 | 2180 | `size:exception` |
+| 09 | `feat/cas-reducer-lease-contract` | `8e0831a..9f41787` | 494 | 118 | 612 | `size:exception` |
+| 10 | `feat/portfolio-baseline-reconciliation` | `40afe83..d6336ec` | 114 | 0 | 114 | — |
+| 11 | `feat/outbox-race-coverage` | `690c527..7fe44bc` | 191 | 3 | 194 | — |
+| 12 | `feat/retry-conformance-coverage` | `07ea165..f5bec0b` | 141 | 2 | 143 | — |
+| 13 | `feat/accepted-provisioning-checkpoint` | `f31d1c8..13a90b7` | 13599 | 437 | 14036 | `size:exception` |
+| 14 | `feat/crash-reconstruction-coverage` | `bb5d430..2acd503` | 243 | 2 | 245 | — |
+| 15 | `feat/terminal-concurrency` | `605d500..494f86c` | 342 | 119 | 461 | `size:exception` |
+| 16 | `feat/freeze-p3-backend` | `57e01e3..4f7bc1c` | 281 | 60 | 341 | — |
+| 17 | `feat/trusted-callable-transport` | `185fb89..185fb89` | 231 | 36 | 267 | — |
+| 18 | `feat/p4-flutter-compatibility` | `3a38f35..bbc26fc` | 90 | 18 | 108 | — |
+| 19 | `feat/reconciled-chain-preparation` | `ea6c0a0..1a1c71e` | 79 | 71 | 150 | — |
+| 20 | `feat/early-gate-stabilization` | `d1b6791..e52c4b0` | 110 | 57 | 167 | — |
+| 21 | `feat/portable-staged-formatter` | `f8856a3..f8856a3` | 273 | 250 | 523 | `size:exception` |
+| 22 | `feat/callable-contract-mapping` | `d43be5c..a55fba4` | 635 | 4 | 639 | `size:exception` |
+| 23 | `feat/resilient-status-polling` | `a450bd2..a450bd2` | 545 | 0 | 545 | `size:exception` |
+| 24 | `feat/employee-creation-ux` | `1905d99..1905d99` | 765 | 1018 | 1783 | `size:exception` |
+| 25 | `feat/retire-direct-client-creation` | `2f94fe3..2f94fe3` | 55 | 538 | 593 | `size:exception` |
+| 26 | `feat/firestore-user-write-hardening` | `897eee6..897eee6` | 1936 | 129 | 2065 | `size:exception` |
+| 27 | `feat/p4-final-gate-checkpoint` | `e93afbb..c2b9094` | 112 | 67 | 179 | — |
+| 28 | `feat/wu5-toolchain-transition` | `4edb048..28db35f` | 345 | 40 | 385 | — |
+| 29 | `feat/visible-app-branding` | `5645af0..f62dea3` | 129 | 25 | 154 | — |
+| 30 | `feat/repository-sanitizer` | `296f06a..296f06a` | 245 | 0 | 245 | — |
+| 31 | `feat/sanitize-portfolio-configuration` | `2797948..1981fd8` | 84 | 108 | 192 | — |
+| 32 | `feat/portfolio-quickstart` | `367400c..367400c` | 77 | 208 | 285 | — |
+| 33 | `feat/retire-deployment-claims` | `d80f84b..634763e` | 11 | 387 | 398 | — |
+| 34 | `feat/portfolio-readme` | `605c186..e272a35` | 25 | 326 | 351 | — |
+| 35 | `feat/remove-archived-history` | `041e490..9daca25` | 2 | 7633 | 7635 | `size:exception` |
+| 36 | `feat/final-portfolio-ci-and-closure` | `b3f3dc6..6fc919f` | 213 | 25 | 238 | — |
 
 ODD-DELIVERY-001 replay evidence (documentation only; independent verification and runtime gates remain ODD-DELIVERY-002):
 
