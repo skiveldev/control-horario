@@ -51,7 +51,7 @@ Materialize a new isolated portfolio integration chain that preserves the accept
 
 ## Tasks
 
-- [ ] **ODD-CHAIN-001 — Materialize the stabilized P4 chain.** Commit this plan, advance the three base-safe WU10 fixes, replay P4 through `16a8195`, advance `40e2693`, replay P4 closure, record mappings, and verify the early and P4 checkpoints.
+- [x] **ODD-CHAIN-001 — Materialize the stabilized P4 chain.** Planned at `d79f6c3`, advanced the three base-safe WU10 fixes, replayed P4 through `16a8195`, advanced `40e2693`, and replayed the P4 closure. The early checkpoint passed 576 full tests, 36 focused tests, fatal analysis, and diff-check. The final P4 checkpoint passed 608 full tests, 53 focused tests, fatal analysis, 269-file format check, 64 Firestore rules tests, Android debug assembly, dependency reproducibility, and diff-check. Root `npm ci` reported 12 dependency audit findings (9 moderate, 2 high, 1 critical) without changing tracked manifests; dependency remediation is outside this replay task.
 - [ ] **ODD-CHAIN-002 — Materialize WU5 and its CI transition.** Replay WU5 with exact accepted Android bytes, add the bounded Flutter 3.47.5/debug-APK CI transition, replay WU5 closure, record mappings, and verify debug/release/toolchain behavior.
 - [ ] **ODD-CHAIN-003 — Materialize WU6 through the final source tip.** Replay WU6, advance `eb40134`, replay the remaining source commits while skipping all five original WU10 positions, replay final-gate documentation, record mappings, and verify WU6 plus the final source checkpoint.
 - [ ] **ODD-CHAIN-004 — Materialize final CI and close the chain.** Replay `acc11dc` using its exact accepted workflow bytes, replay its two documentation commits, complete the mapping ledger, run final independent verification, and record closure evidence.
@@ -62,10 +62,18 @@ Original hashes identify historical source artifacts and remain provenance evide
 
 | Original commit | Replay commit | Placement / note |
 | --- | --- | --- |
-| `811f8c2` | pending | Immediately after compatibility base |
-| `e9aa90e` | pending | Immediately after compatibility base |
-| `45e4420` | pending | Immediately after compatibility base |
-| `40e2693` | pending | Immediately after replayed `16a8195` |
+| `811f8c2` | `7de3d1e` | Immediately after compatibility base |
+| `e9aa90e` | `223553d` | Immediately after compatibility base |
+| `45e4420` | `1225076` | Immediately after compatibility base |
+| `f7b1e1a` | `0ea514e` | P4 callable contracts |
+| `4880bc1` | `e6b958b` | P4 transport closure |
+| `6d55f69` | `2338c1d` | P4 resilient polling |
+| `da77c4b` | `e458dea` | P4 employee creation UX |
+| `3f6e730` | `d29e9e6` | P4 direct-creation retirement |
+| `1ae782e` | `1bd4ac8` | P4 Firestore hardening |
+| `16a8195` | `17fcf26` | P4 final gates |
+| `40e2693` | `ab14a59` | Immediately after replayed `16a8195` |
+| `3a4e281` | `98d140f` | P4 closure |
 | `eb40134` | pending | Immediately after replayed `e6c2dae` |
 | `5b5f57c` | pending | WU5 exact Android transition |
 | `acc11dc` | pending | Final exact CI workflow |
@@ -77,3 +85,6 @@ Original hashes identify historical source artifacts and remain provenance evide
 - Only WU5 overlaps Android compatibility files and final CI overlaps the workflow.
 - No later historical commit touches `.atl/skill-registry.md`.
 - CodeGraph semantic mapping supports the five advanced placements; runtime verification remains required before completion.
+- Early checkpoint: full Flutter suite 576/576, focused widget/tool suite 36/36, fatal analysis, and diff-check passed under Flutter 3.41.9.
+- P4 checkpoint: dependency/registrant hashes remained stable after `pub get`; full Flutter suite 608/608; focused provisioning/drawer suite 53/53; fatal analysis; 269-file format check; Firestore rules 64/64; Android debug APK `build/app/outputs/flutter-apk/app-debug.apk` (164,183,518 bytes); and diff-check passed.
+- Ignored outputs retained: `node_modules/`, `build/`, and `firestore-debug.log`. `.atl/skill-registry.md` remains local, ignored, and untracked.
