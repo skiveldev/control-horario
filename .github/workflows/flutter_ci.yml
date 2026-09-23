@@ -2,8 +2,8 @@
 # GitHub Actions CI/CD - Control Horario
 # ============================================================================
 # Este workflow se ejecuta automáticamente en la nube de GitHub cada vez que:
-# - Haces PUSH a las ramas main o develop
-# - Creas un PULL REQUEST hacia main o develop
+# - Haces PUSH a las ramas configuradas
+# - Creas un PULL REQUEST hacia las ramas configuradas
 #
 # ¿Qué hace?
 # 1. Descarga tu código
@@ -27,6 +27,7 @@ on:
       - 'feature/**'  # Cualquier rama que empiece con feature/
       - 'feat/**'
       - 'fix/**'
+      - 'slice/**'
   
   # Se ejecuta cuando creas o actualizas un Pull Request
   pull_request:
@@ -37,6 +38,7 @@ on:
       - 'feature/**'
       - 'feat/**'
       - 'fix/**'
+      - 'slice/**'
   
   # Permite ejecutarlo manualmente desde GitHub
   workflow_dispatch:
@@ -82,14 +84,18 @@ jobs:
       
       # Paso 5: Verificar formato del código
       - name: 📝 Check formatting
-        run: dart format --set-exit-if-changed lib/
+        run: dart format --output=none --set-exit-if-changed lib test tool
         continue-on-error: false  # Detener si falla
       
-      # Paso 6: Analizar código con linter (CRÍTICO)
+      # Paso 6: Verificar que no haya datos sensibles en el repositorio
+      - name: 🔒 Check repository sanitization
+        run: dart run tool/check_repository_sanitization.dart
+
+      # Paso 7: Analizar código con linter (CRÍTICO)
       - name: 🔎 Analyze code
         run: flutter analyze --fatal-infos --fatal-warnings
       
-      # Paso 7: Verificar que no haya warnings deprecados
+      # Paso 8: Verificar que no haya warnings deprecados
       - name: ⚠️ Check deprecated APIs
         run: flutter analyze --fatal-infos | grep -i deprecated || echo "No deprecated APIs found"
         continue-on-error: false
@@ -202,5 +208,4 @@ jobs:
           echo "============================================"
           echo "✅ Todas las verificaciones pasaron!"
           echo "============================================"
-          echo "El código está listo para merge o deploy"
           echo "============================================"
