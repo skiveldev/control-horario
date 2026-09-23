@@ -1,13 +1,14 @@
 /// RED/GREEN harness for `.githooks/pre-commit.bat` batch `call` semantics.
 ///
-/// On this machine `dart` resolves to `dart.bat`; batch-to-batch calls
-/// WITHOUT `call` transfer control and never return, silently skipping
-/// the analyzer step.  This suite uses mock shims to prove the fix.
+/// A batch-to-batch invocation without `call` transfers control and never
+/// returns, silently skipping the analyzer step. Windows exercises the hook
+/// through `cmd`; other platforms parse the checked-in batch contract.
 ///
 /// Usage:  dart run test/tool/pre_commit_batch_call_test.dart
 library;
 
 import 'dart:io';
+import 'package:flutter_test/flutter_test.dart';
 
 final _hookPath =
     '${Directory.current.path}${Platform.pathSeparator}.githooks${Platform.pathSeparator}pre-commit.bat';
@@ -53,12 +54,7 @@ Future<ProcessResult> _run(Directory tmp, Directory bin) async {
   );
 }
 
-Future<void> main() async {
-  final started = DateTime.now();
-  stdout.writeln('=== pre-commit.bat batch call semantics ===');
-  stdout.writeln('Hook: $_hookPath\n');
-
-  // 1. Happy-path: formatting OK → analyzer reached, exit 0
+Future<void> _windowsCases() async {
   await _case('formatting OK → analyzer reached (exit 0)', () async {
     final (:tmp, :bin) = await _setup(0, 0);
     final r = await _run(tmp, bin);
@@ -71,7 +67,6 @@ Future<void> main() async {
     await tmp.delete(recursive: true);
   });
 
-  // 2. Triangulate: dart fails → analyzer NOT reached, fail closed
   await _case('formatting fails → analyzer NOT reached, fail closed', () async {
     final (:tmp, :bin) = await _setup(1, 0);
     final r = await _run(tmp, bin);
@@ -84,20 +79,73 @@ Future<void> main() async {
     await tmp.delete(recursive: true);
   });
 
-  // 3. Triangulate: analyzer fails → fail closed
   await _case('formatting OK, analyzer fails → fail closed', () async {
     final (:tmp, :bin) = await _setup(0, 1, marker: false);
     final r = await _run(tmp, bin);
     _assert(r.exitCode != 0, 'must fail non-zero, got ${r.exitCode}');
     await tmp.delete(recursive: true);
   });
+}
 
-  // Summary
-  final elapsed = DateTime.now().difference(started);
-  stdout.writeln('\n=== RESULTS ===');
-  stdout.writeln('Cases: 3  Passed: $_passed  Failed: $_failures');
-  stdout.writeln('Elapsed: ${elapsed.inMilliseconds}ms');
-  exit(_failures > 0 ? 1 : 0);
+Future<void> _portableContractCases() async {
+  final hook = await File(_hookPath).readAsString();
+
+  await _case('delegates formatter with batch call', () async {
+    _assert(
+      RegExp(r'^call dart run tool\\check_staged_dart_format\.dart\s*$',
+              multiLine: true)
+          .hasMatch(hook),
+      'hook must call the staged-format helper with its exact argument',
+    );
+  });
+
+  await _case('formatter failure preserves its exit code', () async {
+    _assert(
+      RegExp(
+        r'if errorlevel 1 \([\s\S]*?exit /b %errorlevel%[\s\S]*?\)',
+        caseSensitive: false,
+      ).hasMatch(hook),
+      'formatter failure must propagate the helper exit code',
+    );
+  });
+
+  await _case('analyzer invocation and failure are fail closed', () async {
+    _assert(
+      hook.contains('flutter analyze --no-pub --fatal-infos --fatal-warnings'),
+      'hook must invoke the exact fatal analyzer command',
+    );
+    _assert(
+      RegExp(
+        r'flutter analyze --no-pub --fatal-infos --fatal-warnings[\s\S]*?'
+        r'if errorlevel 1 \([\s\S]*?exit /b 1[\s\S]*?\)',
+        caseSensitive: false,
+      ).hasMatch(hook),
+      'analyzer failure must fail the hook',
+    );
+  });
+}
+
+void main() {
+  test('pre-commit batch hook contract', () async {
+    final started = DateTime.now();
+    stdout.writeln('=== pre-commit.bat batch call semantics ===');
+    stdout.writeln('Hook: $_hookPath\n');
+
+    if (Platform.isWindows) {
+      await _windowsCases();
+    } else {
+      await _portableContractCases();
+    }
+
+    // Summary
+    final elapsed = DateTime.now().difference(started);
+    stdout.writeln('\n=== RESULTS ===');
+    stdout.writeln('Cases: 3  Passed: $_passed  Failed: $_failures');
+    stdout.writeln('Elapsed: ${elapsed.inMilliseconds}ms');
+    if (_failures > 0) {
+      throw StateError('$_failures batch-hook contract assertion(s) failed.');
+    }
+  });
 }
 
 Future<void> _case(String name, Future<void> Function() body) async {
