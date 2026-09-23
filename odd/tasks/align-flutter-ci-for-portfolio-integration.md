@@ -23,7 +23,7 @@ The current workflow uses Flutter 3.38.1, checks formatting by a mutating comman
 
 ## Constraints
 
-- Use the clean worktree `/home/skivel/control-horario-worktrees/portfolio-integration-review` on local branch `ci/portfolio-flutter-gates`, based on `915fd5f`.
+- Use the clean integration worktree on local branch `ci/portfolio-flutter-gates`, based on `915fd5f`.
 - Strict TDD is enabled by `openspec/config.yaml`; the exact configured runner is `flutter test`. Since this task changes only CI YAML, use a pre-edit failing structural workflow contract check and a post-edit passing check, plus relevant Flutter tests without inventing a CI runtime success.
 - CodeGraph is the exclusive code-discovery tool; the current session index belongs to another worktree, so do not use it as target evidence. Direct reads of the exact known workflow/config files and exact known-file checks are allowed.
 - No parallel writes. Preserve unrelated worktrees and all generated state.
