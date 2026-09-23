@@ -60,7 +60,8 @@ Future<int> _run() async {
   }
 
   // 5. Run check-only formatter.
-  final formatBin = Platform.environment['DART_FORMAT_BIN'] ?? 'dart';
+  final formatBin =
+      Platform.environment['DART_FORMAT_BIN'] ?? Platform.resolvedExecutable;
 
   ProcessResult formatResult;
   try {
