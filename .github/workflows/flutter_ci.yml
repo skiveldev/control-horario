@@ -68,7 +68,7 @@ jobs:
       - name: 🐦 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.41.9'  # Versión actualizada (incluye Dart 3.5+)
+          flutter-version: '3.47.5'  # SDK verificado para esta integración
           channel: 'stable'
           cache: true  # Cachear dependencias para ser más rápido
       
@@ -109,7 +109,7 @@ jobs:
       - name: 🐦 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.41.9'
+          flutter-version: '3.47.5'
           channel: 'stable'
           cache: true
 
@@ -134,7 +134,7 @@ jobs:
       - name: 🐦 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.41.9'
+          flutter-version: '3.47.5'
           channel: 'stable'
           cache: true
       
@@ -142,15 +142,15 @@ jobs:
         run: flutter pub get
       
       - name: 🔨 Build APK
-        run: flutter build apk --release
+        run: flutter build apk --debug
       
       # Subir el APK como artifact (disponible para descargar)
       - name: 📤 Upload APK
         uses: actions/upload-artifact@v4
         continue-on-error: true  # No bloquear CI si GitHub Actions alcanza la cuota de artifacts
         with:
-          name: android-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: android-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
           retention-days: 7  # Mantener por 7 días
 
   # --------------------------------------------------------------------------
@@ -168,7 +168,7 @@ jobs:
       - name: 🐦 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.41.9'
+          flutter-version: '3.47.5'
           channel: 'stable'
           cache: true
       
