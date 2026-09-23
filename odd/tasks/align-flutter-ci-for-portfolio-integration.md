@@ -38,7 +38,7 @@ The current workflow uses Flutter 3.38.1, checks formatting by a mutating comman
 
 ## Tasks
 
-- [ ] **ODD-CI-001 — Align and verify Flutter CI.** Record RED on the existing workflow, update only the workflow, validate syntax/structure and focused checks, obtain independent verification, and close with one scoped local commit. Route: bounded writer for source edit and its read preparation, then independent verifier for command-running verification; the parent owns the commit.
+- [x] **ODD-CI-001 — Align and verify Flutter CI.** Structural RED/GREEN, YAML semantics, independent verification, and scoped diff checks pass. Completed in local work-unit commit `acc11dc9299df9332ed7b4ace9e3e34a0fb3d0e4` (`ci(flutter): align portfolio verification gates`); live GitHub Actions remains pending an authorized reviewable PR. Route: bounded writer and independent verifier; parent committed only the workflow and this task document.
 
 ## Progress
 
@@ -51,8 +51,8 @@ The current workflow uses Flutter 3.38.1, checks formatting by a mutating comman
 - Independent read-only verification: YAML parsed with `yaml.BaseLoader` (`on` remains a string); four Flutter setups use 3.47.5; check-only formatting, sanitizer, test/web gates, debug APK name/path, and `analyze` dependencies are structurally consistent. `git diff --check` and the parent's separate structural spot check pass.
 - Focused Flutter tests in this fresh worktree are unavailable under `--no-pub` because `.dart_tool/package_config.json` is absent. Prior source-commit evidence passed 616/616, but it is not a live CI result for this YAML. A GitHub Actions run remains pending an authorized push/PR; a push to the new `ci/**` branch alone would not trigger the current filters, while a PR targeting `master` or `feat/**` would.
 - `.atl/skill-registry.md` changed incidentally outside the task scope after the clean baseline. It remains intact and excluded from staging; neither a cause nor a recovery mutation is claimed.
-- Work-unit commit identity: pending.
+- Work-unit commit: `acc11dc9299df9332ed7b4ace9e3e34a0fb3d0e4`; only `.github/workflows/flutter_ci.yml` and this task document were staged. `.atl/skill-registry.md` remains modified and unstaged, excluded from the commit.
 
 ## Next Step
 
-Commit only the workflow and this ODD task document locally, excluding `.atl/skill-registry.md`; then record the exact commit identity. Do not push or open a PR.
+The local CI correction is complete. Before any PR, derive an isolated reviewable base so the diff does not include the 49 portfolio commits, then obtain separate authorization for push/PR. GitHub master remains unchanged and live Actions is unverified.
