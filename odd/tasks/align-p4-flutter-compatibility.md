@@ -41,7 +41,7 @@ Make the P4-T1 slice reproducibly validate with Flutter 3.41.9 / Dart 3.11.5 wit
 
 ## Tasks
 
-- [ ] **ODD-P4C-001 — Create the P4 Flutter 3.41 compatibility work unit.** Normalize the current experimental proof into the exact intended scope, pin CI to Flutter 3.41.9, run all acceptance gates from the feature worktree, independently verify the candidate, commit the cohesive work unit, and record its commit identity.
+- [x] **ODD-P4C-001 — Create the P4 Flutter 3.41 compatibility work unit.** Completed with work-unit commit `ba33e29e2fa2d9e5df85c4ca7f659aa52a7c2eb7` (`build(android): align P4 with Flutter 3.41`). The normalized candidate pins CI to Flutter 3.41.9, retains Gradle 8.12 and AGP 8.7.3, upgrades only KGP to 2.3.0 with typed JVM 11 compiler options, preserves reproducible lockfile/registrant output, and passes all acceptance gates plus independent and native review.
 
 ## Review Workload Forecast
 
@@ -56,3 +56,5 @@ Expected authored scope is eight repository files plus this task document, with 
 - Writer verification after normalization passed reproducible `flutter pub get`, focused tests 5/5, fatal analysis, Android debug assembly, and scoped diff-check. The APK is `build/app/outputs/flutter-apk/app-debug.apk` (164,157,738 bytes).
 - Independent verification passed the same gates, confirmed unchanged lockfile/registrant hashes after `pub get`, exact Flutter 3.41.9 workflow pins, Gradle 8.12, AGP 8.7.3, KGP 2.3.0, typed JVM 11 compiler options, no WU5 migration leakage, and 103 changed lines across eight candidate paths.
 - `.atl/skill-registry.md` remains pre-existing harness drift and is excluded from the candidate.
+- Work-unit commit: `ba33e29e2fa2d9e5df85c4ca7f659aa52a7c2eb7` (`build(android): align P4 with Flutter 3.41`).
+- Native four-lens review lineage `review-c9ea84335bf8b055` approved the committed range and acknowledgement burned authority successfully.
