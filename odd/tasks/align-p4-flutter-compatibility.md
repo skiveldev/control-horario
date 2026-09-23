@@ -23,9 +23,9 @@ Make the P4-T1 slice reproducibly validate with Flutter 3.41.9 / Dart 3.11.5 wit
 
 - Base commit: `276ad35dd3b297fee0a67d5c5c82467bc1137f10` (`feat(provisioning): add trusted callable transport`).
 - Feature branch: `build/p4-flutter-3-41-compat`.
-- Flutter SDK: `/home/skivel/.local/share/flutter-3.41.9`.
-- Android SDK: `/home/skivel/.local/share/android-sdk`.
-- JDK: `/home/skivel/.local/share/jdk-21`.
+- Flutter SDK: `<flutter-3.41-sdk>`.
+- Android SDK: `<android-sdk>`.
+- JDK: `<jdk-21>`.
 - Keep `.atl/skill-registry.md` unstaged and excluded.
 - Use CodeGraph exclusively for code discovery and GitHub CLI exclusively for GitHub access.
 
