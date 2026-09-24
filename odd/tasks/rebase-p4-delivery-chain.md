@@ -20,9 +20,24 @@ Reconstruct the verified public-portfolio chain on the current `origin/master` w
 - [x] ODD-DELIVERY-001 — Replay the 78 source commits onto current `origin/master` in order, resolve only target-base conflicts, preserve functional bytes, and record the old-to-new commit ledger.
 - [x] ODD-DELIVERY-002 — Independently verify history completeness, source-byte parity modulo the intended `AGENTS.md` base delta, repository cleanliness, and required runtime gates.
 - [x] ODD-DELIVERY-003 — Measure one honest Feature Branch Chain slicing pass, record exact tracker/child boundaries and size exceptions, and stop before publication for explicit maintainer approval.
-- [ ] ODD-DELIVERY-004 — Defer Firebase Functions registration until a deployable entrypoint exists, close the bound native correction, rebuild the downstream replay, reverify the final candidate, and refresh all affected review windows.
+- [x] ODD-DELIVERY-004 — Defer Firebase Functions registration until a deployable entrypoint exists and close native review of corrected commit `0cb6eda932b7b59a1fff5360bfa48a88ef5a42b7`.
+- [ ] ODD-DELIVERY-005 — Preserve the original branch tip, replay all 75 descendants of `a3faf9324e1ca3184ebc2822f4024b187fdc83cd` onto corrected commit `0cb6eda932b7b59a1fff5360bfa48a88ef5a42b7`, resolve only the expected `firebase.json` transition at the accepted provisioning checkpoint, and refresh the replay ledger and delivery boundaries. Route: delegated writer because the history rewrite affects many commits and files.
+- [ ] ODD-DELIVERY-006 — Independently verify rewritten history completeness, final tree parity except for the accepted registration timing correction, repository cleanliness, and applicable runtime gates. Route: delegated verifier.
+- [ ] ODD-DELIVERY-007 — Resume adaptive native review from the approved corrected window boundary and refresh every affected downstream review window before any delivery decision.
+
+## Current recovery acceptance criteria
+
+- The pre-rewrite branch tip remains reachable through a dedicated local backup ref.
+- Rewritten history contains every old descendant in original subject order.
+- `firebase.json` omits Functions registration before the real deployable entrypoint and restores it at the accepted provisioning checkpoint.
+- Final tracked content differs from the previous final candidate only by the accepted correction and updated ODD evidence.
+- No push, pull request, merge, deployment, or publication occurs.
 
 ## Evidence
+
+- Native lineage `review-dad9270679ff85a9` approved corrected window `9542895a2451e47ccb3794d513f8563cf9f36e4a..0cb6eda932b7b59a1fff5360bfa48a88ef5a42b7`; exact acknowledgement burned authority. One informational warning at `functions/package.json:8` opened no correction.
+- ODD-DELIVERY-005 is blocked before mutation: the package-owned writer and its single explicitly authorized remediation retry both refused local ref creation, history rewriting, staging, and commits. No backup ref, stash, rebase, or commit was created; branch tip remains `6b95978162a9c0debce04e98c96d1d4a91fb1675`.
+- Project-local Git-history executor candidate: `.pi/subagents/git-history-worker.md`, `.pi/extensions/git-history.ts`, `.pi/agent-tests/git-history.test.ts`, and `.pi/agent-tests/git-history.integration.test.ts` remain untracked here. `start` now requires a direct RPC `ctx.ui.confirm` of the exact plan within the same invocation, fresh preflight afterward, a local/worktree Git-config allowlist, and a backup before rebase; it never auto-resolves conflicts. Independent verification observed 11/11 mocked and 4/4 disposable real-Git tests pass, including a linked worktree. The HEAD-drift case is mocked, not proven with real Git. Pi lists `git-history-worker` as a project agent; its task-mode session confirmed `git_history` exposure without invoking it. A separate Pi RPC child emitted the exact `Authorize local Git history rewrite` confirmation for `<DISPOSABLE_RPC_REPOSITORY>`. The first fixture timed out before consuming the human answer and left HEAD and refs unchanged. On the single fresh-dialog retry, the maintainer approved only the disposable plan: `backup/work` retained old tip `8a3ff03e77f13f700cfd1ed69199ef8a8882a15a`, and the disposable feature tip became `dbc71bf361671e94c11ddc43dcc9d3c9ad2a5565` with parent `0f8c68c3b8758071a00f90efb6dd3b4162a0c6cd`. Independent verification confirmed clean disposable status and both feature/onto files. The real branch remains `6b95978162a9c0debce04e98c96d1d4a91fb1675` with this task document modified and `.pi/` untracked, so its required clean-tree preflight still blocks real history rewriting. Do not rewrite real history until that gate and a new exact-plan approval pass. Native risk assessment for this untracked candidate was unavailable (`untracked files require an explicit declaration`); no native review outcome is claimed.
 
 ## Delivery plan (ODD-DELIVERY-003)
 
