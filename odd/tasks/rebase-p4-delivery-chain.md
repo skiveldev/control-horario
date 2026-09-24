@@ -20,6 +20,7 @@ Reconstruct the verified public-portfolio chain on the current `origin/master` w
 - [x] ODD-DELIVERY-001 — Replay the 78 source commits onto current `origin/master` in order, resolve only target-base conflicts, preserve functional bytes, and record the old-to-new commit ledger.
 - [x] ODD-DELIVERY-002 — Independently verify history completeness, source-byte parity modulo the intended `AGENTS.md` base delta, repository cleanliness, and required runtime gates.
 - [x] ODD-DELIVERY-003 — Measure one honest Feature Branch Chain slicing pass, record exact tracker/child boundaries and size exceptions, and stop before publication for explicit maintainer approval.
+- [ ] ODD-DELIVERY-004 — Defer Firebase Functions registration until a deployable entrypoint exists, close the bound native correction, rebuild the downstream replay, reverify the final candidate, and refresh all affected review windows.
 
 ## Evidence
 
