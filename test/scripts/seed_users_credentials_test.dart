@@ -3,6 +3,8 @@
 // ignore_for_file: avoid_print
 library;
 
+import 'dart:io';
+
 import '../../scripts/shared/seed_user_definitions.dart';
 import '../../scripts/shared/seed_credentials.dart';
 
@@ -16,8 +18,22 @@ void _a(bool c, String m) {
   }
 }
 
-void main() {
+Future<void> main() async {
   print('=== WU2 seed credential purge ===\n');
+  final environment = Map<String, String>.from(Platform.environment)
+    ..removeWhere((key, _) => key.startsWith('SEED_'));
+  final seedResult = await Process.run(
+    Platform.resolvedExecutable,
+    ['run', 'scripts/seed_users.dart'],
+    environment: environment,
+  );
+  _a(seedResult.exitCode != 0, 'retired client seeder exits nonzero');
+  final seedOutput = '${seedResult.stdout}\n${seedResult.stderr}'.toLowerCase();
+  _a(
+    seedOutput.contains('retired') &&
+        seedOutput.contains('trusted provisioning'),
+    'retirement directs users to trusted provisioning',
+  );
   print('-- 2.1: Data definitions --');
   final users = getSeedUserDefinitions();
   _a(users.length == 5, '5 demo users');
