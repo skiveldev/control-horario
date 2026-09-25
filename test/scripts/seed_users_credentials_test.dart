@@ -22,9 +22,17 @@ Future<void> main() async {
   print('=== WU2 seed credential purge ===\n');
   final environment = Map<String, String>.from(Platform.environment)
     ..removeWhere((key, _) => key.startsWith('SEED_'));
+  // flutter test runs under flutter_tester, not the Dart CLI.
+  final flutterRoot = Platform.environment['FLUTTER_ROOT'];
+  final dartBinary = Platform.isWindows ? 'dart.exe' : 'dart';
+  final dartExecutable = Platform.resolvedExecutable.endsWith(dartBinary)
+      ? Platform.resolvedExecutable
+      : flutterRoot != null
+          ? '${flutterRoot}${Platform.pathSeparator}bin${Platform.pathSeparator}$dartBinary'
+          : dartBinary;
   final seedResult = await Process.run(
-    Platform.resolvedExecutable,
-    ['run', 'scripts/seed_users.dart'],
+    dartExecutable,
+    ['scripts/seed_users.dart'],
     environment: environment,
   );
   _a(seedResult.exitCode != 0, 'retired client seeder exits nonzero');
