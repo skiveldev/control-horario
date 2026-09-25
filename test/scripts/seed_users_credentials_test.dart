@@ -28,7 +28,7 @@ Future<void> main() async {
   final dartExecutable = Platform.resolvedExecutable.endsWith(dartBinary)
       ? Platform.resolvedExecutable
       : flutterRoot != null
-          ? '${flutterRoot}${Platform.pathSeparator}bin${Platform.pathSeparator}$dartBinary'
+          ? '$flutterRoot${Platform.pathSeparator}bin${Platform.pathSeparator}$dartBinary'
           : dartBinary;
   final seedResult = await Process.run(
     dartExecutable,
