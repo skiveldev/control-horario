@@ -128,8 +128,8 @@ void main() {
           reason: 'AdminSidebar header must NOT use a gradient — it must match '
               'the employee panel plain-background pattern.');
 
-      // Assert the app name "Control Horario" is visible
-      expect(find.text('Control Horario'), findsOneWidget);
+      // Assert the exact repository brand is visible
+      expect(find.text('controlhorario-rega'), findsOneWidget);
 
       // Assert the clock icon exists
       expect(find.byIcon(Icons.access_time), findsOneWidget);
@@ -183,8 +183,8 @@ void main() {
           reason: 'AdminSidebar header must NOT use a gradient — it must match '
               'the employee panel plain-background pattern.');
 
-      // Assert the app name "Control Horario" is visible
-      expect(find.text('Control Horario'), findsOneWidget);
+      // Assert the exact repository brand is visible
+      expect(find.text('controlhorario-rega'), findsOneWidget);
 
       // Assert the clock icon exists
       expect(find.byIcon(Icons.access_time), findsOneWidget);

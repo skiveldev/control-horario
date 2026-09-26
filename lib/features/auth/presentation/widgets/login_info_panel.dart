@@ -6,7 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 /// Panel lateral informativo del login
 ///
 /// Visible solo en pantallas desktop (> 1024px).
-/// Muestra características y valor del sistema Time Rega.
+/// Muestra características y valor del sistema controlhorario-rega.
 /// Usa gradiente moderno de 3 colores con iconos animados.
 class LoginInfoPanel extends StatelessWidget {
   const LoginInfoPanel({super.key});
@@ -56,7 +56,7 @@ class LoginInfoPanel extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Time Rega',
+                      'controlhorario-rega',
                       style: AppTextStyles.h2.copyWith(
                         color: AppColors.textOnPrimary,
                         fontWeight: FontWeight.w700,

@@ -382,11 +382,13 @@ void main() {
 
       // anomaliesIncluded debe ser false (el reporte no computa anomalías)
       expect(fakeService.lastAnomaliesIncluded, isFalse,
-          reason: 'ReportsScreen debe indicar que las anomalías no se incluyen');
+          reason:
+              'ReportsScreen debe indicar que las anomalías no se incluyen');
 
       // overtimeIncluded debe ser false (horas extra no se incluyen)
       expect(fakeService.lastOvertimeIncluded, isFalse,
-          reason: 'ReportsScreen debe indicar que las horas extra no se incluyen');
+          reason:
+              'ReportsScreen debe indicar que las horas extra no se incluyen');
 
       // validationSummary debe incluir la nota de horas extra
       expect(
@@ -653,7 +655,8 @@ void main() {
     // Guarda de token — resultado obsoleto no corrompe estado tras cambio
     // =======================================================================
 
-    test('resultado obsoleto no se aplica si se cambió de empleado '
+    test(
+        'resultado obsoleto no se aplica si se cambió de empleado '
         'durante la generación', () async {
       final completer = Completer<Uint8List>();
       final delayedService = _DelayedReportService(completer);
@@ -701,7 +704,8 @@ void main() {
           reason: 'Los bytes obsoletos deben ser descartados');
     });
 
-    test('resultado obsoleto no se aplica si se cambió de mes '
+    test(
+        'resultado obsoleto no se aplica si se cambió de mes '
         'durante la generación', () async {
       final completer = Completer<Uint8List>();
       final delayedService = _DelayedReportService(completer);
@@ -949,7 +953,8 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
 
       expect(find.text('PDF generado correctamente'), findsNothing,
-          reason: 'No se debe generar PDF mientras los registros están cargando');
+          reason:
+              'No se debe generar PDF mientras los registros están cargando');
     });
 
     testWidgets('muestra indicador de carga de registros', (tester) async {
@@ -984,14 +989,16 @@ void main() {
 
       // Debe mostrar el indicador de carga de registros
       expect(find.text('Cargando registros del mes...'), findsOneWidget,
-          reason: 'Debe indicar al usuario que los registros se están cargando');
+          reason:
+              'Debe indicar al usuario que los registros se están cargando');
     });
 
     // =========================================================================
     // NUEVOS TESTS — Vista previa de datos reales
     // =========================================================================
 
-    testWidgets('Vista Previa muestra mensaje honesto sin empleado seleccionado',
+    testWidgets(
+        'Vista Previa muestra mensaje honesto sin empleado seleccionado',
         (tester) async {
       final container = _containerWithState();
       addTearDown(container.dispose);
@@ -1095,7 +1102,8 @@ void main() {
       expect(
         find.descendant(
           of: previewCard,
-          matching: find.text('Horas extra no incluidas en este reporte mensual.'),
+          matching:
+              find.text('Horas extra no incluidas en este reporte mensual.'),
         ),
         findsOneWidget,
       );
@@ -1215,7 +1223,8 @@ void main() {
           reason: 'Con PDF listo, debe aparecer el botón Descargar PDF');
     });
 
-    testWidgets('tapping Descargar PDF llama al fake downloader con datos esperados',
+    testWidgets(
+        'tapping Descargar PDF llama al fake downloader con datos esperados',
         (tester) async {
       final user = _fixtureUser();
       final fakeDownloader = FakePdfDownloader();
@@ -1247,7 +1256,8 @@ void main() {
 
       // Verificar que se llamó al downloader
       expect(fakeDownloader.downloadCalled, isTrue,
-          reason: 'Al tocar Descargar PDF debe llamarse a PdfDownloader.download');
+          reason:
+              'Al tocar Descargar PDF debe llamarse a PdfDownloader.download');
 
       // Verificar bytes pasados
       expect(fakeDownloader.lastBytes, same(fakeBytes));
@@ -1289,7 +1299,8 @@ void main() {
 
       // NO debe aparecer el botón de descarga antes de generar
       expect(find.text('Descargar PDF'), findsNothing,
-          reason: 'Antes de generar el PDF no debe mostrarse el botón de descarga');
+          reason:
+              'Antes de generar el PDF no debe mostrarse el botón de descarga');
     });
 
     // =======================================================================
@@ -1314,8 +1325,8 @@ void main() {
       // Inicia con userA seleccionado y PDF ya generado
       final container = ProviderContainer(
         overrides: [
-          allEmployeesProvider.overrideWith(
-              (ref) => Stream.value([userA, userB])),
+          allEmployeesProvider
+              .overrideWith((ref) => Stream.value([userA, userB])),
           reportsScreenProvider.overrideWith(
             (ref) {
               final service = ref.watch(reportServiceProvider);
@@ -1356,8 +1367,7 @@ void main() {
           reason: 'El empleado seleccionado debe mostrarse en la preview');
 
       // Abrir el dropdown de empleado (filtrado por key)
-      final employeeDropdown =
-          find.byKey(const ValueKey('user-1'));
+      final employeeDropdown = find.byKey(const ValueKey('user-1'));
       await tester.ensureVisible(employeeDropdown);
       await tester.tap(employeeDropdown);
       await tester.pumpAndSettle();
@@ -1374,7 +1384,8 @@ void main() {
           reason: 'Al cambiar de empleado, el botón Descargar PDF debe '
               'ocultarse porque el PDF generado pertenece al empleado anterior');
       expect(find.text('PDF generado correctamente'), findsNothing,
-          reason: 'El banner de PDF listo debe desaparecer al cambiar empleado');
+          reason:
+              'El banner de PDF listo debe desaparecer al cambiar empleado');
     });
   });
 }

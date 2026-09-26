@@ -346,27 +346,29 @@ class _MyTimeControlScreenState extends ConsumerState<MyTimeControlScreen> {
                 onNextMonth: _canNavigateToNextMonth() ? _goToNextMonth : null,
               ),
               Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        size: 64,
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                      AppSpacing.verticalSpaceMd,
-                      Text(
-                        'Error al cargar registros',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      AppSpacing.verticalSpaceSm,
-                      Text(
-                        error.toString(),
-                        style: Theme.of(context).textTheme.bodyMedium,
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+                child: SingleChildScrollView(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        AppSpacing.verticalSpaceMd,
+                        Text(
+                          'Error al cargar registros',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        AppSpacing.verticalSpaceSm,
+                        Text(
+                          error.toString(),
+                          style: Theme.of(context).textTheme.bodyMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -5,7 +5,7 @@ import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
 import 'core/providers/theme_provider.dart';
 
-/// Aplicación principal del Control Horario
+/// Aplicación principal de controlhorario-rega
 ///
 /// Punto de entrada de la app después de main.dart.
 /// Configura el tema, router y providers globales.
@@ -21,7 +21,7 @@ class ControlHorarioApp extends ConsumerWidget {
       // ========================================================================
       // APP CONFIG
       // ========================================================================
-      title: 'Control Horario',
+      title: 'controlhorario-rega',
       debugShowCheckedModeBanner: false,
 
       // ========================================================================

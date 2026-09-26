@@ -41,7 +41,9 @@ void main() {
       expect(find.text('Más adelante'), findsOneWidget);
 
       // Y el mensaje de construcción en el área del gráfico
-      expect(find.text('Datos históricos en construcción — disponibles próximamente'),
+      expect(
+          find.text(
+              'Datos históricos en construcción — disponibles próximamente'),
           findsOneWidget);
     });
 

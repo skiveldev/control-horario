@@ -591,27 +591,30 @@ class _AdminProfileScreenState extends ConsumerState<AdminProfileScreen> {
     required ColorScheme cs,
     required VoidCallback onTap,
   }) {
-    return ListTile(
-      contentPadding: AppSpacing.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.sm,
-      ),
-      leading: Container(
-        padding: AppSpacing.allSm,
-        decoration: BoxDecoration(
-          color: cs.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+    return Material(
+      type: MaterialType.transparency,
+      child: ListTile(
+        contentPadding: AppSpacing.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.sm,
         ),
-        child: Icon(icon, size: AppSpacing.iconMd, color: cs.primary),
+        leading: Container(
+          padding: AppSpacing.allSm,
+          decoration: BoxDecoration(
+            color: cs.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+          ),
+          child: Icon(icon, size: AppSpacing.iconMd, color: cs.primary),
+        ),
+        title: Text(title, style: AppTextStyles.bodyMedium),
+        subtitle: Text(
+          subtitle,
+          style: AppTextStyles.bodySmall.copyWith(color: cs.onSurfaceVariant),
+        ),
+        trailing:
+            Icon(Icons.arrow_forward_ios, size: 16, color: cs.onSurfaceVariant),
+        onTap: onTap,
       ),
-      title: Text(title, style: AppTextStyles.bodyMedium),
-      subtitle: Text(
-        subtitle,
-        style: AppTextStyles.bodySmall.copyWith(color: cs.onSurfaceVariant),
-      ),
-      trailing:
-          Icon(Icons.arrow_forward_ios, size: 16, color: cs.onSurfaceVariant),
-      onTap: onTap,
     );
   }
 

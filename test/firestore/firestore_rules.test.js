@@ -6,6 +6,8 @@ import {
   assertSucceeds,
   initializeTestEnvironment,
 } from '@firebase/rules-unit-testing';
+import { deleteApp, initializeApp } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 import {
   collection,
   collectionGroup,
@@ -23,6 +25,8 @@ const PROJECT_ID = 'control-horario-firestore-rules';
 const RULES_PATH = new URL('../../firestore.rules', import.meta.url);
 
 let testEnv;
+let adminApp;
+let adminDb;
 
 before(async () => {
   const rules = await fs.readFile(RULES_PATH, 'utf8');
@@ -30,6 +34,11 @@ before(async () => {
     projectId: PROJECT_ID,
     firestore: { rules },
   });
+  adminApp = initializeApp(
+    { projectId: PROJECT_ID },
+    'firestore-rules-admin-bypass',
+  );
+  adminDb = getFirestore(adminApp);
 });
 
 beforeEach(async () => {
@@ -38,11 +47,18 @@ beforeEach(async () => {
 });
 
 after(async () => {
-  await testEnv.cleanup();
+  await Promise.all([testEnv.cleanup(), deleteApp(adminApp)]);
 });
 
 function authedDb(uid) {
   return testEnv.authenticatedContext(uid).firestore();
+}
+
+async function assertPermissionDenied(operation) {
+  await assert.rejects(operation, (error) => {
+    assert.equal(error.code, 'permission-denied');
+    return true;
+  });
 }
 
 async function seedBaseData() {
@@ -152,45 +168,91 @@ function buildClosure(supervisorId, overrides = {}) {
   };
 }
 
-describe('Phase 3 - admin supervisor assignment persistence', () => {
-  it('allows admin to persist supervisorId while editing an employee', async () => {
-    const employeeRef = doc(authedDb('admin'), 'users', 'employeeB');
+describe('users create security', () => {
+  for (const { actor, userId, user, scenario } of [
+    {
+      actor: 'safeEmployee',
+      userId: 'safeEmployee',
+      user: buildUser('safeEmployee'),
+      scenario: 'safe self-create',
+    },
+    {
+      actor: 'admin',
+      userId: 'newEmployeeByAdmin',
+      user: buildUser('newEmployeeByAdmin'),
+      scenario: 'admin to employee',
+    },
+    {
+      actor: 'admin',
+      userId: 'newRrhhByAdmin',
+      user: buildUser('newRrhhByAdmin', { role: 'rrhh' }),
+      scenario: 'admin to rrhh',
+    },
+    {
+      actor: 'rrhh',
+      userId: 'newEmployeeByRrhh',
+      user: buildUser('newEmployeeByRrhh'),
+      scenario: 'rrhh to employee',
+    },
+  ]) {
+    it(`denies client create for ${scenario} with permission-denied`, async () => {
+      const userRef = doc(authedDb(actor), 'users', userId);
 
-    await assertSucceeds(
-      updateDoc(employeeRef, {
-        supervisorId: 'supervisorA',
-      }),
-    );
+      await assertPermissionDenied(() => setDoc(userRef, user));
+    });
+  }
+});
 
-    const snapshot = await assertSucceeds(getDoc(employeeRef));
-    assert.equal(snapshot.data().supervisorId, 'supervisorA');
+describe('users privileged fields and client update allowlist', () => {
+  const privilegedFields = {
+    role: 'admin',
+    isSupervisor: true,
+    isActive: false,
+    supervisorId: 'supervisorB',
+  };
+
+  for (const actor of ['employeeA', 'supervisorA', 'admin', 'rrhh']) {
+    for (const [field, value] of Object.entries(privilegedFields)) {
+      it(`denies ${actor} changing ${field} with permission-denied`, async () => {
+        const userRef = doc(authedDb(actor), 'users', 'employeeA');
+
+        await assertPermissionDenied(() => updateDoc(userRef, { [field]: value }));
+      });
+    }
+  }
+
+  it('allows admin to update an explicit nonprivileged profile field', async () => {
+    const userRef = doc(authedDb('admin'), 'users', 'employeeA');
+
+    await assertSucceeds(updateDoc(userRef, { displayName: 'Admin Updated' }));
+  });
+
+  it('allows rrhh to update an explicit nonprivileged profile field', async () => {
+    const userRef = doc(authedDb('rrhh'), 'users', 'employeeA');
+
+    await assertSucceeds(updateDoc(userRef, { telefono: '+34 600 111 222' }));
+  });
+
+  it('denies admin arbitrary nonprivileged update fields with permission-denied', async () => {
+    const userRef = doc(authedDb('admin'), 'users', 'employeeA');
+
+    await assertPermissionDenied(() => updateDoc(userRef, { weeklyHours: 30 }));
+  });
+
+  it('denies rrhh arbitrary nonprivileged update fields with permission-denied', async () => {
+    const userRef = doc(authedDb('rrhh'), 'users', 'employeeA');
+
+    await assertPermissionDenied(() => updateDoc(userRef, { email: 'new@example.com' }));
   });
 });
 
-describe('users create security', () => {
-  it('denies self-creation when the new user tries to elevate role to admin', async () => {
-    const employeeRef = doc(authedDb('newEmployee'), 'users', 'newEmployee');
+describe('Admin SDK emulator bypass', () => {
+  it('writes /users independently of client Firestore rules', async () => {
+    const userRef = adminDb.collection('users').doc('admin-sdk-user');
 
-    await assertFails(
-      setDoc(employeeRef, buildUser('newEmployee', { role: 'admin' })),
-    );
-  });
-
-  it('denies self-creation when the new user tries to mark themselves as supervisor', async () => {
-    const employeeRef = doc(authedDb('newSupervisor'), 'users', 'newSupervisor');
-
-    await assertFails(
-      setDoc(
-        employeeRef,
-        buildUser('newSupervisor', { isSupervisor: true }),
-      ),
-    );
-  });
-
-  it('still allows a safe self-creation without authorization fields elevated', async () => {
-    const employeeRef = doc(authedDb('safeEmployee'), 'users', 'safeEmployee');
-
-    await assertSucceeds(setDoc(employeeRef, buildUser('safeEmployee')));
+    await userRef.set(buildUser('admin-sdk-user', { role: 'admin' }));
+    const snapshot = await userRef.get();
+    assert.equal(snapshot.data().role, 'admin');
   });
 });
 
@@ -790,20 +852,14 @@ describe('Employee self-profile update', () => {
     );
   });
 
-  it('still allows admin to update any field on an employee document', async () => {
+  it('denies an admin mixed update containing a privileged field', async () => {
     const employeeRef = doc(authedDb('admin'), 'users', 'employeeA');
 
-    await assertSucceeds(
+    await assertPermissionDenied(() =>
       updateDoc(employeeRef, {
+        displayName: 'Admin Updated',
         role: 'rrhh',
-        isSupervisor: true,
-        weeklyHours: 30,
       }),
     );
-
-    const snapshot = await assertSucceeds(getDoc(employeeRef));
-    assert.equal(snapshot.data().role, 'rrhh');
-    assert.equal(snapshot.data().isSupervisor, true);
-    assert.equal(snapshot.data().weeklyHours, 30);
   });
 });

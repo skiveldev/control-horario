@@ -48,28 +48,6 @@ final firebaseAuthProvider = AutoDisposeProvider<FirebaseAuth>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef FirebaseAuthRef = AutoDisposeProviderRef<FirebaseAuth>;
-String _$employeeCreationServiceHash() =>
-    r'ad681cd637964a38dd8affdbbe8083f86c6df40d';
-
-/// Provider para el servicio de creación de empleados
-///
-/// Copied from [employeeCreationService].
-@ProviderFor(employeeCreationService)
-final employeeCreationServiceProvider =
-    AutoDisposeProvider<EmployeeCreationService>.internal(
-  employeeCreationService,
-  name: r'employeeCreationServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$employeeCreationServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef EmployeeCreationServiceRef
-    = AutoDisposeProviderRef<EmployeeCreationService>;
 String _$scheduleServiceHash() => r'1c8b2ed82808cd2ac5107a439a9a97381dfcb8d8';
 
 /// Provider para el servicio de gestión de plantillas de horario

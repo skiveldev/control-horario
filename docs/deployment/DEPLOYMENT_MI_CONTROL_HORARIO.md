@@ -1,5 +1,9 @@
 # Checklist de Deployment: Mi Control Horario
 
+> ⚠️ **Portfolio codebase.** This document is future reference only. No deployment
+> has occurred. Publication gates (license, history cleanup, Firebase Console
+> hardening) are pending.
+
 ## 📋 Pre-Deployment
 
 ### Código y Compilación

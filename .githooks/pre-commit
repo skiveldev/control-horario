@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# En Windows, delegar al .bat nativo para evitar ventana de mintty
+# On Windows, delegate to the native .bat to avoid mintty windows
 if [ "$OSTYPE" = "msys" ] || [ "$OSTYPE" = "cygwin" ]; then
   cmd.exe //c ".githooks\\pre-commit.bat"
   exit $?
@@ -9,95 +9,55 @@ fi
 # ============================================================================
 # Pre-commit Hook - Control Horario
 # ============================================================================
-# Este script se ejecuta automáticamente antes de cada commit
-# Verifica calidad del código y previene commits con errores
+# Verifies staged Dart formatting (check-only, no mutation) and runs the
+# static analyzer.  Cancels the commit if either check fails.
 # ============================================================================
 
-echo "🔍 Ejecutando verificaciones pre-commit..."
+set -euo pipefail
 
-# Colores para output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# ============================================================================
-# 1. VERIFICAR QUE FLUTTER ESTÉ DISPONIBLE
-# ============================================================================
-if ! command -v flutter &> /dev/null; then
-    echo -e "${RED}❌ Flutter no está instalado o no está en el PATH${NC}"
-    exit 1
+# ---------------------------------------------------------------------------
+# 1. Check-only staged Dart formatting (no mutation)
+# ---------------------------------------------------------------------------
+echo ""
+echo "📝 Checking staged Dart formatting..."
+
+dart run tool/check_staged_dart_format.dart
+FMT_EXIT=$?
+
+if [ $FMT_EXIT -ne 0 ]; then
+  echo ""
+  echo -e "${RED}❌ Staged Dart formatting check failed.${NC}"
+  echo -e "${RED}   Format the files listed above, stage them, and try again.${NC}"
+  exit $FMT_EXIT
 fi
 
-echo "✓ Flutter detectado"
+echo -e "${GREEN}✓ Staged formatting OK${NC}"
 
-# ============================================================================
-# 2. FORMATEAR CÓDIGO (Auto-fix)
-# ============================================================================
+# ---------------------------------------------------------------------------
+# 2. Static analysis (full project, check-only)
+# ---------------------------------------------------------------------------
 echo ""
-echo "📝 Formateando código Dart..."
-dart format lib/ --set-exit-if-changed
+echo "🔎 Running static analysis..."
+
+flutter analyze --no-pub --fatal-infos --fatal-warnings
 
 if [ $? -ne 0 ]; then
-    echo -e "${YELLOW}⚠️  Archivos formateados automáticamente${NC}"
-    echo -e "${YELLOW}   Agrégalos al stage: git add .${NC}"
-    exit 1
+  echo ""
+  echo -e "${RED}❌ Static analysis failed.${NC}"
+  echo -e "${RED}   Fix the issues above before committing.${NC}"
+  exit 1
 fi
 
-echo "✓ Formato correcto"
+echo -e "${GREEN}✓ Analysis passed${NC}"
 
-# ============================================================================
-# 3. ANALIZAR CÓDIGO (Linter)
-# ============================================================================
+# ---------------------------------------------------------------------------
+# All checks passed
+# ---------------------------------------------------------------------------
 echo ""
-echo "🔎 Analizando código con linter..."
-flutter analyze --fatal-infos
-
-if [ $? -ne 0 ]; then
-    echo ""
-    echo -e "${RED}❌ Errores de linter detectados${NC}"
-    echo -e "${RED}   Corrige los errores antes de hacer commit${NC}"
-    echo ""
-    echo "   Comandos útiles:"
-    echo "   - Ver errores: flutter analyze"
-    echo "   - Formatear: flutter format lib/"
-    echo ""
-    exit 1
-fi
-
-echo "✓ Análisis pasado sin errores"
-
-# ============================================================================
-# 4. VERIFICAR IMPORTS NO USADOS
-# ============================================================================
-echo ""
-echo "📦 Verificando imports..."
-# Esta verificación está incluida en flutter analyze
-echo "✓ Imports verificados"
-
-# ============================================================================
-# 5. VERIFICAR ARCHIVOS GENERADOS (opcional)
-# ============================================================================
-echo ""
-echo "🔨 Verificando archivos generados..."
-
-# Verificar si hay archivos .g.dart desactualizados
-NEEDS_BUILD=$(find lib -name "*.dart" -newer lib -name "*.g.dart" 2>/dev/null | wc -l)
-
-if [ $NEEDS_BUILD -gt 0 ]; then
-    echo -e "${YELLOW}⚠️  Posibles archivos generados desactualizados${NC}"
-    echo -e "${YELLOW}   Considera ejecutar: flutter pub run build_runner build${NC}"
-fi
-
-echo "✓ Archivos generados OK"
-
-# ============================================================================
-# TODO CORRECTO - PERMITIR COMMIT
-# ============================================================================
-echo ""
-echo -e "${GREEN}✅ Todas las verificaciones pasaron correctamente${NC}"
-echo -e "${GREEN}   Procediendo con el commit...${NC}"
-echo ""
-
+echo -e "${GREEN}✅ All pre-commit checks passed.${NC}"
 exit 0
-

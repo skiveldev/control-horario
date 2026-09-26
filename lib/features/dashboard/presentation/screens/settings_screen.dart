@@ -684,7 +684,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Control Horario',
+            'controlhorario-rega',
             style: AppTextStyles.labelSmall.copyWith(
               color: cs.onSurfaceVariant,
               letterSpacing: 0.5,

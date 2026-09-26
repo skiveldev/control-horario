@@ -1,0 +1,71 @@
+# openspec/config.yaml
+# SDD project configuration for control-horario.
+# Consumed by the native SDD dispatcher and all sdd-* phase skills.
+# OpenSpec is the canonical SDD artifact store. Engram retains contextual
+# summaries and locators only; it never carries full artifact bytes or parity gates.
+
+schema: spec-driven
+
+project: control-horario
+strict_tdd: true
+
+context: |
+  Tech stack: Flutter 3.38.1 (Dart ^3.5.0), Riverpod 2.x (flutter_riverpod + riverpod_generator), go_router, Firebase (Core/Auth/Cloud Firestore), freezed + json_serializable code gen.
+  Architecture: Feature-first layered (lib/features/{auth,dashboard,admin}/{presentation,providers,models}); data flow UI -> Riverpod providers -> Firebase services. Strict UI/logic separation; widgets hold no business logic.
+  Testing: flutter_test (unit + widget tests), node:test + @firebase/rules-unit-testing for Firestore security rules, coverage via flutter test --coverage. No E2E layer.
+  Style: flutter_lints 5.0 with strict strong-mode (no implicit casts/dynamic); dart format and flutter analyze enforced in CI; snake_case files, PascalCase classes; YAGNI / anti-overengineering.
+
+sdd:
+  artifact_store: openspec     # OpenSpec files are authoritative; Engram holds summaries/locators only
+  execution_mode: interactive
+  delivery_strategy: auto-chain
+  chain_strategy: feature-branch-chain
+  review_budget_lines: 800
+
+testing:
+  strict_tdd: true
+  detected: "2026-07-28"
+  runner:
+    command: "flutter test"
+    framework: flutter_test
+  layers:
+    unit: "flutter_test"
+    integration: "@firebase/rules-unit-testing (Firestore security rules via Firebase emulator)"
+    e2e: null
+  coverage:
+    available: true
+    command: "flutter test --coverage"
+  quality:
+    linter: "flutter analyze --fatal-infos --fatal-warnings"
+    type_checker: "flutter analyze (Dart analyzer, strict strong-mode)"
+    formatter: "dart run tool/check_staged_dart_format.dart"
+  extra_commands:
+    firestore_rules: "npm run test:firestore-rules"
+    code_gen: "flutter pub run build_runner build --delete-conflicting-outputs"
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - Respect YAGNI: no premature abstractions or speculative features
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale
+    - Keep Riverpod as the only app state management; no business logic in widgets
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    guidelines:
+      - Follow existing code patterns
+      - Run dart format and flutter analyze before considering a task done
+    tdd: true                   # RED-GREEN-REFACTOR is mandatory (strict_tdd)
+    test_command: "flutter test"
+  verify:
+    test_command: "flutter test --coverage"
+    build_command: "flutter build web --release"
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas

@@ -118,7 +118,8 @@ void main() {
           bytesWithAnomalies.length, greaterThan(bytesWithoutAnomalies.length));
     });
 
-    test('generateMonthlyReport con anomaliesIncluded false NO dice "Sin anomalías"',
+    test(
+        'generateMonthlyReport con anomaliesIncluded false NO dice "Sin anomalías"',
         () async {
       final bytes = await service.generateMonthlyReport(
         employeeName: 'Maria Garcia',
@@ -150,11 +151,13 @@ void main() {
       expect(
         pdfText,
         contains('Anomalías no incluidas en este reporte'),
-        reason: 'Debe indicar honestamente que las anomalías no fueron incluidas',
+        reason:
+            'Debe indicar honestamente que las anomalías no fueron incluidas',
       );
     });
 
-    test('generateMonthlyReport con anomaliesIncluded true (default) sí dice "Sin anomalías"',
+    test(
+        'generateMonthlyReport con anomaliesIncluded true (default) sí dice "Sin anomalías"',
         () async {
       final bytes = await service.generateMonthlyReport(
         employeeName: 'Maria Garcia',
@@ -205,7 +208,8 @@ void main() {
     // Horas extra — inclusión/omisión honesta
     // =======================================================================
 
-    test('generateMonthlyReport con overtimeIncluded true (default) incluye '
+    test(
+        'generateMonthlyReport con overtimeIncluded true (default) incluye '
         'fila Horas Extra', () async {
       final bytes = await service.generateMonthlyReport(
         employeeName: 'Maria Garcia',
@@ -229,11 +233,14 @@ void main() {
           reason: 'Debe mostrar el valor de horas extra');
 
       // NO debe contener la nota de omisión
-      expect(pdfText, isNot(contains('Horas extra no incluidas en este reporte')),
-          reason: 'Con overtimeIncluded=true, no debe aparecer la nota de omisión');
+      expect(
+          pdfText, isNot(contains('Horas extra no incluidas en este reporte')),
+          reason:
+              'Con overtimeIncluded=true, no debe aparecer la nota de omisión');
     });
 
-    test('generateMonthlyReport con overtimeIncluded false omite Horas Extra '
+    test(
+        'generateMonthlyReport con overtimeIncluded false omite Horas Extra '
         'y muestra nota honesta', () async {
       final bytes = await service.generateMonthlyReport(
         employeeName: 'Maria Garcia',
@@ -251,12 +258,14 @@ void main() {
 
       // NO debe contener la fila Horas Extra en la tabla
       expect(pdfText, isNot(contains('Horas Extra')),
-          reason: 'Con overtimeIncluded=false, la tabla resumen NO debe incluir '
+          reason:
+              'Con overtimeIncluded=false, la tabla resumen NO debe incluir '
               'fila Horas Extra, ni siquiera con 0.0h');
 
       // Debe contener la nota honesta
       expect(pdfText, contains('Horas extra no incluidas en este reporte'),
-          reason: 'Debe indicar honestamente que las horas extra no fueron incluidas');
+          reason:
+              'Debe indicar honestamente que las horas extra no fueron incluidas');
     });
   });
 }

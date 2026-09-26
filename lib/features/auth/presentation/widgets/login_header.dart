@@ -5,7 +5,7 @@ import '../../../../core/theme/app_spacing.dart';
 
 /// Header del formulario de login
 ///
-/// Contiene el gradiente de marca y branding Time Rega.
+/// Contiene el gradiente de marca y branding controlhorario-rega.
 /// Parte visual superior de la pantalla de login.
 class LoginHeader extends StatelessWidget {
   const LoginHeader({super.key});
@@ -44,9 +44,9 @@ class LoginHeader extends StatelessWidget {
 
           AppSpacing.verticalSpaceMd,
 
-          // Título principal: Time Rega (más grande)
+          // Título principal: controlhorario-rega (más grande)
           Text(
-            'Time Rega',
+            'controlhorario-rega',
             style: AppTextStyles.h1.copyWith(
               // Cambiado de h2 a h1
               color: AppColors.textOnPrimary,

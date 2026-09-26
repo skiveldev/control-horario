@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -52,7 +53,7 @@ void main() async {
   // ============================================================================
   // INICIALIZAR FIREBASE
   // ============================================================================
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await initializeFirebaseWithAppCheck();
 
   // ============================================================================
   // CONFIGURAR EMULATOR EN DEBUG MODE
@@ -102,6 +103,43 @@ void main() async {
       ],
       child: const ControlHorarioApp(),
     ),
+  );
+}
+
+/// Initializes Firebase and App Check before protected services can start.
+Future<void> initializeFirebaseWithAppCheck({
+  Future<void> Function()? initializeFirebase,
+  Future<void> Function()? activateAppCheck,
+}) async {
+  await (initializeFirebase ?? _initializeFirebase)();
+  await (activateAppCheck ?? _activateAppCheck)();
+}
+
+Future<void> _initializeFirebase() {
+  return Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform);
+}
+
+Future<void> _activateAppCheck() {
+  if (kIsWeb) {
+    const webSiteKey =
+        String.fromEnvironment('FIREBASE_APP_CHECK_WEB_SITE_KEY');
+    if (webSiteKey.isEmpty) {
+      throw StateError('FIREBASE_APP_CHECK_WEB_SITE_KEY must be configured.');
+    }
+
+    return FirebaseAppCheck.instance.activate(
+      providerWeb: ReCaptchaV3Provider(webSiteKey),
+    );
+  }
+
+  return FirebaseAppCheck.instance.activate(
+    providerAndroid: kDebugMode
+        ? const AndroidDebugProvider()
+        : const AndroidPlayIntegrityProvider(),
+    providerApple: kDebugMode
+        ? const AppleDebugProvider()
+        : const AppleDeviceCheckProvider(),
   );
 }
 
