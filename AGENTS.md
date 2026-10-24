@@ -1,15 +1,15 @@
 # Control Horario Agent Guide
 
 This file defines durable repository rules for AI coding agents. Keep temporary
-task state, active slice details, and acceptance evidence in OpenSpec rather
-than duplicating them here.
+task state, active slice details, and acceptance evidence in ODD task records
+under `odd/tasks/` rather than duplicating them here.
 
 ## Start Here
 
 1. Read this file and inspect the current worktree before changing anything.
-2. For planned work, read the active change under `openspec/changes/` and treat
-   its proposal, specification, design, tasks, and progress records as the
-   authority for scope and verification.
+2. For planned work, read the applicable ODD task record under `odd/tasks/`
+   and treat its requirements, decisions, tasks, and verification evidence as
+   the authority for scope and verification.
 3. Preserve unrelated user or agent changes. Never clean, restore, or rewrite
    files outside the requested scope.
 4. Use the smallest correct change and run the narrowest relevant checks first.
@@ -23,7 +23,7 @@ than duplicating them here.
 | Firebase Functions | `functions/src/` | Node ESM and strict TypeScript. |
 | Functions tests | `functions/test/` | Include focused provisioning tests explicitly; the package test glob does not discover nested tests. |
 | Firestore contract | `firestore.rules`, `firestore.indexes.json` | Change rules and emulator tests together. |
-| SDD artifacts | `openspec/` | Source of truth for planned scope, budgets, dependencies, and acceptance. |
+| ODD task records | `odd/tasks/` | Source of truth for planned scope, budgets, dependencies, and acceptance. |
 
 ## Architecture Rules
 
@@ -47,7 +47,7 @@ Do not hand-edit:
 - `build/`, `.dart_tool/`, `coverage/`, `.firebase/`, `node_modules/`
 
 Regenerate Dart outputs with the declared build-runner command. An active
-OpenSpec change may protect additional paths, including configuration files;
+ODD task record may protect additional paths, including configuration files;
 those constraints take precedence.
 
 ## Development Commands
@@ -74,11 +74,12 @@ npx --prefix functions tsc --noEmit
 
 The provisioning tests are nested under `functions/test/provisioning/`; invoke
 the focused files and explicit TypeScript command required by the active
-OpenSpec task. Do not assume `npm --prefix functions test` covers them.
+ODD task record. Do not assume `npm --prefix functions test` covers them.
 
-## Testing And SDD
+## Testing And ODD
 
-- This repository uses Strict TDD for active SDD implementation work.
+- Organic Driven Development (ODD) is the current development workflow.
+- This repository uses Strict TDD for applicable behavior changes under ODD.
 - Follow RED -> GREEN -> REFACTOR. Add each behavior test before its matching
   implementation and retain genuine RED evidence.
 - Check the required Node version in the active task before running TypeScript
@@ -88,7 +89,7 @@ OpenSpec task. Do not assume `npm --prefix functions test` covers them.
   release builds when a passive documentation-only change needs only structural
   validation.
 - Do not mark tasks complete without the checks and evidence required by the
-  active OpenSpec artifact.
+  active ODD task record.
 - Respect the active changed-line warning, STOP, and hard maximum. Never borrow
   budget from another work unit.
 - Split work forecast above 400 changed lines unless the active task explicitly
@@ -100,7 +101,7 @@ Context is a bounded engineering resource. Enforce these rules mechanically:
 
 - Parent orchestrators pass matching executor skill paths to delegated agents;
   they do not load complete executor-only skills into the parent context.
-- Never print or load a complete SDD runtime ledger during normal routing.
+- Never print or load a complete runtime ledger during normal routing.
   Project JSON output to only the current revision, objective, counters,
   decision flag, and next action. Read full history only for a proven diagnosis.
 - Do not paste entire large artifacts into prompts. Read targeted sections or
@@ -113,11 +114,49 @@ Context is a bounded engineering resource. Enforce these rules mechanically:
   in the parent session.
 - Allow at most one corrective retry for the same failure. If the runtime asks
   for a maintainer decision, stop and surface that decision instead of looping.
-- On a typed terminal SDD transport failure, execute its exact continuation at
-  most once, preserve the candidate, and stop. Never relaunch an SDD phase in
-  the same session after the runtime latches dispatch.
+- On a typed terminal runtime failure, follow only its authorized continuation,
+  at most once, preserve the candidate, and stop. Never relaunch a phase after
+  the runtime has declared it terminal.
 - For large work, report the forecast and split along independently testable
   boundaries before implementation.
+
+### Local Consumption Guardrails
+
+These rules apply only to this project. Task authorization never implies an
+unlimited token budget. They address repeated captures, premature screenshots,
+and per-command narration observed during visual review.
+
+- Before a review, define the screens, viewport sizes, exclusions, and maximum
+  number of captures. Clarify requests such as "review everything" before
+  starting an unbounded walkthrough.
+- Limit each visual review to six screenshot captures initially. Additional
+  captures, including replacements for premature or failed-state screenshots,
+  require explicit user approval before exceeding that limit.
+- When token usage metrics are available, agree on a token budget before
+  substantial work. Otherwise state that exact usage is unavailable and use
+  operational limits; never invent token estimates or measured savings.
+- Wait for a concrete readiness signal, such as the expected screen heading
+  or loading indicator disappearing, before capturing a screen. A successful
+  click or a fixed delay alone does not prove the destination has rendered.
+- Apply the one-corrective-retry limit above to tooling failures. If the
+  correction fails, preserve the evidence, explain the blocker, and stop.
+- Reuse current evidence. Do not repeat captures, reads, or checks unless the
+  state changed or a named uncertainty requires fresh evidence.
+- Filter tool output to relevant results and errors. Load complete logs only
+  for a justified diagnosis, not routine progress reporting.
+- Give one concise update per meaningful work block, not one reply for every
+  command or background event. Follow completion notifications without polling.
+- Keep task tracking and memory concise: retain decisions, findings, evidence
+  references, and blockers rather than a narration of each operation. Preserve
+  required audit records and verification evidence.
+- If accumulated context, repeated failures, or the remaining work indicates
+  disproportionate consumption, stop before the next costly action and warn
+  the user. Propose a smaller scope or a fresh session with a compact handoff;
+  do not silently restart work or expand its scope.
+- At any agreed limit, report verified findings and outstanding coverage, then
+  wait for explicit approval to extend the budget. Do not label partial review
+  as complete or weaken required security, functional, or verification checks
+  to stay within budget; surface missing proof instead.
 
 These safeguards reinforce rather than replace the native Gentle AI contract.
 When this guide and a newer typed provider contract differ, follow the provider
@@ -137,9 +176,16 @@ contract and propose an evidence-backed update to this file.
 ## Documentation Currency
 
 `.cursorrules` contains historical project guidance and may be stale. Prefer
-current manifests, source, tests, OpenSpec artifacts, and this file when they
+current manifests, source, tests, ODD task records, and this file when they
 conflict. Update this guide only for durable repository conventions, not for the
 status of one temporary implementation slice.
+
+OpenSpec is retired from the current tree. Existing ODD records may retain
+historical OpenSpec paths and decisions; these do not reactivate the SDD workflow.
+Recover a historical artifact with
+`git show bd13408ffa455d98f0ff5729b3cffcfaf6322003:openspec/<path>`.
+Keep historical evidence intact and reconcile any still-applicable requirement
+in the current ODD task record before implementation.
 
 ## Maintaining This Guide
 
@@ -151,4 +197,4 @@ status of one temporary implementation slice.
 - Agents must not modify `AGENTS.md` silently. Maintainer approval is required
   before changing repository agent policy.
 - Do not add temporary task state, branch-specific instructions, speculative
-  rules, or guidance already owned by an active OpenSpec artifact.
+  rules, or guidance already owned by an active ODD task record.
