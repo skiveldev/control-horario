@@ -21,6 +21,7 @@ analyzer:
     - "**/*.freezed.dart"
     - "**/generated/**"
     - "build/**"
+    - "odd/local-preservation/**"  # Copias históricas, no código activo
     - "scripts/**"  # Scripts de desarrollo pueden usar print()
     - "tool/**"     # Herramientas de desarrollo
   
