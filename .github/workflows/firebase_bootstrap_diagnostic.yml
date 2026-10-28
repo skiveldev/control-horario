@@ -63,27 +63,72 @@ jobs:
           "$CHROME_EXECUTABLE" --version | tee evidence/chrome.txt
           export CHROME_EXECUTABLE
           python3 - <<'PY'
-          import json, os, pathlib, subprocess, tempfile, time, urllib.request
+          import json, os, pathlib, subprocess, tempfile, time, urllib.parse, urllib.request
           profile = pathlib.Path(tempfile.mkdtemp(prefix='bootstrap-cdp-', dir=os.environ['RUNNER_TEMP']))
+          started = time.monotonic()
+          deadline = started + 15
+          state = {'status': 'failed', 'stage': 'launch', 'budget_seconds': 15,
+                   'port_file_state': 'not_observed'}
+          browser = None
           with open('evidence/chrome-smoke.log', 'w') as log:
-              browser = subprocess.Popen([os.environ['CHROME_EXECUTABLE'], '--headless', '--no-sandbox', '--no-first-run', '--disable-background-networking', '--remote-debugging-port=0', '--user-data-dir='+str(profile), 'about:blank'], stdout=log, stderr=log)
               try:
+                  browser = subprocess.Popen([os.environ['CHROME_EXECUTABLE'], '--headless', '--no-sandbox', '--no-first-run', '--disable-background-networking', '--remote-debugging-port=0', '--user-data-dir='+str(profile), 'about:blank'], stdout=log, stderr=log)
                   port_file = profile / 'DevToolsActivePort'
-                  deadline = time.monotonic() + 15
-                  while not port_file.exists() and browser.poll() is None and time.monotonic() < deadline:
-                      time.sleep(0.1)
-                  port = int(port_file.read_text().splitlines()[0])
+                  state['stage'] = 'port_file'
+                  while True:
+                      if browser.poll() is not None:
+                          raise RuntimeError('browser_exited_before_readiness')
+                      remaining = deadline - time.monotonic()
+                      if remaining <= 0:
+                          raise TimeoutError('port_file_deadline_exceeded')
+                      try:
+                          port = int(port_file.read_text().splitlines()[0])
+                          if not 1 <= port <= 65535:
+                              raise ValueError('port_out_of_range')
+                          state['port_file_state'] = 'valid'
+                          state['port'] = port
+                          break
+                      except FileNotFoundError:
+                          state['port_file_state'] = 'missing'
+                      except (ValueError, IndexError) as error:
+                          state['port_file_state'] = 'invalid'
+                          state['port_file_error'] = str(error)
+                      time.sleep(min(0.1, max(0, deadline - time.monotonic())))
+                  state['stage'] = 'cdp_response'
+                  remaining = deadline - time.monotonic()
+                  if remaining <= 0:
+                      raise TimeoutError('cdp_deadline_exceeded')
                   opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
-                  with opener.open(f'http://127.0.0.1:{port}/json/version', timeout=3) as response:
-                      pathlib.Path('evidence/cdp.json').write_text(json.dumps(json.load(response)))
+                  with opener.open(f'http://127.0.0.1:{port}/json/version', timeout=min(3, remaining)) as response:
+                      payload = json.load(response)
+                  if time.monotonic() >= deadline:
+                      raise TimeoutError('cdp_deadline_exceeded')
+                  endpoint = urllib.parse.urlparse(payload['webSocketDebuggerUrl'])
+                  if (not isinstance(payload.get('Browser'), str) or not payload['Browser']
+                          or endpoint.scheme != 'ws' or endpoint.hostname not in ('127.0.0.1', 'localhost')
+                          or endpoint.port != port):
+                      raise ValueError('invalid_cdp_response')
+                  if browser.poll() is not None:
+                      raise RuntimeError('browser_exited_before_readiness')
+                  pathlib.Path('evidence/cdp.json').write_text(json.dumps(payload))
+                  state.update(status='ready', stage='complete')
+              except Exception as error:
+                  state['error_type'] = type(error).__name__
+                  state['error'] = str(error)
+                  raise
               finally:
-                  if browser.poll() is None:
+                  state['elapsed_seconds'] = round(time.monotonic() - started, 3)
+                  state['process_returncode_before_cleanup'] = None if browser is None else browser.poll()
+                  # Cleanup has its own bounded grace period, outside readiness.
+                  if browser is not None and browser.poll() is None:
                       browser.terminate()
                       try:
                           browser.wait(timeout=5)
                       except subprocess.TimeoutExpired:
                           browser.kill()
                           browser.wait()
+                  pathlib.Path('evidence/cdp-readiness.json').write_text(json.dumps(state, indent=2))
+                  print('CDP_READINESS ' + json.dumps(state), flush=True)
           PY
       - name: Analyze and compile the exact diagnostic source before execution
         timeout-minutes: 3
