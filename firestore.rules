@@ -118,8 +118,105 @@ service cloud.firestore {
         allow delete: if false;
       }
       
+      function recordPath(id) {
+        return /databases/$(database)/documents/users/$(userId)/time_records/$(id);
+      }
+
+      function dayPath(date) {
+        return /databases/$(database)/documents/users/$(userId)/clocking_days/$(date);
+      }
+
+      function isClockingRecord(data, date) {
+        return data.userId == userId && data.date == date &&
+          data.isManual == false && data.category in ['work', 'breakTime'];
+      }
+
+      function validRecordId(id) {
+        return id is string && id.matches('^[^/]+$');
+      }
+
+      // A successor must be newly created in this commit, never an unrelated row.
+      function newActiveRecord(id, date, initial) {
+        return validRecordId(id) && !exists(recordPath(id)) &&
+          isClockingRecord(getAfter(recordPath(id)).data, date) &&
+          getAfter(recordPath(id)).data.recordStatus == 'active' &&
+          (!initial || getAfter(recordPath(id)).data.category == 'work');
+      }
+
+      // Legacy adoption is bounded to a row that was already active before commit.
+      function departedRecord(id, date) {
+        return validRecordId(id) && exists(recordPath(id)) &&
+          isClockingRecord(get(recordPath(id)).data, date) &&
+          get(recordPath(id)).data.recordStatus == 'active' &&
+          get(recordPath(id)).data.validationStatus != 'blocked' &&
+          (!existsAfter(recordPath(id)) ||
+            (isClockingRecord(getAfter(recordPath(id)).data, date) &&
+             getAfter(recordPath(id)).data.category == get(recordPath(id)).data.category &&
+             getAfter(recordPath(id)).data.recordStatus == 'completed'));
+      }
+
+      match /clocking_days/{date} {
+        function validShape() {
+          return date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') &&
+            request.resource.data.keys().hasAll(['activeRecordId', 'previousRecordId']) &&
+            request.resource.data.keys().hasOnly(['activeRecordId', 'previousRecordId']) &&
+            (request.resource.data.activeRecordId == null ||
+              validRecordId(request.resource.data.activeRecordId)) &&
+            (request.resource.data.previousRecordId == null ||
+              validRecordId(request.resource.data.previousRecordId));
+        }
+        function entry() {
+          return request.resource.data.previousRecordId == null &&
+            newActiveRecord(request.resource.data.activeRecordId, date, true);
+        }
+        function departure(id) {
+          return request.resource.data.previousRecordId == id && departedRecord(id, date) &&
+            (request.resource.data.activeRecordId == null ||
+              (existsAfter(recordPath(id)) &&
+               newActiveRecord(request.resource.data.activeRecordId, date, false)));
+        }
+        allow read: if isActiveOwner(userId);
+        allow create: if isActiveOwner(userId) && validShape() &&
+          (entry() || departure(request.resource.data.previousRecordId));
+        allow update: if isActiveOwner(userId) && validShape() &&
+          ((resource.data.activeRecordId == null && entry()) ||
+           (resource.data.activeRecordId != null && departure(resource.data.activeRecordId)));
+        allow delete: if false;
+      }
+
       // Subcolección de registros de tiempo (Mi Control Horario)
       match /time_records/{recordId} {
+        function isActive(data) {
+          return data.get('recordStatus', 'completed') == 'active';
+        }
+
+        function matchingGuard(data) {
+          return exists(dayPath(data.date)) &&
+            get(dayPath(data.date)).data.activeRecordId == recordId;
+        }
+
+        function releasedGuard() {
+          return existsAfter(dayPath(resource.data.date)) &&
+            getAfter(dayPath(resource.data.date)).data.activeRecordId != recordId &&
+            getAfter(dayPath(resource.data.date)).data.previousRecordId == recordId;
+        }
+
+        function safeClockingCreate() {
+          return !isActive(request.resource.data) ||
+            (isClockingRecord(request.resource.data, request.resource.data.date) &&
+             getAfter(dayPath(request.resource.data.date)).data.activeRecordId == recordId);
+        }
+
+        function safeClockingUpdate() {
+          return (!isActive(request.resource.data) || isActive(resource.data)) &&
+            (!isActive(resource.data) ||
+              (request.resource.data.date == resource.data.date &&
+               request.resource.data.category == resource.data.category &&
+               request.resource.data.isManual == resource.data.isManual &&
+               (!matchingGuard(resource.data) ||
+                 (isActive(request.resource.data) || releasedGuard()))));
+        }
+
         // Helper: Verificar si el registro está bloqueado
         function isBlocked() {
           return resource.data.validationStatus == 'blocked';
@@ -197,6 +294,7 @@ service cloud.firestore {
                       && request.resource.data.userId == userId
                       && request.resource.data.createdBy == request.auth.uid
                       && request.resource.data.validationStatus == 'editable'
+                      && safeClockingCreate()
                       && !request.resource.data.keys().hasAny([
                            'validatedBy', 'validatedAt',
                            'blockedBy', 'blockedAt', 'blockReason'
@@ -214,6 +312,7 @@ service cloud.firestore {
                               isActiveOwner(userId)
                               && resource.data.userId == userId
                               && ownerKeepsIdentityFields()
+                              && safeClockingUpdate()
                               && ownerKeepsAllowedValidationState()
                               && ownerKeepsAuditFields()
                             ) ||
@@ -232,7 +331,8 @@ service cloud.firestore {
         // Los usuarios pueden eliminar sus registros si no están bloqueados
         allow delete: if isActiveOwner(userId)
                       && resource.data.userId == userId
-                      && !isBlocked();
+                      && !isBlocked()
+                      && (!isActive(resource.data) || !matchingGuard(resource.data) || releasedGuard());
       }
     }
 
