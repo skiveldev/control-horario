@@ -17,7 +17,6 @@ jobs:
     env:
       CI: 'true'
       GCLOUD_PROJECT: demo-clockin-dart
-      FIREBASE_EMULATORS_PATH: ${{ runner.temp }}/bootstrap-emulators
       FIREBASE_CLI_DISABLE_UPDATE_CHECK: 'true'
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +37,8 @@ jobs:
         timeout-minutes: 5
         run: |
           set -euo pipefail
+          export FIREBASE_EMULATORS_PATH="$RUNNER_TEMP/bootstrap-emulators"
+          echo "FIREBASE_EMULATORS_PATH=$FIREBASE_EMULATORS_PATH" >> "$GITHUB_ENV"
           mkdir -p evidence "$FIREBASE_EMULATORS_PATH"
           git rev-parse HEAD > evidence/commit.txt
           sha256sum firestore.rules firebase.t3.json pubspec.lock package-lock.json test/firestore/seed_clocking_service_emulator.mjs test/features/dashboard/services/firebase_bootstrap_emulator_test.dart .github/workflows/firebase_bootstrap_diagnostic.yml > evidence/inputs.sha256
